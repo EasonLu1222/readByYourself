@@ -1,15 +1,21 @@
 
 from PyQt5.QtWidgets import (QWidget, QTableView, QTreeView, QHeaderView)
 from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QAbstractItemView
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5 import QtWidgets
 
 
 
 class TableView(QTableView):
     def __init__(self, model):
         super(TableView, self).__init__()
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        self.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
+
         # self.clicked.connect(self.show_cell)
         #  self.setStyleSheet("""
             #  QTableView {
@@ -23,6 +29,7 @@ class TableView(QTableView):
                                 #  stop: 0 #FF92BB, stop: 1 white);
             #  }
         #  """)
+        model.view = self
         self.setModel(model)
 
         # set font
@@ -32,13 +39,18 @@ class TableView(QTableView):
         # set column width to fit contents (set font first!)
         self.resizeColumnsToContents()
 
-        #  self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #  self.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
         #  self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
         #  self.setCurrentIndex(QModelIndex())
 
         # enable sorting
         #  self.setSortingEnabled(True)
 
+    def set_column_width(self, widths):
+        for i, w in enumerate(widths):
+            self.setColumnWidth(i, w)
 
 
 class MyWindow2(QWidget):

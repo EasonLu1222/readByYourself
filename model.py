@@ -27,13 +27,14 @@ class MyTableModel(QAbstractTableModel):
             return None
         return self.mylist[index.row()][index.column()]
 
-    def setData(self, index, value, role):
-        print(index, value, role)
-        return True
+    def update_model(self, datalist):
+        self.mylist = datalist
+        self.layoutAboutToBeChanged.emit()
+        self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
+        self.layoutChanged.emit()
 
     def flags(self, index):
-        #  return Qt.ItemIsEnabled | Qt.ItemIsEditable | Qt.ItemIsSelectable
-        return Qt.ItemIsEnabled 
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def headerData(self, idx, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
@@ -41,17 +42,3 @@ class MyTableModel(QAbstractTableModel):
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             return idx+1
         return None
-
-    #  def sort(self, col, order):
-        #  """sort table by given column number col"""
-        #  #  self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        #  self.layoutAboutToBeChanged.emit()
-
-        #  self.mylist = sorted(self.mylist,
-            #  key=operator.itemgetter(col))
-        #  if order == Qt.DescendingOrder:
-            #  self.mylist.reverse()
-
-        #  #  self.emit(SIGNAL("layoutChanged()"))
-        #  self.layoutChanged.emit()
-
