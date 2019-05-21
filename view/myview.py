@@ -33,7 +33,7 @@ class TableView(QTableView):
         self.setModel(model)
 
         # set font
-        font = QFont("Courier New", 18)
+        font = QFont("Courier New", 16)
         self.setFont(font)
 
         # set column width to fit contents (set font first!)
@@ -47,6 +47,8 @@ class TableView(QTableView):
 
         # enable sorting
         #  self.setSortingEnabled(True)
+
+
 
     def set_column_width(self, widths):
         for i, w in enumerate(widths):

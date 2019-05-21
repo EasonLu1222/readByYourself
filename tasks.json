@@ -1,0 +1,51 @@
+{"header": 
+    ["script", "args", "auto", "group", "item", "min", "expect", "max", "unit"],
+ "pcs": 4,
+ "structure":
+    [
+        {
+            "group": "Write Product ID",
+            "item": "write PID from PCBA's bar code",
+            "script": "test1.py",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "19V",
+            "script": "power_check.py",
+            "args": [19],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "5V with load",
+            "script": "power_check.py",
+            "args": [5],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "3.3V",
+            "script": "power_check.py",
+            "args": [3],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
