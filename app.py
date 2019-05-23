@@ -15,13 +15,15 @@ from PyQt5.QtWidgets import QVBoxLayout, QMainWindow
 import pandas as pd
 
 from view.myview import TableView
-from model import MyTableModel, TableModelTask
+from model import TableModelTask
 from design1 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
+from serials import enter_factory_image_prompt, ser
+
 
 class Task(QThread):
-    task_index = QSignal(int)
+    task_result = QSignal(str)
     message = QSignal(str)
     def __init__(self, jsonfile, mainwindow=None):
         super(Task, self).__init__(mainwindow)
@@ -53,21 +55,27 @@ class Task(QThread):
 
     def runeach(self, index):
         line = self.df.values[index]
-        script = 'tasks/%s' % line[0]
+        script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else None
         print('script', script, 'args', args)
         if args:
-            print('...1')
-            proc = Popen(['python', script] + args, stdout=PIPE)
+            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
         else:
-            print('...2')
-            proc = Popen(['python', script], stdout=PIPE)
-        output = proc.communicate()
+            proc = Popen(['python', '-m', script], stdout=PIPE)
+        output, _ = proc.communicate()
+        output = output.decode('utf8')
         print('output', output)
-        self.task_index.emit(index)
+        result = json.dumps({'index':index, 'output': output})
+        self.task_result.emit(result)
         proc.wait()
 
     def run(self):
+        print('enter factory image prompt start')
+        t0 = time.time()
+        enter_factory_image_prompt(ser)
+        ser.close()
+        t1 = time.time()
+        print('time elapsed entering prompt: %f' % (t1-t0))
         for i in range(len(self.df)):
             self.runeach(i)
         self.message.emit('tasks done')
@@ -88,35 +96,33 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.table_view.setColumnHidden(2, True)
 
         self.verticalLayout_2.addWidget(table_view)
-        self.timer = QTimer()
-        self.timer_started = False
         self.setsignal()
+
+    def reset_model(self):
+        self.table_model.reset()
 
     def setsignal(self):
         self.pushButton.clicked.connect(self.btn_clicked)
-        self.timer.timeout.connect(self.test)
-        self.task.task_index.connect(self.taskrun)
+        self.task.task_result.connect(self.taskrun)
         self.task.message.connect(self.taskdone)
 
-    def taskrun(self, idx):
-        print('running task %s', idx)
+    def taskrun(self, result):
+        ret = json.loads(result)
+        idx, output = ret['index'], ret['output']
+        print('\nrunning task %s' % idx)
         self.table_view.selectRow(idx)
+
+        data = self.table_model.mylist
+        data[idx][6] = output
 
     def taskdone(self, message):
         if message.startswith('tasks done'):
             print("taskdone!")
             self.pushButton.setEnabled(True)
 
-    def test(self):
-        print('timer test')
-        data = self.table_model.mylist
-        for row in range(self.table_model.rowCount(QModelIndex())):
-            data[row][6] = random.randint(0,10)
-            data[row][7] = random.randint(0,10)
-        self.table_model.update_model(data)
-
     def btn_clicked(self):
         print('btn_clicked')
+        self.reset_model()
         self.pushButton.setEnabled(False)
         self.task.start()
 

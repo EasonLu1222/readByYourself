@@ -1,0 +1,6 @@
+[2019.5.23 - 10:40]
+1. add module serials.py
+2. link to PCBA and wait for prompt to occur
+3. modify test1.py to actually connect to PCBA and do wifi interface check
+4. remove some redundant codes
+

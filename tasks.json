@@ -6,7 +6,7 @@
         {
             "group": "Write Product ID",
             "item": "write PID from PCBA's bar code",
-            "script": "test1.py",
+            "script": "test1",
             "args": null,
             "auto": false,
             "min": null,
@@ -17,7 +17,7 @@
         ,{
             "group": "Power Rail",
             "item": "19V",
-            "script": "power_check.py",
+            "script": "power_check",
             "args": [19],
             "auto": true,
             "min": null,
@@ -28,7 +28,7 @@
         ,{
             "group": "Power Rail",
             "item": "5V with load",
-            "script": "power_check.py",
+            "script": "power_check",
             "args": [5],
             "auto": true,
             "min": null,
@@ -39,7 +39,7 @@
         ,{
             "group": "Power Rail",
             "item": "3.3V",
-            "script": "power_check.py",
+            "script": "power_check",
             "args": [3],
             "auto": true,
             "min": null,
