@@ -3,7 +3,7 @@ import os
 import logging
 import time
 import serial
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject
 from threading import Timer
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d][%(message)s]')
@@ -11,17 +11,6 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d][%(m
 PORT = 'COM3'
 RATE = 115200
 TIMEOUT = 1
-#  TIMEOUT = 0
-
-
-#  ser = serial.Serial(port=PORT,
-                    #  baudrate=RATE,
-                    #  bytesize=serial.EIGHTBITS,
-                    #  parity=serial.PARITY_NONE,
-                    #  stopbits=serial.STOPBITS_ONE,
-                    #  rtscts=False,
-                    #  dsrdtr=False,
-                    #  timeout=TIMEOUT)
 
 
 def get_serial(port_name, baudrate, timeout):
@@ -36,18 +25,13 @@ def get_serial(port_name, baudrate, timeout):
     return ser
 
 
+class SerialEmit(QObject):
+    serial_msg = QSignal(str)
+se = SerialEmit()
+
+
 def wait_for_prompt(serial, prompt, thread_timeout=25):
-    is_timeout = False
-    #  def check_timeout():
-        #  nonlocal is_timeout
-        #  is_timeout = True
-    #  timer = Timer(thread_timeout, check_timeout)
-    #  timer.setDaemon(True)
-    #  timer.start()
     while True:
-        if is_timeout:
-            print('TIMEOUT!!!')
-            break
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
@@ -55,7 +39,8 @@ def wait_for_prompt(serial, prompt, thread_timeout=25):
             logging.debug('ERR1: UnicodeDecodeError', ex)
 
         #  logging.info(line)
-        print(line)
+        #  print(line)
+        se.serial_msg.emit(line.strip())
         if line.startswith(prompt):
             logging.info('get %s' % prompt)
             break

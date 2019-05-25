@@ -16,11 +16,11 @@ import pandas as pd
 
 from view.myview import TableView
 from model import TableModelTask
-from design1 import Ui_MainWindow
+from design2 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
 from serial.tools import list_ports
-from serials import enter_factory_image_prompt, get_serial
+from serials import enter_factory_image_prompt, get_serial, se
 
 PORTNAME = 'COM3'
 
@@ -58,6 +58,7 @@ class SerialListener(QThread):
 class Task(QThread):
     task_result = QSignal(str)
     message = QSignal(str)
+    printterm_msg = QSignal(str)
     def __init__(self, jsonfile, mainwindow=None):
         super(Task, self).__init__(mainwindow)
         self.base = json.loads(open(jsonfile, 'r').read())
@@ -90,7 +91,10 @@ class Task(QThread):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else None
+
         print('script', script, 'args', args)
+        msg1 = '[task %s][script: %s][args: %s]' % (index, script, args)
+        self.printterm_msg.emit(msg1)
         if args:
             proc = Popen(['python', '-m', script] + args, stdout=PIPE)
         else:
@@ -98,6 +102,8 @@ class Task(QThread):
         output, _ = proc.communicate()
         output = output.decode('utf8')
         print('output', output)
+        msg2 = '[task %s][output: %s]' % (index, output)
+        self.printterm_msg.emit(msg2)
         result = json.dumps({'index':index, 'output': output})
         self.task_result.emit(result)
         proc.wait()
@@ -120,30 +126,32 @@ class Task(QThread):
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
-
-        self.ser_listener = SerialListener()
-        
         self.setupUi(self)
-        self.setGeometry(300, 200, 1200, 450)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
 
         self.task = task
         self.table_model = TableModelTask(self, task)
-        self.table_view = table_view = TableView(self.table_model)
-        #  self.table_view.set_column_width([300, 300, 100, 100, 100, 100, 50, 50])
+        self.table_view.setModel(self.table_model)
 
-        #  self.table_view.setColumnHidden(0, True)
-        #  self.table_view.setColumnHidden(1, True)
-        #  self.table_view.setColumnHidden(2, True)
-
-        self.verticalLayout_2.addWidget(table_view)
         self.setsignal()
-        self.showMaximized()
 
+        self.ser_listener = SerialListener()
         self.ser_listener.comports.connect(self.ser_update)
         self.ser_listener.start()
+
+        self.showMaximized()
         self.show()
+
+    def modUi(self):
+        #  font = QFont("Courier New", 20)
+        #  self.plainTextEdit.setFont(font)
+        self.edit1.setStyleSheet("""
+            QPlainTextEdit {
+                font-family: Courier;
+                font-size: 20;
+            }
+        """)
 
     def ser_update(self, comports):
         print('ser_update', comports)
@@ -155,6 +163,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.message.connect(self.taskdone)
+        se.serial_msg.connect(self.printterm1)
+        self.task.printterm_msg.connect(self.printterm2)
+
+    def printterm1(self, msg):
+        self.edit1.appendPlainText(msg)
+
+    def printterm2(self, msg):
+        self.edit2.appendPlainText(msg)
 
     def taskrun(self, result):
         ret = json.loads(result)

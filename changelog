@@ -1,3 +1,9 @@
+[2019.5.26 - 00:20]
+1. add two debug terminals
+   a. new layout: design2.ui
+   b. first attempt to try promote widget at Qt Designer
+   c. one term for serial output; the other for task output
+
 [2019.5.25 - 22:55]
 1. manual test framwork for multiple duts
 	a. new modules: view/imglist.py view/task_dialog.py

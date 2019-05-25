@@ -8,8 +8,9 @@ from PyQt5 import QtWidgets
 
 
 class TableView(QTableView):
-    def __init__(self, model):
-        super(TableView, self).__init__()
+    #  def __init__(self, model):
+    def __init__(self, *args, **kwargs):
+        super(TableView, self).__init__(*args, **kwargs)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -28,8 +29,10 @@ class TableView(QTableView):
                                 #  stop: 0 #FF92BB, stop: 1 white);
             #  }
         #  """)
-        model.view = self
-        self.setModel(model)
+
+        #  model.view = self
+
+        #  self.setModel(model)
 
         # set font
         font = QFont("Courier New", 16)
