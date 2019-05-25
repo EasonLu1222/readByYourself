@@ -19,7 +19,40 @@ from model import TableModelTask
 from design1 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
-from serials import enter_factory_image_prompt, ser
+from serial.tools import list_ports
+from serials import enter_factory_image_prompt, get_serial
+
+PORTNAME = 'COM3'
+
+
+def uart_ready(portnum=2):
+    ports = listports()
+    if len(ports)==portnum:
+        return ports
+    else:
+        return None
+
+
+class SerialListener(QThread):
+    rate = 0.5
+    comports = QSignal(str)
+    def __init__(self):
+        super(SerialListener, self).__init__()
+        self.ports = []
+
+    def run(self):
+        while True:
+            time.sleep(SerialListener.rate)
+            ports = [e.device for e in list_ports.comports()]
+            if set(ports)!=set(self.ports):
+                if set(ports)>set(self.ports):
+                    d = set(ports) - set(self.ports)
+                    self.ports.extend(list(d))
+                else:
+                    d = set(self.ports) - set(ports)
+                    for e in d:
+                        self.ports.remove(e)
+                self.comports.emit(json.dumps(ports))
 
 
 class Task(QThread):
@@ -72,8 +105,11 @@ class Task(QThread):
     def run(self):
         print('enter factory image prompt start')
         t0 = time.time()
-        enter_factory_image_prompt(ser)
-        ser.close()
+
+        with get_serial(PORTNAME, 115200, timeout=1) as ser:
+            enter_factory_image_prompt(ser)
+
+        #  ser.close()
         t1 = time.time()
         print('time elapsed entering prompt: %f' % (t1-t0))
         for i in range(len(self.df)):
@@ -84,8 +120,14 @@ class Task(QThread):
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
+
+        self.ser_listener = SerialListener()
+        
         self.setupUi(self)
         self.setGeometry(300, 200, 1200, 450)
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
         self.task = task
         self.table_model = TableModelTask(self, task)
         self.table_view = table_view = TableView(self.table_model)
@@ -97,6 +139,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.verticalLayout_2.addWidget(table_view)
         self.setsignal()
+        self.showMaximized()
+
+        self.ser_listener.comports.connect(self.ser_update)
+        self.ser_listener.start()
+        self.show()
+
+    def ser_update(self, comports):
+        print('ser_update', comports)
 
     def reset_model(self):
         self.table_model.reset()
@@ -131,6 +181,5 @@ if __name__ == "__main__":
     mb_task = Task('tasks.json')
     app = QApplication(sys.argv)
     win = MyWindow(app, mb_task)
-    move_mainwindow_centered(app, win)
-    win.show()
+    #  move_mainwindow_centered(app, win)
     app.exec_()

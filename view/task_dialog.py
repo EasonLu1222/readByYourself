@@ -1,57 +1,52 @@
+# -*- coding: utf8 -*-
 import json
 from PyQt5 import QtWidgets, QtCore, QtGui
+from view.imglist import QCustomQWidget, ImageList
+
+import logging
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(message)s]')
 
 
 class Page(QtWidgets.QWidget):
-    def __init__(self, index):
+    def __init__(self, index, img_info):
         super(Page, self).__init__()
-        label = QtWidgets.QLabel('My Page%s' % index)
+        imglist = ImageList(img_info)
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(label)
+        imglist.setCurrentRow(index)
+        layout.addWidget(imglist)
         self.setLayout(layout)
-
-
-
-class ContentWidget(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setStyleSheet("""
-            QWidget {
-                background: #58b;
-            }
-        """)
-        layout = QtWidgets.QVBoxLayout(self)
-        label = QtWidgets.QLabel('TEST')
-        self.setLayout(layout)
-        layout.addWidget(label)
 
 
 class MyDialog(QtWidgets.QDialog):
-    message = QtCore.pyqtSignal(str)
+    message_each = QtCore.pyqtSignal(int)
+    message_end = QtCore.pyqtSignal(str)
     def __init__(self, *args, **kwargs):
 
         number = None
         if 'content_widget' in kwargs:
             content_widget = kwargs.pop('content_widget')
+            content_widget.father = self
         if 'number' in kwargs:
             number = kwargs.pop('number')
+        if 'img_info' in kwargs:
+            img_info = kwargs.pop('img_info')
 
         super().__init__(*args, **kwargs)
         self.setStyleSheet("""
-            QPushButton { 
-                padding: 6px; 
-                background: #369; 
-                color: white; 
+            QPushButton {
+                padding: 6px;
+                background: #369;
+                color: white;
                 font-size: 33px;
-                border: 0; 
-                border-radius: 3px; 
-                outline: 0px; 
+                border: 0;
+                border-radius: 3px;
+                outline: 0px;
             }
-            QPushButton:hover { 
-                background: #47a; 
+            QPushButton:hover {
+                background: #47a;
             }
-            QPushButton:pressed { 
-                background: #58b; 
+            QPushButton:pressed {
+                background: #58b;
             }
         """)
         self.setModal(True)
@@ -72,11 +67,14 @@ class MyDialog(QtWidgets.QDialog):
         self.vertical_layout = vertical_layout = QtWidgets.QVBoxLayout()
         self.setLayout(vertical_layout)
 
+
+
         self.content_layout = QtWidgets.QVBoxLayout() # could be almost any layout actually
         vertical_layout.addLayout(self.content_layout)
 
         for i in range(self.number):
-            page = Page(i)
+            page = Page(i, img_info)
+            page.setFixedHeight(300)
             self.pages.append(page)
         self.content_layout.addWidget(self.pages[0])
 
@@ -103,13 +101,10 @@ class MyDialog(QtWidgets.QDialog):
         #  content_widget = QtWidgets.QWidget()
         vertical_layout.addWidget(content_widget)
 
-        self.message.connect(self.parent().xx)
+        #  self.message.connect(self.parent().xx)
         vertical_layout.addLayout(button_layout)
         self.showMaximized()
         self.show()
-
-    def set_content(self, widget):
-        self.vertical_layout
 
     def button_clicked(self):
         btn = self.sender()
@@ -123,49 +118,10 @@ class MyDialog(QtWidgets.QDialog):
             self.content_layout.removeWidget(page)
             page.deleteLater()
             self.content_layout.addWidget(self.pages[self.idx+1])
+            self.message_each.emit(self.idx)
         else:
-            self.message.emit(json.dumps(self.passes))
+            logging.info('button_clicked')
+            result = json.dumps(self.passes)
+            self.message_end.emit(result)
             self.close()
         self.idx += 1
-
-
-
-class MyWindow(QtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(MyWindow, self).__init__(*args, *kwargs)
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        #  self.setWindowFlag(QtCore.Qt.WindowMinimizeButtonHint, False)
-        #  self.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint, False)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setGeometry(400,400,400,400)
-        self.setWindowTitle('MyWizard Example')
-        centralwidget = QtWidgets.QWidget(self)
-        layout = QtWidgets.QVBoxLayout(centralwidget)
-        btn = QtWidgets.QPushButton('wizard show')
-        layout.addWidget(btn)
-        self.setCentralWidget(centralwidget)
-        self.show()
-        btn.clicked.connect(self.wizardshow)
-        self.showMaximized()
-        self.show()
-
-    def mouseMoveEvent(self, event):
-        print('.')
-
-    def wizardshow(self):
-        print('aaa')
-        w = ContentWidget()
-        d = MyDialog(self, number=2, content_widget=w)
-        if d.exec_():
-            print('a')
-        else:
-            print('b')
-
-    def xx(self, msg):
-        print('xx', msg)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-    win = MyWindow()
-    app.exec_()

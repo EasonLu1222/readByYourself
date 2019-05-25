@@ -10,17 +10,30 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d][%(m
 
 PORT = 'COM3'
 RATE = 115200
-TIMEOUT = 5
+TIMEOUT = 1
+#  TIMEOUT = 0
 
 
-ser = serial.Serial(port=PORT,
-                    baudrate=RATE,
-                    bytesize=serial.EIGHTBITS,
-                    parity=serial.PARITY_NONE,
-                    stopbits=serial.STOPBITS_ONE,
-                    rtscts=False,
-                    dsrdtr=False,
-                    timeout=TIMEOUT)
+#  ser = serial.Serial(port=PORT,
+                    #  baudrate=RATE,
+                    #  bytesize=serial.EIGHTBITS,
+                    #  parity=serial.PARITY_NONE,
+                    #  stopbits=serial.STOPBITS_ONE,
+                    #  rtscts=False,
+                    #  dsrdtr=False,
+                    #  timeout=TIMEOUT)
+
+
+def get_serial(port_name, baudrate, timeout):
+    ser = serial.Serial(port=port_name,
+                        baudrate=baudrate,
+                        bytesize=serial.EIGHTBITS,
+                        parity=serial.PARITY_NONE,
+                        stopbits=serial.STOPBITS_ONE,
+                        rtscts=False,
+                        dsrdtr=False,
+                        timeout=timeout)
+    return ser
 
 
 def wait_for_prompt(serial, prompt, thread_timeout=25):
@@ -42,6 +55,7 @@ def wait_for_prompt(serial, prompt, thread_timeout=25):
             logging.debug('ERR1: UnicodeDecodeError', ex)
 
         #  logging.info(line)
+        print(line)
         if line.startswith(prompt):
             logging.info('get %s' % prompt)
             break
@@ -55,8 +69,9 @@ def enter_factory_image_prompt(serial):
     #  wait_for_prompt(serial, '#')
 
 
-def issue_command(serial, cmd):
+def issue_command(serial, cmd, timeout_for_readlines=0):
     serial.write(('%s\n' % cmd).encode('utf-8'))
+    #  serial.timeout = timeout_for_readlines
     lines = [e.decode('utf8') for e in serial.readlines()]
     return lines
 

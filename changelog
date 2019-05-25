@@ -1,3 +1,13 @@
+[2019.5.25 - 22:55]
+1. manual test framwork for multiple duts
+	a. new modules: view/imglist.py view/task_dialog.py
+2. led test
+	a. prototypes: proto/led.py
+	b. new modules: tasks/task_led.py
+	c. led test on one duts OK
+3. serial port listner
+	a. add class SerialListener (app.py) & func get_serial (serials.py)
+
 [2019.5.23 - 10:40]
 1. add module serials.py
 2. link to PCBA and wait for prompt to occur

@@ -8,6 +8,17 @@
             "item": "write PID from PCBA's bar code",
             "script": "test1",
             "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "LED Test",
+            "item": "",
+            "script": "task_led",
+            "args": null,
             "auto": false,
             "min": null,
             "expect": null,
