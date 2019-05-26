@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'design2.ui'
+# Form implementation generated from reading ui file 'design3.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #
@@ -15,12 +15,13 @@ class Ui_MainWindow(object):
         MainWindow.resize(765, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
-
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
+        self.hbox_ports = QtWidgets.QHBoxLayout()
+        self.hbox_ports.setObjectName("hbox_ports")
+        self.verticalLayout.addLayout(self.hbox_ports)
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setObjectName("pushButton")
         self.verticalLayout.addWidget(self.pushButton)

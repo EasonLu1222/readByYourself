@@ -5,18 +5,19 @@ import time
 import random
 from subprocess import Popen, PIPE
 import operator
-from PyQt5.QtWidgets import (QWidget, QTableView, QTreeView, QHeaderView)
+from PyQt5.QtWidgets import (QWidget, QTableView, QTreeView, QHeaderView,
+                             QLabel, QSpacerItem)
 from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt,
-                          pyqtSignal as QSignal)
+                          pyqtSignal as QSignal, QRect)
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QVBoxLayout, QMainWindow
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QMainWindow
 
 import pandas as pd
 
 from view.myview import TableView
 from model import TableModelTask
-from design2 import Ui_MainWindow
+from design3 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
 from serial.tools import list_ports
@@ -35,7 +36,7 @@ def uart_ready(portnum=2):
 
 class SerialListener(QThread):
     rate = 0.5
-    comports = QSignal(str)
+    comports = QSignal(list)
     def __init__(self):
         super(SerialListener, self).__init__()
         self.ports = []
@@ -52,7 +53,7 @@ class SerialListener(QThread):
                     d = set(self.ports) - set(ports)
                     for e in d:
                         self.ports.remove(e)
-                self.comports.emit(json.dumps(ports))
+                self.comports.emit(self.ports)
 
 
 class Task(QThread):
@@ -127,8 +128,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
+        self.modUi()
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
+        self.comports = []
 
         self.task = task
         self.table_model = TableModelTask(self, task)
@@ -143,18 +146,59 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.showMaximized()
         self.show()
 
+        #  self.test()
+
+    #  def test(self):
+        #  self.timer = QTimer(self)
+        #  self.timer.start(1000)
+        #  self.timer.timeout.connect(self.test_timeout)
+
+    #  def test_timeout(self):
+        #  from random import randint
+        #  ports = ['COM%s' % randint(3, 10) for _ in range(randint(3,6))]
+        #  self.ser_update(ports)
+        #  self.ser_update(['COM3', 'COM5'])
+
     def modUi(self):
-        #  font = QFont("Courier New", 20)
-        #  self.plainTextEdit.setFont(font)
         self.edit1.setStyleSheet("""
             QPlainTextEdit {
+                font-family: Arial Narrow;
+                font-size: 10pt;
+            }
+        """)
+        self.edit2.setStyleSheet("""
+            QPlainTextEdit {
                 font-family: Courier;
-                font-size: 20;
+                font-size: 14pt;
             }
         """)
 
+    def clearlayout(self, layout):
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+              child.widget().deleteLater()
+
     def ser_update(self, comports):
         print('ser_update', comports)
+        self.comports = comports
+        self.clearlayout(self.hbox_ports)
+        for port in self.comports:
+            lb_port = QLabel(port)
+            lb_port.setStyleSheet("""
+                QLabel {
+                    padding: 6px;
+                    background: #369;
+                    color: white;
+                    border: 0;
+                    border-radius: 3px;
+                    outline: 0px;
+                    font-family: Courier;
+                    font-size: 16px;
+                }
+            #  """)
+            self.hbox_ports.addWidget(lb_port)
+        self.hbox_ports.addStretch()
 
     def reset_model(self):
         self.table_model.reset()
