@@ -6,7 +6,7 @@ import random
 from subprocess import Popen, PIPE
 from threading import Thread
 import operator
-from PyQt5.QtWidgets import (QWidget, QTableView, QTreeView, QHeaderView,
+from PyQt5.QtWidgets import (QWidget, QTableView, QTableWidgetItem, QTreeView, QHeaderView,
                              QLabel, QSpacerItem)
 from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt,
                           pyqtSignal as QSignal, QRect)
@@ -292,9 +292,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         print('task %s are done, j=%s' % (idx, j))
 
-        data = self.table_model.mylist
-        data[idx][9+j] = output
-        self.table_model.update()
+        self.table_view.setItem(idx, 9+j, QTableWidgetItem(str(output)))
 
     def taskdone(self, message):
         if message.startswith('tasks done'):
