@@ -1,12 +1,12 @@
 {"header": 
     ["script", "args", "auto", "group", "item", "min", "expect", "max", "unit"],
- "pcs": 4,
+ "pcs": 2,
  "structure":
     [
         {
-            "group": "Write Product ID",
-            "item": "write PID from PCBA's bar code",
-            "script": "test1",
+            "group": "WiFi Ping Test",
+            "item": "check if wifi interface exists",
+            "script": "wifi_ping",
             "args": null,
             "auto": true,
             "min": null,

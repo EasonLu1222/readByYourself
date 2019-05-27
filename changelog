@@ -1,3 +1,7 @@
+[2019.5.27 - 15:50]
+1. multiple com ports for auto & manual mode all work
+2. solve serial ports confliction between comports update & tasks serial usages
+
 [2019.5.26 - 21:38]
 1. update com ports realtime and show it on top
    a. new layout: design3.ui

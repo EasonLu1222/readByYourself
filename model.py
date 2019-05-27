@@ -41,6 +41,11 @@ class TableModelTask(QAbstractTableModel):
         #  self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
         #  self.layoutChanged.emit()
 
+    def update(self):
+        self.layoutAboutToBeChanged.emit()
+        self.dataChanged.emit(self.createIndex(0, 0), self.createIndex(self.rowCount(0), self.columnCount(0)))
+        self.layoutChanged.emit()
+
     def flags(self, index):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 

@@ -19,7 +19,8 @@ class Page(QtWidgets.QWidget):
 
 class MyDialog(QtWidgets.QDialog):
     message_each = QtCore.pyqtSignal(int)
-    message_end = QtCore.pyqtSignal(str)
+    message_end = QtCore.pyqtSignal(list)
+    #  message_end = QtCore.pyqtSignal(str)
     def __init__(self, *args, **kwargs):
 
         number = None
@@ -66,7 +67,6 @@ class MyDialog(QtWidgets.QDialog):
 
         self.vertical_layout = vertical_layout = QtWidgets.QVBoxLayout()
         self.setLayout(vertical_layout)
-
 
 
         self.content_layout = QtWidgets.QVBoxLayout() # could be almost any layout actually
@@ -122,6 +122,6 @@ class MyDialog(QtWidgets.QDialog):
         else:
             logging.info('button_clicked')
             result = json.dumps(self.passes)
-            self.message_end.emit(result)
+            self.message_end.emit(list(self.passes.values()))
             self.close()
         self.idx += 1

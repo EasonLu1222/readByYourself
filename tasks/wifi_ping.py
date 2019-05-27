@@ -21,19 +21,18 @@ def check_wlan(portname):
         lines = issue_command(ser, 'ifconfig')
         has_wlan =  True if any(re.match('wlan[\d]+', e) for e in lines) else False
         logging.info('has wlan: %s' % has_wlan)
-        result = 'passed' if has_wlan else 'failed'
+        result = 'pass' if has_wlan else 'fail'
         return result
     return None
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--portname', help='serial com port name', type=str)
     args = parser.parse_args()
     portname = args.portname
 
-    logging.info('test1 start')
+    logging.info('wifi_ping start')
     result = check_wlan(portname)
-    logging.info('test1 end')
+    logging.info('wifi_ping end')
     sys.stdout.write(result)
