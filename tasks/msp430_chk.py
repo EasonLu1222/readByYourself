@@ -18,10 +18,10 @@ SERIAL_TIMEOUT = 0.2
 
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        lines = issue_command(ser, 'ifconfig')
-        has_wlan =  True if any(re.match('wlan[\d]+', e) for e in lines) else False
-        logging.info('has wlan: %s' % has_wlan)
-        result = 'pass' if has_wlan else 'fail'
+        lines = issue_command(ser, 'cat /sys/class/i2c-adapter/i2c-1/1-001f/name')
+        has_msp430 =  True if any(re.match('msp430', e) for e in lines) else False
+        logging.info('has msp430: %s' % has_msp430)
+        result = 'pass' if has_msp430 else 'fail'
         return result
     return None
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     portname = args.portname
 
-    logging.info('wifi_ping start')
+    logging.info('I2C_has_msp430 start')
     result = check_wlan(portname)
-    logging.info('wifi_ping end')
+    logging.info('I2C_has_msp430 end')
     sys.stdout.write(result)

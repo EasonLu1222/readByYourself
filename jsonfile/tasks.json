@@ -15,6 +15,17 @@
             "unit": null
         },
         {
+            "group": "BT Ping Test",
+            "item": "check if BT exists",
+            "script": "bt_ping",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "LED Test",
             "item": "",
             "script": "task_led",
@@ -52,6 +63,72 @@
             "item": "3.3V",
             "script": "power_check",
             "args": [3],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check CPU Frequency Test",
+            "item": "check frequency of CPU",
+            "script": "cpu_freq",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check CPU Cores Test",
+            "item": "check num of CPU cores",
+            "script": "cpu_cores",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check DDR size Test",
+            "item": "check size of DDR",
+            "script": "ddr_size",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check I2C-tas5766m Test",
+            "item": "check if I2C device AMP Driver (tas5766m) exists",
+            "script": "tas5766m_chk",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check I2C-msp430 Test",
+            "item": "check if I2C device msp430 exists",
+            "script": "msp430_chk",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Check I2C-lp5018 Test",
+            "item": "check if I2C device LED Driver (lp5018) exists",
+            "script": "lp5018_chk",
+            "args": null,
             "auto": true,
             "min": null,
             "expect": null,

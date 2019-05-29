@@ -18,10 +18,10 @@ SERIAL_TIMEOUT = 0.2
 
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        lines = issue_command(ser, 'ifconfig')
-        has_wlan =  True if any(re.match('wlan[\d]+', e) for e in lines) else False
-        logging.info('has wlan: %s' % has_wlan)
-        result = 'pass' if has_wlan else 'fail'
+        lines = issue_command(ser, 'grep MemTotal /proc/meminfo')
+        ddr_size =  True if any(re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else False
+        logging.info('DDR Size: %s' % ddr_size)
+        result = 'pass' if ddr_size else 'fail'
         return result
     return None
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     portname = args.portname
 
-    logging.info('wifi_ping start')
+    logging.info('check_DDR_size start')
     result = check_wlan(portname)
-    logging.info('wifi_ping end')
+    logging.info('check_DDR_size end')
     sys.stdout.write(result)
