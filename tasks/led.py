@@ -52,7 +52,7 @@ def led_all_blue(ser, b=10):
 
 
 if __name__ == "__main__":
-    logging.info('test1 start')
+    logging.info('LED test start')
     with get_serial('COM3', 115200, 0) as ser:
         led_all_red(ser)
         time.sleep(1)
@@ -61,4 +61,4 @@ if __name__ == "__main__":
         led_all_blue(ser)
         time.sleep(1)
         led_all_clear(ser)
-        logging.info('test1 end')
+        logging.info('LED test end')
