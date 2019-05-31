@@ -310,9 +310,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
     mb_task = Task('jsonfile/tasks.json')
-    #  mb_task = Task('jsonfile/power.json')
-    #  mb_task = Task('jsonfile/wifi_ping.json')
-    #  mb_task = Task('jsonfile/led.json')
 
     app = QApplication(sys.argv)
     win = MyWindow(app, mb_task)
