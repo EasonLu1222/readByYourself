@@ -101,16 +101,12 @@ class Task(QThread):
     def runeach(self, index, port, to_wait=False):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
-        args = [str(e) for e in line[1]] if line[1] else None
+        args = [str(e) for e in line[1]] if line[1] else []
         msg1 = '\n[runeach][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
 
         print(msg1)
         self.printterm_msg.emit(msg1)
-        if args:
-            proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
-        else:
-            proc = Popen(['python', '-m', script, '-p', port], stdout=PIPE)
-        return proc
+        proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
 
         #  output, _ = proc.communicate()
         #  output = output.decode('utf8')
@@ -119,22 +115,20 @@ class Task(QThread):
         #  self.printterm_msg.emit(msg2)
         #  result = json.dumps({'index':index, 'port': port, 'output': output})
         #  self.task_result.emit(result)
+        return proc
 
-        #  if to_wait:
-            #  proc.wait()
 
     def runeachports(self, index, ports):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
-        args = [str(e) for e in line[1]] if line[1] else None
+        args = [str(e) for e in line[1]] if line[1] else []
         msg1 = '\n[runeachports][script: %s][index: %s][ports: %s][args: %s]' % (script, index, ports, args)
 
         print(msg1)
         self.printterm_msg.emit(msg1)
-        if args:
-            proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
-        else:
-            proc = Popen(['python', '-m', script, '-pp', ports], stdout=PIPE)
+
+        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
+
         outputs, _ = proc.communicate()
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
