@@ -108,13 +108,6 @@ class Task(QThread):
         self.printterm_msg.emit(msg1)
         proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
 
-        #  output, _ = proc.communicate()
-        #  output = output.decode('utf8')
-        #  print('output', output)
-        #  msg2 = '[task %s][output: %s]' % (index, output)
-        #  self.printterm_msg.emit(msg2)
-        #  result = json.dumps({'index':index, 'port': port, 'output': output})
-        #  self.task_result.emit(result)
         return proc
 
 
