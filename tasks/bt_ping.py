@@ -19,9 +19,9 @@ SERIAL_TIMEOUT = 0.2
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'pidof bsa_server')
-        has_bt =  True if any(re.match('[\d]+', e) for e in lines) else False
-        logging.info('has BT: %s' % has_bt)
-        result = 'pass' if has_bt else 'fail'
+        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        logging.info('has BT: %s' % result)
+
         return result
     return None
 

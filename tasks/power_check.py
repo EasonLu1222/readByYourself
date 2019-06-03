@@ -19,13 +19,13 @@ if __name__ == "__main__":
 
     if voltage == 3.3:
         logging.info('v = 3.3')
-        sys.stdout.write(str(3.25))
+        sys.stdout.write('Passed(%.2f)'% 3.25 )
     if voltage == 3.0:
         logging.info('v = 3')
-        sys.stdout.write(str(2.8))
+        sys.stdout.write('Passed(%.2f)'% 2.8)
     if voltage == 5.0:
         logging.info('v = 5')
-        sys.stdout.write(str(4.7))
+        sys.stdout.write('Passed(%.2f)'% 4.7)
     elif voltage == 19.0:
         logging.info('v = 19')
-        sys.stdout.write(str(18))
+        sys.stdout.write('Passed(%.2f)'% 18)

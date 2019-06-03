@@ -19,9 +19,9 @@ SERIAL_TIMEOUT = 0.2
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'cat /sys/class/i2c-adapter/i2c-1/1-0028/name')
-        has_lp5018 =  True if any(re.match('lp5018', e) for e in lines) else False
-        logging.info('has lp5018: %s' % has_lp5018)
-        result = 'pass' if has_lp5018 else 'fail'
+        result =  'Passed' if any(re.match('lp5018', e) for e in lines) else 'Failed'
+        logging.info('has lp5018: %s' % result)
+
         return result
     return None
 

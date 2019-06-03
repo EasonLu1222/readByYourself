@@ -19,9 +19,9 @@ SERIAL_TIMEOUT = 0.2
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
-        cpu_freq =  True if any(re.match('[\d]+', e) for e in lines) else False
-        logging.info('Check CPU Freq: %s' % cpu_freq)
-        result = 'pass' if cpu_freq else 'fail'
+        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        logging.info('Check CPU Freq: %s' % result)
+
         return result
     return None
 

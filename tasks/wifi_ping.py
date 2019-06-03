@@ -19,9 +19,9 @@ SERIAL_TIMEOUT = 0.2
 def check_wlan(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'ifconfig')
-        has_wlan =  True if any(re.match('wlan[\d]+', e) for e in lines) else False
-        logging.info('has wlan: %s' % has_wlan)
-        result = 'pass' if has_wlan else 'fail'
+        result =  'Passed' if any(re.match('wlan[\d]+', e) for e in lines) else 'Failed'
+        logging.info('has wlan: %s' % result)
+
         return result
     return None
 

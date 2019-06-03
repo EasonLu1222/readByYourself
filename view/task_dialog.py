@@ -109,9 +109,9 @@ class MyDialog(QtWidgets.QDialog):
     def button_clicked(self):
         btn = self.sender()
         if btn.objectName() == 'pass_button':
-            self.passes[self.idx] = True
+            self.passes[self.idx] = 'Passed'
         elif btn.objectName() == 'fail_button':
-            self.passes[self.idx] = False
+            self.passes[self.idx] = 'Failed'
 
         if self.idx < self.number-1:
             page = self.pages[self.idx]

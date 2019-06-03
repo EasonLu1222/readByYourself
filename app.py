@@ -6,12 +6,12 @@ import random
 from subprocess import Popen, PIPE
 from threading import Thread
 import operator
-from PyQt5.QtWidgets import (QWidget, QTableView, QTableWidgetItem, QTreeView, QHeaderView,
+from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTreeView, QHeaderView,
                              QLabel, QSpacerItem)
 from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt,
                           pyqtSignal as QSignal, QRect)
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QMainWindow
 
 import pandas as pd
@@ -260,7 +260,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def taskrun(self, result):
         ret = json.loads(result)
-        idx, output = ret['index'], ret['output']
+        idx, output = ret['index'], str(ret['output'])
         self.table_view.selectRow(idx)
 
         if 'port' in ret:
@@ -268,11 +268,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             j = self.comports.index(port)
         elif 'idx' in ret:
             j = ret['idx']
-            output = {True:'pass', False:'fail'}[output]
+            # output = {True:'pass', False:'fail'}[output]
 
         print('task %s are done, j=%s' % (idx, j))
 
-        self.table_view.setItem(idx, 9+j, QTableWidgetItem(str(output)))
+        self.table_view.setItem(idx, 9+j, QTableWidgetItem(output))
+        color = QColor(0,255,0) if output.startswith('Passed') else QColor(255,0,0)
+        self.table_view.item(idx,9+j).setBackground(color)
 
     def taskdone(self, message):
         if message.startswith('tasks done'):
