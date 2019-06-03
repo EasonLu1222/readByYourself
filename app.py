@@ -25,13 +25,6 @@ from serial.tools import list_ports
 from serials import enter_factory_image_prompt, get_serial, se
 
 
-def uart_ready(portnum=2):
-    ports = listports()
-    if len(ports)==portnum:
-        return ports
-    else:
-        return None
-
 
 class SerialListener(QThread):
     update_msec = 500
