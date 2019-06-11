@@ -1,3 +1,11 @@
+[2019.6.11 - 16:52]
+0. use power supply to boot up DUT
+1. power rail voltage measurement : function ok
+2. power rail voltage for single DUT : gui ok
+3. add package instrument
+4. add power.json for test
+5. modify power_check.py
+
 [2019.5.27 - 15:50]
 1. multiple com ports for auto & manual mode all work
 2. solve serial ports confliction between comports update & tasks serial usages

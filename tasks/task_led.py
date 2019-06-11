@@ -109,6 +109,6 @@ if __name__ == "__main__":
                   ('No.2', 'Nyaruko', img2),]
     #  img1 = 'images/fixture_dummy1.png'
     #  image_info = [('No.1', 'Meyoko',  img1)]
-    d = task_dialog.MyDialog(number=2, content_widget=w, img_info=image_info)
+    d = task_dialog.MyDialog(number=1, content_widget=w, img_info=image_info)
     w.setsignal()
     app.exec_()

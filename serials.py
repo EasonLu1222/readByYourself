@@ -1,12 +1,15 @@
 # -*- coding=utf-8 -*-
 import os
+import re
+import json
 import logging
 import time
 import serial
+from serial.tools.list_ports import comports
 from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject
 from threading import Timer
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d][%(message)s]')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d]%(message)s')
 
 
 def get_serial(port_name, baudrate, timeout):
@@ -19,6 +22,30 @@ def get_serial(port_name, baudrate, timeout):
                         dsrdtr=False,
                         timeout=timeout)
     return ser
+
+
+def is_serial_free(port_name):
+    try:
+        get_serial(port_name, 115200, 1)
+    except serial.serialutil.SerialException as ex:
+        return False
+    return True
+
+
+def get_device(comport):
+    matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
+    devices = json.load(open('device.json', 'r'))
+    vid_pid = matched[8:]
+    device = devices[vid_pid]
+    return device
+
+
+def get_devices():
+    devices = [{'comport': e.device,
+                'hwid': e.hwid,
+                'name': get_device(e)}
+                for e in comports()]
+    return devices
 
 
 class SerialEmit(QObject):
@@ -52,7 +79,9 @@ def enter_factory_image_prompt(serial):
 
 
 def issue_command(serial, cmd, timeout_for_readlines=0):
-    serial.write(('%s\n' % cmd).encode('utf-8'))
-    #  serial.timeout = timeout_for_readlines
-    lines = [e.decode('utf8') for e in serial.readlines()]
+    logging.info('issue_command: write')
+    serial.write(f'{cmd}\n'.encode('utf-8'))
+    logging.info(f'issue_command: {cmd}')
+    lines = [e.decode('utf-8') for e in serial.readlines()]
+    for line in lines: logging.info(f'{line.rstrip()}')
     return lines

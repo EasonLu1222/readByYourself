@@ -21,7 +21,6 @@ def check_wlan(portname):
         lines = issue_command(ser, 'ifconfig')
         result =  'Passed' if any(re.match('wlan[\d]+', e) for e in lines) else 'Failed'
         logging.info('has wlan: %s' % result)
-
         return result
     return None
 

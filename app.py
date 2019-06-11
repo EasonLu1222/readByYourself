@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import random
+import configparser
 from subprocess import Popen, PIPE
 from threading import Thread
 import operator
@@ -21,34 +22,51 @@ from model import TableModelTask
 from ui.design3 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
-from serial.tools import list_ports
-from serials import enter_factory_image_prompt, get_serial, se
+from serial.tools.list_ports import comports
+from serials import (enter_factory_image_prompt, get_serial,
+                     se, get_device, get_devices, is_serial_free)
 
+from instrument import update_serial, power1, dmm
 
 
 class SerialListener(QThread):
     update_msec = 500
     comports = QSignal(list)
+    comports_instrument = QSignal(list)
     def __init__(self):
         super(SerialListener, self).__init__()
         self.is_reading = False
         self.ports = []
+        self.instruments = []
+
+    def update(self, devices_prev, devices):
+        set_prev, set_now = set(devices_prev), set(devices)
+        if set_prev != set_now:
+            if set_now > set_prev:
+                d = set_now - set_prev
+                devices_prev.extend(list(d))
+            else:
+                d = set_prev - set_now
+                for e in d:
+                    devices_prev.remove(e)
+            return True
+        return False
 
     def run(self):
         while True:
             QThread.msleep(SerialListener.update_msec)
             self.is_reading = True
-            ports = [e.device for e in list_ports.comports()]
+            devices = get_devices()
+            ports = [e['comport'] for e in 
+                    [e for e in devices if e['name']=='cygnal_cp2102']]
+            instruments = [e['comport'] for e in 
+                [e for e in devices if e['name'] in ['gw_powersupply', 'gw_dmm']]]
             self.is_reading = False
-            if set(ports)!=set(self.ports):
-                if set(ports)>set(self.ports):
-                    d = set(ports) - set(self.ports)
-                    self.ports.extend(list(d))
-                else:
-                    d = set(self.ports) - set(ports)
-                    for e in d:
-                        self.ports.remove(e)
+            if self.update(self.ports, ports):
                 self.comports.emit(self.ports)
+            if self.update(self.instruments, instruments):
+                update_serial([dmm, power1])
+                self.comports_instrument.emit(self.instruments)
 
     def stop(self):
         # wait 1s for list_ports to finish, is it enough or too long in order
@@ -99,7 +117,9 @@ class Task(QThread):
 
         print(msg1)
         self.printterm_msg.emit(msg1)
-        proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
+        #  proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
+        port_dmm = dmm.com
+        proc = Popen(['python', '-m', script, '-p', port, '-pm', port_dmm] + args, stdout=PIPE)
 
         return proc
 
@@ -147,6 +167,9 @@ class Task(QThread):
             ser.close()
 
     def run(self):
+        if not all(is_serial_free(p) for p in self.window.comports):
+            self.window.pushButton.setEnabled(True)
+            return
         self.enter_prompt()
         QThread.msleep(500)
         for i in range(len(self.df)):
@@ -176,6 +199,7 @@ class Task(QThread):
 
 
 class MyWindow(QMainWindow, Ui_MainWindow):
+
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
@@ -193,10 +217,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.ser_listener = SerialListener()
         self.ser_listener.comports.connect(self.ser_update)
+        self.ser_listener.comports_instrument.connect(self.instrument_update)
         self.ser_listener.start()
+
+        self.set_power()
 
         self.showMaximized()
         self.show()
+
+    def set_power(self):
+        update_serial([dmm, power1])
+        if power1.open_com():
+            power1.off()
+            power1.on()
+        #  dmm.open_com()
 
     def modUi(self):
         self.edit1.setStyleSheet("""
@@ -217,6 +251,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             child = layout.takeAt(0)
             if child.widget():
               child.widget().deleteLater()
+
+    def instrument_update(self, comports):
+        print('instrument_update', comports)
 
     def ser_update(self, comports):
         print('ser_update', comports)
@@ -273,7 +310,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('task %s are done, j=%s' % (idx, j))
 
         self.table_view.setItem(idx, 9+j, QTableWidgetItem(output))
-        color = QColor(0,255,0) if output.startswith('Passed') else QColor(255,0,0)
+        color = QColor(0,255,0) if output.startswith('Pass') else QColor(255,0,0)
         self.table_view.item(idx,9+j).setBackground(color)
 
     def taskdone(self, message):
@@ -289,10 +326,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ser_listener.stop()
         self.task.start()
 
+    def closeEvent(self, event):
+        power1.off()
+        event.accept() # let the window close
+
 
 if __name__ == "__main__":
-    mb_task = Task('jsonfile/tasks.json')
+    mainboard_task = Task('jsonfile/power.json')
 
     app = QApplication(sys.argv)
-    win = MyWindow(app, mb_task)
+    win = MyWindow(app, mainboard_task)
     app.exec_()
