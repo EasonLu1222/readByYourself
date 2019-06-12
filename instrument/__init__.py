@@ -178,14 +178,16 @@ class SerialInstrument():
             return False
 
     def run_cmd(self, items, fetch=False):
-        for item in items:
-            cmd = f'{item}\n'.encode()
-            self.ser.write(cmd)
-            if self.delay_sec: time.sleep(self.delay_sec)
-
-        if fetch:
-            result = self.ser.readline().decode('utf8')
-            return result
+        try:
+            for item in items:
+                cmd = f'{item}\n'.encode()
+                self.ser.write(cmd)
+                if self.delay_sec: time.sleep(self.delay_sec)
+            if fetch:
+                result = self.ser.readline().decode('utf8')
+                return result
+        except Exception as e:
+            logging.debug("run_cmd failed!")
 
 
 class PowerSupply(SerialInstrument):
