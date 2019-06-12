@@ -1,11 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
 from PyQt5.QtCore import Qt, pyqtSignal, QSettings
-from fixture_select import Ui_FixtureSelectWindow
+from fixture_select_dialog import Ui_FixtureSelectDialog
 from eng_mode_pwd_dialog import Ui_EngModePwdDialog
 
 
-class AppWindow(QMainWindow, Ui_FixtureSelectWindow):
+class FxDialog(QDialog, Ui_FixtureSelectDialog):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -60,6 +60,6 @@ class PwdDialog(QDialog, Ui_EngModePwdDialog):
 
 
 app = QApplication(sys.argv)
-w = AppWindow()
+w = FxDialog()
 w.show()
 sys.exit(app.exec_())

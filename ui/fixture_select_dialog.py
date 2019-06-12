@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'fixture_select.ui'
+# Form implementation generated from reading ui file 'fixture_select_dialog.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #
@@ -9,19 +9,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_FixtureSelectWindow(object):
-    def setupUi(self, FixtureSelectWindow):
-        FixtureSelectWindow.setObjectName("FixtureSelectWindow")
-        FixtureSelectWindow.resize(616, 425)
-        self.centralwidget = QtWidgets.QWidget(FixtureSelectWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+class Ui_FixtureSelectDialog(object):
+    def setupUi(self, FixtureSelectDialog):
+        FixtureSelectDialog.setObjectName("FixtureSelectDialog")
+        FixtureSelectDialog.resize(710, 260)
+        self.gridLayout = QtWidgets.QGridLayout(FixtureSelectDialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.checkBoxEngMode = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBoxEngMode = QtWidgets.QCheckBox(FixtureSelectDialog)
         self.checkBoxEngMode.setMaximumSize(QtCore.QSize(582, 16777215))
         self.checkBoxEngMode.setObjectName("checkBoxEngMode")
         self.horizontalLayout.addWidget(self.checkBoxEngMode, 0, QtCore.Qt.AlignRight)
@@ -30,17 +28,17 @@ class Ui_FixtureSelectWindow(object):
         self.verticalLayout.addItem(spacerItem)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.checkBoxFx1 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBoxFx1 = QtWidgets.QCheckBox(FixtureSelectDialog)
         self.checkBoxFx1.setObjectName("checkBoxFx1")
         self.verticalLayout_2.addWidget(self.checkBoxFx1, 0, QtCore.Qt.AlignHCenter)
-        self.checkBoxFx2 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBoxFx2 = QtWidgets.QCheckBox(FixtureSelectDialog)
         self.checkBoxFx2.setObjectName("checkBoxFx2")
         self.verticalLayout_2.addWidget(self.checkBoxFx2, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
-        self.pushButtonStart = QtWidgets.QPushButton(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.pushButtonStart = QtWidgets.QPushButton(FixtureSelectDialog)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtonStart.sizePolicy().hasHeightForWidth())
@@ -51,20 +49,16 @@ class Ui_FixtureSelectWindow(object):
         self.pushButtonStart.setObjectName("pushButtonStart")
         self.verticalLayout.addWidget(self.pushButtonStart)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        FixtureSelectWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(FixtureSelectWindow)
-        self.statusbar.setObjectName("statusbar")
-        FixtureSelectWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(FixtureSelectWindow)
-        QtCore.QMetaObject.connectSlotsByName(FixtureSelectWindow)
+        self.retranslateUi(FixtureSelectDialog)
+        QtCore.QMetaObject.connectSlotsByName(FixtureSelectDialog)
 
-    def retranslateUi(self, FixtureSelectWindow):
+    def retranslateUi(self, FixtureSelectDialog):
         _translate = QtCore.QCoreApplication.translate
-        FixtureSelectWindow.setWindowTitle(_translate("FixtureSelectWindow", "MainWindow"))
-        self.checkBoxEngMode.setText(_translate("FixtureSelectWindow", "Engineering mode"))
-        self.checkBoxFx1.setText(_translate("FixtureSelectWindow", "Test on fixture 1"))
-        self.checkBoxFx2.setText(_translate("FixtureSelectWindow", "Test on fixture 2"))
-        self.pushButtonStart.setText(_translate("FixtureSelectWindow", "Start"))
+        FixtureSelectDialog.setWindowTitle(_translate("FixtureSelectDialog", "Dialog"))
+        self.checkBoxEngMode.setText(_translate("FixtureSelectDialog", "Engineering mode"))
+        self.checkBoxFx1.setText(_translate("FixtureSelectDialog", "Test on fixture 1"))
+        self.checkBoxFx2.setText(_translate("FixtureSelectDialog", "Test on fixture 2"))
+        self.pushButtonStart.setText(_translate("FixtureSelectDialog", "Start"))
 
 
