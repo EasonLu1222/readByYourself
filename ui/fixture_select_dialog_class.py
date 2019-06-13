@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from PyQt5.QtCore import Qt, pyqtSignal, QSettings
+from PyQt5.QtCore import Qt, QSettings
 from ui.fixture_select_dialog import Ui_FixtureSelectDialog
 from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
 
