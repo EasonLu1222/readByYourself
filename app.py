@@ -30,6 +30,7 @@ from serials import (enter_factory_image_prompt, get_serial,
                      se, get_device, get_devices, is_serial_free)
 
 from instrument import update_serial, power1, power2, dmm1
+from ui.fixture_select_dialog_class import FixtureSelectDialog
 
 
 class ProcessListener(QThread):
@@ -347,6 +348,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.showMaximized()
         self.show()
+        self.w = FixtureSelectDialog(self)
+        self.w.show()
 
         self.power_process = {}
         self.power_results = {}
@@ -541,4 +544,4 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     win = MyWindow(app, mainboard_task)
-    app.exec_()
+    sys.exit(app.exec_())
