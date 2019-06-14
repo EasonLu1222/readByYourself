@@ -1,3 +1,6 @@
+[2019.6.14 - 13:50]
+minor bug fixed to allow test2.json(both power & other tests) passed
+
 [2019.6.14 - 09:30]
 0. modify power rail measurments to all channles & DUTs all at once without chaning the json file format
 	a. add Task.runeach2

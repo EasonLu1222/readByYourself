@@ -229,6 +229,7 @@ class Task(QThread):
 
                 msg2 = '[task %s][output: %s]' % ([i, i+len(items)], output)
                 self.printterm_msg.emit(msg2)
+                #  result = json.dumps({'index':[i, i+len(items)], 'output': output})
                 result = json.dumps({'index':[i, i+len(items)], 'output': output})
                 self.task_result.emit(result)
             else:
@@ -359,20 +360,25 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def taskrun(self, result):
         ret = json.loads(result)
-        idx, output = ret['index'], json.loads(ret['output'])
+        idx = ret['index']
 
         if type(idx)==list:
+            output = json.loads(ret['output'])
 
             for i in range(*idx):
-                x1, x2 = output[i][0], output[i][1]
+                # DUT1
+                x1 = output[i-idx[0]][0]
                 self.table_view.setItem(i, 9, QTableWidgetItem(x1))
-                self.table_view.setItem(i, 10, QTableWidgetItem(x2))
                 color1 = QColor(0,255,0) if x1.startswith('Pass') else QColor(255,0,0)
-                color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
                 self.table_view.item(i, 9).setBackground(color1)
-                self.table_view.item(i, 10).setBackground(color2)
+
+                # DUT2
+                #  x2 = output[i][1]
+                #  self.table_view.setItem(i, 10, QTableWidgetItem(x2))
+                #  color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
+                #  self.table_view.item(i, 10).setBackground(color2)
         else:
-            print('...B')
+            output = str(ret['output'])
             self.table_view.selectRow(idx)
 
             if 'port' in ret:
