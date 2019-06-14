@@ -12,7 +12,7 @@ from threading import Thread
 import operator
 from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTreeView, QHeaderView,
                              QLabel, QSpacerItem)
-from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt,
+from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt, QTranslator,
                           pyqtSignal as QSignal, QRect)
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont, QColor
@@ -542,5 +542,8 @@ if __name__ == "__main__":
     #  mainboard_task = Task('jsonfile/simulate1.json')
 
     app = QApplication(sys.argv)
+    translator = QTranslator()
+    translator.load("translate/zh_TW.qm")
+    app.installTranslator(translator)
     win = MyWindow(app, mainboard_task)
     sys.exit(app.exec_())
