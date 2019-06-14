@@ -34,6 +34,8 @@ if __name__ == "__main__":
     portname = args.portname
     port_dmm = args.port_dmm
     channel = int(args.channel)
+    #  channels = [int(e) for e in args.channel]
+    #  channel = channels[0]
 
     logging.info('power check start. [channel: %s]' % channel)
 

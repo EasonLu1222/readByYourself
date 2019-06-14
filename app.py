@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import random
+from collections import defaultdict
 import configparser
 from subprocess import Popen, PIPE
 from threading import Thread
@@ -26,7 +27,7 @@ from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial,
                      se, get_device, get_devices, is_serial_free)
 
-from instrument import update_serial, power1, dmm
+from instrument import update_serial, power1, power2, dmm1
 
 
 class SerialListener(QThread):
@@ -57,15 +58,15 @@ class SerialListener(QThread):
             QThread.msleep(SerialListener.update_msec)
             self.is_reading = True
             devices = get_devices()
-            ports = [e['comport'] for e in 
+            ports = [e['comport'] for e in
                     [e for e in devices if e['name']=='cygnal_cp2102']]
-            instruments = [e['comport'] for e in 
+            instruments = [e['comport'] for e in
                 [e for e in devices if e['name'] in ['gw_powersupply', 'gw_dmm']]]
             self.is_reading = False
             if self.update(self.ports, ports):
                 self.comports.emit(self.ports)
             if self.update(self.instruments, instruments):
-                update_serial([dmm, power1])
+                update_serial([dmm1, power1, power2])
                 self.comports_instrument.emit(self.instruments)
 
     def stop(self):
@@ -77,13 +78,49 @@ class SerialListener(QThread):
         self.terminate()
 
 
+def parse_json(jsonfile):
+    x = json.loads(open(jsonfile, 'r').read())
+    groups = defaultdict(list)
+    cur_group = None
+    x = x['structure']
+    group_orders = []
+    for e in x:
+        group_name = e['group']
+        if not group_name in group_orders:
+            group_orders.append(group_name)
+        del e['group']
+        print(e)
+        groups[group_name].append(e)
+    groups = {k:groups[k] for k in group_orders}
+
+    idx = 0
+    for k,items in groups.items():
+        for e in items:
+            e['index'] = idx
+            idx += 1
+    return groups
+
+
 class Task(QThread):
     task_result = QSignal(str)
     message = QSignal(str)
     printterm_msg = QSignal(str)
+    '''
+        there's three types of tasks
+            1. DUT Based
+                a. serial port of DUTs only
+                b. one process per row, one process per DUT
+            2. Instrument Based
+                a. serial port of instruments only
+                b. one process to handle rows and duts
+            3. Mixed
+                a. serial port of both DUTs and instruments
+                b. TBD
+    '''
     def __init__(self, jsonfile, mainwindow=None):
         super(Task, self).__init__(mainwindow)
         self.base = json.loads(open(jsonfile, 'r').read())
+        self.groups = parse_json(jsonfile)
 
     def load(self):
         header = self.base['header']
@@ -109,20 +146,28 @@ class Task(QThread):
         header_extension = dut_names if dut_names else self.header_dut()
         return self.header() + header_extension
 
-    def runeach(self, index, port, to_wait=False):
+    def runeach1(self, index, port, to_wait=False):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
-        msg1 = '\n[runeach][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
+        msg1 = '\n[runeach1][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
 
         print(msg1)
         self.printterm_msg.emit(msg1)
-        #  proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
-        port_dmm = dmm.com
-        proc = Popen(['python', '-m', script, '-p', port, '-pm', port_dmm] + args, stdout=PIPE)
+        proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
 
         return proc
 
+    def runeach2(self, groupname):
+        group = self.groups[groupname]
+        script = f'tasks.{group[0]["script"]}'
+        index = group[0]['index']
+        item_len = len(group)
+        args = [g['args'] for g in group]
+        print(f'[runeach2][script: {script}][index: {index}][len: {item_len}][args: {args}]')
+        port_dmm = dmm1.com
+        proc = Popen(['python', '-m', script, '-pm', port_dmm] + [json.dumps(args)], stdout=PIPE)
+        return proc
 
     def runeachports(self, index, ports):
         line = self.df.values[index]
@@ -172,29 +217,42 @@ class Task(QThread):
             return
         self.enter_prompt()
         QThread.msleep(500)
-        for i in range(len(self.df)):
-            line = self.df.values[i]
-            is_auto = bool(line[2])
-            if is_auto:
-                procs = {}
-                for port in self.window.comports:
-                    proc = self.runeach(i, port)
-                    procs[port] = proc
 
-                for port, proc in procs.items():
-                    output, _ = proc.communicate()
-                    output = output.decode('utf8')
-                    print('output', output)
-                    msg2 = '[task %s][output: %s]' % (i, output)
-                    self.printterm_msg.emit(msg2)
-                    result = json.dumps({'index':i, 'port': port, 'output': output})
-                    self.task_result.emit(result)
+        #  for i in range(len(self.df)):
+        for group, items in self.groups.items():
+            i = items[0]['index']
+            if len(items) > 1:
+                proc = self.runeach2(group)
+                output, _ = proc.communicate()
+                output = output.decode('utf8')
+                print('OUTPUT', output)
 
+                msg2 = '[task %s][output: %s]' % ([i, i+len(items)], output)
+                self.printterm_msg.emit(msg2)
+                result = json.dumps({'index':[i, i+len(items)], 'output': output})
+                self.task_result.emit(result)
             else:
-                ports = ','.join(self.window.comports)
-                self.runeachports(i, ports)
-            QThread.msleep(500)
+                line = self.df.values[i]
+                is_auto = bool(line[2])
+                if is_auto:
+                    procs = {}
+                    for port in self.window.comports:
+                        proc = self.runeach1(i, port)
+                        procs[port] = proc
 
+                    for port, proc in procs.items():
+                        output, _ = proc.communicate()
+                        output = output.decode('utf8')
+                        print('output', output)
+                        msg2 = '[task %s][output: %s]' % (i, output)
+                        self.printterm_msg.emit(msg2)
+                        result = json.dumps({'index':i, 'port': port, 'output': output})
+                        self.task_result.emit(result)
+
+                else:
+                    ports = ','.join(self.window.comports)
+                    self.runeachports(i, ports)
+            QThread.msleep(500)
         self.message.emit('tasks done')
 
 
@@ -212,6 +270,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         task.window = self
         self.table_model = TableModelTask(self, task)
         self.table_view.setModel(self.table_model)
+        for col in [0,1,2]:
+            self.table_view.setColumnHidden(col, True)
 
         self.setsignal()
 
@@ -226,11 +286,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def set_power(self):
-        update_serial([dmm, power1])
-        if power1.open_com():
-            power1.off()
-            power1.on()
-        #  dmm.open_com()
+        update_serial([power1, power2])
+        if not power1.is_open:
+            power1.open_com()
+        if not power2.is_open:
+            power2.open_com()
+        power1.on()
+        power2.on()
 
     def modUi(self):
         self.edit1.setStyleSheet("""
@@ -297,21 +359,34 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def taskrun(self, result):
         ret = json.loads(result)
-        idx, output = ret['index'], str(ret['output'])
-        self.table_view.selectRow(idx)
+        idx, output = ret['index'], json.loads(ret['output'])
 
-        if 'port' in ret:
-            port = ret['port']
-            j = self.comports.index(port)
-        elif 'idx' in ret:
-            j = ret['idx']
-            # output = {True:'pass', False:'fail'}[output]
+        if type(idx)==list:
 
-        print('task %s are done, j=%s' % (idx, j))
+            for i in range(*idx):
+                x1, x2 = output[i][0], output[i][1]
+                self.table_view.setItem(i, 9, QTableWidgetItem(x1))
+                self.table_view.setItem(i, 10, QTableWidgetItem(x2))
+                color1 = QColor(0,255,0) if x1.startswith('Pass') else QColor(255,0,0)
+                color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
+                self.table_view.item(i, 9).setBackground(color1)
+                self.table_view.item(i, 10).setBackground(color2)
+        else:
+            print('...B')
+            self.table_view.selectRow(idx)
 
-        self.table_view.setItem(idx, 9+j, QTableWidgetItem(output))
-        color = QColor(0,255,0) if output.startswith('Pass') else QColor(255,0,0)
-        self.table_view.item(idx,9+j).setBackground(color)
+            if 'port' in ret:
+                port = ret['port']
+                j = self.comports.index(port)
+            elif 'idx' in ret:
+                j = ret['idx']
+                # output = {True:'pass', False:'fail'}[output]
+
+            print('task %s are done, j=%s' % (idx, j))
+
+            self.table_view.setItem(idx, 9+j, QTableWidgetItem(output))
+            color = QColor(0,255,0) if output.startswith('Pass') else QColor(255,0,0)
+            self.table_view.item(idx,9+j).setBackground(color)
 
     def taskdone(self, message):
         if message.startswith('tasks done'):
@@ -328,11 +403,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         power1.off()
+        power2.off()
         event.accept() # let the window close
 
 
 if __name__ == "__main__":
-    mainboard_task = Task('jsonfile/power.json')
+    #  mainboard_task = Task('jsonfile/power_new.json')
+    mainboard_task = Task('jsonfile/test2.json')
+    #  mainboard_task = Task('jsonfile/power.json')
 
     app = QApplication(sys.argv)
     win = MyWindow(app, mainboard_task)

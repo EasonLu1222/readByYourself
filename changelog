@@ -1,3 +1,10 @@
+[2019.6.14 - 09:30]
+0. modify power rail measurments to all channles & DUTs all at once without chaning the json file format
+	a. add Task.runeach2
+1. power rail voltage for two DUTs : gui ok
+	a. power_new.json + tasks/power_check2.py
+	b. modify instrument package: SCPI commands less buggy
+
 [2019.6.11 - 16:52]
 0. use power supply to boot up DUT
 1. power rail voltage measurement : function ok
