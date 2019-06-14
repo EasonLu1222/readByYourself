@@ -347,7 +347,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.set_power_old()
 
         self.showMaximized()
-        self.show()
         self.w = FixtureSelectDialog(self)
         self.w.show()
 

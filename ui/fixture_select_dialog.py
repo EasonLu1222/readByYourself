@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FixtureSelectDialog(object):
     def setupUi(self, FixtureSelectDialog):
         FixtureSelectDialog.setObjectName("FixtureSelectDialog")
-        FixtureSelectDialog.resize(710, 260)
+        FixtureSelectDialog.resize(710, 235)
         self.gridLayout = QtWidgets.QGridLayout(FixtureSelectDialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -37,17 +37,17 @@ class Ui_FixtureSelectDialog(object):
         self.verticalLayout.addLayout(self.verticalLayout_2)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
-        self.pushButtonStart = QtWidgets.QPushButton(FixtureSelectDialog)
+        self.startBtn = QtWidgets.QPushButton(FixtureSelectDialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonStart.sizePolicy().hasHeightForWidth())
-        self.pushButtonStart.setSizePolicy(sizePolicy)
-        self.pushButtonStart.setMinimumSize(QtCore.QSize(490, 32))
-        self.pushButtonStart.setMouseTracking(False)
-        self.pushButtonStart.setStyleSheet("")
-        self.pushButtonStart.setObjectName("pushButtonStart")
-        self.verticalLayout.addWidget(self.pushButtonStart)
+        sizePolicy.setHeightForWidth(self.startBtn.sizePolicy().hasHeightForWidth())
+        self.startBtn.setSizePolicy(sizePolicy)
+        self.startBtn.setMinimumSize(QtCore.QSize(490, 32))
+        self.startBtn.setMouseTracking(False)
+        self.startBtn.setStyleSheet("")
+        self.startBtn.setObjectName("startBtn")
+        self.verticalLayout.addWidget(self.startBtn)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
         self.retranslateUi(FixtureSelectDialog)
@@ -59,6 +59,6 @@ class Ui_FixtureSelectDialog(object):
         self.checkBoxEngMode.setText(_translate("FixtureSelectDialog", "Engineering mode"))
         self.checkBoxFx1.setText(_translate("FixtureSelectDialog", "Test on fixture 1"))
         self.checkBoxFx2.setText(_translate("FixtureSelectDialog", "Test on fixture 2"))
-        self.pushButtonStart.setText(_translate("FixtureSelectDialog", "Start"))
+        self.startBtn.setText(_translate("FixtureSelectDialog", "Start"))
 
 

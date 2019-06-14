@@ -1,13 +1,17 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
-from barcode_dialog import Ui_BarcodeDialog
+from ui.barcode_dialog import Ui_BarcodeDialog
 
 
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
     barcode_entered = pyqtSignal(str)  # str:barcode
-    def __init__(self, parent=None):
+    barcode_dialog_closed = pyqtSignal()
+    num_of_barcode_collected = 0
+    def __init__(self, parent=None, num=0):
         super().__init__(parent)
         self.setupUi(self)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.total_barcode = num
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)
         self.barcodeLineEdit.setFocus()
         
@@ -15,7 +19,11 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         barcode = self.barcodeLineEdit.text()
         if (self.is_valid(barcode)):
             self.barcode_entered.emit(barcode)
-            self.close()
+            self.num_of_barcode_collected+=1
+            if (self.num_of_barcode_collected >= self.total_barcode):
+                self.close()
+            else:
+                self.barcodeLineEdit.clear()
         else:
             self.barcodeLineEdit.clear()
         
@@ -23,5 +31,9 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         """
         Verify if the input is a valid barcode
         """
-        # TODO: Modify this when the actual barcode format is determined
+        # TODO: Modify this when the actual barcode format is defined
         return len(barcode)==4
+    
+    def closeEvent(self, evnt):
+        self.barcode_dialog_closed.emit()
+        
