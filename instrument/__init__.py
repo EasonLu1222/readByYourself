@@ -72,16 +72,37 @@ MEASURE_VOLT_ALL = '''
     ROUT:CHAN 107,1,10,0
     ROUT:CHAN 108,1,10,0
     ROUT:CHAN 109,1,100,0
-    ROUT:CHAN 110,1,100,0
-    ROUT:CHAN 111,1,100,0
-    ROUT:CHAN 112,1,100,0
-    ROUT:CHAN 113,1,100,0
-    ROUT:CHAN 114,1,100,0
-    ROUT:CHAN 115,1,100,0
-    ROUT:CHAN 116,1,100,0
+    ROUT:CHAN 110,1,10,0
+    ROUT:CHAN 111,1,10,0
+    ROUT:CHAN 112,1,10,0
+    ROUT:CHAN 113,1,10,0
+    ROUT:CHAN 114,1,10,0
+    ROUT:CHAN 115,1,10,0
+    ROUT:CHAN 116,1,10,0
     ROUT:FUNC SCAN
     FETCH?
 '''
+
+
+MEASURE_FREQ = '''
+    SYST:OUTP:SEP 1
+    ROUT:SCAN:FIN OFF
+    ROUT:ADV ON
+    SENS:DET:RATE F
+    SENS:FREQ:APER 0.01
+    ROUT:MULT:CLOS 101,116
+    ROUT:MULT:OPEN 113,116
+    ROUT:COUN 4
+    ROUT:DEL 0
+    TRIG:DEL 0
+    ROUT:CHAN 113,8,10,0
+    ROUT:CHAN 114,8,10,0
+    ROUT:CHAN 115,8,10,0
+    ROUT:CHAN 116,8,10,0
+    ROUT:FUNC SCAN
+    FETCH?
+'''
+
 
 
 
@@ -122,16 +143,7 @@ def cmd_volt(channel):
     cmds = [e for e in cmds if not e.startswith(f'ROUT:CLOSE {channel}')]
     for i, e in enumerate(cmds):
         if '___' in e: cmds[i] = f'ROUT:CHAN {channel},1,100,0'
-    #  idx = cmds.index('TRIG:DEL 0')
-    #  cmds.insert(idx+1, f'ROUT:CHAN {channel},1,100,0')
     return cmds
-
-
-#  def update_serial(instruments):
-    #  devices = get_devices()
-    #  for instrument in instruments:
-        #  device = [e for e in devices if instrument.NAME in e['name']]
-        #  instrument.com = device[0]['comport'] if device else None
 
 
 def update_serial(instruments):
@@ -170,6 +182,7 @@ class SerialInstrument():
             cmd = f'{item}\n'.encode()
             self.ser.write(cmd)
             if self.delay_sec: time.sleep(self.delay_sec)
+
         if fetch:
             result = self.ser.readline().decode('utf8')
             return result
@@ -194,6 +207,11 @@ class DMM(SerialInstrument):
             if result:
                 return float(result)
 
+    def measure_freq(self, channel):
+        result = self.run_cmd(cmd_volt(channel), True)
+        if result:
+            return float(result)
+
     def measure_volts(self, channels):
         result = self.run_cmd(cmd_volts(channels), True)
         logging.info(f'result: {result}')
@@ -205,12 +223,28 @@ class DMM(SerialInstrument):
         values = [float(e) for e in result.split(',')]
         return values
 
+    def measure_freqs_all(self):
+        result = self.run_cmd(cmd(MEASURE_FREQ), True)
+        values = [float(e) for e in result.split(',')]
+        return values
 
 
-dmm1 = DMM()
-power1 = PowerSupply(1)
-power2 = PowerSupply(2)
-#  power1 = PowerSupply('COM8')
-#  power2 = PowerSupply('COM11')
+def open_all(update_ser=False, if_open_com=False, if_poweron=False):
+    dmm1 = DMM(1)
+    power1 = PowerSupply(1)
+    power2 = PowerSupply(2)
+    instruments = [dmm1, power1, power2]
+    if update_ser:
+        update_serial(instruments)
+    if if_open_com:
+        for e in instruments:
+            e.open_com() if e is not dmm1 else e.open_com(timeout=5)
+    if if_poweron:
+        power1.on(); power2.on()
+    return instruments
+
+#  dmm1, power1, power2 = open_all()
+dmm1, power1, power2 = open_all(True, True)
+
 
 #  list(zip(range(1,17), dmm.measure_volts_all()))

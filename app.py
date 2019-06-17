@@ -37,6 +37,7 @@ class SerialListener(QThread):
     def __init__(self):
         super(SerialListener, self).__init__()
         self.is_reading = False
+
         self.ports = []
         self.instruments = []
 
@@ -373,10 +374,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.item(i, 9).setBackground(color1)
 
                 # DUT2
-                #  x2 = output[i][1]
-                #  self.table_view.setItem(i, 10, QTableWidgetItem(x2))
-                #  color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
-                #  self.table_view.item(i, 10).setBackground(color2)
+                x2 = output[i-idx[0]][1]
+                self.table_view.setItem(i, 10, QTableWidgetItem(x2))
+                color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
+                self.table_view.item(i, 10).setBackground(color2)
         else:
             output = str(ret['output'])
             self.table_view.selectRow(idx)
