@@ -542,8 +542,5 @@ if __name__ == "__main__":
     #  mainboard_task = Task('jsonfile/simulate1.json')
 
     app = QApplication(sys.argv)
-    translator = QTranslator()
-    translator.load("translate/zh_TW.qm")
-    app.installTranslator(translator)
     win = MyWindow(app, mainboard_task)
     sys.exit(app.exec_())

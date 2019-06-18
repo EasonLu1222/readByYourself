@@ -7,13 +7,15 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
     barcode_entered = pyqtSignal(str)  # str:barcode
     barcode_dialog_closed = pyqtSignal()
     num_of_barcode_collected = 0
-    def __init__(self, parent=None, num=0):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
-        self.total_barcode = num
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)
         self.barcodeLineEdit.setFocus()
+    
+    def set_total_barcode(self, num):
+        self.total_barcode = num
         
     def on_input_done(self):
         barcode = self.barcodeLineEdit.text()

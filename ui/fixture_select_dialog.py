@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'fixture_select_dialog.ui'
+# Form implementation generated from reading ui file './fixture_select_dialog.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.2
 #
@@ -12,20 +12,27 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FixtureSelectDialog(object):
     def setupUi(self, FixtureSelectDialog):
         FixtureSelectDialog.setObjectName("FixtureSelectDialog")
-        FixtureSelectDialog.resize(710, 235)
+        FixtureSelectDialog.resize(781, 417)
         self.gridLayout = QtWidgets.QGridLayout(FixtureSelectDialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.langSelectMenu = QtWidgets.QComboBox(FixtureSelectDialog)
+        self.langSelectMenu.setObjectName("langSelectMenu")
+        self.langSelectMenu.addItem("")
+        self.langSelectMenu.addItem("")
+        self.horizontalLayout.addWidget(self.langSelectMenu)
         self.checkBoxEngMode = QtWidgets.QCheckBox(FixtureSelectDialog)
         self.checkBoxEngMode.setMaximumSize(QtCore.QSize(582, 16777215))
         self.checkBoxEngMode.setObjectName("checkBoxEngMode")
         self.horizontalLayout.addWidget(self.checkBoxEngMode, 0, QtCore.Qt.AlignRight)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.checkBoxFx1 = QtWidgets.QCheckBox(FixtureSelectDialog)
@@ -35,8 +42,8 @@ class Ui_FixtureSelectDialog(object):
         self.checkBoxFx2.setObjectName("checkBoxFx2")
         self.verticalLayout_2.addWidget(self.checkBoxFx2, 0, QtCore.Qt.AlignHCenter)
         self.verticalLayout.addLayout(self.verticalLayout_2)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem1)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem2)
         self.startBtn = QtWidgets.QPushButton(FixtureSelectDialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -56,6 +63,8 @@ class Ui_FixtureSelectDialog(object):
     def retranslateUi(self, FixtureSelectDialog):
         _translate = QtCore.QCoreApplication.translate
         FixtureSelectDialog.setWindowTitle(_translate("FixtureSelectDialog", "Dialog"))
+        self.langSelectMenu.setItemText(0, _translate("FixtureSelectDialog", "en_US"))
+        self.langSelectMenu.setItemText(1, _translate("FixtureSelectDialog", "zh_TW"))
         self.checkBoxEngMode.setText(_translate("FixtureSelectDialog", "Engineering mode"))
         self.checkBoxFx1.setText(_translate("FixtureSelectDialog", "Test on fixture 1"))
         self.checkBoxFx2.setText(_translate("FixtureSelectDialog", "Test on fixture 2"))
