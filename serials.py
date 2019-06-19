@@ -32,10 +32,15 @@ def is_serial_free(port_name):
 
 
 def get_device(comport):
-    matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
-    devices = json.load(open('device.json', 'r'))
-    vid_pid = matched[8:]
-    device = devices[vid_pid]
+    try:
+        matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
+        devices = json.load(open('device.json', 'r'))
+        vid_pid = matched[8:]
+        device = devices[vid_pid]
+    except Exception as e:
+        logging.debug("get_device failed!")
+        device = ""
+
     return device
 
 
