@@ -140,9 +140,6 @@ def parse_json(jsonfile):
 
 
 class Task(QThread):
-    task_result = QSignal(str)
-    message = QSignal(str)
-    printterm_msg = QSignal(str)
     '''
         there's three types of tasks
             1. DUT Based
@@ -155,6 +152,10 @@ class Task(QThread):
                 a. serial port of both DUTs and instruments
                 b. TBD
     '''
+    task_result = QSignal(str)
+    message = QSignal(str)
+    printterm_msg = QSignal(str)
+    
     def __init__(self, jsonfile, mainwindow=None):
         super(Task, self).__init__(mainwindow)
         self.base = json.loads(open(jsonfile, 'r').read())
