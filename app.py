@@ -3,6 +3,8 @@ import sys
 import json
 import time
 import random
+import pickle
+import serial
 from collections import defaultdict
 import configparser
 from subprocess import Popen, PIPE
@@ -30,16 +32,38 @@ from serials import (enter_factory_image_prompt, get_serial,
 from instrument import update_serial, power1, power2, dmm1
 
 
+class ProcessListener(QThread):
+    process_results = QSignal(dict)
+    def __init__(self):
+        super(ProcessListener, self).__init__()
+
+    def set_process(self, processes):
+        self.processes = processes
+
+    def run(self):
+        outputs = {}
+        for pid, proc in self.processes.items():
+            output, _ = proc.communicate()
+            output = output.decode('utf8')
+            outputs[pid] = float(output)
+        self.process_results.emit(outputs)
+
+    def stop(self):
+        self.terminate()
+
+
 class SerialListener(QThread):
     update_msec = 500
     comports = QSignal(list)
     comports_instrument = QSignal(list)
-    def __init__(self):
-        super(SerialListener, self).__init__()
+    if_all_ready = QSignal(bool)
+    def __init__(self, *args, **kwargs):
+        super(SerialListener, self).__init__(*args, **kwargs)
         self.is_reading = False
 
         self.ports = []
         self.instruments = []
+        self.is_instrument_ready = False
 
     def update(self, devices_prev, devices):
         set_prev, set_now = set(devices_prev), set(devices)
@@ -64,11 +88,23 @@ class SerialListener(QThread):
             instruments = [e['comport'] for e in
                 [e for e in devices if e['name'] in ['gw_powersupply', 'gw_dmm']]]
             self.is_reading = False
+
             if self.update(self.ports, ports):
                 self.comports.emit(self.ports)
+
+            # update comport of intruments
             if self.update(self.instruments, instruments):
                 update_serial([dmm1, power1, power2])
                 self.comports_instrument.emit(self.instruments)
+
+            if not self.is_instrument_ready and len(self.instruments)==3:
+                self.is_instrument_ready = True
+                self.if_all_ready.emit(True)
+
+            if self.is_instrument_ready and len(self.instruments)<3:
+                self.is_instrument_ready = False
+                self.if_all_ready.emit(False)
+
 
     def stop(self):
         # wait 1s for list_ports to finish, is it enough or too long in order
@@ -90,7 +126,7 @@ def parse_json(jsonfile):
         if not group_name in group_orders:
             group_orders.append(group_name)
         del e['group']
-        print(e)
+        #  print(e)
         groups[group_name].append(e)
     groups = {k:groups[k] for k in group_orders}
 
@@ -152,11 +188,9 @@ class Task(QThread):
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
         msg1 = '\n[runeach1][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
-
         print(msg1)
         self.printterm_msg.emit(msg1)
         proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
-
         return proc
 
     def runeach2(self, groupname):
@@ -168,6 +202,17 @@ class Task(QThread):
         print(f'[runeach2][script: {script}][index: {index}][len: {item_len}][args: {args}]')
         port_dmm = dmm1.com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] + [json.dumps(args)], stdout=PIPE)
+        return proc
+
+    def runeach3(self, index, port):
+        line = self.df.values[index]
+        script = 'tasks.%s' % line[0]
+        args = [str(e) for e in line[1]] if line[1] else []
+        msg1 = '\n[runeach3][script: %s][index: %s][args: %s]' % (script, index, args)
+        print(msg1)
+        x = {'COM3': 2, 'COM11': 1}
+        args = [str(x[port])]
+        proc = Popen(['python', '-m', script] + args, stdout=PIPE)
         return proc
 
     def runeachports(self, index, ports):
@@ -197,8 +242,11 @@ class Task(QThread):
 
         port_ser_thread = {}
         for port in self.window.comports:
-            ser = get_serial(port, 115200, timeout=1)
-            t = Thread(target=enter_factory_image_prompt, args=(ser,))
+            #  ser = get_serial(port, 115200, timeout=1)
+            ser = get_serial(port, 115200, timeout=0.2)
+
+            #  t = Thread(target=enter_factory_image_prompt, args=(ser,))
+            t = Thread(target=enter_factory_image_prompt, args=(ser, 0))
             port_ser_thread[port] = [ser, t]
             t.start()
 
@@ -214,6 +262,7 @@ class Task(QThread):
 
     def run(self):
         if not all(is_serial_free(p) for p in self.window.comports):
+            print('not all serial port are free!')
             self.window.pushButton.setEnabled(True)
             return
         self.enter_prompt()
@@ -236,11 +285,18 @@ class Task(QThread):
             else:
                 line = self.df.values[i]
                 is_auto = bool(line[2])
+                task_type=  int(line[3])
+
                 if is_auto:
                     procs = {}
-                    for port in self.window.comports:
-                        proc = self.runeach1(i, port)
-                        procs[port] = proc
+                    if task_type == 3:
+                        for port in self.window.comports:
+                            proc = self.runeach3(i, port)
+                            procs[port] = proc
+                    else:
+                        for port in self.window.comports:
+                            proc = self.runeach1(i, port)
+                            procs[port] = proc
 
                     for port, proc in procs.items():
                         output, _ = proc.communicate()
@@ -254,6 +310,7 @@ class Task(QThread):
                 else:
                     ports = ','.join(self.window.comports)
                     self.runeachports(i, ports)
+
             QThread.msleep(500)
         self.message.emit('tasks done')
 
@@ -280,21 +337,46 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ser_listener = SerialListener()
         self.ser_listener.comports.connect(self.ser_update)
         self.ser_listener.comports_instrument.connect(self.instrument_update)
+        self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
+        self.proc_listener = ProcessListener()
+        self.proc_listener.process_results.connect(self.recieve_power)
 
-        self.set_power()
+        self.pushButton.setEnabled(False)
+        #  self.set_power_old()
 
         self.showMaximized()
         self.show()
 
+        self.power_process = {}
+        self.power_results = {}
+
+        self.col_dut_start = 10
+
+    #  def set_power_old(self):
+        #  update_serial([power1, power2])
+        #  if not power1.is_open:
+            #  power1.open_com()
+        #  if not power2.is_open:
+            #  power2.open_com()
+        #  power1.on()
+        #  power2.on()
+
+    def recieve_power(self, process_results):
+        print('recieve_power', process_results)
+        self.proc_listener.stop()
+        self.power_results = process_results
+        with open('power_results' , 'w+') as f:
+            f.write(json.dumps(process_results))
+
     def set_power(self):
-        update_serial([power1, power2])
-        if not power1.is_open:
-            power1.open_com()
-        if not power2.is_open:
-            power2.open_com()
-        power1.on()
-        power2.on()
+        script = 'tasks.poweron'
+        for idx in range(1,3):
+            args = [str(idx)]
+            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
+            self.power_process[idx] = proc
+        self.proc_listener.set_process(self.power_process)
+        self.proc_listener.start()
 
     def modUi(self):
         self.edit1.setStyleSheet("""
@@ -318,6 +400,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def instrument_update(self, comports):
         print('instrument_update', comports)
+
+    def instrument_ready(self, ready):
+        if ready:
+            self.pushButton.setEnabled(True)
+            print('\nREADY\n!')
+            with open('instruments', 'wb') as f:
+                pickle.dump([dmm1, power1, power2], f)
+
+
+            #  for p in self.comports:
+                #  print('p', p)
+                #  print(is_serial_free(p))
+        else:
+            self.pushButton.setEnabled(False)
+            print('\nNOT READY\n!')
 
     def ser_update(self, comports):
         print('ser_update', comports)
@@ -353,7 +450,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def printterm1(self, port_msg):
         port, msg = port_msg
         msg = '[port: %s]%s' % (port, msg)
-        print(msg)
+        #  print(msg)
         self.edit1.appendPlainText(msg)
 
     def printterm2(self, msg):
@@ -369,15 +466,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for i in range(*idx):
                 # DUT1
                 x1 = output[i-idx[0]][0]
-                self.table_view.setItem(i, 9, QTableWidgetItem(x1))
+                self.table_view.setItem(i, self.col_dut_start, QTableWidgetItem(x1))
                 color1 = QColor(0,255,0) if x1.startswith('Pass') else QColor(255,0,0)
-                self.table_view.item(i, 9).setBackground(color1)
+                self.table_view.item(i, self.col_dut_start).setBackground(color1)
 
                 # DUT2
                 x2 = output[i-idx[0]][1]
-                self.table_view.setItem(i, 10, QTableWidgetItem(x2))
+                self.table_view.setItem(i, self.col_dut_start+1, QTableWidgetItem(x2))
                 color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
-                self.table_view.item(i, 10).setBackground(color2)
+                self.table_view.item(i, self.col_dut_start+1).setBackground(color2)
         else:
             output = str(ret['output'])
             self.table_view.selectRow(idx)
@@ -391,9 +488,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             print('task %s are done, j=%s' % (idx, j))
 
-            self.table_view.setItem(idx, 9+j, QTableWidgetItem(output))
+            self.table_view.setItem(idx, self.col_dut_start+j, QTableWidgetItem(output))
             color = QColor(0,255,0) if output.startswith('Pass') else QColor(255,0,0)
-            self.table_view.item(idx,9+j).setBackground(color)
+            self.table_view.item(idx,self.col_dut_start+j).setBackground(color)
 
     def taskdone(self, message):
         if message.startswith('tasks done'):
@@ -401,23 +498,46 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
+            if not power1.is_open:
+                power1.open_com()
+            if not power2.is_open:
+                power2.open_com()
+
+            if power1.ser:
+                power1.off()
+                power1.ser.close()
+            if power2.ser:
+                power2.off()
+                power2.ser.close()
+
     def btn_clicked(self):
         print('btn_clicked')
         self.reset_model()
+        self.table_model.update()
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
+        self.set_power()
 
     def closeEvent(self, event):
-        power1.off()
-        power2.off()
+        try:
+            if not power1.is_open:
+                power1.open_com()
+            if not power2.is_open:
+                power2.open_com()
+        except serial.serialutil.SerialException as ex:
+            print('My SerialException', ex)
+            raise ex
+        finally:
+            if power1.ser: power1.off()
+            if power2.ser: power2.off()
         event.accept() # let the window close
 
 
 if __name__ == "__main__":
-    #  mainboard_task = Task('jsonfile/power_new.json')
-    mainboard_task = Task('jsonfile/test2.json')
-    #  mainboard_task = Task('jsonfile/power.json')
+    mainboard_task = Task('jsonfile/power_new2.json')
+    #  mainboard_task = Task('jsonfile/test2.json')
+    #  mainboard_task = Task('jsonfile/simulate1.json')
 
     app = QApplication(sys.argv)
     win = MyWindow(app, mainboard_task)

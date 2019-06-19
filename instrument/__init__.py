@@ -1,9 +1,8 @@
 import time
 from serials import (get_serial, get_devices)
 from collections import defaultdict
-import logging
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][pid=%(process)d][%(message)s]')
+from mylogger import logger
 
 
 POWERON = '''
@@ -17,12 +16,10 @@ POWERON = '''
     OUTPut 1
 '''
 
-
 POWEROFF = '''
     OUTPut:PROTection:CLEar
     OUTPut 0
 '''
-
 
 MEASURE_VOLT_BASE = '''
     SYST:OUTP:SEP 1
@@ -83,7 +80,6 @@ MEASURE_VOLT_ALL = '''
     FETCH?
 '''
 
-
 MEASURE_FREQ = '''
     SYST:OUTP:SEP 1
     ROUT:SCAN:FIN OFF
@@ -102,9 +98,6 @@ MEASURE_FREQ = '''
     ROUT:FUNC SCAN
     FETCH?
 '''
-
-
-
 
 MEASURE_VOLT_B = '''
     SYST:OUTP:SEP 1
@@ -128,13 +121,13 @@ def cmd_volts(channels):
     cmds = cmd(MEASURE_VOLT_B)
     idx1 = cmds.index('ROUT:MULT:OPEN 101,116')
     into1 = [f'ROUT:CLOS {e}' for e in range(101, 117) if e not in channels]
-    cmds = cmds[:idx1+1] + into1 + cmds[idx1+1:]
+    cmds = cmds[:idx1 + 1] + into1 + cmds[idx1 + 1:]
     idx2 = cmds.index('TRIG:DEL 0')
     into2 = [f'ROUT:CHAN {e},1,100,0' for e in channels]
-    cmds = cmds[:idx2+1] + into2 + cmds[idx2+1:]
+    cmds = cmds[:idx2 + 1] + into2 + cmds[idx2 + 1:]
     cmds[cmds.index('ROUT:COUN 1')] = f'ROUT:COUN {len(channels)}'
     for e in cmds:
-        logging.info(e)
+        logger.info(e)
     return cmds
 
 
@@ -150,29 +143,41 @@ def update_serial(instruments):
     devices = get_devices()
     instrument_set = set(e.NAME for e in instruments)
     for instrument_name in instrument_set:
-        device = [e for e in devices if e['name']==instrument_name]
-        for idx, d in enumerate(sorted(device, key=lambda x: int(x['comport'][3:])), 1):
-            print(f'{instrument_name}_{idx}', d)
-            each = next(filter(lambda e: e.NAME==instrument_name and e.index==idx, instruments))
+        device = [e for e in devices if e['name'] == instrument_name]
+        for idx, d in enumerate(
+                sorted(device, key=lambda x: int(x['comport'][3:])), 1):
+            logger.info(
+                f'{instrument_name}_{idx} ---> {d["comport"]} ---> {d["hwid"]}')
+            each = next(
+                filter(lambda e: e.NAME == instrument_name and e.index == idx,
+                       instruments))
             each.com = d['comport']
 
 
 class SerialInstrument():
-    def __init__(self, index=1, port=None, baud=115200, timeout=2, delay_sec=0.002):
+
+    def __init__(self,
+                 index=1,
+                 port=None,
+                 baud=115200,
+                 timeout=2,
+                 delay_sec=0.002):
         self.index = index
         self.delay_sec = delay_sec
         if port:
             self.com = port
             self.ser = get_serial(port, baudrate=baud, timeout=timeout)
-            self.is_open = True
         else:
-            self.is_open = False
             self.com = None
+            self.ser = None
+
+    @property
+    def is_open(self):
+        return self.ser.isOpen() if self.ser else False
 
     def open_com(self, baud=115200, timeout=2):
         if self.com:
             self.ser = get_serial(self.com, baudrate=baud, timeout=timeout)
-            self.is_open = True
             return True
         else:
             return False
@@ -190,17 +195,38 @@ class SerialInstrument():
 
 class PowerSupply(SerialInstrument):
     NAME = 'gw_powersupply'
+    StartFetchTime = 2
+    MeasureTime = 10
+
     def on(self):
-        print('power on!')
+        logger.info(f'power_{self.index}({self}) on!')
         self.run_cmd(cmd(POWERON))
 
     def off(self):
-        print('power off!')
+        logger.info(f'power_{self.index}({self}) off!')
         self.run_cmd(cmd(POWEROFF))
+
+    def measure_current(self):
+        t0 = time.perf_counter()
+        elapsed = lambda: time.perf_counter() - t0
+        currents = []
+        while (True):
+            if elapsed() >= self.StartFetchTime:
+                line = self.run_cmd(['MEASure:CURRent:DC?'], True)
+                #  print(line)
+                if not line: continue
+                result = float(line)
+                currents.append(result)
+            if elapsed() > self.MeasureTime:
+                currents.sort(reverse=True)
+                self.max_current = currents[0]
+                break
+        return currents
 
 
 class DMM(SerialInstrument):
     NAME = 'gw_dmm'
+
     def measure_volt(self, channel):
         while True:
             result = self.run_cmd(cmd_volt(channel), True)
@@ -214,7 +240,7 @@ class DMM(SerialInstrument):
 
     def measure_volts(self, channels):
         result = self.run_cmd(cmd_volts(channels), True)
-        logging.info(f'result: {result}')
+        logger.info(f'result: {result}')
         values = [float(e) for e in result.split(',')]
         return values
 
@@ -240,11 +266,12 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
         for e in instruments:
             e.open_com() if e is not dmm1 else e.open_com(timeout=5)
     if if_poweron:
-        power1.on(); power2.on()
+        power1.on()
+        power2.on()
     return instruments
 
-#  dmm1, power1, power2 = open_all()
-dmm1, power1, power2 = open_all(True, True)
 
+dmm1, power1, power2 = open_all()
+#  dmm1, power1, power2 = open_all(True, True)
 
 #  list(zip(range(1,17), dmm.measure_volts_all()))

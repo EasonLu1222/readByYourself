@@ -2,7 +2,6 @@
 import os
 import re
 import sys
-import logging
 import time
 import serials
 #  from serials import issue_command, ser
@@ -10,7 +9,7 @@ from serials import issue_command, get_serial
 from PyQt5.QtCore import QTimer
 from threading import Timer
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][pid=%(process)d][%(message)s]')
+from mylogger import logger
 
 
 
@@ -52,7 +51,7 @@ def led_all_blue(ser, b=10):
 
 
 if __name__ == "__main__":
-    logging.info('LED test start')
+    logger.info('LED test start')
     with get_serial('COM3', 115200, 0) as ser:
         led_all_red(ser)
         time.sleep(1)
@@ -61,4 +60,4 @@ if __name__ == "__main__":
         led_all_blue(ser)
         time.sleep(1)
         led_all_clear(ser)
-        logging.info('LED test end')
+        logger.info('LED test end')

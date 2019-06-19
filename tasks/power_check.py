@@ -1,9 +1,8 @@
 import sys
-import logging
 import argparse
 from instrument import DMM
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][pid=%(process)d][%(message)s]')
+from mylogger import logger
 
 
 volt_ranges = {
@@ -37,41 +36,41 @@ if __name__ == "__main__":
     #  channels = [int(e) for e in args.channel]
     #  channel = channels[0]
 
-    logging.info('power check start. [channel: %s]' % channel)
+    logger.info('power check start. [channel: %s]' % channel)
 
     dmm = DMM(port=port_dmm, timeout=0.4)
-    logging.info(f'dmm.com: {dmm.com}')
-    logging.info(f'dmm.is_open: {dmm.is_open}')
-    logging.info(f'dmm.ser: {dmm.ser}')
+    logger.info(f'dmm.com: {dmm.com}')
+    logger.info(f'dmm.is_open: {dmm.is_open}')
+    logger.info(f'dmm.ser: {dmm.ser}')
 
     if channel == 102:
-        logging.info('channel: 102 --> 5V')
+        logger.info('channel: 102 --> 5V')
         volt = dmm.measure_volt(102)
 
     elif channel == 103:
-        logging.info('channel: 103 --> 3.3V')
+        logger.info('channel: 103 --> 3.3V')
         volt = dmm.measure_volt(103)
 
     elif channel == 104:
-        logging.info('channel: 104 --> 1.8V')
+        logger.info('channel: 104 --> 1.8V')
         volt = dmm.measure_volt(104)
 
     elif channel == 105:
-        logging.info('channel: 105 --> 1.35V')
+        logger.info('channel: 105 --> 1.35V')
         volt = dmm.measure_volt(105)
 
     elif channel == 106:
-        logging.info('channel: 106 --> 0.9V')
+        logger.info('channel: 106 --> 0.9V')
         volt = dmm.measure_volt(106)
 
     elif channel == 107:
-        logging.info('channel: 107 --> 1.1V')
+        logger.info('channel: 107 --> 1.1V')
         volt = dmm.measure_volt(107)
 
     elif channel == 108:
-        logging.info('channel: 108 --> 19V')
+        logger.info('channel: 108 --> 19V')
         volt = dmm.measure_volt(108)
 
     volt_in_range(channel, volt)
-    logging.info(f'volt measured: {volt}')
-    logging.info('power check end')
+    logger.info(f'volt measured: {volt}')
+    logger.info('power check end')

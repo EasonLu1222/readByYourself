@@ -3,8 +3,7 @@ import json
 from PyQt5 import QtWidgets, QtCore, QtGui
 from view.imglist import QCustomQWidget, ImageList
 
-import logging
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(message)s]')
+from mylogger import logger
 
 
 class Page(QtWidgets.QWidget):
@@ -120,7 +119,7 @@ class MyDialog(QtWidgets.QDialog):
             self.content_layout.addWidget(self.pages[self.idx+1])
             self.message_each.emit(self.idx)
         else:
-            logging.info('button_clicked')
+            logger.info('button_clicked')
             result = json.dumps(self.passes)
             self.message_end.emit(list(self.passes.values()))
             self.close()

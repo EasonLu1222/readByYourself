@@ -2,14 +2,13 @@
 import os
 import re
 import json
-import logging
 import time
 import serial
 from serial.tools.list_ports import comports
 from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject
 from threading import Timer
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(process)d]%(message)s')
+from mylogger import logger
 
 
 def get_serial(port_name, baudrate, timeout):
@@ -55,33 +54,51 @@ se = SerialEmit()
 
 
 def wait_for_prompt(serial, prompt, thread_timeout=25):
+    logger.info('\n\nwait_for_prompt\n\n')
     portname = serial.name
+    logger.info(f'portname: {portname}')
+    logger.info(f'is_open: {serial.isOpen()}')
     while True:
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
+            print(line)
         except UnicodeDecodeError as ex:
-            logging.debug('ERR1: UnicodeDecodeError', ex)
+            logger.error('ERR1: UnicodeDecodeError', ex)
 
         #  print(portname, line.strip())
         se.serial_msg.emit([portname, line.strip()])
         if line.startswith(prompt):
-            logging.info('get %s' % prompt)
+            logger.info('get %s' % prompt)
             break
 
 
-def enter_factory_image_prompt(serial):
+def enter_factory_image_prompt(serial, waitwordidx=1):
+
+    waitwords = [
+        'Starting kernel',
+        'Server is ready for client connect',
+        '|-----bluetooth speaker is ready for connections------|',
+    ]
     #  wait_for_prompt(serial, 'Starting kernel')
-    wait_for_prompt(serial, 'Server is ready for client connect')
+    #  wait_for_prompt(serial, 'Server is ready for client connect')
     #  wait_for_prompt(serial, '|-----bluetooth speaker is ready for connections------|')
+    wait_for_prompt(serial, waitwords[waitwordidx])
     for _ in range(3): serial.write(os.linesep.encode('ascii'))
     #  wait_for_prompt(serial, '#')
 
 
 def issue_command(serial, cmd, timeout_for_readlines=0):
-    logging.info('issue_command: write')
+    logger.info('issue_command: write')
     serial.write(f'{cmd}\n'.encode('utf-8'))
-    logging.info(f'issue_command: {cmd}')
+    logger.info(f'issue_command: {cmd}')
     lines = [e.decode('utf-8') for e in serial.readlines()]
-    for line in lines: logging.info(f'{line.rstrip()}')
+    for line in lines: logger.info(f'{line.rstrip()}')
     return lines
+
+
+if __name__ == "__main__":
+    port_name = 'COM3'
+    ser = get_serial(port_name, 115200, 0.2)
+    enter_factory_image_prompt(ser)
+

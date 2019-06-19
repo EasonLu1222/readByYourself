@@ -1,3 +1,41 @@
+[2019.6.19 - 14:40]
+1. unify logger into one module: mylogger.py
+   usage:
+		- from mylogger import logger
+		- logger.info(...)
+
+2. measure maximum current when boot up
+  mechanism:
+	a. move set_power() when button clicked
+	b. in set_power, use new class ProcessListener(QThread) to listen for
+	   two subprocess poweron.py to poweron and measure maximaum currents
+	   at the same time. When the measures are done, use recieve_power() 
+	   to get the results and save it as a file "power_results".
+	c. use power_max_current.py to get results from "power_results".
+	   wait until the file exists and not empty. 
+  modified
+	json:
+		a. add tasktype to json structure
+		b. power_new2.json for app.py
+	py:
+		a.instrument/__init__.py: add measure_current()
+
+  added:
+	a. tasks/poweron.py
+	b. tasks/power_max_current.py
+
+3. fix serial bugs
+    a. close window raise serial error
+	b. click button not working
+	   - actually not close serial for powersupply previously
+
+4. insturment update & ready
+	a. button enabled only when power1,power2,dmm1 are detected
+	a. add instrument_ready(), instrument_update() for MyWindow
+	c. pickle [dmm1,power1,power2] in file "instrument" for 
+	   poweron.py to unpickle to get the correct com port of each
+	   instruments
+
 [2019.6.17 - 14:00]
 1. minor bug fixed to allow test2.json(both power & other tests) passed for 2 DUTs
 2. measure frequency test ok

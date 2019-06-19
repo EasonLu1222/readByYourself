@@ -6,8 +6,7 @@ from view import task_dialog
 from tasks import led
 from serials import get_serial
 
-import logging
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(message)s]')
+from mylogger import logger
 
 
 LED_TIMEOUT = 1000
@@ -67,14 +66,14 @@ class ContentWidget(QtWidgets.QWidget):
         if self.idx >= 3:
             self.timer.stop()
             return
-        logging.info('time check idx: %s' % self.idx)
+        logger.info('time check idx: %s' % self.idx)
         if self.idx >= 0:
             self.all_color(self.rgb[self.idx])
             self.cmds[self.idx](self.ser, 10)
         self.idx += 1
 
     def onclose(self, msg):
-        logging.info('onclose')
+        logger.info('onclose')
         led.led_all_clear(self.ser)
         self.ser.close()
         sys.stdout.write(json.dumps(msg))
@@ -84,7 +83,7 @@ class ContentWidget(QtWidgets.QWidget):
         self.ser.close()
         self.ser = get_serial(next(self.iterports), 115200, 0)
         self.idx = 0
-        logging.info('nextpage - idx:%s' % idx)
+        logger.info('nextpage - idx:%s' % idx)
         self.all_color('#ffffff')
         led.led_all_clear(self.ser)
         self.timer = timer = QtCore.QTimer(self)
