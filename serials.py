@@ -12,6 +12,7 @@ from mylogger import logger
 
 
 def get_serial(port_name, baudrate, timeout):
+    logger.info(f'===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
                         baudrate=baudrate,
                         bytesize=serial.EIGHTBITS,
@@ -82,6 +83,7 @@ def enter_factory_image_prompt(serial, waitwordidx=1):
 
     waitwords = [
         'Starting kernel',
+        'usb rndis & adb start: OK',
         'Server is ready for client connect',
         '|-----bluetooth speaker is ready for connections------|',
     ]
@@ -93,13 +95,16 @@ def enter_factory_image_prompt(serial, waitwordidx=1):
     #  wait_for_prompt(serial, '#')
 
 
-def issue_command(serial, cmd, timeout_for_readlines=0):
+def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
     logger.info('issue_command: write')
     serial.write(f'{cmd}\n'.encode('utf-8'))
     logger.info(f'issue_command: {cmd}')
-    lines = [e.decode('utf-8') for e in serial.readlines()]
-    for line in lines: logger.info(f'{line.rstrip()}')
-    return lines
+    if fetch:
+        lines = [e.decode('utf-8') for e in serial.readlines()]
+        for line in lines: logger.info(f'{line.rstrip()}')
+        return lines
+    else:
+        return None
 
 
 if __name__ == "__main__":

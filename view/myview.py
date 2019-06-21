@@ -8,8 +8,7 @@ from PyQt5 import QtWidgets
 class TableView(QTableWidget):
     def __init__(self, *args, **kwargs):
         super(QTableWidget, self).__init__(*args, **kwargs)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setSelectionMode(QAbstractItemView.MultiSelection)
         self.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         font = QFont("Courier New", 16)
         self.setFont(font)

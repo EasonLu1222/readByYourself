@@ -5,15 +5,16 @@ import time
 import random
 import pickle
 import serial
+from operator import itemgetter
 from collections import defaultdict
 import configparser
 from subprocess import Popen, PIPE
 from threading import Thread
 import operator
 from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTreeView, QHeaderView,
-                             QLabel, QSpacerItem)
+                             QLabel, QSpacerItem, QTableView, QAbstractItemView)
 from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt,
-                          pyqtSignal as QSignal, QRect)
+                          pyqtSignal as QSignal, QRect, QItemSelectionModel)
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QMainWindow
@@ -29,7 +30,10 @@ from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial,
                      se, get_device, get_devices, is_serial_free)
 
-from instrument import update_serial, power1, power2, dmm1
+from instrument import update_serial, open_all
+
+
+dmm1, power1, power2 = open_all()
 
 
 class ProcessListener(QThread):
@@ -138,10 +142,39 @@ def parse_json(jsonfile):
     return groups
 
 
+class TaskItems():
+    def __init__(self, jsonfile):
+        self.base = json.loads(open(jsonfile, 'r').read())
+        self._groups = parse_json(jsonfile)
+
+    def __len__(self):
+        return len(self._groups)
+
+    def __getitem__(self, key):
+        return self._groups[key]
+
+    def keys(self):
+        return self._groups.keys()
+
+    def items(self):
+        return self._groups.items()
+
+    def __iter__(self):
+        for k in self.keys():
+            yield k
+
+    def each(self, key, idx):
+        each = self._groups[key][idx]
+        return each
+
+    def limits(self, key, idx):
+        each = self.each(key, idx)
+        min_, expect, max_ = itemgetter('min', 'expect', 'max')(each)
+        return (min_, expect, max_)
+
+
+
 class Task(QThread):
-    task_result = QSignal(str)
-    message = QSignal(str)
-    printterm_msg = QSignal(str)
     '''
         there's three types of tasks
             1. DUT Based
@@ -154,6 +187,11 @@ class Task(QThread):
                 a. serial port of both DUTs and instruments
                 b. TBD
     '''
+    #  task_each = QSignal(int)
+    task_each = QSignal(list)
+    task_result = QSignal(str)
+    message = QSignal(str)
+    printterm_msg = QSignal(str)
     def __init__(self, jsonfile, mainwindow=None):
         super(Task, self).__init__(mainwindow)
         self.base = json.loads(open(jsonfile, 'r').read())
@@ -167,6 +205,9 @@ class Task(QThread):
         for col in header_dut:
             df[col] = None
         return df
+
+    def instruments(self):
+        self.base['instruments']
 
     def header_dut(self, dut_names=None):
         if dut_names:
@@ -183,36 +224,33 @@ class Task(QThread):
         header_extension = dut_names if dut_names else self.header_dut()
         return self.header() + header_extension
 
-    def runeach1(self, index, port, to_wait=False):
-        line = self.df.values[index]
-        script = 'tasks.%s' % line[0]
-        args = [str(e) for e in line[1]] if line[1] else []
-        msg1 = '\n[runeach1][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
-        print(msg1)
-        self.printterm_msg.emit(msg1)
-        proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
-        return proc
-
-    def runeach2(self, groupname):
+    def rungroup(self, groupname):
         group = self.groups[groupname]
         script = f'tasks.{group[0]["script"]}'
         index = group[0]['index']
         item_len = len(group)
         args = [g['args'] for g in group]
-        print(f'[runeach2][script: {script}][index: {index}][len: {item_len}][args: {args}]')
+        print(f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]')
         port_dmm = dmm1.com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] + [json.dumps(args)], stdout=PIPE)
         return proc
 
-    def runeach3(self, index, port):
+    def runeach(self, index, port, tasktype):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
-        msg1 = '\n[runeach3][script: %s][index: %s][args: %s]' % (script, index, args)
-        print(msg1)
-        x = {'COM3': 2, 'COM11': 1}
-        args = [str(x[port])]
-        proc = Popen(['python', '-m', script] + args, stdout=PIPE)
+        if tasktype==1:
+            msg = '\n[runeach1][script: %s][index: %s][port: %s][args: %s]' % (script, index, port, args)
+            proc = Popen(['python', '-m', script, '-p', port] + args, stdout=PIPE)
+
+        elif tasktype==3:
+            msg = '\n[runeach3][script: %s][index: %s][args: %s]' % (script, index, args)
+            x = {'COM3': 2, 'COM11': 1} # <-- hard coded!!! To Be Modified
+            args = [str(x[port])]
+            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
+
+        self.printterm_msg.emit(msg)
+        print(msg)
         return proc
 
     def runeachports(self, index, ports):
@@ -246,7 +284,7 @@ class Task(QThread):
             ser = get_serial(port, 115200, timeout=0.2)
 
             #  t = Thread(target=enter_factory_image_prompt, args=(ser,))
-            t = Thread(target=enter_factory_image_prompt, args=(ser, 0))
+            t = Thread(target=enter_factory_image_prompt, args=(ser, 1))
             port_ser_thread[port] = [ser, t]
             t.start()
 
@@ -265,6 +303,7 @@ class Task(QThread):
             print('not all serial port are free!')
             self.window.pushButton.setEnabled(True)
             return
+        self.window.set_power()
         self.enter_prompt()
         QThread.msleep(500)
 
@@ -272,14 +311,16 @@ class Task(QThread):
         for group, items in self.groups.items():
             i = items[0]['index']
             if len(items) > 1:
-                proc = self.runeach2(group)
+                #  self.task_each.emit(i)
+                self.task_each.emit([i, len(items)])
+
+                proc = self.rungroup(group)
                 output, _ = proc.communicate()
                 output = output.decode('utf8')
                 print('OUTPUT', output)
 
                 msg2 = '[task %s][output: %s]' % ([i, i+len(items)], output)
                 self.printterm_msg.emit(msg2)
-                #  result = json.dumps({'index':[i, i+len(items)], 'output': output})
                 result = json.dumps({'index':[i, i+len(items)], 'output': output})
                 self.task_result.emit(result)
             else:
@@ -287,16 +328,13 @@ class Task(QThread):
                 is_auto = bool(line[2])
                 task_type=  int(line[3])
 
+                self.task_each.emit([i, 1])
+
                 if is_auto:
                     procs = {}
-                    if task_type == 3:
-                        for port in self.window.comports:
-                            proc = self.runeach3(i, port)
-                            procs[port] = proc
-                    else:
-                        for port in self.window.comports:
-                            proc = self.runeach1(i, port)
-                            procs[port] = proc
+                    for port in self.window.comports:
+                        proc = self.runeach(i, port, task_type)
+                        procs[port] = proc
 
                     for port, proc in procs.items():
                         output, _ = proc.communicate()
@@ -329,6 +367,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         task.window = self
         self.table_model = TableModelTask(self, task)
         self.table_view.setModel(self.table_model)
+        self.table_view.setSelectionBehavior(QTableView.SelectRows)
         for col in [0,1,2]:
             self.table_view.setColumnHidden(col, True)
 
@@ -339,8 +378,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ser_listener.comports_instrument.connect(self.instrument_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
+
         self.proc_listener = ProcessListener()
         self.proc_listener.process_results.connect(self.recieve_power)
+        self.power_recieved = False
 
         self.pushButton.setEnabled(False)
         #  self.set_power_old()
@@ -351,16 +392,29 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_process = {}
         self.power_results = {}
 
-        self.col_dut_start = 10
+        self.col_dut_start = 11
+        self.table_hidden_row()
+        self.clean_power()
+        self.taskdone_first = False
 
-    #  def set_power_old(self):
-        #  update_serial([power1, power2])
-        #  if not power1.is_open:
-            #  power1.open_com()
-        #  if not power2.is_open:
-            #  power2.open_com()
-        #  power1.on()
-        #  power2.on()
+    def clean_power(self):
+        # prevent from last crash and power supply not closed normally
+        update_serial([dmm1, power1, power2])
+        if not power1.is_open:
+            power1.open_com()
+        if not power2.is_open:
+            power2.open_com()
+        if power1.ser:
+            power1.off()
+            power1.close_com()
+        if power2.ser:
+            power2.off()
+            power2.close_com()
+
+    def table_hidden_row(self):
+        for i, each in enumerate(self.table_model.mylist):
+            is_hidden = each[4]
+            self.table_view.setRowHidden(i, is_hidden)
 
     def recieve_power(self, process_results):
         print('recieve_power', process_results)
@@ -368,6 +422,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_results = process_results
         with open('power_results' , 'w+') as f:
             f.write(json.dumps(process_results))
+        self.power_recieved = True
+        if self.taskdone_first:
+            self.taskdone('tasks done')
 
     def set_power(self):
         script = 'tasks.poweron'
@@ -443,6 +500,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def setsignal(self):
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
+        self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
         self.task.printterm_msg.connect(self.printterm2)
@@ -456,9 +514,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def printterm2(self, msg):
         self.edit2.appendPlainText(msg)
 
+    def taskeach(self, row_rlen):
+        self.table_view.clearSelection()
+        row, rowlen = row_rlen
+        for i in range(row, row+rowlen):
+            self.table_view.selectRow(i)
+
     def taskrun(self, result):
         ret = json.loads(result)
         idx = ret['index']
+
+        def color_check(s):
+            if s.startswith('Pass'):
+                color = QColor(1,255,0)
+            elif s.startswith('Fail'):
+                color = QColor(255,0,0)
+            else:
+                color = QColor(255,255,255)
+            return color
 
         if type(idx)==list:
             output = json.loads(ret['output'])
@@ -467,34 +540,33 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 # DUT1
                 x1 = output[i-idx[0]][0]
                 self.table_view.setItem(i, self.col_dut_start, QTableWidgetItem(x1))
-                color1 = QColor(0,255,0) if x1.startswith('Pass') else QColor(255,0,0)
-                self.table_view.item(i, self.col_dut_start).setBackground(color1)
+                #  self.table_model.mylist[i][self.col_dut_start] = x1
 
                 # DUT2
                 x2 = output[i-idx[0]][1]
                 self.table_view.setItem(i, self.col_dut_start+1, QTableWidgetItem(x2))
-                color2 = QColor(0,255,0) if x2.startswith('Pass') else QColor(255,0,0)
-                self.table_view.item(i, self.col_dut_start+1).setBackground(color2)
+
+                #  self.table_model.mylist[i][self.col_dut_start+1] = x2
+                #  self.table_model.update()
+
+                self.table_view.item(i, self.col_dut_start).setBackground(color_check(x1))
+                self.table_view.item(i, self.col_dut_start+1).setBackground(color_check(x2))
+
+            print(self.table_model.mylist)
         else:
             output = str(ret['output'])
-            self.table_view.selectRow(idx)
-
             if 'port' in ret:
                 port = ret['port']
                 j = self.comports.index(port)
             elif 'idx' in ret:
                 j = ret['idx']
-                # output = {True:'pass', False:'fail'}[output]
-
             print('task %s are done, j=%s' % (idx, j))
-
             self.table_view.setItem(idx, self.col_dut_start+j, QTableWidgetItem(output))
-            color = QColor(0,255,0) if output.startswith('Pass') else QColor(255,0,0)
-            self.table_view.item(idx,self.col_dut_start+j).setBackground(color)
+            self.table_view.item(idx,self.col_dut_start+j).setBackground(color_check(output))
 
     def taskdone(self, message):
-        if message.startswith('tasks done'):
-            print("taskdone!")
+        self.taskdone_first = True
+        if message.startswith('tasks done') and self.power_recieved:
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
@@ -505,40 +577,47 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if power1.ser:
                 power1.off()
-                power1.ser.close()
+                power1.close_com()
             if power2.ser:
                 power2.off()
-                power2.ser.close()
+                power2.close_com()
+
+            self.table_view.clearSelection()
+            self.taskdone_first = False
+            self.power_recieved = False
 
     def btn_clicked(self):
         print('btn_clicked')
+        for i in range(len(self.table_model.mylist)):
+            for j in range(2):
+                self.table_view.setItem(i, self.col_dut_start+j, QTableWidgetItem(""))
+
         self.reset_model()
         self.table_model.update()
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
-        self.set_power()
+        #  self.set_power()
 
     def closeEvent(self, event):
-        try:
-            if not power1.is_open:
-                power1.open_com()
-            if not power2.is_open:
-                power2.open_com()
-        except serial.serialutil.SerialException as ex:
-            print('My SerialException', ex)
-            raise ex
-        finally:
-            if power1.ser: power1.off()
-            if power2.ser: power2.off()
+        print('closeEvent')
+        if power1.is_open:
+            power1.off()
+        if power2.is_open:
+            power2.off()
         event.accept() # let the window close
 
 
 if __name__ == "__main__":
-    mainboard_task = Task('jsonfile/power_new2.json')
+    mainboard_task = Task('jsonfile/v3_total.json')
     #  mainboard_task = Task('jsonfile/test2.json')
     #  mainboard_task = Task('jsonfile/simulate1.json')
 
     app = QApplication(sys.argv)
     win = MyWindow(app, mainboard_task)
-    app.exec_()
+
+    try:
+        app.exec_()
+    except Exception as ex:
+        print(f'\n\ncatch!!!\n{ex}')
+        raise ex
