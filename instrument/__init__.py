@@ -192,7 +192,7 @@ class SerialInstrument():
                 result = self.ser.readline().decode('utf8')
                 return result
         except Exception as e:
-            logging.debug("run_cmd failed!")
+            logger.debug("run_cmd failed!")
 
 
 class PowerSupply(SerialInstrument):

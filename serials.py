@@ -38,7 +38,7 @@ def get_device(comport):
         vid_pid = matched[8:]
         device = devices[vid_pid]
     except Exception as e:
-        logging.debug("get_device failed!")
+        logger.debug("get_device failed!")
         device = ""
 
     return device
