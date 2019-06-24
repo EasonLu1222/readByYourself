@@ -1,3 +1,17 @@
+[2019.6.24 - 16:15]
+1. reorg class Task to allow simulated task
+	a. register action mechanism to decouple some actions from class Task like
+	   is_serial_ok(), set_power(), enter_prompt(), ...
+	b. add simulated json and py
+		b1. jsonfile/v3_simu1.json
+		b2. tasks/simu_each1.py
+		b3. tasks/simu_group1.py
+
+2. remove model dependency from QTableWidget. setModel()->set_data()
+
+3. users can't select & focus the row now
+
+
 [2019.6.21 - 12:10]
 1. speaker test done
 	a. jsonfile template v3 proposed.

@@ -28,6 +28,7 @@ def is_serial_free(port_name):
     try:
         get_serial(port_name, 115200, 1)
     except serial.serialutil.SerialException as ex:
+        logger.error(f'error in is_serial_free: {ex}')
         return False
     return True
 
@@ -39,7 +40,7 @@ def get_device(comport):
         vid_pid = matched[8:]
         device = devices[vid_pid]
     except Exception as e:
-        logging.debug("get_device failed!")
+        logger.debug("get_device failed!")
         device = ""
 
     return device
