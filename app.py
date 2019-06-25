@@ -12,7 +12,7 @@ from threading import Thread
 import operator
 from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTreeView, QHeaderView,
                              QLabel, QSpacerItem)
-from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QThread, QTimer, Qt, QTranslator,
+from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QSettings, QThread, QTimer, Qt, QTranslator,
                           pyqtSignal as QSignal, QRect)
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont, QColor
@@ -30,7 +30,8 @@ from serials import (enter_factory_image_prompt, get_serial,
                      se, get_device, get_devices, is_serial_free)
 
 from instrument import update_serial, power1, power2, dmm1
-from ui.fixture_select_dialog_class import FixtureSelectDialog
+from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
+from ui.barcode_dialog_class import BarcodeDialog
 
 
 class ProcessListener(QThread):
@@ -322,9 +323,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
-        self.modUi()
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
+        
+        self.d = EngModePwdDialog(self)
+        self.b = BarcodeDialog(self)
+        
+        self.settings = QSettings("FAB", "SAP109")
+        self.checkBoxFx1.setChecked(self.settings.value("fixture_1", False))
+        self.checkBoxFx2.setChecked(self.settings.value("fixture_2", False))
+        self.langSelectMenu.setCurrentIndex(self.settings.value("lang_index", 0))
+        self.on_lang_changed(self.settings.value("lang_index", 0))
+        
         self.comports = []
 
         self.task = task
@@ -348,8 +358,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.set_power_old()
 
         self.showMaximized()
-        self.w = FixtureSelectDialog(self)
-        self.w.show()
 
         self.power_process = {}
         self.power_results = {}
@@ -380,20 +388,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.power_process[idx] = proc
         self.proc_listener.set_process(self.power_process)
         self.proc_listener.start()
-
-    def modUi(self):
-        self.edit1.setStyleSheet("""
-            QPlainTextEdit {
-                font-family: Arial Narrow;
-                font-size: 10pt;
-            }
-        """)
-        self.edit2.setStyleSheet("""
-            QPlainTextEdit {
-                font-family: Arial Narrow;
-                font-size: 12pt;
-            }
-        """)
 
     def clearlayout(self, layout):
         while layout.count():
@@ -444,6 +438,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_model.reset()
 
     def setsignal(self):
+        self.checkBoxFx1.stateChanged.connect(self.chk_box_fx1_state_changed)
+        self.checkBoxFx2.stateChanged.connect(self.chk_box_fx2_state_changed)
+        self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
+        self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
+        self.d.dialog_close.connect(self.on_dialog_close)
+        self.b.barcode_entered.connect(self.on_barcode_entered)
+        self.b.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.message.connect(self.taskdone)
@@ -512,15 +513,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if power2.ser:
                 power2.off()
                 power2.ser.close()
+                
+    def show_barcode_dialog(self):
+        s = [self.settings.value("fixture_1"), self.settings.value("fixture_2")]
+        num = len(list(filter(lambda x: x==True, s)))
+        self.b.set_total_barcode(num)
+        if num>0:
+            self.b.show()
 
     def btn_clicked(self):
         print('btn_clicked')
-        self.reset_model()
-        self.table_model.update()
-        self.pushButton.setEnabled(False)
-        self.ser_listener.stop()
-        self.task.start()
-        self.set_power()
+        self.show_barcode_dialog()
 
     def closeEvent(self, event):
         try:
@@ -535,6 +538,43 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if power1.ser: power1.off()
             if power2.ser: power2.off()
         event.accept() # let the window close
+        
+    def eng_mode_state_changed(self, status):
+        if (status == Qt.Checked):
+            self.d.show()
+
+    def chk_box_fx1_state_changed(self, status):
+        self.settings.setValue("fixture_1", status == Qt.Checked)
+
+    def chk_box_fx2_state_changed(self, status):
+        self.settings.setValue("fixture_2", status == Qt.Checked)
+
+    def on_dialog_close(self, is_eng_mode_on):
+        if(not is_eng_mode_on):
+            self.checkBoxEngMode.setChecked(False)
+            
+    def on_lang_changed(self, index):
+        self.settings.setValue("lang_index", index)
+        lang_list = ['en_US.qm', 'zh_TW.qm']
+        app = QApplication.instance()
+        translator = QTranslator()
+        translator.load(f"translate/{lang_list[index]}")
+        app.removeTranslator(translator)
+        app.installTranslator(translator)
+        self.retranslateUi(self)
+        self.d.retranslateUi(self.d)
+        self.b.retranslateUi(self.b)
+
+    def on_barcode_entered(self, barcode):
+        print(barcode)
+        
+    def on_barcode_dialog_closed(self):
+        self.reset_model()
+        self.table_model.update()
+        self.pushButton.setEnabled(False)
+        self.ser_listener.stop()
+        self.task.start()
+        self.set_power()
 
 
 if __name__ == "__main__":

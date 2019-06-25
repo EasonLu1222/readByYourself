@@ -77,13 +77,38 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="52"/>
+        <location filename="../ui/design3.py" line="75"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="53"/>
+        <location filename="../ui/design3.py" line="81"/>
         <source>PushButton</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="76"/>
+        <source>Test on fixture 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="77"/>
+        <source>Test on fixture 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="78"/>
+        <source>en_US</source>
+        <translation type="unfinished">English</translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="79"/>
+        <source>zh_TW</source>
+        <translation type="unfinished">中文</translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="80"/>
+        <source>Engineering mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

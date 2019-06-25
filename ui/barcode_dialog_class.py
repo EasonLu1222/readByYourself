@@ -6,7 +6,7 @@ from ui.barcode_dialog import Ui_BarcodeDialog
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
     barcode_entered = pyqtSignal(str)  # str:barcode
     barcode_dialog_closed = pyqtSignal()
-    num_of_barcode_collected = 0
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -21,8 +21,8 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         barcode = self.barcodeLineEdit.text()
         if (self.is_valid(barcode)):
             self.barcode_entered.emit(barcode)
-            self.num_of_barcode_collected+=1
-            if (self.num_of_barcode_collected >= self.total_barcode):
+            self.total_barcode = self.total_barcode - 1
+            if (self.total_barcode <= 0):
                 self.close()
             else:
                 self.barcodeLineEdit.clear()
@@ -38,4 +38,5 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
     
     def closeEvent(self, evnt):
         self.barcode_dialog_closed.emit()
+
         
