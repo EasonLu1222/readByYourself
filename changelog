@@ -1,3 +1,11 @@
+[2019.6.25 - 16:40]
+1. add summary row to check pass/fail
+2. modifications for type2 task 
+	a. modify tasks/power_check2.py, speaker_check.py to allow both 1 & 2 DUTs 
+	b. change v3_total.json to v3_total_two_dut.json
+	c. new v3_total_one_dut.json
+
+
 [2019.6.24 - 16:15]
 1. reorg class Task to allow simulated task
 	a. register action mechanism to decouple some actions from class Task like

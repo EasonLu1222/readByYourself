@@ -65,12 +65,14 @@ if __name__ == "__main__":
 
     dmm.measure_volt(101)
     volts = dmm.measure_volts(channels)
-    chs = list(range(101,107))+list(range(109,115))
-    volts_passfail = [volt_in_range(ch,e) for ch, e in zip(chs, volts)]
+
+    volts_passfail = [volt_in_range(ch,e) for ch, e in zip(channels, volts)]
     logger.info(f'volts measured: {volts}')
 
     #  logger.info('power check end')
 
     channel_volt = dict(zip(channels, volts_passfail))
-    results = [[channel_volt[g[0]], channel_volt[g[1]]] for g in channel_group]
+
+    #  results = [[channel_volt[g[0]], channel_volt[g[1]]] for g in channel_group]
+    results = [[channel_volt[e] for e in g]for g in channel_group]
     sys.stdout.write(json.dumps(results))

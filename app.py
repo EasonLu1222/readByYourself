@@ -239,6 +239,11 @@ class Task(QThread):
         self.action_args = list()
         self.df = self.load()
         self.mylist = self.df.fillna('').values.tolist()
+        self.duts = []
+
+    @property
+    def dut_num(self):
+        return int(self.base['pcs'])
 
     def load(self):
         header = self.base['header']
@@ -251,6 +256,12 @@ class Task(QThread):
 
     def __len__(self):
         return len(self.groups)
+
+    def len(self, include_hidden=True):
+        if include_hidden:
+            return len(self.mylist)
+        else:
+            return len(self.df[self.df['hidden'] == False])
 
     def __getitem__(self, key):
         return self.groups[key]
@@ -373,17 +384,7 @@ class Task(QThread):
             if not action(*args):
                 print('return !!!!!')
                 return
-
-        #  if not all(is_serial_free(p) for p in self.window.comports):
-        #  print('not all serial port are free!')
-        #  self.window.pushButton.setEnabled(True)
-        #  return
-
-        #  self.window.set_power()
-
-        #  self.enter_prompt()
         QThread.msleep(500)
-
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             print('i', i, 'next_item', next_item)
@@ -401,10 +402,16 @@ class Task(QThread):
                     'index': [i, i + len(items)],
                     'output': output
                 })
+
+                r1, r2 = i, i+len(items)
+                c1, c2 = len(self.header()), len(self.header())+self.dut_num
+                self.df.iloc[r1:r2,c1:c2] = json.loads(output)
+
                 self.task_result.emit(result)
             else:
                 is_auto, task_type = next_item['auto'], next_item['tasktype']
                 self.task_each.emit([i, 1])
+
 
                 if is_auto:
                     procs = {}
@@ -413,7 +420,7 @@ class Task(QThread):
                         proc = self.runeach(i, port, task_type)
                         procs[port] = proc
 
-                    for port, proc in procs.items():
+                    for j, (port, proc) in enumerate(procs.items()):
                         output, _ = proc.communicate()
                         output = output.decode('utf8')
                         msg2 = '[task %s][output: %s]' % (i, output)
@@ -423,6 +430,7 @@ class Task(QThread):
                             'port': port,
                             'output': output
                         })
+                        self.df.iat[i,len(self.header())+j] = output
                         print('run: result', result)
                         self.task_result.emit(result)
 
@@ -480,9 +488,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports = []
         self.task = task
         self.task.window = self
+        self.task_results = []
 
-        #  self.table_model = TableModelTask(self, task)
-        #  self.table_view.setModel(self.table_model)
         self.table_view.set_data(self.task.mylist, self.task.header_ext())
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
         widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * 2
@@ -490,6 +497,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.table_view.setColumnWidth(idx, w)
         for col in [0, 1, 2, 3, 4]:
             self.table_view.setColumnHidden(col, True)
+        self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
+        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem('Summary'))
 
         self.setsignal()
 
@@ -505,9 +514,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
 
         # for simulation without serial devices
-        self.pushButtonM = QPushButton(self.centralwidget)
-        self.pushButtonM.setText("SimulateRun")
-        self.pushButtonM.clicked.connect(self.btn_clickedM)
+        #  self.pushButtonM = QPushButton(self.centralwidget)
+        #  self.pushButtonM.setText("SimulateRun")
+        #  self.pushButtonM.clicked.connect(self.btn_clickedM)
 
         self.showMaximized()
         self.show()
@@ -515,7 +524,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_process = {}
         self.power_results = {}
 
-        self.col_dut_start = 11
+        self.col_dut_start = len(self.task.header())
         self.table_hidden_row()
         self.clean_power()
         self.taskdone_first = False
@@ -661,37 +670,44 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
         self.table_view.setFocusPolicy(Qt.NoFocus)
 
+    def color_check(self, s):
+        if s.startswith('Pass'):
+            color = QColor(1, 255, 0)
+        elif s.startswith('Fail'):
+            color = QColor(255, 0, 0)
+        else:
+            color = QColor(255, 255, 255)
+        return color
+
     def taskrun(self, result):
         ret = json.loads(result)
         idx = ret['index']
-
-        def color_check(s):
-            if s.startswith('Pass'):
-                color = QColor(1, 255, 0)
-            elif s.startswith('Fail'):
-                color = QColor(255, 0, 0)
-            else:
-                color = QColor(255, 255, 255)
-            return color
 
         if type(idx) == list:
             print('output', ret['output'])
             output = json.loads(ret['output'])
 
             for i in range(*idx):
+                for j in range(self.task.dut_num):
+                    x = output[i - idx[0]][j]
+                    self.table_view.setItem(i, self.col_dut_start+j,
+                                            QTableWidgetItem(x))
+                    self.table_view.item(i, self.col_dut_start+j).setBackground(
+                        self.color_check(x))
+                
                 # DUT1
-                x1 = output[i - idx[0]][0]
-                self.table_view.setItem(i, self.col_dut_start,
-                                        QTableWidgetItem(x1))
-                self.table_view.item(i, self.col_dut_start).setBackground(
-                    color_check(x1))
+                #  x1 = output[i - idx[0]][0]
+                #  self.table_view.setItem(i, self.col_dut_start,
+                                        #  QTableWidgetItem(x1))
+                #  self.table_view.item(i, self.col_dut_start).setBackground(
+                    #  self.color_check(x1))
 
                 # DUT2
-                x2 = output[i - idx[0]][1]
-                self.table_view.setItem(i, self.col_dut_start + 1,
-                                        QTableWidgetItem(x2))
-                self.table_view.item(i, self.col_dut_start + 1).setBackground(
-                    color_check(x2))
+                #  x2 = output[i - idx[0]][1]
+                #  self.table_view.setItem(i, self.col_dut_start + 1,
+                                        #  QTableWidgetItem(x2))
+                #  self.table_view.item(i, self.col_dut_start + 1).setBackground(
+                    #  self.color_check(x2))
 
         else:
             output = str(ret['output'])
@@ -707,12 +723,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.table_view.setItem(idx, self.col_dut_start + j,
                                     QTableWidgetItem(output))
             self.table_view.item(idx, self.col_dut_start + j).setBackground(
-                color_check(output))
+                self.color_check(output))
 
     def taskdone(self, message):
+        print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
-        if message.startswith('tasks done') and self.power_recieved:
+        #  if message.startswith('tasks done') and self.power_recieved:
+        if message.startswith('tasks done'):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
@@ -728,6 +746,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 power2.off()
                 power2.close_com()
 
+            r = self.task.len()
+            all_pass = lambda results: all(e.startswith('Pass') and not e for e in results)
+
+            for j in range(self.task.dut_num):
+                res = 'Pass' if all_pass(self.task.df[f'#{j+1}']) else 'Fail'
+                self.table_view.setItem(r, self.col_dut_start + j,
+                                        QTableWidgetItem(res))
+                self.table_view.item(r, self.col_dut_start + j).setBackground(
+                    self.color_check(res))
+
+            #  __import__('ipdb').set_trace()
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
             self.table_view.clearSelection()
@@ -744,8 +773,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def btn_clicked(self):
         print('btn_clicked')
 
-        for i in range(len(self.task.mylist)):
-            for j in range(2):
+        for i in range(self.task.len()+1):
+            for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
         self.pushButton.setEnabled(False)
@@ -765,31 +794,38 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    # ===== main board task =====
-    mb_task = Task('jsonfile/v3_total.json')
-    win = MyWindow(app, mb_task)
-    print('win comports' , win.comports())
-    actions = [
-    {'action': is_serial_ok,
-    'args': (win.comports, mb_task.serial_ok)},
-    {'action': set_power,
-    'args': (win.power_process, win.proc_listener)},
-    {'action': enter_prompt,
-    'args': (win.comports, 0.2)},
-    ]
-    mb_task.register_action(actions)
+    mb_task = Task('jsonfile/v3_total2.json')
+    simu_task = TaskSimu('jsonfile/v3_simu1.json')
+    TASK = mb_task
 
-    # ===== simulation task =====
-    #  simu_task = TaskSimu('jsonfile/v3_simu1.json')
-    #  win = MyWindow(app, simu_task)
+    win = MyWindow(app, TASK)
+
+    actions = [
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, mb_task.serial_ok)
+        },
+        {
+            'action': set_power,
+            'args': (win.power_process, win.proc_listener)
+        },
+        {
+            'action': enter_prompt,
+            'args': (win.comports, 0.2)
+        },
+    ]
+    actions_simu = [
+        {
+            'action': enter_prompt_simu,
+            'args': ()
+        },
+    ]
+
+    ACTIONS = actions
+    TASK.register_action(ACTIONS)
+
+    # for simulated tasks
     #  win.dummy_com(['COM8', 'COM3'])
-    #  actions = [
-        #  {
-            #  'action': enter_prompt_simu,
-            #  'args': ()
-        #  },
-    #  ]
-    #  simu_task.register_action(actions)
 
     try:
         app.exec_()

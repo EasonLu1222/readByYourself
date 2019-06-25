@@ -62,6 +62,6 @@ if __name__ == "__main__":
 
     
     channel_freq = dict(zip(channels, freqs_passfail))
-    results = [[channel_freq[g[0]], channel_freq[g[1]]] for g in channel_group]
+    results = [[channel_freq[e] for e in g]for g in channel_group]
 
     sys.stdout.write(json.dumps(results))
