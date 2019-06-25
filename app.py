@@ -22,7 +22,6 @@ import pandas as pd
 
 from view.myview import TableView
 from model import TableModelTask
-from ui.design3 import Ui_MainWindow
 from utils import test_data, move_mainwindow_centered
 
 from serial.tools.list_ports import comports
@@ -32,6 +31,7 @@ from serials import (enter_factory_image_prompt, get_serial,
 from instrument import update_serial, power1, power2, dmm1
 from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
 from ui.barcode_dialog_class import BarcodeDialog
+from ui.design3_class import MainWindow
 
 
 class ProcessListener(QThread):
@@ -318,9 +318,9 @@ class Task(QThread):
         self.message.emit('tasks done')
 
 
-class MyWindow(QMainWindow, Ui_MainWindow):
+class MyWindow(QMainWindow, MainWindow):
 
-    def __init__(self, app, task, *args):
+    def __init__(self, app, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -336,13 +336,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.on_lang_changed(self.settings.value("lang_index", 0))
         
         self.comports = []
-
-        self.task = task
-        task.window = self
-        self.table_model = TableModelTask(self, task)
-        self.table_view.setModel(self.table_model)
-        for col in [0,1,2]:
-            self.table_view.setColumnHidden(col, True)
+        
+        # self.set_task(task)
 
         self.setsignal()
 
@@ -379,7 +374,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_results = process_results
         with open('power_results' , 'w+') as f:
             f.write(json.dumps(process_results))
+    
+    def set_task(self, task):
+        self.task = task
+        task.window = self
+        self.table_model = TableModelTask(self, task)
+        self.table_view.setModel(self.table_model)
+        for col in [0,1,2]:
+            self.table_view.setColumnHidden(col, True)
 
+    def update_task(self):
+        mainboard_task = Task(self.task_path)
+        self.set_task(mainboard_task)
+    
     def set_power(self):
         script = 'tasks.poweron'
         for idx in range(1,3):
@@ -446,10 +453,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.b.barcode_entered.connect(self.on_barcode_entered)
         self.b.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
-        self.task.task_result.connect(self.taskrun)
-        self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
-        self.task.printterm_msg.connect(self.printterm2)
 
     def printterm1(self, port_msg):
         port, msg = port_msg
@@ -562,6 +566,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         app.removeTranslator(translator)
         app.installTranslator(translator)
         self.retranslateUi(self)
+        self.update_task()
         self.d.retranslateUi(self.d)
         self.b.retranslateUi(self.b)
 
@@ -578,10 +583,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    mainboard_task = Task('jsonfile/power_new2.json')
+    #  mainboard_task = Task('jsonfile/power_new.json')
     #  mainboard_task = Task('jsonfile/test2.json')
-    #  mainboard_task = Task('jsonfile/simulate1.json')
+    #  mainboard_task = Task('jsonfile/power.json')
 
     app = QApplication(sys.argv)
-    win = MyWindow(app, mainboard_task)
+    win = MyWindow(app)
+    mainboard_task = Task(win.task_path)
+    win.set_task(mainboard_task)
     sys.exit(app.exec_())

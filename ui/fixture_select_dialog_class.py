@@ -58,6 +58,7 @@ class FixtureSelectDialog(QDialog, Ui_FixtureSelectDialog):
         self.d.retranslateUi(self.d)
         self.b.retranslateUi(self.b)
         self.parent().retranslateUi(self.parent())
+        self.parent().update_task()
             
     def on_start_clicked(self):
         s = [self.settings.value("fixture_1"), self.settings.value("fixture_2")]

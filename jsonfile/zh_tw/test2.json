@@ -1,0 +1,150 @@
+{"header": 
+    ["script", "args", "auto", "group", "item", "min", "expect", "max", "unit"],
+ "pcs": 2,
+ "structure":
+    [
+        {
+            "group": "WiFi",
+            "item": "無線網路介面",
+            "script": "wifi_ping",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Power Rail",
+            "item": "19V",
+            "script": "power_check2",
+            "args": [101, 109],
+            "auto": true,
+            "min": 18.05,
+            "expect": 19,
+            "max": 19.95,
+            "unit": "V"
+        },
+        {
+            "group": "Power Rail",
+            "item": "5V",
+            "script": "power_check2",
+            "args": [102, 110],
+            "auto": true,
+            "min": 4.75,
+            "expect": 5,
+            "max": 5.25,
+            "unit": "V"
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "3.3V",
+            "script": "power_check2",
+            "args": [103, 111],
+            "auto": true,
+            "min": 3.135,
+            "expect": 3.3,
+            "max": 3.465,
+            "unit": "V"
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "1.35V",
+            "script": "power_check2",
+            "args": [104, 112],
+            "auto": true,
+            "min": 1.282,
+            "expect": 1.35,
+            "max": 1.4175,
+            "unit": "V"
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "0.95V",
+            "script": "power_check2",
+            "args": [105, 113],
+            "auto": true,
+            "min": 0.81,
+            "expect": 0.95,
+            "max": 1.09,
+            "unit": "V"
+        }
+        ,{
+            "group": "Power Rail",
+            "item": "1.1V",
+            "script": "power_check2",
+            "args": [106, 114],
+            "auto": true,
+            "min": 0.86,
+            "expect": 1.1,
+            "max": 1.14,
+            "unit": "V"
+        }
+        ,{
+            "group": "CPU1",
+            "item": "CPU_Freq",
+            "script": "cpu_freq",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "CPU2",
+            "item": "CPU_Core_Num",
+            "script": "cpu_cores",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "DDR",
+            "item": "DDR Size",
+            "script": "ddr_size",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "I2C1",
+            "item": "I2C_Amp_TAS5766",
+            "script": "tas5766m_chk",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "I2C2",
+            "item": "I2C_Cap_MSP430",
+            "script": "msp430_chk",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "I2C3",
+            "item": "I2C_LED_LP5018",
+            "script": "lp5018_chk",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}

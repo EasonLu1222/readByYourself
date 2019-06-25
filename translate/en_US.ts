@@ -39,76 +39,56 @@
 <context>
     <name>FixtureSelectDialog</name>
     <message>
-        <location filename="../ui/fixture_select_dialog.py" line="65"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="68"/>
-        <source>Engineering mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="69"/>
-        <source>Test on fixture 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="70"/>
-        <source>Test on fixture 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="71"/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../ui/fixture_select_dialog.py" line="66"/>
         <source>en_US</source>
-        <translation type="unfinished">English</translation>
+        <translation type="obsolete">English</translation>
     </message>
     <message>
         <location filename="../ui/fixture_select_dialog.py" line="67"/>
         <source>zh_TW</source>
-        <translation type="unfinished">中文</translation>
+        <translation type="obsolete">中文</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="75"/>
+        <location filename="../ui/design3.py" line="83"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="81"/>
+        <location filename="../ui/design3.py" line="89"/>
         <source>PushButton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="76"/>
+        <location filename="../ui/design3.py" line="84"/>
         <source>Test on fixture 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="77"/>
+        <location filename="../ui/design3.py" line="85"/>
         <source>Test on fixture 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="78"/>
+        <location filename="../ui/design3.py" line="86"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="79"/>
+        <location filename="../ui/design3.py" line="87"/>
         <source>zh_TW</source>
         <translation type="unfinished">中文</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="80"/>
+        <location filename="../ui/design3.py" line="88"/>
         <source>Engineering mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/design3_class.py" line="20"/>
+        <source>jsonfile/test2.json</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
