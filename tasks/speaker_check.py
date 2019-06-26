@@ -5,17 +5,18 @@ from instrument import DMM
 
 from mylogger import logger
 
-freq_ranges = {
-    107: [995, 1005],
-    108: [995, 1005],
-    115: [995, 1005],
-    116: [995, 1005],
-}
+#  freq_ranges = {
+    #  107: [995, 1005],
+    #  108: [995, 1005],
+    #  115: [995, 1005],
+    #  116: [995, 1005],
+#  }
 
 
-def freq_in_range(channel, freq):
-    rng = freq_ranges[channel]
-    if rng[0] < freq and freq < rng[1]:
+def freq_in_range(channel, freq, limits):
+    #  rng = freq_ranges[channel]
+    rng = limits[channel]
+    if rng[0] < freq and freq < rng[2]: 
         return 'Pass(%.3f)' % freq
     else:
         return 'Fail(%.3f)' % freq
@@ -24,14 +25,21 @@ def freq_in_range(channel, freq):
 if __name__ == "__main__":
     logger.info('speaker check...')
     parser = argparse.ArgumentParser()
-    parser.add_argument('channel', help='channel', type=str)
+    #  parser.add_argument('channel', help='channel', type=str)
+    parser.add_argument('channels_limits', help='channel', type=str)
     parser.add_argument('-pm',
                         '--port_dmm',
                         help='serial com port dmm',
                         type=str)
     args = parser.parse_args()
 
-    channel_group = json.loads(args.channel)
+    #  channel_group = json.loads(args.channel)
+
+    unpacked = json.loads(args.channels_limits)
+    logger.info(f'unpacked: {unpacked}')
+    channel_group = unpacked['args']
+    limits = {int(k):v for k,v in unpacked['limits'].items()}
+    
     port_dmm = args.port_dmm
 
     logger.info('speaker check start. [channel_group: %s]' % channel_group)
@@ -54,7 +62,8 @@ if __name__ == "__main__":
 
     freqs = dmm.measure_freqs_all()
     chs = list(range(107, 109)) + list(range(115, 117))
-    freqs_passfail = [freq_in_range(ch, e) for ch, e in zip(chs, freqs)]
+    #  freqs_passfail = [freq_in_range(ch, e) for ch, e in zip(chs, freqs)]
+    freqs_passfail = [freq_in_range(ch, e, limits) for ch, e in zip(channels, freqs)]
 
     logger.info('...3')
     logger.info(f'freqs: {freqs}')

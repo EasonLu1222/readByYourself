@@ -281,7 +281,7 @@ class Task(QThread):
         return sum(x, [])[index]
 
     def limits(self, key, idx):
-        each = self.each(key, idx)
+        each = self.each(idx)
         min_, expect, max_ = itemgetter('min', 'expect', 'max')(each)
         return (min_, expect, max_)
 
@@ -326,6 +326,21 @@ class Task(QThread):
         print(
             f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]'
         )
+
+
+        limits_group = [self.limits(groupname, i) for i in range(item_len)]
+        print('limits_group', limits_group)
+        limits = {}
+        for e in zip(*args):
+            xx = {i:j for i,j in zip(e,limits_group)}
+            limits.update(xx)
+
+        #  A = [{i:j for i,j in zip(each_arg, limits_group)} for each_arg in args]
+
+        print('limits', limits)
+
+        args = {'args': args, 'limits':limits}
+
         port_dmm = dmm1.com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] +
                      [json.dumps(args)],
@@ -407,6 +422,7 @@ class Task(QThread):
                 c1, c2 = len(self.header()), len(self.header())+self.dut_num
                 self.df.iloc[r1:r2,c1:c2] = json.loads(output)
 
+
                 self.task_result.emit(result)
             else:
                 is_auto, task_type = next_item['auto'], next_item['tasktype']
@@ -440,6 +456,8 @@ class Task(QThread):
                     self.runeachports(i, ports)
 
                 QThread.msleep(500)
+
+        self.df = self.df.fillna('')
         self.message.emit('tasks done')
 
 
@@ -694,7 +712,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                             QTableWidgetItem(x))
                     self.table_view.item(i, self.col_dut_start+j).setBackground(
                         self.color_check(x))
-                
+
                 # DUT1
                 #  x1 = output[i - idx[0]][0]
                 #  self.table_view.setItem(i, self.col_dut_start,
@@ -729,8 +747,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
-        #  if message.startswith('tasks done') and self.power_recieved:
-        if message.startswith('tasks done'):
+        if message.startswith('tasks done') and self.power_recieved:
+        #  if message.startswith('tasks done'):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
@@ -747,16 +765,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 power2.close_com()
 
             r = self.task.len()
-            all_pass = lambda results: all(e.startswith('Pass') and not e for e in results)
+            all_pass = lambda results: all(e.startswith('Pass') for e in results)
 
+            d = self.task.df
             for j in range(self.task.dut_num):
-                res = 'Pass' if all_pass(self.task.df[f'#{j+1}']) else 'Fail'
+                res = 'Pass' if all_pass(d[d.hidden==False][f'#{j+1}']) else 'Fail'
                 self.table_view.setItem(r, self.col_dut_start + j,
                                         QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
 
-            #  __import__('ipdb').set_trace()
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
             self.table_view.clearSelection()
@@ -794,7 +812,8 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    mb_task = Task('jsonfile/v3_total2.json')
+    #  mb_task = Task('jsonfile/v3_total_two_dut.json')
+    mb_task = Task('jsonfile/temp2.json')
     simu_task = TaskSimu('jsonfile/v3_simu1.json')
     TASK = mb_task
 
