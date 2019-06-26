@@ -500,55 +500,26 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
-#<<<<<<< HEAD
 
         self.d = EngModePwdDialog(self)
         self.b = BarcodeDialog(self)
 
-        self.settings = QSettings("FAB", "SAP109")
-
-        #  self.checkBoxFx1.setChecked(self.settings.value("fixture_1", False))
-        #  self.checkBoxFx2.setChecked(self.settings.value("fixture_2", False))
-
-
-
         self.jsonfileroot = 'jsonfile/en_us'
-        print('jsonfile', jsonfile)
         self.jsonfilename = jsonfile
 
-        # TODO: QSetting issue for window & mac
-        #  self.checkBoxFx1.setChecked(False)
-        #  self.checkBoxFx2.setChecked(False)
+        # Read UI states from app settings
+        self.settings = QSettings("FAB", "SAP109")
+        is_fx1_checked = self.settings.value("fixture_1", False, type=bool)
+        is_fx2_checked = self.settings.value("fixture_2", False, type=bool)
+        lang_index = self.settings.value("lang_index", 0, type=int)
+        
+        # Restore UI states
+        self.checkBoxFx1.setChecked(is_fx1_checked)
+        self.checkBoxFx2.setChecked(is_fx2_checked)
+        self.langSelectMenu.setCurrentIndex(lang_index)
+        self.on_lang_changed(lang_index)
 
-        set1 = self.settings.value("fixture_1", False)
-        set2 = self.settings.value("fixture_2", False)
-        self.checkBoxFx1.setChecked(json.loads(set1.lower()))
-        self.checkBoxFx2.setChecked(json.loads(set2.lower()))
-
-        self.langSelectMenu.setCurrentIndex(self.settings.value("lang_index", 0))
-        self.on_lang_changed(self.settings.value("lang_index", 0))
-
-        #  self.comports = []
-
-        # self.set_task(task)
-#=======
         self._comports = []
-
-
-        #  self.task = task
-        #  self.task.window = self
-        #  self.task_results = []
-        #  self.table_view.set_data(self.task.mylist, self.task.header_ext())
-        #  self.table_view.setSelectionBehavior(QTableView.SelectRows)
-        #  widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * 2
-        #  for idx, w in zip(range(len(widths)), widths):
-            #  self.table_view.setColumnWidth(idx, w)
-        #  for col in [0, 1, 2, 3, 4]:
-            #  self.table_view.setColumnHidden(col, True)
-        #  self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        #  self.table_view.setItem(self.task.len(), 0, QTableWidgetItem('Summary'))
-
-#>>>>>>> master
 
         self.setsignal()
 
@@ -835,16 +806,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def show_barcode_dialog(self):
         print('show_barcode_dialog start')
-        s = [self.settings.value("fixture_1"), self.settings.value("fixture_2")]
-
-        # TODO: QSetting issue for window & mac, quick work-around!!
-        s = [json.loads(e.lower()) for e in s]
-
-
+        s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
         num = len(list(filter(lambda x: x==True, s)))
         self.b.set_total_barcode(num)
 
-        print('num', num)
         if num>0:
             self.b.show()
         print('show_barcode_dialog end')
@@ -905,6 +870,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def on_barcode_dialog_closed(self):
         # move original btn_clicked to here
+        # TODO: should distinguish confirm from cancel
         for i in range(self.task.len()+1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
