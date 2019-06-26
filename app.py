@@ -8,25 +8,17 @@ import serial
 import threading
 from operator import itemgetter
 from collections import defaultdict
-import configparser
 from subprocess import Popen, PIPE
 from threading import Thread
-import operator
-from PyQt5.QtWidgets import (QWidget, QTableWidgetItem, QTreeView, QHeaderView,
-                             QLabel, QSpacerItem, QTableView, QAbstractItemView)
-
-from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QSettings, QThread, QTimer, Qt, QTranslator,
-			  QCoreApplication,
-                          pyqtSignal as QSignal, QRect, QItemSelectionModel)
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView, QAbstractItemView)
+from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
+                          pyqtSignal as QSignal)
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QMainWindow, QPushButton
 
 import pandas as pd
 
 from view.myview import TableView
-from model import TableModelTask
-from utils import test_data, move_mainwindow_centered
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
@@ -285,7 +277,7 @@ class Task(QThread):
         return sum(x, [])[index]
 
     def limits(self, key, idx):
-        each = self.each(idx)
+        each = self[key][idx]
         min_, expect, max_ = itemgetter('min', 'expect', 'max')(each)
         return (min_, expect, max_)
 
@@ -519,7 +511,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.checkBoxFx2.setChecked(self.settings.value("fixture_2", False))
 
 
-        
+
         self.jsonfileroot = 'jsonfile/en_us'
         print('jsonfile', jsonfile)
         self.jsonfilename = jsonfile
@@ -625,16 +617,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.taskdone('tasks done')
 
     def set_task(self, task):
-        print('set_task!!!!!')
-        #  self.task = task
-        #  task.window = self
-
-        #  self.table_model = TableModelTask(self, task)
-        #  self.table_view.setModel(self.table_model)
-
-        #  for col in [0,1,2]:
-            #  self.table_view.setColumnHidden(col, True)
-
         self.task = task
         self.task.window = self
         self.task_results = []
@@ -940,7 +922,7 @@ if __name__ == "__main__":
     mb_task = Task('jsonfile/v3_total_two_dut.json')
     simu_task = TaskSimu('jsonfile/v3_simu1.json')
 
-    jsonfilename = 'v3_total_two_dut.json' 
+    jsonfilename = 'v3_total_two_dut.json'
     win = MyWindow(app, jsonfilename)
 
     actions = [
