@@ -9,6 +9,7 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        print('BarcodeDialog init')
         self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)

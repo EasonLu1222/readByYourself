@@ -1,3 +1,49 @@
+[2019.6.26 - 08:30]
+1. parse limits of jsonfile (currently for tasktype2)
+	a. change power_check2.py
+	b. chnage speaker_check.py
+
+[2019.6.25 - 16:40]
+1. add summary row to check pass/fail
+2. modifications for type2 task 
+	a. modify tasks/power_check2.py, speaker_check.py to allow both 1 & 2 DUTs 
+	b. change v3_total.json to v3_total_two_dut.json
+	c. new v3_total_one_dut.json
+
+
+[2019.6.24 - 16:15]
+1. reorg class Task to allow simulated task
+	a. register action mechanism to decouple some actions from class Task like
+	   is_serial_ok(), set_power(), enter_prompt(), ...
+	b. add simulated json and py
+		b1. jsonfile/v3_simu1.json
+		b2. tasks/simu_each1.py
+		b3. tasks/simu_group1.py
+
+2. remove model dependency from QTableWidget. setModel()->set_data()
+
+3. users can't select & focus the row now
+
+
+[2019.6.21 - 12:10]
+1. speaker test done
+	a. jsonfile template v3 proposed.
+		a.1 add hidden fields to handle complex tests
+		a.2 ex: use two scripts speaker_setup.py & speaker_check.py to handler
+		speaker test. speaker_setup.py is set hidden.
+	b. add two test scripts: speaker_setup.py & speaker_check.py
+	c. v3_speaker.json & v3_total.json for app.py
+
+2. UI modification
+	a. now row selection are highlighting the processing rows
+	b. multiple rows selection for task type 2
+
+3. minor adjust
+	app.py
+		a. change runeach1 & runeach3 to runeach
+		b. change runeach2 to rungroup
+		c. still need to be reorg
+
 [2019.6.19 - 14:40]
 1. unify logger into one module: mylogger.py
    usage:
@@ -9,10 +55,10 @@
 	a. move set_power() when button clicked
 	b. in set_power, use new class ProcessListener(QThread) to listen for
 	   two subprocess poweron.py to poweron and measure maximaum currents
-	   at the same time. When the measures are done, use recieve_power() 
+	   at the same time. When the measures are done, use recieve_power()
 	   to get the results and save it as a file "power_results".
 	c. use power_max_current.py to get results from "power_results".
-	   wait until the file exists and not empty. 
+	   wait until the file exists and not empty.
   modified
 	json:
 		a. add tasktype to json structure
@@ -32,7 +78,7 @@
 4. insturment update & ready
 	a. button enabled only when power1,power2,dmm1 are detected
 	a. add instrument_ready(), instrument_update() for MyWindow
-	c. pickle [dmm1,power1,power2] in file "instrument" for 
+	c. pickle [dmm1,power1,power2] in file "instrument" for
 	   poweron.py to unpickle to get the correct com port of each
 	   instruments
 

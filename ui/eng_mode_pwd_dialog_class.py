@@ -8,6 +8,7 @@ class EngModePwdDialog(QDialog, Ui_EngModePwdDialog):
     dialog_close = pyqtSignal(bool)
     def __init__(self, parent=None):
         super().__init__(parent)
+        print('EngModePwdDialog init')
         self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
         self.confirmBtn.clicked.connect(self.on_confirm)
