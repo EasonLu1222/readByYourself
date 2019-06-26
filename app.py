@@ -491,25 +491,19 @@ class TaskSimu(Task):
         return proc
 
 
-#  class MyWindow(QMainWindow, MainWindow):
 class MyWindow(QMainWindow, Ui_MainWindow):
 
-    #  def __init__(self, app, *args):
     def __init__(self, app, jsonfile, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
-#<<<<<<< HEAD
+        self.logfile = 'xxx.csv'
 
         self.d = EngModePwdDialog(self)
         self.b = BarcodeDialog(self)
 
         self.settings = QSettings("FAB", "SAP109")
-
-        #  self.checkBoxFx1.setChecked(self.settings.value("fixture_1", False))
-        #  self.checkBoxFx2.setChecked(self.settings.value("fixture_2", False))
-
 
 
         self.jsonfileroot = 'jsonfile/en_us'
@@ -531,24 +525,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.comports = []
 
         # self.set_task(task)
-#=======
         self._comports = []
-
-
-        #  self.task = task
-        #  self.task.window = self
-        #  self.task_results = []
-        #  self.table_view.set_data(self.task.mylist, self.task.header_ext())
-        #  self.table_view.setSelectionBehavior(QTableView.SelectRows)
-        #  widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * 2
-        #  for idx, w in zip(range(len(widths)), widths):
-            #  self.table_view.setColumnWidth(idx, w)
-        #  for col in [0, 1, 2, 3, 4]:
-            #  self.table_view.setColumnHidden(col, True)
-        #  self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        #  self.table_view.setItem(self.task.len(), 0, QTableWidgetItem('Summary'))
-
-#>>>>>>> master
 
         self.setsignal()
 
@@ -826,6 +803,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                         QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
+
+
+                df = d[d.hidden==False]
+                dd = pd.DataFrame(df[[f'#{j+1}']].values.T)
+                dd.index = [random.randint(1000,9999)]
+                dd.index.name = 'pid'
+                with open(self.logfile, 'a') as f:
+                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
+
 
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
