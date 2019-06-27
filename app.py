@@ -503,7 +503,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pwd_dialog = EngModePwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
 
-        self.jsonfileroot = 'jsonfile/en_us'
+        self.jsonfileroot = 'jsonfile'
         self.jsonfilename = jsonfile
 
         # Read UI states from app settings
@@ -551,12 +551,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.clean_power()
         self.taskdone_first = False
 
-    def retranslateUi(self, MyWindow):
-    #  def retranslateUi(self):
-        super().retranslateUi(self)
-        _translate = QCoreApplication.translate
-        self.task_path = _translate("MainWindow", "jsonfile/test2.json")
-
     def dummy_com(self, coms):
         self._comports = coms
 
@@ -601,11 +595,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for col in [0, 1, 2, 3, 4]:
             self.table_view.setColumnHidden(col, True)
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem('Summary'))
+        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
 
-    def update_task(self):
+    def update_task(self, lang_folder):
         #  mainboard_task = Task(self.task_path)
-        mainboard_task = Task(f'{self.jsonfileroot}/{self.jsonfilename}')
+        mainboard_task = Task(f'{self.jsonfileroot}/{lang_folder}/{self.jsonfilename}')
         print('update_task')
         self.set_task(mainboard_task)
 
@@ -879,7 +873,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.retranslateUi(self)
 
-        self.update_task()
+        json_folder = lang_list[index].split(".")[0]
+        self.update_task(json_folder)
 
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
@@ -897,6 +892,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
+        
+    def retranslateUi(self, MyWindow):
+        super().retranslateUi(self)
+        _translate = QCoreApplication.translate
+        self.summary_text = _translate("MainWindow", "Summary")
 
 
 

@@ -91,5 +91,10 @@
         <source>jsonfile/test2.json</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../app.py" line="899"/>
+        <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

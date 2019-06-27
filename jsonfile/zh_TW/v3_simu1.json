@@ -1,0 +1,63 @@
+{"header": 
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "pcs": 2,
+ "instruments": {
+     "gw_powersupply": 2,
+     "gw_dmm": 1
+    },
+ "structure":
+    [
+        {
+            "group": "電源通道",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "19伏",
+            "script": "simu_group1",
+            "args": [101, 109],
+            "auto": true,
+            "min": 18.05,
+            "expect": 19,
+            "max": 19.95,
+            "unit": "V"
+        }
+        ,{
+            "group": "電源通道",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "5伏",
+            "script": "simu_group1",
+            "args": [102, 110],
+            "auto": true,
+            "min": 4.75,
+            "expect": 5,
+            "max": 5.25,
+            "unit": "V"
+        }
+        ,{
+            "group": "藍牙",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "藍牙介面",
+            "script": "simu_each1",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "無線網路",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "無線網路介面",
+            "script": "simu_each1",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
