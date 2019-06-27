@@ -856,11 +856,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def toggle_engineering_mode(self, is_on):
         self.settings.setValue("is_eng_mode_on", is_on)
         if is_on:
-            self.edit1.show()
-            self.edit2.show()
+            self.splitter.show()
         else:
-            self.edit1.hide()
-            self.edit2.hide()
+            self.splitter.hide()
 
     def on_lang_changed(self, index):
         self.settings.setValue("lang_index", index)
