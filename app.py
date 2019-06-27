@@ -881,8 +881,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print(barcode)
 
     def on_barcode_dialog_closed(self):
-        # move original btn_clicked to here
-        # TODO: should distinguish confirm from cancel
         for i in range(self.task.len()+1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,

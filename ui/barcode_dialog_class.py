@@ -11,6 +11,8 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         super().__init__(parent)
         print('BarcodeDialog init')
         self.setupUi(self)
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.setWindowModality(Qt.ApplicationModal)
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)
         self.barcodeLineEdit.setFocus()
