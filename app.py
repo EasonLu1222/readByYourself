@@ -511,12 +511,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         is_fx1_checked = self.settings.value("fixture_1", False, type=bool)
         is_fx2_checked = self.settings.value("fixture_2", False, type=bool)
         lang_index = self.settings.value("lang_index", 0, type=int)
+        is_eng_mode_on = self.settings.value("is_eng_mode_on", False, type=bool)
         
         # Restore UI states
         self.checkBoxFx1.setChecked(is_fx1_checked)
         self.checkBoxFx2.setChecked(is_fx2_checked)
         self.langSelectMenu.setCurrentIndex(lang_index)
         self.on_lang_changed(lang_index)
+        self.checkBoxEngMode.setChecked(is_eng_mode_on)
+        self.toggle_engineering_mode(is_eng_mode_on)
 
         self._comports = []
 
@@ -677,8 +680,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         se.serial_msg.connect(self.printterm1)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
-
-
 
     def serial_ok(self, ok):
         if ok:
@@ -843,10 +844,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             power2.off()
         event.accept()  # let the window close
 
-    def eng_mode_state_changed(self, status):
-        if (status == Qt.Checked):
-            self.d.show()
-
     def chk_box_fx1_state_changed(self, status):
         self.settings.setValue("fixture_1", status == Qt.Checked)
 
@@ -856,6 +853,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def on_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
+    
+    def eng_mode_state_changed(self, status):
+        self.toggle_engineering_mode(status == Qt.Checked)
+        if (status == Qt.Checked):
+            self.d.show()
+
+    def toggle_engineering_mode(self, is_on):
+        self.settings.setValue("is_eng_mode_on", is_on)
+        if is_on:
+            self.edit1.show()
+            self.edit2.show()
+        else:
+            self.edit1.hide()
+            self.edit2.hide()
 
     def on_lang_changed(self, index):
         self.settings.setValue("lang_index", index)
