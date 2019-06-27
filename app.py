@@ -500,8 +500,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.logfile = 'xxx.csv'
 
-        self.d = EngModePwdDialog(self)
-        self.b = BarcodeDialog(self)
+        self.pwd_dialog = EngModePwdDialog(self)
+        self.barcode_dialog = BarcodeDialog(self)
 
         self.jsonfileroot = 'jsonfile/en_us'
         self.jsonfilename = jsonfile
@@ -670,9 +670,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBoxFx2.stateChanged.connect(self.chk_box_fx2_state_changed)
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
-        self.d.dialog_close.connect(self.on_dialog_close)
-        self.b.barcode_entered.connect(self.on_barcode_entered)
-        self.b.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
+        self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
+        self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
+        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.task_each.connect(self.taskeach)
@@ -817,10 +817,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('show_barcode_dialog start')
         s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
         num = len(list(filter(lambda x: x==True, s)))
-        self.b.set_total_barcode(num)
+        self.barcode_dialog.set_total_barcode(num)
 
         if num>0:
-            self.b.show()
+            self.barcode_dialog.show()
         print('show_barcode_dialog end')
 
     def btn_clicked(self):
@@ -850,14 +850,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def chk_box_fx2_state_changed(self, status):
         self.settings.setValue("fixture_2", status == Qt.Checked)
 
-    def on_dialog_close(self, is_eng_mode_on):
+    def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
     
     def eng_mode_state_changed(self, status):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
-            self.d.show()
+            self.pwd_dialog.show()
 
     def toggle_engineering_mode(self, is_on):
         self.settings.setValue("is_eng_mode_on", is_on)
@@ -881,8 +881,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.update_task()
 
-        self.d.retranslateUi(self.d)
-        self.b.retranslateUi(self.b)
+        self.pwd_dialog.retranslateUi(self.pwd_dialog)
+        self.barcode_dialog.retranslateUi(self.barcode_dialog)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
