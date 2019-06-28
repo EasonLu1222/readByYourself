@@ -20,14 +20,14 @@ from PyQt5.QtGui import QFont, QColor
 import pandas as pd
 
 from view.myview import TableView
+from view.pwd_dialog import PwdDialog
+from view.barcode_dialog import BarcodeDialog
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free)
 
 from instrument import update_serial, open_all, generate_instruments
-from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
-from ui.barcode_dialog_class import BarcodeDialog
 from ui.design3 import Ui_MainWindow
 
 from mylogger import logger
@@ -505,7 +505,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.logfile = 'xxx.csv'
 
-        self.pwd_dialog = EngModePwdDialog(self)
+        self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
 
         self.jsonfileroot = 'jsonfile'
