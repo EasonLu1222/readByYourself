@@ -927,6 +927,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.splitter.hide()
 
     def on_lang_changed(self, index):
+        """
+        When language is changed, update UI
+        """
         self.settings.setValue("lang_index", index)
         lang_list = ['en_US.qm', 'zh_TW.qm']
         app = QApplication.instance()
@@ -936,17 +939,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         app.installTranslator(translator)
 
         self.retranslateUi(self)
-
-        json_folder = lang_list[index].split(".")[0]
-        self.update_task(json_folder)
-
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
+        
+        # Retrieve the translated task list(json file)
+        lang_folder = lang_list[index].split(".")[0]
+        self.update_task(lang_folder)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
 
     def on_barcode_dialog_closed(self):
+        """
+        When the barcode(s) are ready, start testing
+        """
         for i in range(self.task.len()+1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
