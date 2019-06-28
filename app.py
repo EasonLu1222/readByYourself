@@ -11,7 +11,7 @@ from collections import defaultdict
 from subprocess import Popen, PIPE
 from threading import Thread
 from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
-                             QAbstractItemView, QHBoxLayout, QWidget)
+                             QAbstractItemView, QHBoxLayout, QWidget, QProgressDialog)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
@@ -22,6 +22,7 @@ import pandas as pd
 from view.myview import TableView
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
+from view.loading_dialog import LoadingDialog
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
@@ -507,6 +508,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
+        self.loading_dialog = LoadingDialog(self)
 
         self.jsonfileroot = 'jsonfile'
         self.jsonfilename = jsonfile
@@ -757,7 +759,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
-        se.detect_notice.connect(self.detect_received)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
 
@@ -936,7 +937,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
-
+    
     def eng_mode_state_changed(self, status):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
@@ -983,7 +984,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
-
+    
+    def toggle_loading_dialog(self, is_on=False):
+        if is_on:
+            loading_dialog.show()
+        else:
+            loading_dialog.done(1)
+        
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
