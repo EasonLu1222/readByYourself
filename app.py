@@ -29,7 +29,6 @@ from instrument import update_serial, open_all, generate_instruments
 from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
 from ui.barcode_dialog_class import BarcodeDialog
 from ui.design3 import Ui_MainWindow
-from ui.design3_class import MainWindow
 
 from mylogger import logger
 
