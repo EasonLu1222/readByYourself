@@ -23,7 +23,7 @@ from view.myview import TableView
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
-                     get_devices, is_serial_free)
+                     get_devices, is_serial_free, check_which_port_when_poweron)
 
 from instrument import update_serial, open_all, generate_instruments
 from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
@@ -129,7 +129,7 @@ class SerialListener(QThread):
 
 
 def parse_json(jsonfile):
-    x = json.loads(open(jsonfile, 'r').read())
+    x = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     groups = defaultdict(list)
     cur_group = None
     x = x['structure']
@@ -200,7 +200,7 @@ def enter_prompt(comports, ser_timeout=0.2):
     print('enter_prompt: comports - ', comports)
     for port in comports():
         ser = get_serial(port, 115200, ser_timeout)
-        t = Thread(target=enter_factory_image_prompt, args=(ser, 1))
+        t = Thread(target=enter_factory_image_prompt, args=(ser,))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -235,7 +235,7 @@ class Task(QThread):
 
     def __init__(self, jsonfile):
         super(Task, self).__init__()
-        self.base = json.loads(open(jsonfile, 'r').read())
+        self.base = json.loads(open(jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(jsonfile)
         self.action_args = list()
         self.df = self.load()
@@ -535,6 +535,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(instruments_array)
 
 
+        # proto for port-auto-dectect button
+        self.push_detect = QPushButton()
+        self.push_detect.resize(200,30)
+        self.push_detect.setText("#1 port auto detect")
+        self.push_detect.clicked.connect(self.btn_detect)
+        self.hbox_ports.addWidget(self.push_detect)
+
         self.dut_layout = []
         colors = ['#edd', '#edd']
         for i in range(self.task.dut_num):
@@ -572,6 +579,22 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.clean_power()
         self.taskdone_first = False
+
+    def btn_detect(self):
+        self.push_detect.setText(f'#1 port auto detect...')
+        print("btn_detect")
+        self.push_detect.setEnabled(False)
+        t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
+        t.start()
+
+    def detect_received(self, comport_when_poweron_first_dut):
+        print('detect_received')
+        if self._comports[0]!=comport_when_poweron_first_dut:
+            print('reverse comport!!!')
+            self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
+        self.render_port_plot()
+        self.push_detect.setEnabled(True)
+        self.push_detect.setText(f"#1 port auto detect ---> {comport_when_poweron_first_dut}")
 
     def dummy_com(self, coms):
         self._comports = coms
@@ -735,6 +758,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
+        se.detect_notice.connect(self.detect_received)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
 
@@ -913,7 +937,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
-    
+
     def eng_mode_state_changed(self, status):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
@@ -954,7 +978,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
-        
+
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate

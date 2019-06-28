@@ -6,7 +6,9 @@ import time
 import serial
 from serial.tools.list_ports import comports
 from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject
-from threading import Timer
+from threading import Timer, Thread, Event
+import argparse
+from queue import Queue
 
 from mylogger import logger
 
@@ -57,11 +59,13 @@ def get_devices():
 class SerialEmit(QObject):
     #  serial_msg = QSignal(str)
     serial_msg = QSignal(list)
+    detect_notice = QSignal(str)
 se = SerialEmit()
 
 
+
 def wait_for_prompt(serial, prompt, thread_timeout=25):
-    logger.info('\n\nwait_for_prompt\n\n')
+    logger.info(f'\n\nwait_for_prompt: {prompt}\n\n')
     portname = serial.name
     logger.info(f'portname: {portname}')
     logger.info(f'is_open: {serial.isOpen()}')
@@ -69,31 +73,80 @@ def wait_for_prompt(serial, prompt, thread_timeout=25):
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
-            print(line)
+            if line: print(line)
         except UnicodeDecodeError as ex:
             logger.error('ERR1: UnicodeDecodeError', ex)
+            continue
 
-        #  print(portname, line.strip())
         se.serial_msg.emit([portname, line.strip()])
         if line.startswith(prompt):
             logger.info('get %s' % prompt)
             break
 
 
-def enter_factory_image_prompt(serial, waitwordidx=1):
+class WaitPromptThread(Thread):
+    def __init__(self, serial, prompt, q=None):
+        super(WaitPromptThread, self).__init__()
+        self.ser = serial
+        self.prompt = prompt
+        self.q = q
+        self.kill = False
 
+    def run(self):
+        logger.info(f'\n\nwait_for_prompt: {self.prompt}\n\n')
+        portname = self.ser.name
+        logger.info(f'portname: {portname}')
+        logger.info(f'is_open: {self.ser.isOpen()}')
+        while not self.kill:
+            line = ''
+            try:
+                x1 = self.ser.readline()
+                x2 = x1.decode('utf-8')
+                line = x2.rstrip('\n')
+                #  line = self.ser.readline().decode('utf-8').rstrip('\n')
+                if line: logger.info(line)
+            except UnicodeDecodeError as ex:
+                logger.error(f'ERR1: UnicodeDecodeError: {ex}')
+                logger.error(f'x1: {x1}')
+                continue
+
+            if line.startswith(self.prompt):
+                logger.info('get %s' % self.prompt)
+                if self.q:
+                    self.q.put(portname)
+                self.ser.close()
+                break
+        logger.info('end of WaitPromptThread')
+
+
+def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
+    serial_ports = [get_serial(port, 115200, 0.2) for port in ports]
+    q = Queue()
+    threads = {}
+    for port in serial_ports:
+        t = WaitPromptThread(port, prompt, q)
+        threads[port.name] = t
+        t.start()
+    port = q.get()
+    for p in ports:
+        threads[p].kill = True
+    print('port', port)
+    if qsignal: se.detect_notice.emit(port)
+    #  return port
+
+
+def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
     waitwords = [
+        'U-Boot',
         'Starting kernel',
         'usb rndis & adb start: OK',
         'Server is ready for client connect',
         '|-----bluetooth speaker is ready for connections------|',
+        '#',
     ]
-    #  wait_for_prompt(serial, 'Starting kernel')
-    #  wait_for_prompt(serial, 'Server is ready for client connect')
-    #  wait_for_prompt(serial, '|-----bluetooth speaker is ready for connections------|')
     wait_for_prompt(serial, waitwords[waitwordidx])
-    for _ in range(3): serial.write(os.linesep.encode('ascii'))
-    #  wait_for_prompt(serial, '#')
+    if press_enter:
+        for _ in range(3): serial.write(os.linesep.encode('ascii'))
 
 
 def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
@@ -109,7 +162,16 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
 
 
 if __name__ == "__main__":
-    port_name = 'COM3'
-    ser = get_serial(port_name, 115200, 0.2)
-    enter_factory_image_prompt(ser)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--ports', help='serial com port names', type=str)
+    args = parser.parse_args()
+    ports = args.ports.split(',')
+
+    print('ports', ports)
+    check_which_port_when_poweron(ports)
+
+
+    #  port_name = 'COM3'
+    #  ser = get_serial(port_name, 115200, 0.2)
+    #  enter_factory_image_prompt(ser, 0)
 

@@ -1,3 +1,10 @@
+[2019.6.28 - 16:50]
+1. auto detect the comport of #1 dut using button
+	a. when auto-detect button press, listening to current two comports
+	b. plug adator into #1 dut
+	c. detect the comport which response
+	d. change self._comports if necessary
+
 [2019.6.28 - 08:10]
 1. add comport label-box for instruments whenever serial ports get updated
 2. TBD: DUT/powersupply comports need to be correct according to the DUT's num
