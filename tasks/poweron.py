@@ -16,7 +16,8 @@ if __name__ == "__main__":
     logger.info(f'power_index: {power_index}')
 
     with open('instruments', 'rb') as f:
-        _, power1, power2 = pickle.load(f)
+        #  _, power1, power2 = pickle.load(f)
+        power1, power2, _ = pickle.load(f)
 
     power = [power1, power2][power_index - 1]
     if not power.is_open:

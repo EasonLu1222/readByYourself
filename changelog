@@ -1,3 +1,7 @@
+[2019.6.28 - 08:10]
+1. add comport label-box for instruments whenever serial ports get updated
+2. TBD: DUT/powersupply comports need to be correct according to the DUT's num
+
 [2019.6.26 - 17:35]
 1. start to write testing log
 

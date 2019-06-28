@@ -4,7 +4,6 @@ from collections import defaultdict
 
 from mylogger import logger
 
-
 POWERON = '''
     OUTPut:PROTection:CLEar
     OUTPut 0
@@ -81,22 +80,22 @@ MEASURE_VOLT_ALL = '''
 '''
 
 #  MEASURE_FREQ = '''
-    #  SYST:OUTP:SEP 1
-    #  ROUT:SCAN:FIN OFF
-    #  ROUT:ADV ON
-    #  SENS:DET:RATE F
-    #  SENS:FREQ:APER 0.01
-    #  ROUT:MULT:CLOS 101,116
-    #  ROUT:MULT:OPEN 113,116
-    #  ROUT:COUN 4
-    #  ROUT:DEL 0
-    #  TRIG:DEL 0
-    #  ROUT:CHAN 113,8,10,0
-    #  ROUT:CHAN 114,8,10,0
-    #  ROUT:CHAN 115,8,10,0
-    #  ROUT:CHAN 116,8,10,0
-    #  ROUT:FUNC SCAN
-    #  FETCH?
+#  SYST:OUTP:SEP 1
+#  ROUT:SCAN:FIN OFF
+#  ROUT:ADV ON
+#  SENS:DET:RATE F
+#  SENS:FREQ:APER 0.01
+#  ROUT:MULT:CLOS 101,116
+#  ROUT:MULT:OPEN 113,116
+#  ROUT:COUN 4
+#  ROUT:DEL 0
+#  TRIG:DEL 0
+#  ROUT:CHAN 113,8,10,0
+#  ROUT:CHAN 114,8,10,0
+#  ROUT:CHAN 115,8,10,0
+#  ROUT:CHAN 116,8,10,0
+#  ROUT:FUNC SCAN
+#  FETCH?
 #  '''
 
 MEASURE_FREQ = '''
@@ -163,6 +162,9 @@ def update_serial(instruments):
     logger.info('update_serial start')
     devices = get_devices()
     instrument_set = set(e.NAME for e in instruments)
+    for e in instruments:
+        e.com = None
+
     for instrument_name in instrument_set:
         device = [e for e in devices if e['name'] == instrument_name]
         for idx, d in enumerate(
@@ -172,9 +174,7 @@ def update_serial(instruments):
             each = next(
                 filter(lambda e: e.NAME == instrument_name and e.index == idx,
                        instruments))
-
             logger.info(f'each: {each}')
-            logger.info(f'comport: {d["comport"]}')
             each.com = d['comport']
 
 
@@ -278,10 +278,10 @@ class DMM(SerialInstrument):
         return values
 
     #  def measure_freqs(self, channels):
-        #  result = self.run_cmd(cmd_volts(channels), True)
-        #  logger.info(f'result: {result}')
-        #  values = [float(e) for e in result.split(',')]
-        #  return values
+    #  result = self.run_cmd(cmd_volts(channels), True)
+    #  logger.info(f'result: {result}')
+    #  values = [float(e) for e in result.split(',')]
+    #  return values
 
     def measure_volts_all(self):
         result = self.run_cmd(cmd(MEASURE_VOLT_ALL), True)
@@ -316,3 +316,17 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
 #  dmm1, power1, power2 = open_all(True, True)
 
 #  list(zip(range(1,17), dmm.measure_volts_all()))
+
+
+INSTRUMENT_MAP = {
+    'gw_powersupply': PowerSupply, 
+    'gw_dmm': DMM,
+}
+
+
+def generate_instruments(task_instruments):
+    instruments = defaultdict(list)
+    for name, num in task_instruments.items():
+        for i in range(1, num+1):
+            instruments[name].append(INSTRUMENT_MAP[name](i))
+    return instruments

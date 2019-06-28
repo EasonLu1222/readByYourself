@@ -10,7 +10,8 @@ from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
 from threading import Thread
-from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView, QAbstractItemView)
+from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
+                             QAbstractItemView, QHBoxLayout, QWidget)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
@@ -24,11 +25,13 @@ from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free)
 
-from instrument import update_serial, open_all
+from instrument import update_serial, open_all, generate_instruments
 from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
 from ui.barcode_dialog_class import BarcodeDialog
 from ui.design3 import Ui_MainWindow
 from ui.design3_class import MainWindow
+
+from mylogger import logger
 
 dmm1, power1, power2 = open_all()
 
@@ -43,11 +46,13 @@ class ProcessListener(QThread):
         self.processes = processes
 
     def run(self):
+        print('\n\n\nProcessListener run start!')
         outputs = {}
         for pid, proc in self.processes.items():
             output, _ = proc.communicate()
             output = output.decode('utf8')
             outputs[pid] = float(output)
+        print('\n\n\nProcessListener run done!')
         self.process_results.emit(outputs)
 
     def stop(self):
@@ -103,7 +108,7 @@ class SerialListener(QThread):
 
             # update comport of intruments
             if self.update(self.instruments, instruments):
-                update_serial([dmm1, power1, power2])
+                #  update_serial([dmm1, power1, power2])
                 self.comports_instrument.emit(self.instruments)
 
             if not self.is_instrument_ready and len(self.instruments) == 3:
@@ -282,7 +287,7 @@ class Task(QThread):
         return (min_, expect, max_)
 
     def instruments(self):
-        self.base['instruments']
+        return self.base['instruments']
 
     def header_dut(self, dut_names=None):
         if dut_names:
@@ -345,21 +350,21 @@ class Task(QThread):
 
     def runeach(self, index, port, tasktype):
         each, script, tasktype, args = self.unpack_each(index)
+        msg = f'[runeach][script: {script}][index: {index}][type: {tasktype}][port: {port}][args: {args}]'
+        print(msg)
         if tasktype == 1:
-            msg = '\n[runeach][script: %s][index: %s][port: %s][args: %s]' % (
-                script, index, port, args)
             proc = Popen(['python', '-m', script, '-p', port] + args,
                          stdout=PIPE)
 
         elif tasktype == 3:
-            msg = '\n[runeach3][script: %s][index: %s][args: %s]' % (
-                script, index, args)
-            x = {'COM3': 2, 'COM11': 1}  # <-- hard coded!!! To Be Modified
-            args = [str(x[port])]
+            ports = self.window.comports()
+            print(f'window.comports(): {self.window.comports()}')
+            power_index = self.window.comports().index(port)+1
+            print('power_index', power_index)
+            args = [str(power_index)]
             proc = Popen(['python', '-m', script] + args, stdout=PIPE)
 
         self.printterm_msg.emit(msg)
-        print(msg)
         return proc
 
     def runeachports(self, index, ports):
@@ -392,6 +397,7 @@ class Task(QThread):
 
     def run(self):
         for action, args in self.action_args:
+            print('run action', action, args)
             if not action(*args):
                 print('return !!!!!')
                 return
@@ -511,7 +517,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         is_fx1_checked = self.settings.value("fixture_1", False, type=bool)
         is_fx2_checked = self.settings.value("fixture_2", False, type=bool)
         lang_index = self.settings.value("lang_index", 0, type=int)
-        
+
         # Restore UI states
         self.checkBoxFx1.setChecked(is_fx1_checked)
         self.checkBoxFx2.setChecked(is_fx2_checked)
@@ -519,6 +525,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.on_lang_changed(lang_index)
 
         self._comports = []
+        self._comports_inst = []
+
+        self.instruments = generate_instruments(self.task.instruments())
+        instruments_array = sum(self.instruments.values(), [])
+        update_serial(instruments_array)
+
+
+        __import__('ipdb').set_trace()
+
+        self.dut_layout = []
+        colors = ['#edd', '#edd']
+        for i in range(self.task.dut_num):
+            c = QWidget()
+            c.setStyleSheet(f'background-color:{colors[i]};')
+            layout = QHBoxLayout(c)
+            self.hbox_ports.addWidget(c)
+            self.dut_layout.append(layout)
 
         self.setsignal()
 
@@ -527,6 +550,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ser_listener.comports_instrument.connect(self.instrument_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
+
         self.proc_listener = ProcessListener()
         self.proc_listener.process_results.connect(self.recieve_power)
         self.power_recieved = False
@@ -580,10 +604,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('recieve_power', process_results)
         self.proc_listener.stop()
         self.power_results = process_results
+
         with open('power_results', 'w+') as f:
             f.write(json.dumps(process_results))
+        print('recieve_power write power_results')
+
         self.power_recieved = True
         if self.taskdone_first:
+            print('\nCCCCCC')
             self.taskdone('tasks done')
 
     def set_task(self, task):
@@ -606,14 +634,22 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('update_task')
         self.set_task(mainboard_task)
 
-    def set_power(self):
-        script = 'tasks.poweron'
-        for idx in range(1, 3):
-            args = [str(idx)]
-            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
-            self.power_process[idx] = proc
-        self.proc_listener.set_process(self.power_process)
-        self.proc_listener.start()
+    def auto_align_com_port(self):
+        self._comports_inst
+
+    def poweron(self, power):
+        if not power.is_open:
+            power.open_com()
+            power.on()
+
+    #  def set_power(self):
+        #  script = 'tasks.poweron'
+        #  for idx in range(1, 3):
+            #  args = [str(idx)]
+            #  proc = Popen(['python', '-m', script] + args, stdout=PIPE)
+            #  self.power_process[idx] = proc
+        #  self.proc_listener.set_process(self.power_process)
+        #  self.proc_listener.start()
 
     def clearlayout(self, layout):
         while layout.count():
@@ -623,44 +659,73 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def instrument_update(self, comports):
         print('instrument_update', comports)
+        self._comports_inst = comports
+        instruments_array = sum(self.instruments.values(), [])
+        update_serial(instruments_array)
 
-    def instrument_ready(self, ready):
-        if ready:
-            self.pushButton.setEnabled(True)
-            print('\nREADY\n!')
-            with open('instruments', 'wb') as f:
-                pickle.dump([dmm1, power1, power2], f)
-        else:
-            self.pushButton.setEnabled(False)
-            print('\nNOT READY\n!')
-
-    def comports(self):
-        return self._comports
-
-    #  @comports.setter
-    #  def comports(self, ports):
-    #  self._comports = ports
+        self.render_port_plot()
 
     def ser_update(self, comports):
         print('ser_update', comports)
         self._comports = comports
-        self.clearlayout(self.hbox_ports)
-        for port in self._comports:
-            lb_port = QLabel(port)
-            lb_port.setStyleSheet("""
+        self.render_port_plot()
+
+    def render_port_plot(self):
+        style_ = lambda color: """
                 QLabel {
                     padding: 6px;
-                    background: #369;
+                    background: %s;
                     color: white;
                     border: 0;
                     border-radius: 3px;
                     outline: 0px;
                     font-family: Courier;
                     font-size: 16px;
-                }
-            #  """)
-            self.hbox_ports.addWidget(lb_port)
-        self.hbox_ports.addStretch()
+                }""" % (color,)
+
+        for i, e in enumerate(self.dut_layout, 1):
+            self.clearlayout(e)
+            e.addWidget(QLabel(f'#{i}'))
+
+        for i, port in enumerate(self._comports):
+            print(f'port {i}: {port}')
+            lb_port = QLabel(port)
+            lb_port.setStyleSheet(style_('#369'))
+            self.dut_layout[i].addWidget(lb_port)
+
+        colors_inst = {'gw_powersupply': '#712', 'gw_dmm': '#4a3'}
+        for name, num in self.task.instruments().items():
+            print('name', name, 'num', num)
+            each_instruments = self.instruments[name]
+            for i, e in enumerate(each_instruments):
+                print(f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
+                if e.com in self._comports_inst:
+                    lb_port = QLabel(e.com)
+                    lb_port.setStyleSheet(style_(colors_inst[name]))
+                    self.dut_layout[i].addWidget(lb_port)
+
+        for i in range(self.task.dut_num):
+            self.dut_layout[i].addStretch()
+
+    def instrument_ready(self, ready):
+        if ready:
+            self.pushButton.setEnabled(True)
+            print('\nREADY\n!')
+
+            #  with open('instruments', 'wb') as f:
+                #  pickle.dump([dmm1, power1, power2], f)
+
+            # order: power1,power2, dmm1
+            instruments_to_dump = sum(self.instruments.values(), [])
+
+            with open('instruments', 'wb') as f:
+                pickle.dump(instruments_to_dump, f)
+        else:
+            self.pushButton.setEnabled(False)
+            print('\nNOT READY\n!')
+
+    def comports(self):
+        return self._comports
 
     def setsignal(self):
         self.checkBoxFx1.stateChanged.connect(self.chk_box_fx1_state_changed)
@@ -677,8 +742,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         se.serial_msg.connect(self.printterm1)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
-
-
 
     def serial_ok(self, ok):
         if ok:
@@ -811,6 +874,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.table_view.clearSelection()
             self.taskdone_first = False
             self.power_recieved = False
+
+            if os.path.isfile('power_results'):
+                os.remove('power_results')
 
     def show_barcode_dialog(self):
         print('show_barcode_dialog start')
