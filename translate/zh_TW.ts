@@ -116,5 +116,10 @@
         <source>jsonfile/test2.json</source>
         <translation type="unfinished">jsonfile/zh_tw/test2.json</translation>
     </message>
+    <message>
+        <location filename="../app.py" line="899"/>
+        <source>Summary</source>
+        <translation type="unfinished">總結</translation>
+    </message>
 </context>
 </TS>

@@ -506,10 +506,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.logfile = 'xxx.csv'
 
-        self.d = EngModePwdDialog(self)
-        self.b = BarcodeDialog(self)
+        self.pwd_dialog = EngModePwdDialog(self)
+        self.barcode_dialog = BarcodeDialog(self)
 
-        self.jsonfileroot = 'jsonfile/en_us'
+        self.jsonfileroot = 'jsonfile'
         self.jsonfilename = jsonfile
 
         # Read UI states from app settings
@@ -517,12 +517,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         is_fx1_checked = self.settings.value("fixture_1", False, type=bool)
         is_fx2_checked = self.settings.value("fixture_2", False, type=bool)
         lang_index = self.settings.value("lang_index", 0, type=int)
+        is_eng_mode_on = self.settings.value("is_eng_mode_on", False, type=bool)
 
         # Restore UI states
         self.checkBoxFx1.setChecked(is_fx1_checked)
         self.checkBoxFx2.setChecked(is_fx2_checked)
         self.langSelectMenu.setCurrentIndex(lang_index)
         self.on_lang_changed(lang_index)
+        self.checkBoxEngMode.setChecked(is_eng_mode_on)
+        self.toggle_engineering_mode(is_eng_mode_on)
 
         self._comports = []
         self._comports_inst = []
@@ -531,8 +534,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         instruments_array = sum(self.instruments.values(), [])
         update_serial(instruments_array)
 
-
-        __import__('ipdb').set_trace()
 
         self.dut_layout = []
         colors = ['#edd', '#edd']
@@ -571,12 +572,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.clean_power()
         self.taskdone_first = False
-
-    def retranslateUi(self, MyWindow):
-    #  def retranslateUi(self):
-        super().retranslateUi(self)
-        _translate = QCoreApplication.translate
-        self.task_path = _translate("MainWindow", "jsonfile/test2.json")
 
     def dummy_com(self, coms):
         self._comports = coms
@@ -626,11 +621,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for col in [0, 1, 2, 3, 4]:
             self.table_view.setColumnHidden(col, True)
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem('Summary'))
+        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
 
-    def update_task(self):
+    def update_task(self, lang_folder):
         #  mainboard_task = Task(self.task_path)
-        mainboard_task = Task(f'{self.jsonfileroot}/{self.jsonfilename}')
+        mainboard_task = Task(f'{self.jsonfileroot}/{lang_folder}/{self.jsonfilename}')
         print('update_task')
         self.set_task(mainboard_task)
 
@@ -732,9 +727,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBoxFx2.stateChanged.connect(self.chk_box_fx2_state_changed)
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
-        self.d.dialog_close.connect(self.on_dialog_close)
-        self.b.barcode_entered.connect(self.on_barcode_entered)
-        self.b.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
+        self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
+        self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
+        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.task_each.connect(self.taskeach)
@@ -882,10 +877,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('show_barcode_dialog start')
         s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
         num = len(list(filter(lambda x: x==True, s)))
-        self.b.set_total_barcode(num)
+        self.barcode_dialog.set_total_barcode(num)
 
         if num>0:
-            self.b.show()
+            self.barcode_dialog.show()
         print('show_barcode_dialog end')
 
     def btn_clicked(self):
@@ -909,19 +904,27 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             power2.off()
         event.accept()  # let the window close
 
-    def eng_mode_state_changed(self, status):
-        if (status == Qt.Checked):
-            self.d.show()
-
     def chk_box_fx1_state_changed(self, status):
         self.settings.setValue("fixture_1", status == Qt.Checked)
 
     def chk_box_fx2_state_changed(self, status):
         self.settings.setValue("fixture_2", status == Qt.Checked)
 
-    def on_dialog_close(self, is_eng_mode_on):
+    def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
+    
+    def eng_mode_state_changed(self, status):
+        self.toggle_engineering_mode(status == Qt.Checked)
+        if (status == Qt.Checked):
+            self.pwd_dialog.show()
+
+    def toggle_engineering_mode(self, is_on):
+        self.settings.setValue("is_eng_mode_on", is_on)
+        if is_on:
+            self.splitter.show()
+        else:
+            self.splitter.hide()
 
     def on_lang_changed(self, index):
         self.settings.setValue("lang_index", index)
@@ -934,17 +937,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.retranslateUi(self)
 
-        self.update_task()
+        json_folder = lang_list[index].split(".")[0]
+        self.update_task(json_folder)
 
-        self.d.retranslateUi(self.d)
-        self.b.retranslateUi(self.b)
+        self.pwd_dialog.retranslateUi(self.pwd_dialog)
+        self.barcode_dialog.retranslateUi(self.barcode_dialog)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
 
     def on_barcode_dialog_closed(self):
-        # move original btn_clicked to here
-        # TODO: should distinguish confirm from cancel
         for i in range(self.task.len()+1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
@@ -952,6 +954,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
+        
+    def retranslateUi(self, MyWindow):
+        super().retranslateUi(self)
+        _translate = QCoreApplication.translate
+        self.summary_text = _translate("MainWindow", "Summary")
 
 
 
