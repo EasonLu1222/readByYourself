@@ -20,16 +20,15 @@ from PyQt5.QtGui import QFont, QColor
 import pandas as pd
 
 from view.myview import TableView
+from view.pwd_dialog import PwdDialog
+from view.barcode_dialog import BarcodeDialog
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron)
 
 from instrument import update_serial, open_all, generate_instruments
-from ui.eng_mode_pwd_dialog_class import EngModePwdDialog
-from ui.barcode_dialog_class import BarcodeDialog
 from ui.design3 import Ui_MainWindow
-from ui.design3_class import MainWindow
 
 from mylogger import logger
 
@@ -506,7 +505,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.logfile = 'xxx.csv'
 
-        self.pwd_dialog = EngModePwdDialog(self)
+        self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
 
         self.jsonfileroot = 'jsonfile'
@@ -951,6 +950,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.splitter.hide()
 
     def on_lang_changed(self, index):
+        """
+        When language is changed, update UI
+        """
         self.settings.setValue("lang_index", index)
         lang_list = ['en_US.qm', 'zh_TW.qm']
         app = QApplication.instance()
@@ -960,17 +962,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         app.installTranslator(translator)
 
         self.retranslateUi(self)
-
-        json_folder = lang_list[index].split(".")[0]
-        self.update_task(json_folder)
-
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
+        
+        # Retrieve the translated task list(json file)
+        lang_folder = lang_list[index].split(".")[0]
+        self.update_task(lang_folder)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
 
     def on_barcode_dialog_closed(self):
+        """
+        When the barcode(s) are ready, start testing
+        """
         for i in range(self.task.len()+1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,

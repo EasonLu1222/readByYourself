@@ -9,47 +9,6 @@
     </message>
 </context>
 <context>
-    <name>EngModePwdDialog</name>
-    <message>
-        <location filename="../ui/eng_mode_pwd_dialog.py" line="69"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/eng_mode_pwd_dialog.py" line="70"/>
-        <source>By enabling this mode, you can force continue a failed test(if the test item is continuable)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/eng_mode_pwd_dialog.py" line="71"/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/eng_mode_pwd_dialog.py" line="72"/>
-        <source>Confirm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/eng_mode_pwd_dialog.py" line="73"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FixtureSelectDialog</name>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="66"/>
-        <source>en_US</source>
-        <translation type="obsolete">English</translation>
-    </message>
-    <message>
-        <location filename="../ui/fixture_select_dialog.py" line="67"/>
-        <source>zh_TW</source>
-        <translation type="obsolete">中文</translation>
-    </message>
-</context>
-<context>
     <name>MainWindow</name>
     <message>
         <location filename="../ui/design3.py" line="83"/>
@@ -87,13 +46,36 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3_class.py" line="20"/>
-        <source>jsonfile/test2.json</source>
+        <location filename="../app.py" line="966"/>
+        <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PwdDialog</name>
+    <message>
+        <location filename="../ui/pwd_dialog.py" line="69"/>
+        <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="899"/>
-        <source>Summary</source>
+        <location filename="../ui/pwd_dialog.py" line="70"/>
+        <source>By enabling this mode, you can force continue a failed test(if the test item is continuable)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pwd_dialog.py" line="71"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pwd_dialog.py" line="72"/>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/pwd_dialog.py" line="73"/>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

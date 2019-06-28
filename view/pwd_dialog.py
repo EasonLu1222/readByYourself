@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
-from ui.eng_mode_pwd_dialog import Ui_EngModePwdDialog
+from ui.pwd_dialog import Ui_PwdDialog
 
 
-class EngModePwdDialog(QDialog, Ui_EngModePwdDialog):
+class PwdDialog(QDialog, Ui_PwdDialog):
     dialog_close = pyqtSignal(bool)
     def __init__(self, parent=None):
         super().__init__(parent)
-        print('EngModePwdDialog init')
+        print('PwdDialog init')
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -20,7 +20,7 @@ class EngModePwdDialog(QDialog, Ui_EngModePwdDialog):
         return password=='1234'
         
     def showEvent(self, event):
-        super(EngModePwdDialog, self).showEvent(event)
+        super(PwdDialog, self).showEvent(event)
         
         # Clear the password when dialog is opened
         self.pwdText.clear()
