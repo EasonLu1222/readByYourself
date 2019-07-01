@@ -573,6 +573,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.clean_power()
         self.taskdone_first = False
+        
+        self.statusBar().hide()
 
     def btn_detect(self):
         self.pushDetect.setText(f'{self.push_detect_text}...')
