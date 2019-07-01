@@ -64,14 +64,19 @@
         <translation type="unfinished">工程模式</translation>
     </message>
     <message>
-        <location filename="../app.py" line="990"/>
+        <location filename="../app.py" line="991"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../app.py" line="991"/>
+        <location filename="../app.py" line="992"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished">第一連接埠自動偵測</translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="993"/>
+        <source>按此按鈕後將第一台待測物上電，以校準連接埠</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

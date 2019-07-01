@@ -557,6 +557,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
+        self.pushDetect.setToolTip(self.push_detect_tooltip_text)
 
         # for simulation without serial devices
         #  self.pushButtonM = QPushButton(self.centralwidget)
@@ -989,6 +990,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         _translate = QCoreApplication.translate
         self.summary_text = _translate("MainWindow", "Summary")
         self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
+        self.push_detect_tooltip_text = _translate("MainWindow", "Press this button and power on the first DUT to calibrate the COM ports")
 
 
 
