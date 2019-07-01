@@ -29,53 +29,53 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="92"/>
+        <location filename="../ui/design3.py" line="103"/>
         <source>MainWindow</source>
         <translation type="unfinished">主視窗</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="99"/>
+        <location filename="../ui/design3.py" line="110"/>
         <source>PushButton</source>
         <translation type="unfinished">開始測試</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="93"/>
+        <location filename="../ui/design3.py" line="105"/>
         <source>Test on fixture 1</source>
         <translation type="unfinished">使用治具1測試</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="94"/>
+        <location filename="../ui/design3.py" line="104"/>
         <source>Test on fixture 2</source>
         <translation type="unfinished">使用治具2測試</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="95"/>
+        <location filename="../ui/design3.py" line="106"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="96"/>
+        <location filename="../ui/design3.py" line="107"/>
         <source>zh_TW</source>
         <translation type="unfinished">中文</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="97"/>
+        <location filename="../ui/design3.py" line="108"/>
         <source>Engineering mode</source>
         <translation type="unfinished">工程模式</translation>
     </message>
     <message>
-        <location filename="../app.py" line="991"/>
+        <location filename="../app.py" line="1005"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../app.py" line="992"/>
+        <location filename="../app.py" line="1006"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished">第一連接埠自動偵測</translation>
     </message>
     <message>
-        <location filename="../app.py" line="993"/>
-        <source>按此按鈕後將第一台待測物上電，以校準連接埠</source>
+        <location filename="../app.py" line="1007"/>
+        <source>Press this button and power on the first DUT to calibrate the COM ports</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

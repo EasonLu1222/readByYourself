@@ -29,52 +29,52 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="92"/>
+        <location filename="../ui/design3.py" line="103"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="99"/>
+        <location filename="../ui/design3.py" line="110"/>
         <source>PushButton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="93"/>
+        <location filename="../ui/design3.py" line="105"/>
         <source>Test on fixture 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="94"/>
+        <location filename="../ui/design3.py" line="104"/>
         <source>Test on fixture 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="95"/>
+        <location filename="../ui/design3.py" line="106"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="96"/>
+        <location filename="../ui/design3.py" line="107"/>
         <source>zh_TW</source>
         <translation type="unfinished">中文</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="97"/>
+        <location filename="../ui/design3.py" line="108"/>
         <source>Engineering mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="991"/>
+        <location filename="../app.py" line="1005"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="992"/>
+        <location filename="../app.py" line="1006"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="993"/>
+        <location filename="../app.py" line="1007"/>
         <source>Press this button and power on the first DUT to calibrate the COM ports</source>
         <translation type="unfinished"></translation>
     </message>
