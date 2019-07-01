@@ -535,21 +535,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         instruments_array = sum(self.instruments.values(), [])
         update_serial(instruments_array)
 
-
-        # proto for port-auto-dectect button
-        self.push_detect = QPushButton()
-        self.push_detect.resize(200,30)
-        self.push_detect.setText("#1 port auto detect")
-        self.push_detect.clicked.connect(self.btn_detect)
-        self.hbox_ports.addWidget(self.push_detect)
-
         self.dut_layout = []
         colors = ['#edd', '#edd']
         for i in range(self.task.dut_num):
             c = QWidget()
             c.setStyleSheet(f'background-color:{colors[i]};')
             layout = QHBoxLayout(c)
-            self.hbox_ports.addWidget(c)
+            self.hboxPorts.addWidget(c)
             self.dut_layout.append(layout)
 
         self.setsignal()
@@ -582,9 +574,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.taskdone_first = False
 
     def btn_detect(self):
-        self.push_detect.setText(f'#1 port auto detect...')
+        self.pushDetect.setText(f'{self.push_detect_text}...')
         print("btn_detect")
-        self.push_detect.setEnabled(False)
+        self.pushDetect.setEnabled(False)
         t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
         t.start()
 
@@ -594,8 +586,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('reverse comport!!!')
             self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
         self.render_port_plot()
-        self.push_detect.setEnabled(True)
-        self.push_detect.setText(f"#1 port auto detect ---> {comport_when_poweron_first_dut}")
+        self.pushDetect.setEnabled(True)
+        self.pushDetect.setText(f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
 
     def dummy_com(self, coms):
         self._comports = coms
@@ -752,6 +744,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
+        self.pushDetect.clicked.connect(self.btn_detect)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
         self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
@@ -995,6 +988,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
         self.summary_text = _translate("MainWindow", "Summary")
+        self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
 
 
 

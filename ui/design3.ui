@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
@@ -80,7 +80,30 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="hbox_ports"/>
+       <layout class="QHBoxLayout" name="hboxPorts">
+        <property name="spacing">
+         <number>-1</number>
+        </property>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QPushButton" name="pushDetect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>#1 port auto detect</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QSplitter" name="splitter_2">

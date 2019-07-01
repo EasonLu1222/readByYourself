@@ -9,45 +9,68 @@
     </message>
 </context>
 <context>
+    <name>LoadingDialog</name>
+    <message>
+        <location filename="../ui/loading_dialog.py" line="38"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loading_dialog.py" line="39"/>
+        <source>Booting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/loading_dialog.py" line="40"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="83"/>
+        <location filename="../ui/design3.py" line="92"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="89"/>
+        <location filename="../ui/design3.py" line="99"/>
         <source>PushButton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="84"/>
+        <location filename="../ui/design3.py" line="93"/>
         <source>Test on fixture 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="85"/>
+        <location filename="../ui/design3.py" line="94"/>
         <source>Test on fixture 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="86"/>
+        <location filename="../ui/design3.py" line="95"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="87"/>
+        <location filename="../ui/design3.py" line="96"/>
         <source>zh_TW</source>
         <translation type="unfinished">中文</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="88"/>
+        <location filename="../ui/design3.py" line="97"/>
         <source>Engineering mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="966"/>
+        <location filename="../app.py" line="990"/>
         <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="991"/>
+        <source>#1 port auto detect</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
