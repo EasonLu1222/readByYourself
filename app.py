@@ -986,18 +986,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             loading_dialog.show()
         else:
             loading_dialog.done(1)
-            
-    def set_fail_window_color():
-        """
-        Set window background to red when some test failed
-        """
-        self.setStyleSheet("background-color: #FF5722;")
-    
-    def set_pass_window_color():
-        """
-        Set window background to green when all tests passed
-        """
-        self.setStyleSheet("background-color: #8BC34A;")
+        
+    def set_window_color(self, state="default"):
+        '''
+        Set the window background color based on the test result
+        Args:
+            state (str): "pass", "fail" or "default"
+        '''
+        color = {
+            "pass": "#8BC34A",
+            "fail": "#FF5722",
+            "default": "#ECECEC"
+        }[state]
+        self.setStyleSheet(f"background-color: {color}")
         
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
