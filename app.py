@@ -402,6 +402,9 @@ class Task(QThread):
 
         get_col = lambda arr, col: map(lambda x: x[col], arr)
 
+        c1 = len(self.header())
+        self.df.iloc[:, c1:c1+2] = ""
+
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             print('i', i, 'next_item', next_item)
@@ -449,7 +452,7 @@ class Task(QThread):
                             'port': port,
                             'output': output
                         })
-                        self.df.iat[i, len(self.header()) + j] = output
+                        self.df.iat[i, len(self.header()) + self.window.dut_selected[j]] = output
                         print('run: result', result)
                         self.task_result.emit(result)
                 else:
@@ -904,17 +907,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             d = self.task.df
             all_res = []
+
+            print('\n\n')
+            print(d)
+            print(d.columns)
+            print(d.columns[-2])
+
             #  for j in range(self.task.dut_num):
             for j in self.dut_selected:
                 res = 'Pass' if all_pass(
-                    d[d.hidden == False][f'#{j+1}']) else 'Fail'
+                    d[d.hidden == False][d.columns[-2+j]]) else 'Fail'
                 self.table_view.setItem(r, self.col_dut_start + j,
                                         QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
 
                 df = d[d.hidden == False]
-                dd = pd.DataFrame(df[[f'#{j+1}']].values.T)
+                dd = pd.DataFrame(df[[d.columns[-2+j]]].values.T)
                 dd.index = [random.randint(1000, 9999)]
                 dd.index.name = 'pid'
                 all_res.append(res)
@@ -953,7 +962,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
-
+        
     def btn_clickedM(self):
         print('btn_clickedM')
         self.show_barcode_dialog()
@@ -1086,7 +1095,7 @@ if __name__ == "__main__":
     mb_task = Task('jsonfile/v3_total_two_dut.json')
     simu_task = TaskSimu('jsonfile/v3_simu1.json')
 
-    jsonfilename = 'v3_total_two_dut.json'
+    jsonfilename = 'v3_temp.json'
     win = MyWindow(app, jsonfilename)
 
     actions = [
