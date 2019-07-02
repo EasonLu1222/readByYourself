@@ -1,4 +1,10 @@
-[2019.7.12 - 11:35]
+[2019.7.02 - 14:10]
+1. add transparent loading animation (apple style)
+	a. add images/AppleLoading.gif
+	b. add show_animation_dialog QSignal
+
+
+[2019.7.02 - 11:35]
 1. complete the comport auto detect process
 	a. two dut, two powersupply, one dmm on
 	b. click auto-detect button
@@ -52,8 +58,8 @@
 
 [2019.6.25 - 16:40]
 1. add summary row to check pass/fail
-2. modifications for type2 task 
-	a. modify tasks/power_check2.py, speaker_check.py to allow both 1 & 2 DUTs 
+2. modifications for type2 task
+	a. modify tasks/power_check2.py, speaker_check.py to allow both 1 & 2 DUTs
 	b. change v3_total.json to v3_total_two_dut.json
 	c. new v3_total_one_dut.json
 

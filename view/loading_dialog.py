@@ -9,15 +9,25 @@ class LoadingDialog(QDialog, Ui_LoadingDialog):
         super().__init__(parent)
         print('LoadingDialog init')
         self.setupUi(self)
-        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        #  self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint |
+                            #  Qt.FramelessWindowHint)
+
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+
         self.setWindowModality(Qt.ApplicationModal)
-        
-        movie = QMovie("./images/spinning_wheel.gif")
-        movie.setCacheMode(QMovie.CacheAll) 
-        movie.setSpeed(100) 
-        self.label.setMovie(movie)   
+
+        self.label.setAttribute(Qt.WA_TranslucentBackground, True)
+        #  self.setStyleSheet("background:transparent;")
+        self.label.setText('fuck!')
+        #  self.label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+        self.label.setScaledContents(True)
+
+        self.setWindowOpacity(0.5)
+
+        #  movie = QMovie("./images/spinning_wheel.gif")
+        movie = QMovie("./images/AppleLoading.gif")
+        movie.setCacheMode(QMovie.CacheAll)
+        movie.setSpeed(200)
+        self.label.setMovie(movie)
         movie.start()
-    
-    # def reject(self):
-    #     pass

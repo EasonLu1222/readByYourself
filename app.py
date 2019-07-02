@@ -33,8 +33,6 @@ from ui.design3 import Ui_MainWindow
 
 from mylogger import logger
 
-#  dmm1, power1, power2 = open_all()
-
 
 class ProcessListener(QThread):
     process_results = QSignal(dict)
@@ -62,7 +60,6 @@ class ProcessListener(QThread):
 class SerialListener(QThread):
     update_msec = 500
     comports = QSignal(list)
-    #  comports_instrument = QSignal(list)
     comports_ps = QSignal(list)
     comports_dmm = QSignal(list)
     if_all_ready = QSignal(bool)
@@ -72,7 +69,6 @@ class SerialListener(QThread):
         self.is_reading = False
 
         self.ports = []
-        #  self.instruments = []
         self.ports_ps = []
         self.ports_dmm = []
         self.is_instrument_ready = False
@@ -107,51 +103,23 @@ class SerialListener(QThread):
                 e['comport']
                 for e in [e for e in devices if e['name'] == 'gw_dmm']
             ]
-            #  instruments = [
-                #  e['comport'] for e in [
-                    #  e for e in devices
-                    #  if e['name'] in ['gw_powersupply', 'gw_dmm']
-                #  ]
-            #  ]
             self.is_reading = False
 
             if self.update(self.ports, ports):
                 self.comports.emit(self.ports)
-
-            # update comport of intruments
-
-            #  print(self.instruments)
-            #  if self.update(self.instruments, instruments):
-                #  self.comports_instrument.emit(self.instruments)
-            #  print(self.instruments)
-
-            #  print('ps before', self.ports_ps)
             if self.update(self.ports_ps, ports_ps):
                 self.comports_ps.emit(self.ports_ps)
-
-            #  print('dmm before', self.ports_dmm)
             if self.update(self.ports_dmm, ports_dmm):
                 self.comports_dmm.emit(self.ports_dmm)
-
 
             if not self.is_instrument_ready and (len(self.ports_ps) == 2 and 
                                                  len(self.ports_dmm)==1):
                 self.is_instrument_ready = True
                 self.if_all_ready.emit(True)
-
             if self.is_instrument_ready and (len(self.ports_ps)!=2 or
                                              len(self.ports_dmm)!=1):
                 self.is_instrument_ready = False
                 self.if_all_ready.emit(False)
-
-
-            #  if not self.is_instrument_ready and len(self.instruments) == 3:
-                #  self.is_instrument_ready = True
-                #  self.if_all_ready.emit(True)
-
-            #  if self.is_instrument_ready and len(self.instruments) < 3:
-                #  self.is_instrument_ready = False
-                #  self.if_all_ready.emit(False)
 
     def stop(self):
         # wait 1s for list_ports to finish, is it enough or too long in order
@@ -361,22 +329,14 @@ class Task(QThread):
         print(
             f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]'
         )
-
-
         limits_group = [self.limits(groupname, i) for i in range(item_len)]
         print('limits_group', limits_group)
         limits = {}
         for e in zip(*args):
             xx = {i:j for i,j in zip(e,limits_group)}
             limits.update(xx)
-
-        #  A = [{i:j for i,j in zip(each_arg, limits_group)} for each_arg in args]
-
         print('limits', limits)
-
         args = {'args': args, 'limits':limits}
-
-        #  port_dmm = dmm1.com
         port_dmm = self.window.instruments['gw_dmm'][0].com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] +
                      [json.dumps(args)],
@@ -408,12 +368,10 @@ class Task(QThread):
         args = [str(e) for e in line[1]] if line[1] else []
         msg1 = '\n[runeachports][script: %s][index: %s][ports: %s][args: %s]' % (
             script, index, ports, args)
-
         print(msg1)
         self.printterm_msg.emit(msg1)
 
         proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
-
         outputs, _ = proc.communicate()
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
@@ -431,48 +389,44 @@ class Task(QThread):
             self.action_args.append([action, args])
 
     def run(self):
+        print('show_animation_dialog True')
+        self.window.show_animation_dialog.emit(True)
         for action, args in self.action_args:
             print('run action', action, args)
             if not action(*args):
                 print('return !!!!!')
                 return
+        print('show_animation_dialog False')
         QThread.msleep(500)
+        self.window.show_animation_dialog.emit(False)
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             print('i', i, 'next_item', next_item)
             if len(items) > 1:
                 self.task_each.emit([i, len(items)])
-
                 proc = self.rungroup(group)
                 output, _ = proc.communicate()
                 output = output.decode('utf8')
                 print('OUTPUT', output)
-
                 msg2 = '[task %s][output: %s]' % ([i, i + len(items)], output)
                 self.printterm_msg.emit(msg2)
                 result = json.dumps({
                     'index': [i, i + len(items)],
                     'output': output
                 })
-
                 r1, r2 = i, i+len(items)
                 c1, c2 = len(self.header()), len(self.header())+self.dut_num
                 self.df.iloc[r1:r2,c1:c2] = json.loads(output)
-
-
                 self.task_result.emit(result)
             else:
                 is_auto, task_type = next_item['auto'], next_item['tasktype']
                 self.task_each.emit([i, 1])
-
-
                 if is_auto:
                     procs = {}
                     #  for port in self.window.comports:
                     for port in self.window.comports():
                         proc = self.runeach(i, port, task_type)
                         procs[port] = proc
-
                     for j, (port, proc) in enumerate(procs.items()):
                         output, _ = proc.communicate()
                         output = output.decode('utf8')
@@ -486,14 +440,10 @@ class Task(QThread):
                         self.df.iat[i,len(self.header())+j] = output
                         print('run: result', result)
                         self.task_result.emit(result)
-
                 else:
-                    #  ports = ','.join(self.window.comports)
                     ports = ','.join(self.window.comports())
                     self.runeachports(i, ports)
-
                 QThread.msleep(500)
-
         self.df = self.df.fillna('')
         self.message.emit('tasks done')
 
@@ -533,7 +483,7 @@ class TaskSimu(Task):
 
 
 class MyWindow(QMainWindow, Ui_MainWindow):
-
+    show_animation_dialog = QSignal(bool)
     def __init__(self, app, jsonfile, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
@@ -543,7 +493,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
-        self.loading_dialog = LoadingDialog(self)
+        #  self.loading_dialog = LoadingDialog(self)
 
         self.jsonfileroot = 'jsonfile'
         self.jsonfilename = jsonfile
@@ -611,6 +561,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.taskdone_first = False
         self.port_autodecting = False
         self.statusBar().hide()
+        self.show_animation_dialog.connect(self.toggle_loading_dialog)
 
     def btn_detect(self):
         self.pushDetect.setText(f'{self.push_detect_text}...')
@@ -1027,10 +978,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.start()
     
     def toggle_loading_dialog(self, is_on=False):
-        if is_on:
-            loading_dialog.show()
+        if hasattr(self, 'loading_dialog'):
+            print("has dialog")
         else:
-            loading_dialog.done(1)
+            print("no dialog")
+            self.loading_dialog = LoadingDialog(self)
+        if is_on:
+            self.loading_dialog.show()
+        else:
+            self.loading_dialog.done(1)
+
+        #  if is_on:
+            #  loading_dialog.show()
+        #  else:
+            #  loading_dialog.done(1)
         
     def set_window_color(self, state="default"):
         '''
