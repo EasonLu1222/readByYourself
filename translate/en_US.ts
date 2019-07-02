@@ -29,14 +29,9 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="129"/>
+        <location filename="../ui/design3.py" line="130"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/design3.py" line="136"/>
-        <source>PushButton</source>
-        <translation type="unfinished">Run</translation>
     </message>
     <message>
         <location filename="../ui/design3.py" line="131"/>
@@ -44,38 +39,48 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="130"/>
+        <location filename="../ui/design3.py" line="132"/>
         <source>Test on fixture 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="132"/>
+        <location filename="../ui/design3.py" line="133"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="133"/>
+        <location filename="../ui/design3.py" line="134"/>
         <source>zh_TW</source>
         <translation type="unfinished">中文</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="134"/>
+        <location filename="../ui/design3.py" line="135"/>
         <source>Engineering mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1018"/>
+        <location filename="../app.py" line="1023"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1019"/>
+        <location filename="../app.py" line="1024"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1020"/>
+        <location filename="../app.py" line="1025"/>
         <source>Press this button and power on the first DUT to calibrate the COM ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="137"/>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="1026"/>
+        <source>At least one of the fixture should be checked</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
