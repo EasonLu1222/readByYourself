@@ -64,17 +64,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1016"/>
+        <location filename="../app.py" line="1018"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1017"/>
+        <location filename="../app.py" line="1019"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="1018"/>
+        <location filename="../app.py" line="1020"/>
         <source>Press this button and power on the first DUT to calibrate the COM ports</source>
         <translation type="unfinished"></translation>
     </message>
