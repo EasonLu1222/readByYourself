@@ -571,14 +571,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(self.instruments, 'gw_powersupply', self._comports_ps)
         update_serial(self.instruments, 'gw_dmm', self._comports_dmm)
 
-        # proto for port-auto-dectect button
-        self.push_detect = QPushButton()
-        self.push_detect.resize(200,30)
-        self.push_detect.setText("#1 port auto detect")
-        #  self.push_detect.clicked.connect(self.btn_detect)
-        self.push_detect.clicked.connect(self.btn_detect_mb)
-        self.hbox_ports.addWidget(self.push_detect)
-
         self.dut_layout = []
         colors = ['#edd', '#edd']
         for i in range(self.task.dut_num):
@@ -650,8 +642,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def btn_detect_mb(self):
         print("btn_detect_mb start")
-        self.push_detect.setText(f'#1 port auto detect... please turn on the #1 powersupply')
-        self.push_detect.setEnabled(False)
+        self.pushDetect.setText(f'#1 port auto detect... please turn on the #1 powersupply')
+        self.pushDetect.setEnabled(False)
         self.port_autodecting = True
 
     def detect_received(self, comport_when_poweron_first_dut):
@@ -660,7 +652,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('reverse comport!!!')
             self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
         self.render_port_plot()
-        self.push_detect.setEnabled(True)
+        self.pushDetect.setEnabled(True)
         self.port_autodecting = False
         self.clean_power()
         self.pushDetect.setText(f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
@@ -827,7 +819,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
-        self.pushDetect.clicked.connect(self.btn_detect)
+        #  self.pushDetect.clicked.connect(self.btn_detect)
+        self.pushDetect.clicked.connect(self.btn_detect_mb)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
         self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
@@ -835,6 +828,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
+        se.detect_notice.connect(self.detect_received)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
 
