@@ -11,7 +11,8 @@ from collections import defaultdict
 from subprocess import Popen, PIPE
 from threading import Thread
 from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
-                             QAbstractItemView, QHBoxLayout, QWidget, QProgressDialog)
+                             QAbstractItemView, QHBoxLayout, QWidget,
+                             QProgressDialog)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
@@ -112,12 +113,12 @@ class SerialListener(QThread):
             if self.update(self.ports_dmm, ports_dmm):
                 self.comports_dmm.emit(self.ports_dmm)
 
-            if not self.is_instrument_ready and (len(self.ports_ps) == 2 and
-                                                 len(self.ports_dmm)==1):
+            if not self.is_instrument_ready and (len(self.ports_ps) == 2
+                                                 and len(self.ports_dmm) == 1):
                 self.is_instrument_ready = True
                 self.if_all_ready.emit(True)
-            if self.is_instrument_ready and (len(self.ports_ps)!=2 or
-                                             len(self.ports_dmm)!=1):
+            if self.is_instrument_ready and (len(self.ports_ps) != 2
+                                             or len(self.ports_dmm) != 1):
                 self.is_instrument_ready = False
                 self.if_all_ready.emit(False)
 
@@ -202,7 +203,7 @@ def enter_prompt(comports, ser_timeout=0.2):
     print('enter_prompt: comports - ', comports)
     for port in comports():
         ser = get_serial(port, 115200, ser_timeout)
-        t = Thread(target=enter_factory_image_prompt, args=(ser,))
+        t = Thread(target=enter_factory_image_prompt, args=(ser, ))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -333,10 +334,10 @@ class Task(QThread):
         print('limits_group', limits_group)
         limits = {}
         for e in zip(*args):
-            xx = {i:j for i,j in zip(e,limits_group)}
+            xx = {i: j for i, j in zip(e, limits_group)}
             limits.update(xx)
         print('limits', limits)
-        args = {'args': args, 'limits':limits}
+        args = {'args': args, 'limits': limits}
         port_dmm = self.window.instruments['gw_dmm'][0].com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] +
                      [json.dumps(args)],
@@ -350,11 +351,10 @@ class Task(QThread):
         if tasktype == 1:
             proc = Popen(['python', '-m', script, '-p', port] + args,
                          stdout=PIPE)
-
         elif tasktype == 3:
             ports = self.window.comports()
             print(f'window.comports(): {self.window.comports()}')
-            power_index = self.window.comports().index(port)+1
+            power_index = self.window.comports().index(port) + 1
             print('power_index', power_index)
             args = [str(power_index)]
             proc = Popen(['python', '-m', script] + args, stdout=PIPE)
@@ -399,6 +399,9 @@ class Task(QThread):
         print('show_animation_dialog False')
         QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
+
+        get_col = lambda arr, col: map(lambda x: x[col], arr)
+
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             print('i', i, 'next_item', next_item)
@@ -414,9 +417,16 @@ class Task(QThread):
                     'index': [i, i + len(items)],
                     'output': output
                 })
-                r1, r2 = i, i+len(items)
-                c1, c2 = len(self.header()), len(self.header())+self.dut_num
-                self.df.iloc[r1:r2,c1:c2] = json.loads(output)
+                r1, r2 = i, i + len(items)
+                c1 = len(self.header()) + self.window.dut_selected[0]
+                c2 = c1 + len(self.window.dut_selected)
+
+                output = json.loads(output)
+                if len(self.window.dut_selected) == 1:
+                    output = [[e] for e in get_col(output, self.window.dut_selected[0])]
+                print('OUTPUT', output)
+
+                self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
             else:
                 is_auto, task_type = next_item['auto'], next_item['tasktype']
@@ -424,9 +434,11 @@ class Task(QThread):
                 if is_auto:
                     procs = {}
                     #  for port in self.window.comports:
-                    for port in self.window.comports():
-                        proc = self.runeach(i, port, task_type)
-                        procs[port] = proc
+                    for port, barcode in self.window.port_barcodes.items():
+                        if barcode:
+                            proc = self.runeach(i, port, task_type)
+                            procs[port] = proc
+
                     for j, (port, proc) in enumerate(procs.items()):
                         output, _ = proc.communicate()
                         output = output.decode('utf8')
@@ -437,7 +449,7 @@ class Task(QThread):
                             'port': port,
                             'output': output
                         })
-                        self.df.iat[i,len(self.header())+j] = output
+                        self.df.iat[i, len(self.header()) + j] = output
                         print('run: result', result)
                         self.task_result.emit(result)
                 else:
@@ -484,6 +496,7 @@ class TaskSimu(Task):
 
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
+
     def __init__(self, app, jsonfile, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
@@ -493,6 +506,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
+        self.barcodes = []
+        self.port_barcodes = {}
         #  self.loading_dialog = LoadingDialog(self)
 
         self.jsonfileroot = 'jsonfile'
@@ -566,7 +581,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushDetect.setText(f'{self.push_detect_text}...')
         print("btn_detect")
         self.pushDetect.setEnabled(False)
-        t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
+        t = threading.Thread(target=check_which_port_when_poweron,
+                             args=(self._comports, ))
         t.start()
 
     def btn_detect_mb_after(self):
@@ -576,8 +592,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             devices = get_devices()
             print('devices', devices)
 
-            powers = list(filter(lambda x: x['name']=='gw_powersupply', devices))
-            if len(powers)==1:
+            powers = list(
+                filter(lambda x: x['name'] == 'gw_powersupply', devices))
+            if len(powers) == 1:
                 device_power1 = powers[0]
                 power1 = self.instruments['gw_powersupply'][0]
                 print('device_power1', device_power1)
@@ -587,25 +604,29 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 print('please only turn on #1 power')
 
-            t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
+            t = threading.Thread(target=check_which_port_when_poweron,
+                                 args=(self._comports, ))
             t.start()
 
     def btn_detect_mb(self):
         print("btn_detect_mb start")
-        self.pushDetect.setText(f'#1 port auto detect... please turn on the #1 powersupply')
+        self.pushDetect.setText(
+            f'#1 port auto detect... please turn on the #1 powersupply')
         self.pushDetect.setEnabled(False)
         self.port_autodecting = True
 
     def detect_received(self, comport_when_poweron_first_dut):
         print('detect_received start')
-        if self._comports[0]!=comport_when_poweron_first_dut:
+        if self._comports[0] != comport_when_poweron_first_dut:
             print('reverse comport!!!')
-            self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
+            self._comports[0], self._comports[1] = self._comports[
+                1], self._comports[0]
         self.render_port_plot()
         self.pushDetect.setEnabled(True)
         self.port_autodecting = False
         self.clean_power()
-        self.pushDetect.setText(f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
+        self.pushDetect.setText(
+            f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
 
     def dummy_com(self, coms):
         self._comports = coms
@@ -638,7 +659,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.power_recieved = True
         if self.taskdone_first:
-            print('\nCCCCCC')
             self.taskdone('tasks done')
 
     def set_task(self, task):
@@ -653,11 +673,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for col in [0, 1, 2, 3, 4]:
             self.table_view.setColumnHidden(col, True)
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
+        self.table_view.setItem(self.task.len(), 0,
+                                QTableWidgetItem(self.summary_text))
 
     def update_task(self, lang_folder):
         #  mainboard_task = Task(self.task_path)
-        mainboard_task = Task(f'{self.jsonfileroot}/{lang_folder}/{self.jsonfilename}')
+        mainboard_task = Task(
+            f'{self.jsonfileroot}/{lang_folder}/{self.jsonfilename}')
         print('update_task')
         self.set_task(mainboard_task)
 
@@ -702,6 +724,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def ser_update(self, comports):
         print('ser_update', comports)
         self._comports = comports
+        self.barcodes = []
+        for port in self._comports:
+            self.port_barcodes[port] = None
         self.render_port_plot()
 
     def render_port_plot(self):
@@ -715,9 +740,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     outline: 0px;
                     font-family: Courier;
                     font-size: 16px;
-                }""" % (color,)
-        comports_map = {'gw_powersupply': self._comports_ps,
-                        'gw_dmm': self._comports_dmm}
+                }""" % (color, )
+        comports_map = {
+            'gw_powersupply': self._comports_ps,
+            'gw_dmm': self._comports_dmm
+        }
 
         for i, e in enumerate(self.dut_layout, 1):
             self.clearlayout(e)
@@ -734,8 +761,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('name', name, 'num', num)
             each_instruments = self.instruments[name]
             for i, e in enumerate(each_instruments):
-                print(f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
-
+                print(
+                    f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
+                )
 
                 #  if e.com in self._comports_inst:
                 if e.com in comports_map[name]:
@@ -772,7 +800,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.pushDetect.clicked.connect(self.btn_detect)
         self.pushDetect.clicked.connect(self.btn_detect_mb)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
-        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
+        self.barcode_dialog.barcode_dialog_closed.connect(
+            self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.task_each.connect(self.taskeach)
@@ -830,12 +859,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             output = json.loads(ret['output'])
 
             for i in range(*idx):
-                for j in range(self.task.dut_num):
+                #  for j in range(self.task.dut_num):
+                for j in self.dut_selected:
                     x = output[i - idx[0]][j]
-                    self.table_view.setItem(i, self.col_dut_start+j,
+                    self.table_view.setItem(i, self.col_dut_start + j,
                                             QTableWidgetItem(x))
-                    self.table_view.item(i, self.col_dut_start+j).setBackground(
-                        self.color_check(x))
+                    self.table_view.item(i,
+                                         self.col_dut_start + j).setBackground(
+                                             self.color_check(x))
         else:
             output = str(ret['output'])
             print('runeach output', output)
@@ -868,26 +899,30 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     power.close_com()
 
             r = self.task.len()
-            all_pass = lambda results: all(e.startswith('Pass') for e in results)
+            all_pass = lambda results: all(
+                e.startswith('Pass') for e in results)
 
             d = self.task.df
             all_res = []
-            for j in range(self.task.dut_num):
-                res = 'Pass' if all_pass(d[d.hidden==False][f'#{j+1}']) else 'Fail'
+            #  for j in range(self.task.dut_num):
+            for j in self.dut_selected:
+                res = 'Pass' if all_pass(
+                    d[d.hidden == False][f'#{j+1}']) else 'Fail'
                 self.table_view.setItem(r, self.col_dut_start + j,
                                         QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
 
-                df = d[d.hidden==False]
+                df = d[d.hidden == False]
                 dd = pd.DataFrame(df[[f'#{j+1}']].values.T)
-                dd.index = [random.randint(1000,9999)]
+                dd.index = [random.randint(1000, 9999)]
                 dd.index.name = 'pid'
                 all_res.append(res)
                 with open(self.logfile, 'a') as f:
-                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
+                    dd.to_csv(f, mode='a', header=f.tell() == 0, sep=',')
 
-            self.set_window_color('pass' if all(e=='Pass' for e in all_res) else 'fail')
+            self.set_window_color('pass' if all(e == 'Pass'
+                                                for e in all_res) else 'fail')
 
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
@@ -901,17 +936,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def show_barcode_dialog(self):
         print('show_barcode_dialog start')
         s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
-        num = len(list(filter(lambda x: x==True, s)))
+        num = len(list(filter(lambda x: x == True, s)))
         self.barcode_dialog.set_total_barcode(num)
-        if num>0:
+        if num > 0:
             self.barcode_dialog.show()
         print('show_barcode_dialog end')
 
     def btn_clicked(self):
         print('btn_clicked')
+        self.barcodes = []
+        for port in self._comports:
+            self.port_barcodes[port] = None
         self.show_barcode_dialog()
         self.set_window_color('default')
-        for i in range(self.task.len()+1):
+        for i in range(self.task.len() + 1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
@@ -935,7 +973,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings.setValue("fixture_2", status == Qt.Checked)
 
     def on_pwd_dialog_close(self, is_eng_mode_on):
-        if(not is_eng_mode_on):
+        if (not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
 
     def eng_mode_state_changed(self, status):
@@ -973,15 +1011,31 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def on_barcode_entered(self, barcode):
         print(barcode)
+        self.barcodes.append(barcode)
 
     def on_barcode_dialog_closed(self):
         """
         When the barcode(s) are ready, start testing
         """
-        #  for i in range(self.task.len()+1):
-            #  for j in range(self.task.dut_num):
-                #  self.table_view.setItem(i, self.col_dut_start + j,
-                                        #  QTableWidgetItem(""))
+        is_1 = self.settings.value("fixture_1", False, type=bool)
+        is_2 = self.settings.value("fixture_2", False, type=bool)
+        dut_selected = [
+            w[0] for w in filter(lambda e: e[1], enumerate([is_1, is_2]))
+        ]
+        self.dut_selected = dut_selected
+        print('dut_selected', dut_selected)
+
+        header = self.task.header_ext()
+
+        for j, dut_i in enumerate(dut_selected):
+            header[-2 + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
+            port = self._comports[dut_i]
+            self.port_barcodes[port] = self.barcodes[j]
+        print('header', header)
+        print('port_barcodes', self.port_barcodes)
+
+        self.table_view.setHorizontalHeaderLabels(header)
+
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
@@ -1010,16 +1064,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 "default": "#ECECEC"
             }[state]
         except KeyError as e:
-            color =  "#ECECEC"
-        self.setStyleSheet(f"QWidget#centralwidget {{background-color:{color} }}")
+            color = "#ECECEC"
+        self.setStyleSheet(
+            f"QWidget#centralwidget {{background-color:{color} }}")
 
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
         self.summary_text = _translate("MainWindow", "Summary")
         self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
-        self.push_detect_tooltip_text = _translate("MainWindow", "Press this button and power on the first DUT to calibrate the COM ports")
-
+        self.push_detect_tooltip_text = _translate(
+            "MainWindow",
+            "Press this button and power on the first DUT to calibrate the COM ports"
+        )
 
 
 if __name__ == "__main__":
