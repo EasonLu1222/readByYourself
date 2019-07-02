@@ -1,3 +1,32 @@
+[2019.7.12 - 11:35]
+1. complete the comport auto detect process
+	a. two dut, two powersupply, one dmm on
+	b. click auto-detect button
+	c. turn on powersupply1 which connect to dut1
+	d. auto-detect the correct comport of dut & powersupply and display
+	e. turn on 2nd powersupply and display
+	f. ready to run test!
+
+2. modification
+	a. instrument/__init__.py: get_serial() function
+	update_serial(instruments) --> update_serial(instruments, inst_type, comports)
+
+	b. app.py
+	- SerialListener
+		self.comports_instrument --> self.comports_ps, self.comports_dmm
+		self.instruments --> self.ports_ps, self.ports_dmm
+	- MyWindow
+	  modified:
+		clean_power()
+		closeEvent()
+		taskdone()
+		instrument_ready()
+		ser_update()
+		instrument_update() --> ps_update() & dmm_update()
+	  added:
+		btn_detect_mb()
+		btn_detect_mb_after()
+
 [2019.6.28 - 16:50]
 1. auto detect the comport of #1 dut using button
 	a. when auto-detect button press, listening to current two comports

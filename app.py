@@ -32,7 +32,7 @@ from ui.design3 import Ui_MainWindow
 
 from mylogger import logger
 
-dmm1, power1, power2 = open_all()
+#  dmm1, power1, power2 = open_all()
 
 
 class ProcessListener(QThread):
@@ -61,7 +61,9 @@ class ProcessListener(QThread):
 class SerialListener(QThread):
     update_msec = 500
     comports = QSignal(list)
-    comports_instrument = QSignal(list)
+    #  comports_instrument = QSignal(list)
+    comports_ps = QSignal(list)
+    comports_dmm = QSignal(list)
     if_all_ready = QSignal(bool)
 
     def __init__(self, *args, **kwargs):
@@ -69,7 +71,9 @@ class SerialListener(QThread):
         self.is_reading = False
 
         self.ports = []
-        self.instruments = []
+        #  self.instruments = []
+        self.ports_ps = []
+        self.ports_dmm = []
         self.is_instrument_ready = False
 
     def update(self, devices_prev, devices):
@@ -94,29 +98,59 @@ class SerialListener(QThread):
                 e['comport']
                 for e in [e for e in devices if e['name'] == 'cygnal_cp2102']
             ]
-            instruments = [
-                e['comport'] for e in [
-                    e for e in devices
-                    if e['name'] in ['gw_powersupply', 'gw_dmm']
-                ]
+            ports_ps = [
+                e['comport']
+                for e in [e for e in devices if e['name'] == 'gw_powersupply']
             ]
+            ports_dmm = [
+                e['comport']
+                for e in [e for e in devices if e['name'] == 'gw_dmm']
+            ]
+            #  instruments = [
+                #  e['comport'] for e in [
+                    #  e for e in devices
+                    #  if e['name'] in ['gw_powersupply', 'gw_dmm']
+                #  ]
+            #  ]
             self.is_reading = False
 
             if self.update(self.ports, ports):
                 self.comports.emit(self.ports)
 
             # update comport of intruments
-            if self.update(self.instruments, instruments):
-                #  update_serial([dmm1, power1, power2])
-                self.comports_instrument.emit(self.instruments)
 
-            if not self.is_instrument_ready and len(self.instruments) == 3:
+            #  print(self.instruments)
+            #  if self.update(self.instruments, instruments):
+                #  self.comports_instrument.emit(self.instruments)
+            #  print(self.instruments)
+
+            #  print('ps before', self.ports_ps)
+            if self.update(self.ports_ps, ports_ps):
+                self.comports_ps.emit(self.ports_ps)
+
+            #  print('dmm before', self.ports_dmm)
+            if self.update(self.ports_dmm, ports_dmm):
+                self.comports_dmm.emit(self.ports_dmm)
+
+
+            if not self.is_instrument_ready and (len(self.ports_ps) == 2 and 
+                                                 len(self.ports_dmm)==1):
                 self.is_instrument_ready = True
                 self.if_all_ready.emit(True)
 
-            if self.is_instrument_ready and len(self.instruments) < 3:
+            if self.is_instrument_ready and (len(self.ports_ps)!=2 or
+                                             len(self.ports_dmm)!=1):
                 self.is_instrument_ready = False
                 self.if_all_ready.emit(False)
+
+
+            #  if not self.is_instrument_ready and len(self.instruments) == 3:
+                #  self.is_instrument_ready = True
+                #  self.if_all_ready.emit(True)
+
+            #  if self.is_instrument_ready and len(self.instruments) < 3:
+                #  self.is_instrument_ready = False
+                #  self.if_all_ready.emit(False)
 
     def stop(self):
         # wait 1s for list_ports to finish, is it enough or too long in order
@@ -341,7 +375,8 @@ class Task(QThread):
 
         args = {'args': args, 'limits':limits}
 
-        port_dmm = dmm1.com
+        #  port_dmm = dmm1.com
+        port_dmm = self.window.instruments['gw_dmm'][0].com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] +
                      [json.dumps(args)],
                      stdout=PIPE)
@@ -527,18 +562,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toggle_engineering_mode(is_eng_mode_on)
 
         self._comports = []
-        self._comports_inst = []
+        self._comports_ps = []
+        self._comports_dmm = []
 
         self.instruments = generate_instruments(self.task.instruments())
-        instruments_array = sum(self.instruments.values(), [])
-        update_serial(instruments_array)
-
+        update_serial(self.instruments, 'gw_powersupply', self._comports_ps)
+        update_serial(self.instruments, 'gw_dmm', self._comports_dmm)
 
         # proto for port-auto-dectect button
         self.push_detect = QPushButton()
         self.push_detect.resize(200,30)
         self.push_detect.setText("#1 port auto detect")
-        self.push_detect.clicked.connect(self.btn_detect)
+        #  self.push_detect.clicked.connect(self.btn_detect)
+        self.push_detect.clicked.connect(self.btn_detect_mb)
         self.hbox_ports.addWidget(self.push_detect)
 
         self.dut_layout = []
@@ -554,7 +590,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.ser_listener = SerialListener()
         self.ser_listener.comports.connect(self.ser_update)
-        self.ser_listener.comports_instrument.connect(self.instrument_update)
+        self.ser_listener.comports_ps.connect(self.ps_update)
+        self.ser_listener.comports_dmm.connect(self.dmm_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
 
@@ -576,8 +613,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.col_dut_start = len(self.task.header())
         self.table_hidden_row()
-        self.clean_power()
         self.taskdone_first = False
+        self.port_autodecting = False
 
     def btn_detect(self):
         self.push_detect.setText(f'#1 port auto detect...')
@@ -586,31 +623,58 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
         t.start()
 
+    def btn_detect_mb_after(self):
+        print('btn_detect_mb_after start')
+        if self.port_autodecting:
+            print('port_autodecting...')
+            devices = get_devices()
+            print('devices', devices)
+
+            powers = list(filter(lambda x: x['name']=='gw_powersupply', devices))
+            if len(powers)==1:
+                device_power1 = powers[0]
+                power1 = self.instruments['gw_powersupply'][0]
+                print('device_power1', device_power1)
+                print('power1', power1)
+                power1.com = device_power1['comport']
+                self.poweron(power1)
+            else:
+                print('please only turn on #1 power')
+
+            t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
+            t.start()
+
+    def btn_detect_mb(self):
+        print("btn_detect_mb start")
+        self.push_detect.setText(f'#1 port auto detect... please turn on the #1 powersupply')
+        self.push_detect.setEnabled(False)
+        self.port_autodecting = True
+
     def detect_received(self, comport_when_poweron_first_dut):
-        print('detect_received')
+        print('detect_received start')
         if self._comports[0]!=comport_when_poweron_first_dut:
             print('reverse comport!!!')
             self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
         self.render_port_plot()
         self.push_detect.setEnabled(True)
         self.push_detect.setText(f"#1 port auto detect ---> {comport_when_poweron_first_dut}")
+        self.port_autodecting = False
+        self.clean_power()
 
     def dummy_com(self, coms):
         self._comports = coms
 
     def clean_power(self):
+        print('clean_power start')
         # prevent from last crash and power supply not closed normally
-        update_serial([dmm1, power1, power2])
-        if not power1.is_open:
-            power1.open_com()
-        if not power2.is_open:
-            power2.open_com()
-        if power1.ser:
-            power1.off()
-            power1.close_com()
-        if power2.ser:
-            power2.off()
-            power2.close_com()
+        update_serial(self.instruments, 'gw_powersupply', self._comports_ps)
+        for power in self.instruments['gw_powersupply']:
+            if not power.is_open:
+                power.open_com()
+            if power.ser:
+                power.off()
+                power.close_com()
+        print('clean_power end')
 
     def table_hidden_row(self):
         for i, each in enumerate(self.task.mylist):
@@ -655,18 +719,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports_inst
 
     def poweron(self, power):
+        print('poweron start')
+        print('is_open', power.is_open)
         if not power.is_open:
+            print("poweron, power.com", power.com)
+            print('open_com')
             power.open_com()
+            print('power on')
             power.on()
 
-    #  def set_power(self):
-        #  script = 'tasks.poweron'
-        #  for idx in range(1, 3):
-            #  args = [str(idx)]
-            #  proc = Popen(['python', '-m', script] + args, stdout=PIPE)
-            #  self.power_process[idx] = proc
-        #  self.proc_listener.set_process(self.power_process)
-        #  self.proc_listener.start()
+    def poweroff(self, power):
+        if power.ser:
+            power.off()
+            power.close_com()
 
     def clearlayout(self, layout):
         while layout.count():
@@ -674,13 +739,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if child.widget():
                 child.widget().deleteLater()
 
-    def instrument_update(self, comports):
-        print('instrument_update', comports)
-        self._comports_inst = comports
-        instruments_array = sum(self.instruments.values(), [])
-        update_serial(instruments_array)
-
+    def ps_update(self, comports):
+        print('ps_update', comports)
+        self._comports_ps = comports
+        update_serial(self.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
+        self.btn_detect_mb_after()
+
+    def dmm_update(self, comports):
+        print('dmm_update', comports)
+        self._comports_dmm = comports
+        update_serial(self.instruments, 'gw_dmm', comports)
+        self.render_port_plot()
+        self.btn_detect_mb_after()
 
     def ser_update(self, comports):
         print('ser_update', comports)
@@ -699,6 +770,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     font-family: Courier;
                     font-size: 16px;
                 }""" % (color,)
+        comports_map = {'gw_powersupply': self._comports_ps,
+                        'gw_dmm': self._comports_dmm}
 
         for i, e in enumerate(self.dut_layout, 1):
             self.clearlayout(e)
@@ -716,7 +789,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             each_instruments = self.instruments[name]
             for i, e in enumerate(each_instruments):
                 print(f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
-                if e.com in self._comports_inst:
+
+
+                #  if e.com in self._comports_inst:
+                if e.com in comports_map[name]:
                     lb_port = QLabel(e.com)
                     lb_port.setStyleSheet(style_(colors_inst[name]))
                     self.dut_layout[i].addWidget(lb_port)
@@ -728,13 +804,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if ready:
             self.pushButton.setEnabled(True)
             print('\nREADY\n!')
-
-            #  with open('instruments', 'wb') as f:
-                #  pickle.dump([dmm1, power1, power2], f)
+            self.clean_power()
 
             # order: power1,power2, dmm1
             instruments_to_dump = sum(self.instruments.values(), [])
-
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
         else:
@@ -815,21 +888,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                                             QTableWidgetItem(x))
                     self.table_view.item(i, self.col_dut_start+j).setBackground(
                         self.color_check(x))
-
-                # DUT1
-                #  x1 = output[i - idx[0]][0]
-                #  self.table_view.setItem(i, self.col_dut_start,
-                                        #  QTableWidgetItem(x1))
-                #  self.table_view.item(i, self.col_dut_start).setBackground(
-                    #  self.color_check(x1))
-
-                # DUT2
-                #  x2 = output[i - idx[0]][1]
-                #  self.table_view.setItem(i, self.col_dut_start + 1,
-                                        #  QTableWidgetItem(x2))
-                #  self.table_view.item(i, self.col_dut_start + 1).setBackground(
-                    #  self.color_check(x2))
-
         else:
             output = str(ret['output'])
             print('runeach output', output)
@@ -851,21 +909,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
         if message.startswith('tasks done') and self.power_recieved:
-        #  if message.startswith('tasks done'):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
-            if not power1.is_open:
-                power1.open_com()
-            if not power2.is_open:
-                power2.open_com()
-
-            if power1.ser:
-                power1.off()
-                power1.close_com()
-            if power2.ser:
-                power2.off()
-                power2.close_com()
+            for power in self.instruments['gw_powersupply']:
+                if not power.is_open:
+                    power.open_com()
+                if power.ser:
+                    power.off()
+                    power.close_com()
 
             r = self.task.len()
             all_pass = lambda results: all(e.startswith('Pass') for e in results)
@@ -878,14 +930,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
 
-
                 df = d[d.hidden==False]
                 dd = pd.DataFrame(df[[f'#{j+1}']].values.T)
                 dd.index = [random.randint(1000,9999)]
                 dd.index.name = 'pid'
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
-
 
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
@@ -901,7 +951,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
         num = len(list(filter(lambda x: x==True, s)))
         self.barcode_dialog.set_total_barcode(num)
-
         if num>0:
             self.barcode_dialog.show()
         print('show_barcode_dialog end')
@@ -913,18 +962,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def btn_clickedM(self):
         print('btn_clickedM')
         self.show_barcode_dialog()
-        #  for i in range(len(self.task.mylist)):
-            #  for j in range(2):
-                #  self.table_view.setItem(i, self.col_dut_start + j,
-                                        #  QTableWidgetItem(""))
-        #  self.task.start()
+        self.power_recieved = True
 
     def closeEvent(self, event):
         print('closeEvent')
-        if power1.is_open:
-            power1.off()
-        if power2.is_open:
-            power2.off()
+        for power in self.instruments['gw_powersupply']:
+            if power.is_open:
+                power.off()
         event.accept()  # let the window close
 
     def chk_box_fx1_state_changed(self, status):
@@ -964,7 +1008,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.retranslateUi(self)
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
-        
+
         # Retrieve the translated task list(json file)
         lang_folder = lang_list[index].split(".")[0]
         self.update_task(lang_folder)

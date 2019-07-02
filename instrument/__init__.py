@@ -158,24 +158,38 @@ def cmd_volt(channel):
     return cmds
 
 
-def update_serial(instruments):
-    logger.info('update_serial start')
-    devices = get_devices()
-    instrument_set = set(e.NAME for e in instruments)
-    for e in instruments:
-        e.com = None
+#  def update_serial(instruments):
+    #  logger.info('update_serial start')
+    #  devices = get_devices()
+    #  instrument_set = set(e.NAME for e in instruments)
+    #  for e in instruments:
+        #  e.com = None
 
-    for instrument_name in instrument_set:
-        device = [e for e in devices if e['name'] == instrument_name]
-        for idx, d in enumerate(
-                sorted(device, key=lambda x: int(x['comport'][3:])), 1):
-            logger.info(
-                f'{instrument_name}_{idx} ---> {d["comport"]} ---> {d["hwid"]}')
-            each = next(
-                filter(lambda e: e.NAME == instrument_name and e.index == idx,
-                       instruments))
-            logger.info(f'each: {each}')
-            each.com = d['comport']
+    #  for instrument_name in instrument_set:
+        #  device = [e for e in devices if e['name'] == instrument_name]
+        #  #  for idx, d in enumerate(
+                #  #  sorted(device, key=lambda x: int(x['comport'][3:])), 1):
+        #  for idx, d in enumerate(device, 1):
+            #  logger.info(
+                #  f'{instrument_name}_{idx} ---> {d["comport"]} ---> {d["hwid"]}')
+            #  each = next(
+                #  filter(lambda e: e.NAME == instrument_name and e.index == idx,
+                       #  instruments))
+            #  logger.info(f'each: {each}')
+            #  each.com = d['comport']
+
+
+def update_serial(instruments, inst_type, comports):
+    logger.info('update_serial start')
+    for i, e in enumerate(instruments[inst_type]):
+        e.com = None
+    for i, com in enumerate(comports):
+        instruments[inst_type][i].com = com
+    for name, items in instruments.items():
+        logger.info('  name: %s', name)
+        for i, e in enumerate(items):
+            logger.info('    e: %s, com=%s', e, e.com)
+    logger.info('update_serial end\n')
 
 
 class SerialInstrument():
@@ -200,14 +214,15 @@ class SerialInstrument():
         return self.ser.isOpen() if self.ser else False
 
     def open_com(self, baud=115200, timeout=2):
-        logger.info('in SerialInstrument: open_com 1')
+        logger.info('in SerialInstrument: open_com start')
+        success = False
         if self.com:
-            logger.info('in SerialInstrument: open_com 2')
+            logger.info('  get_serial start')
             self.ser = get_serial(self.com, baudrate=baud, timeout=timeout)
-            logger.info('in SerialInstrument: open_com 3')
-            return True
-        else:
-            return False
+            logger.info('  get_serial end')
+            success = True
+        logger.info('in SerialInstrument: open_com end\n')
+        return success
 
     def close_com(self):
         self.ser.close()
@@ -301,8 +316,10 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
     power1 = PowerSupply(1)
     power2 = PowerSupply(2)
     instruments = [dmm1, power1, power2]
+
     if update_ser:
         update_serial(instruments)
+
     if if_open_com:
         for e in instruments:
             e.open_com() if e is not dmm1 else e.open_com(timeout=5)

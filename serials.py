@@ -120,6 +120,7 @@ class WaitPromptThread(Thread):
 
 
 def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
+    logger.info('check_which_port_when_poweron start')
     serial_ports = [get_serial(port, 115200, 0.2) for port in ports]
     q = Queue()
     threads = {}
@@ -130,8 +131,15 @@ def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
     port = q.get()
     for p in ports:
         threads[p].kill = True
-    print('port', port)
+    logger.info('port %s', port)
     if qsignal: se.detect_notice.emit(port)
+
+    logger.info('close each serial start')
+    for sp in serial_ports:
+        sp.close()
+    logger.info('close each serial end')
+    logger.info('check_which_port_when_poweron end')
+
     #  return port
 
 
