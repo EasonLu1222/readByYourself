@@ -112,7 +112,7 @@ class SerialListener(QThread):
             if self.update(self.ports_dmm, ports_dmm):
                 self.comports_dmm.emit(self.ports_dmm)
 
-            if not self.is_instrument_ready and (len(self.ports_ps) == 2 and 
+            if not self.is_instrument_ready and (len(self.ports_ps) == 2 and
                                                  len(self.ports_dmm)==1):
                 self.is_instrument_ready = True
                 self.if_all_ready.emit(True)
@@ -872,6 +872,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             all_pass = lambda results: all(e.startswith('Pass') for e in results)
 
             d = self.task.df
+            all_res = []
             for j in range(self.task.dut_num):
                 res = 'Pass' if all_pass(d[d.hidden==False][f'#{j+1}']) else 'Fail'
                 self.table_view.setItem(r, self.col_dut_start + j,
@@ -883,8 +884,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dd = pd.DataFrame(df[[f'#{j+1}']].values.T)
                 dd.index = [random.randint(1000,9999)]
                 dd.index.name = 'pid'
+                all_res.append(res)
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
+
+            self.set_window_color('pass' if all(e=='Pass' for e in all_res) else 'fail')
 
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
@@ -907,6 +911,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def btn_clicked(self):
         print('btn_clicked')
         self.show_barcode_dialog()
+        self.set_window_color('default')
+        for i in range(self.task.len()+1):
+            for j in range(self.task.dut_num):
+                self.table_view.setItem(i, self.col_dut_start + j,
+                                        QTableWidgetItem(""))
 
     def btn_clickedM(self):
         print('btn_clickedM')
@@ -929,7 +938,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
-    
+
     def eng_mode_state_changed(self, status):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
@@ -969,14 +978,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         When the barcode(s) are ready, start testing
         """
-        for i in range(self.task.len()+1):
-            for j in range(self.task.dut_num):
-                self.table_view.setItem(i, self.col_dut_start + j,
-                                        QTableWidgetItem(""))
+        #  for i in range(self.task.len()+1):
+            #  for j in range(self.task.dut_num):
+                #  self.table_view.setItem(i, self.col_dut_start + j,
+                                        #  QTableWidgetItem(""))
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
-    
+
     def toggle_loading_dialog(self, is_on=False):
         if hasattr(self, 'loading_dialog'):
             print("has dialog")
@@ -988,11 +997,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.loading_dialog.done(1)
 
-        #  if is_on:
-            #  loading_dialog.show()
-        #  else:
-            #  loading_dialog.done(1)
-        
     def set_window_color(self, state="default"):
         '''
         Set the window background color based on the test result
@@ -1009,7 +1013,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             color =  "#ECECEC"
 
         self.setStyleSheet(f"background-color: {color}")
-        
+
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
