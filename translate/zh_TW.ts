@@ -64,17 +64,17 @@
         <translation type="unfinished">工程模式</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1016"/>
+        <location filename="../app.py" line="1018"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1017"/>
+        <location filename="../app.py" line="1019"/>
         <source>#1 port auto detect</source>
         <translation type="unfinished">第一連接埠自動偵測</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1018"/>
+        <location filename="../app.py" line="1020"/>
         <source>Press this button and power on the first DUT to calibrate the COM ports</source>
         <translation type="unfinished">按此按鈕後將第一台待測物上電，以校準連接埠</translation>
     </message>

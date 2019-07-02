@@ -1008,7 +1008,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         except KeyError as e:
             color =  "#ECECEC"
 
-        self.setStyleSheet(f"background-color: {color}")
+        self.setStyleSheet(f"QWidget#centralwidget {{background-color:{color} }}")
         
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
