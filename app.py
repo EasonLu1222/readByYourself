@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
                              QAbstractItemView, QHBoxLayout, QWidget, QProgressDialog)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QErrorMessage
 from PyQt5.QtGui import QFont, QColor
 
 import pandas as pd
@@ -909,6 +909,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def btn_clicked(self):
         print('btn_clicked')
+        if (not self.checkBoxFx1.isChecked()) and (not self.checkBoxFx2.isChecked()):
+            e_msg = QErrorMessage(self)
+            e_msg.showMessage(self.both_fx_not_checked_err)
+            return
         self.show_barcode_dialog()
         self.set_window_color('default')
         for i in range(self.task.len()+1):
@@ -1019,6 +1023,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.summary_text = _translate("MainWindow", "Summary")
         self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
         self.push_detect_tooltip_text = _translate("MainWindow", "Press this button and power on the first DUT to calibrate the COM ports")
+        self.both_fx_not_checked_err = _translate("MainWindow", "At least one of the fixture should be checked")
 
 
 
