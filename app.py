@@ -993,11 +993,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         Args:
             state (str): "pass", "fail" or "default"
         '''
-        color = {
-            "pass": "#8BC34A",
-            "fail": "#FF5722",
-            "default": "#ECECEC"
-        }[state]
+        try:
+            color = {
+                "pass": "#8BC34A",
+                "fail": "#FF5722",
+                "default": "#ECECEC"
+            }[state]
+        except KeyError as e:
+            color =  "#ECECEC"
+
         self.setStyleSheet(f"background-color: {color}")
         
     def retranslateUi(self, MyWindow):
