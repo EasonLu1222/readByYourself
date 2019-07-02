@@ -222,7 +222,7 @@
             <string notr="true">padding:10px</string>
            </property>
            <property name="text">
-            <string>PushButton</string>
+            <string>Run</string>
            </property>
           </widget>
          </item>

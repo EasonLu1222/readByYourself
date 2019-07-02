@@ -544,7 +544,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
-        self.pushDetect.setToolTip(self.push_detect_tooltip_text)
 
         # for simulation without serial devices
         #  self.pushButtonM = QPushButton(self.centralwidget)
@@ -957,6 +956,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.retranslateUi(self)
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
+        self.pushDetect.setToolTip(self.push_detect_tooltip_text)
 
         # Retrieve the translated task list(json file)
         lang_folder = lang_list[index].split(".")[0]
