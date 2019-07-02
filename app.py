@@ -11,7 +11,7 @@ from collections import defaultdict
 from subprocess import Popen, PIPE
 from threading import Thread
 from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
-                             QAbstractItemView, QHBoxLayout, QWidget)
+                             QAbstractItemView, QHBoxLayout, QWidget, QProgressDialog)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
@@ -22,6 +22,7 @@ import pandas as pd
 from view.myview import TableView
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
+from view.loading_dialog import LoadingDialog
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
@@ -542,6 +543,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
+        self.loading_dialog = LoadingDialog(self)
 
         self.jsonfileroot = 'jsonfile'
         self.jsonfilename = jsonfile
@@ -583,7 +585,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             c = QWidget()
             c.setStyleSheet(f'background-color:{colors[i]};')
             layout = QHBoxLayout(c)
-            self.hbox_ports.addWidget(c)
+            self.hboxPorts.addWidget(c)
             self.dut_layout.append(layout)
 
         self.setsignal()
@@ -600,6 +602,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
+        self.pushDetect.setToolTip(self.push_detect_tooltip_text)
 
         # for simulation without serial devices
         #  self.pushButtonM = QPushButton(self.centralwidget)
@@ -615,11 +618,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.taskdone_first = False
         self.port_autodecting = False
+        self.statusBar().hide()
 
     def btn_detect(self):
-        self.push_detect.setText(f'#1 port auto detect...')
+        self.pushDetect.setText(f'{self.push_detect_text}...')
         print("btn_detect")
-        self.push_detect.setEnabled(False)
+        self.pushDetect.setEnabled(False)
         t = threading.Thread(target=check_which_port_when_poweron, args=(self._comports,))
         t.start()
 
@@ -657,9 +661,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self._comports[0], self._comports[1] = self._comports[1], self._comports[0]
         self.render_port_plot()
         self.push_detect.setEnabled(True)
-        self.push_detect.setText(f"#1 port auto detect ---> {comport_when_poweron_first_dut}")
         self.port_autodecting = False
         self.clean_power()
+        self.pushDetect.setText(f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
 
     def dummy_com(self, coms):
         self._comports = coms
@@ -823,6 +827,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
+        self.pushDetect.clicked.connect(self.btn_detect)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
         self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
@@ -830,7 +835,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
-        se.detect_notice.connect(self.detect_received)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
 
@@ -980,7 +984,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if(not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
-
+    
     def eng_mode_state_changed(self, status):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
@@ -1027,11 +1031,36 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
+    
+    def toggle_loading_dialog(self, is_on=False):
+        if is_on:
+            loading_dialog.show()
+        else:
+            loading_dialog.done(1)
+        
+    def set_window_color(self, state="default"):
+        '''
+        Set the window background color based on the test result
+        Args:
+            state (str): "pass", "fail" or "default"
+        '''
+        try:
+            color = {
+                "pass": "#8BC34A",
+                "fail": "#FF5722",
+                "default": "#ECECEC"
+            }[state]
+        except KeyError as e:
+            color =  "#ECECEC"
 
+        self.setStyleSheet(f"background-color: {color}")
+        
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
         self.summary_text = _translate("MainWindow", "Summary")
+        self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
+        self.push_detect_tooltip_text = _translate("MainWindow", "Press this button and power on the first DUT to calibrate the COM ports")
 
 
 
