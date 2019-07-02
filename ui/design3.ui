@@ -55,19 +55,6 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QCheckBox" name="checkBoxFx2">
-               <property name="font">
-                <font>
-                 <family>Courier New</family>
-                 <pointsize>14</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>Test on fixture 2</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QCheckBox" name="checkBoxFx1">
                <property name="font">
                 <font>
@@ -77,6 +64,19 @@
                </property>
                <property name="text">
                 <string>Test on fixture 1</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBoxFx2">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>14</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Test on fixture 2</string>
                </property>
               </widget>
              </item>
