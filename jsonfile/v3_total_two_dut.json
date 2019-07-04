@@ -138,6 +138,19 @@
             "unit": null
         }
         ,{
+            "group": "Power On",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "max current",
+            "script": "power_max_current",
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": 0.08,
+            "unit": "V"
+        }
+        ,{
             "group": "WiFi",
             "hidden": false,
             "tasktype": 1,

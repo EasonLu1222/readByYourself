@@ -329,21 +329,11 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
     return instruments
 
 
-#  dmm1, power1, power2 = open_all()
-#  dmm1, power1, power2 = open_all(True, True)
-
-#  list(zip(range(1,17), dmm.measure_volts_all()))
-
-
-INSTRUMENT_MAP = {
-    'gw_powersupply': PowerSupply, 
-    'gw_dmm': DMM,
-}
-
-
-def generate_instruments(task_instruments):
+def generate_instruments(task_devices, instrument_map):
     instruments = defaultdict(list)
-    for name, num in task_instruments.items():
+    for dev, dev_info in task_devices.items():
+        name, num = dev_info['name'], dev_info['num']
+        if name not in instrument_map.keys(): continue
         for i in range(1, num+1):
-            instruments[name].append(INSTRUMENT_MAP[name](i))
+            instruments[name].append(instrument_map[name](i))
     return instruments

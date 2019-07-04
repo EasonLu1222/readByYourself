@@ -1,3 +1,13 @@
+[2019.7.04 - 19:00]
+1. jsonfile verions 4
+	a. re-org
+	b. add v4_total_two_dut.json, v4_led.json, v4_simu.json
+	c. delete jsonfile/en_us/* jsonfile/zh_TW/*
+	d. move INSTRUMENT_MAP from instrument/__init__.py to app.py
+
+2. accomdate both station jsonfile 
+	a. choose STATION at app.py: main()
+
 [2019.7.04 - 16:40]
 1. re-arg SerialListener and change name to BaseSerialListener & move to serials module
 	a. inherent BaseSerialListener to modify for each station need

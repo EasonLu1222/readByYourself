@@ -29,10 +29,16 @@ from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron,
                      filter_devices, BaseSerialListener)
 
-from instrument import update_serial, open_all, generate_instruments
+from instrument import update_serial, open_all, generate_instruments, PowerSupply, DMM
 from ui.design3 import Ui_MainWindow
 
 from mylogger import logger
+
+
+INSTRUMENT_MAP = {
+    'gw_powersupply': PowerSupply,
+    'gw_dmm': DMM,
+}
 
 
 class ProcessListener(QThread):
@@ -65,33 +71,15 @@ class ComportDMM(): comports_dmm = QSignal(list)
 
 class SerialListener(BaseSerialListener, ComportDUT, ComportPWR, ComportDMM):
     def __init__(self, *args, **kwargs):
+        devices = kwargs.pop('devices')
         super(SerialListener, self).__init__(*args, **kwargs)
         self.is_reading = False
         self.is_instrument_ready = False
-        self.set_instrument()
+        self.set_devices(devices)
 
-    def set_instrument(self):
-        #  self.instruments = {
-            #  'dut': {
-                #  'name': 'cygnal_cp2102',
-                #  'num': 2,
-            #  },
-        #  }
-        self.instruments = {
-            'dut': {
-                'name': 'cygnal_cp2102',
-                'num': 2,
-            },
-            'pwr': {
-                'name': 'gw_powersupply',
-                'num': 2,
-            },
-            'dmm': {
-                'name': 'gw_dmm',
-                'num': 1,
-            },
-        }
-        for k,v in self.instruments.items():
+    def set_devices(self, devices):
+        self.devices = devices
+        for k,v in self.devices.items():
             setattr(self, f'ports_{k}', [])
 
 
@@ -193,32 +181,28 @@ class Task(QThread):
                 a. serial port of both DUTs and instruments
                 b. TBD
     '''
-
     task_each = QSignal(list)
     task_result = QSignal(str)
     serial_ok = QSignal(bool)
     message = QSignal(str)
     printterm_msg = QSignal(str)
-
-    #  def __init__(self, jsonfile):
     def __init__(self, json_name, settings, json_root='jsonfile'):
         super(Task, self).__init__()
-
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
         self.settings = settings
-
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
         self.df = self.load()
         self.mylist = self.df.fillna('').values.tolist()
         self.duts = []
+        self.instruments = generate_instruments(self.devices(), INSTRUMENT_MAP)
 
     @property
     def dut_num(self):
-        return int(self.base['pcs'])
+        return self.devices()['dut']['num']
 
     def load(self):
         header = self.base['header']
@@ -260,15 +244,16 @@ class Task(QThread):
         min_, expect, max_ = itemgetter('min', 'expect', 'max')(each)
         return (min_, expect, max_)
 
-    def instruments(self):
-        return self.base['instruments']
+    def devices(self):
+        return self.base['devices']
 
     def header_dut(self, dut_names=None):
         if dut_names:
             return dut_names
         else:
-            pcs = self.base['pcs']
-            header = ['#%d' % e for e in list(range(1, 1 + pcs))]
+            #  pcs = self.base['pcs']
+            num = self.devices()['dut']['num']
+            header = ['#%d' % e for e in list(range(1, 1 + num))]
             return header
 
     def header(self):
@@ -309,7 +294,7 @@ class Task(QThread):
             limits.update(xx)
         print('limits', limits)
         args = {'args': args, 'limits': limits}
-        port_dmm = self.window.instruments['gw_dmm'][0].com
+        port_dmm = self.instruments['gw_dmm'][0].com
         proc = Popen(['python', '-m', script, '-pm', port_dmm] +
                      [json.dumps(args)],
                      stdout=PIPE)
@@ -539,9 +524,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports_pwr = []
         self._comports_dmm = []
 
-        self.instruments = generate_instruments(self.task.instruments())
-        update_serial(self.instruments, 'gw_powersupply', self._comports_pwr)
-        update_serial(self.instruments, 'gw_dmm', self._comports_dmm)
+        update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
+        update_serial(self.task.instruments, 'gw_dmm', self._comports_dmm)
 
         self.dut_layout = []
         colors = ['#edd', '#edd']
@@ -554,12 +538,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.setsignal()
 
-        self.ser_listener = SerialListener()
-
+        self.ser_listener = SerialListener(devices=self.task.devices())
         self.ser_listener.comports_dut.connect(self.ser_update)
         self.ser_listener.comports_pwr.connect(self.pwr_update)
         self.ser_listener.comports_dmm.connect(self.dmm_update)
-
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
 
@@ -568,11 +550,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
-
-        # for simulation without serial devices
-        #  self.pushButtonM = QPushButton(self.centralwidget)
-        #  self.pushButtonM.setText("SimulateRun")
-        #  self.pushButtonM.clicked.connect(self.btn_clickedM)
 
         self.showMaximized()
 
@@ -605,7 +582,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 filter(lambda x: x['name'] == 'gw_powersupply', devices))
             if len(powers) == 1:
                 device_power1 = powers[0]
-                power1 = self.instruments['gw_powersupply'][0]
+                power1 = self.task.instruments['gw_powersupply'][0]
                 print('device_power1', device_power1)
                 print('power1', power1)
                 power1.com = device_power1['comport']
@@ -639,12 +616,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def dummy_com(self, coms):
         self._comports_dut = coms
+        self.instrument_ready(True)
 
     def clean_power(self):
         print('clean_power start')
         # prevent from last crash and power supply not closed normally
-        update_serial(self.instruments, 'gw_powersupply', self._comports_pwr)
-        for power in self.instruments['gw_powersupply']:
+        update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
+        for power in self.task.instruments['gw_powersupply']:
             if not power.is_open:
                 power.open_com()
             if power.ser:
@@ -716,14 +694,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def pwr_update(self, comports):
         print('pwr_update', comports)
         self._comports_pwr = comports
-        update_serial(self.instruments, 'gw_powersupply', comports)
+        update_serial(self.task.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
         self.btn_detect_mb_after()
 
     def dmm_update(self, comports):
         print('dmm_update', comports)
         self._comports_dmm = comports
-        update_serial(self.instruments, 'gw_dmm', comports)
+        update_serial(self.task.instruments, 'gw_dmm', comports)
         self.render_port_plot()
         self.btn_detect_mb_after()
 
@@ -763,9 +741,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.dut_layout[i].addWidget(lb_port)
 
         colors_inst = {'gw_powersupply': '#712', 'gw_dmm': '#4a3'}
-        for name, num in self.task.instruments().items():
+        for name, num in self.task.instruments.items():
             print('name', name, 'num', num)
-            each_instruments = self.instruments[name]
+            each_instruments = self.task.instruments[name]
             for i, e in enumerate(each_instruments):
                 print(
                     f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
@@ -786,7 +764,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clean_power()
 
             # order: power1,power2, dmm1
-            instruments_to_dump = sum(self.instruments.values(), [])
+            instruments_to_dump = sum(self.task.instruments.values(), [])
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
         else:
@@ -892,12 +870,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
+
         #  if message.startswith('tasks done') and self.power_recieved:
         if message.startswith('tasks done'):
+
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
-            for power in self.instruments['gw_powersupply']:
+            for power in self.task.instruments['gw_powersupply']:
                 if not power.is_open:
                     power.open_com()
                 if power.ser:
@@ -971,14 +951,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
 
-    def btn_clickedM(self):
-        print('btn_clickedM')
-        self.show_barcode_dialog()
-        self.power_recieved = True
-
     def closeEvent(self, event):
         print('closeEvent')
-        for power in self.instruments['gw_powersupply']:
+        for power in self.task.instruments['gw_powersupply']:
             if power.is_open:
                 power.off()
         event.accept()  # let the window close
@@ -1105,18 +1080,46 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
 
+    thismodule = sys.modules[__name__]
+
+    STATION = 'MainBoard'
+    STATION = 'LED'
+    STATION = 'SIMULATION'
+
     app = QApplication(sys.argv)
-    mb_task = Task('v3_total_two_dut', MySettings())
-    win = MyWindow(app, mb_task)
+    task_mb = Task('v4_total_two_dut', MySettings())
+    task_led = Task('v4_led', MySettings())
+    task_simu = TaskSimu('v4_simu', MySettings())
+
+    _map = {
+        'MainBoard': 'mb',
+        'LED': 'led',
+        'SIMULATION': 'simu'
+    }
+
+    task = getattr(thismodule, f'task_{_map[STATION]}')
+    win = MyWindow(app, task)
+
+    if STATION == 'SIMULATION': win.dummy_com(['COM8', 'COM3'])
 
     actions_mb = [
         {
             'action': is_serial_ok,
-            'args': (win.comports, mb_task.serial_ok)
+            'args': (win.comports, task_mb.serial_ok)
         },
         {
             'action': set_power,
             'args': (win.power_process, win.proc_listener)
+        },
+        {
+            'action': enter_prompt,
+            'args': (win.comports, 0.2)
+        },
+    ]
+    actions_led = [
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, task_mb.serial_ok)
         },
         {
             'action': enter_prompt,
@@ -1129,10 +1132,9 @@ if __name__ == "__main__":
             'args': ()
         },
     ]
-    mb_task.register_action(actions_mb)
 
-    # for simulated tasks
-    #  win.dummy_com(['COM8', 'COM3'])
+    actions = getattr(thismodule, f'actions_{_map[STATION]}')
+    task.register_action(actions)
 
     print('main end')
     try:

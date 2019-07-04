@@ -184,12 +184,11 @@ class BaseSerialListener(QThread):
         super(BaseSerialListener, self).__init__(*args, **kwargs)
         self.is_reading = False
         self.is_instrument_ready = False
-        self.set_instrument()
 
     def get_update_ports_map(self):
         devices = get_devices()
         ports_map = {}
-        for k,v in self.instruments.items():
+        for k,v in self.devices.items():
             ports = filter_devices(devices, v['name'])
             ports_map[k] = ports
         return ports_map
@@ -207,9 +206,11 @@ class BaseSerialListener(QThread):
             return True
         return False
     
-    def port_full(self):
-        for k,v in self.instruments.items():
-            if k=='dut': continue
+    def port_full(self, excludes=None):
+        for k,v in self.devices.items():
+            if excludes:
+                for e in excludes:
+                    if k==e: continue
             if len(getattr(self, f'ports_{k}')) < v['num']:
                 return False
         return True
@@ -219,7 +220,7 @@ class BaseSerialListener(QThread):
             QThread.msleep(BaseSerialListener.update_msec)
             self.is_reading = True
             ports_map = self.get_update_ports_map()
-            for k in self.instruments.keys():
+            for k in self.devices.keys():
                 ports = ports_map[k]
                 self_ports = getattr(self, f'ports_{k}')
                 self_comports = getattr(self, f'comports_{k}')
