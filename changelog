@@ -1,3 +1,17 @@
+[2019.7.04 - 16:40]
+1. re-arg SerialListener and change name to BaseSerialListener & move to serials module
+	a. inherent BaseSerialListener to modify for each station need
+	b. define instruments json and set_instruments()
+	c. json str need to be integrate into jsonfile (v4?)
+
+2. task_led 
+	a. still bugs need to be fixed. all_pass logics
+	b. exit key need to be ignored
+
+3. add class MySetting
+	a. change MyWindow.__init__. add task parameters back
+	b. remove translate jsonfile function
+
 [2019.7.02 - 19:40]
 1. dut selectable (#1 or #2 or both). fix some bugs. preliminary correct version.
 

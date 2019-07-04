@@ -1,0 +1,23 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "pcs": 2,
+ "instruments": {},
+ "structure":
+    [
+        {
+            "group": "LED Test",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_led",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+

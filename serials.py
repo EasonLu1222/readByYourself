@@ -5,7 +5,7 @@ import json
 import time
 import serial
 from serial.tools.list_ports import comports
-from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject
+from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject, QThread
 from threading import Timer, Thread, Event
 import argparse
 from queue import Queue
@@ -54,6 +54,11 @@ def get_devices():
                 'name': get_device(e)}
                 for e in comports()]
     return devices
+
+
+def filter_devices(devices, name, field='comport'):
+    filtered = [e[field] for e in [e for e in devices if e['name']==name]]
+    return filtered
 
 
 class SerialEmit(QObject):
@@ -162,11 +167,79 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
     serial.write(f'{cmd}\n'.encode('utf-8'))
     logger.info(f'issue_command: {cmd}')
     if fetch:
-        lines = [e.decode('utf-8') for e in serial.readlines()]
+        lines = serial.readlines() 
+        #  logger.info(lines)
+        #  lines = [e.decode('utf-8') for e in serial.readlines()]
+        lines = [e.decode('utf-8') for e in lines]
         for line in lines: logger.info(f'{line.rstrip()}')
         return lines
     else:
         return None
+
+
+class BaseSerialListener(QThread):
+    update_msec = 500
+    if_all_ready = QSignal(bool)
+    def __init__(self, *args, **kwargs):
+        super(BaseSerialListener, self).__init__(*args, **kwargs)
+        self.is_reading = False
+        self.is_instrument_ready = False
+        self.set_instrument()
+
+    def get_update_ports_map(self):
+        devices = get_devices()
+        ports_map = {}
+        for k,v in self.instruments.items():
+            ports = filter_devices(devices, v['name'])
+            ports_map[k] = ports
+        return ports_map
+
+    def update(self, devices_prev, devices):
+        set_prev, set_now = set(devices_prev), set(devices)
+        if set_prev != set_now:
+            if set_now > set_prev:
+                d = set_now - set_prev
+                devices_prev.extend(list(d))
+            else:
+                d = set_prev - set_now
+                for e in d:
+                    devices_prev.remove(e)
+            return True
+        return False
+    
+    def port_full(self):
+        for k,v in self.instruments.items():
+            if k=='dut': continue
+            if len(getattr(self, f'ports_{k}')) < v['num']:
+                return False
+        return True
+
+    def run(self):
+        while True:
+            QThread.msleep(BaseSerialListener.update_msec)
+            self.is_reading = True
+            ports_map = self.get_update_ports_map()
+            for k in self.instruments.keys():
+                ports = ports_map[k]
+                self_ports = getattr(self, f'ports_{k}')
+                self_comports = getattr(self, f'comports_{k}')
+                if self.update(self_ports, ports):
+                    self_comports.emit(self_ports)
+            self.is_reading = False
+
+            if not self.is_instrument_ready and self.port_full():
+                self.is_instrument_ready = True
+                self.if_all_ready.emit(True)
+            if self.is_instrument_ready and not self.port_full():
+                self.is_instrument_ready = False
+                self.if_all_ready.emit(False)
+
+    def stop(self):
+        # wait 1s for list_ports to finish, is it enough or too long in order
+        # not to occupy com port for subsequent test scripts
+        if self.is_reading:
+            QThread.msleep(1000)
+        self.terminate()
 
 
 if __name__ == "__main__":

@@ -20,14 +20,14 @@ from PyQt5.QtGui import QFont, QColor
 
 import pandas as pd
 
-from view.myview import TableView
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
 
 from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
-                     get_devices, is_serial_free, check_which_port_when_poweron)
+                     get_devices, is_serial_free, check_which_port_when_poweron,
+                     filter_devices, BaseSerialListener)
 
 from instrument import update_serial, open_all, generate_instruments
 from ui.design3 import Ui_MainWindow
@@ -58,77 +58,41 @@ class ProcessListener(QThread):
         self.terminate()
 
 
-class SerialListener(QThread):
-    update_msec = 500
-    comports = QSignal(list)
-    comports_ps = QSignal(list)
-    comports_dmm = QSignal(list)
-    if_all_ready = QSignal(bool)
+class ComportDUT(): comports_dut = QSignal(list)
+class ComportPWR(): comports_pwr = QSignal(list)
+class ComportDMM(): comports_dmm = QSignal(list)
 
+
+class SerialListener(BaseSerialListener, ComportDUT, ComportPWR, ComportDMM):
     def __init__(self, *args, **kwargs):
         super(SerialListener, self).__init__(*args, **kwargs)
         self.is_reading = False
-
-        self.ports = []
-        self.ports_ps = []
-        self.ports_dmm = []
         self.is_instrument_ready = False
+        self.set_instrument()
 
-    def update(self, devices_prev, devices):
-        set_prev, set_now = set(devices_prev), set(devices)
-        if set_prev != set_now:
-            if set_now > set_prev:
-                d = set_now - set_prev
-                devices_prev.extend(list(d))
-            else:
-                d = set_prev - set_now
-                for e in d:
-                    devices_prev.remove(e)
-            return True
-        return False
-
-    def run(self):
-        while True:
-            QThread.msleep(SerialListener.update_msec)
-            self.is_reading = True
-            devices = get_devices()
-            ports = [
-                e['comport']
-                for e in [e for e in devices if e['name'] == 'cygnal_cp2102']
-            ]
-            ports_ps = [
-                e['comport']
-                for e in [e for e in devices if e['name'] == 'gw_powersupply']
-            ]
-            ports_dmm = [
-                e['comport']
-                for e in [e for e in devices if e['name'] == 'gw_dmm']
-            ]
-            self.is_reading = False
-
-            if self.update(self.ports, ports):
-                self.comports.emit(self.ports)
-            if self.update(self.ports_ps, ports_ps):
-                self.comports_ps.emit(self.ports_ps)
-            if self.update(self.ports_dmm, ports_dmm):
-                self.comports_dmm.emit(self.ports_dmm)
-
-            if not self.is_instrument_ready and (len(self.ports_ps) == 2
-                                                 and len(self.ports_dmm) == 1):
-                self.is_instrument_ready = True
-                self.if_all_ready.emit(True)
-            if self.is_instrument_ready and (len(self.ports_ps) != 2
-                                             or len(self.ports_dmm) != 1):
-                self.is_instrument_ready = False
-                self.if_all_ready.emit(False)
-
-    def stop(self):
-        # wait 1s for list_ports to finish, is it enough or too long in order
-        # not to occupy com port for subsequent test scripts
-        if self.is_reading:
-            print('is_reading!')
-            QThread.msleep(1000)
-        self.terminate()
+    def set_instrument(self):
+        #  self.instruments = {
+            #  'dut': {
+                #  'name': 'cygnal_cp2102',
+                #  'num': 2,
+            #  },
+        #  }
+        self.instruments = {
+            'dut': {
+                'name': 'cygnal_cp2102',
+                'num': 2,
+            },
+            'pwr': {
+                'name': 'gw_powersupply',
+                'num': 2,
+            },
+            'dmm': {
+                'name': 'gw_dmm',
+                'num': 1,
+            },
+        }
+        for k,v in self.instruments.items():
+            setattr(self, f'ports_{k}', [])
 
 
 def parse_json(jsonfile):
@@ -236,10 +200,17 @@ class Task(QThread):
     message = QSignal(str)
     printterm_msg = QSignal(str)
 
-    def __init__(self, jsonfile):
+    #  def __init__(self, jsonfile):
+    def __init__(self, json_name, settings, json_root='jsonfile'):
         super(Task, self).__init__()
-        self.base = json.loads(open(jsonfile, 'r', encoding='utf8').read())
-        self.groups = parse_json(jsonfile)
+
+        self.json_root = json_root
+        self.json_name = json_name
+        self.jsonfile = f'{json_root}/{json_name}.json'
+        self.settings = settings
+
+        self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
+        self.groups = parse_json(self.jsonfile)
         self.action_args = list()
         self.df = self.load()
         self.mylist = self.df.fillna('').values.tolist()
@@ -373,7 +344,11 @@ class Task(QThread):
 
         proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
         outputs, _ = proc.communicate()
+        #  print('1. runeachports outputs', outputs)
+        if not outputs:
+            print('outputs is None!!!!')
         outputs = outputs.decode('utf8')
+        #  print('2. runeachports outputs', outputs)
         outputs = json.loads(outputs)
         msg2 = '[task %s][outputs: %s]' % (index, outputs)
         self.printterm_msg.emit(msg2)
@@ -403,7 +378,7 @@ class Task(QThread):
         get_col = lambda arr, col: map(lambda x: x[col], arr)
 
         c1 = len(self.header())
-        self.df.iloc[:, c1:c1+2] = ""
+        self.df.iloc[:, c1:c1 + 2] = ""
 
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
@@ -426,7 +401,9 @@ class Task(QThread):
 
                 output = json.loads(output)
                 if len(self.window.dut_selected) == 1:
-                    output = [[e] for e in get_col(output, self.window.dut_selected[0])]
+                    output = [[
+                        e
+                    ] for e in get_col(output, self.window.dut_selected[0])]
                 print('OUTPUT', output)
 
                 self.df.iloc[r1:r2, c1:c2] = output
@@ -436,7 +413,6 @@ class Task(QThread):
                 self.task_each.emit([i, 1])
                 if is_auto:
                     procs = {}
-                    #  for port in self.window.comports:
                     for port, barcode in self.window.port_barcodes.items():
                         if barcode:
                             proc = self.runeach(i, port, task_type)
@@ -452,7 +428,9 @@ class Task(QThread):
                             'port': port,
                             'output': output
                         })
-                        self.df.iat[i, len(self.header()) + self.window.dut_selected[j]] = output
+                        self.df.iat[i,
+                                    len(self.header()) +
+                                    self.window.dut_selected[j]] = output
                         print('run: result', result)
                         self.task_result.emit(result)
                 else:
@@ -497,10 +475,45 @@ class TaskSimu(Task):
         return proc
 
 
+class Settings():
+    def __init__(self, key1, key2):
+        self._settings = QSettings(key1, key2)
+
+    def get(self, key, default, key_type):
+        return self._settings.value(key, default, key_type)
+
+    def set(self, key, value):
+        self._settings.setValue(key, value)
+        self.update()
+
+
+class MySettings(Settings):
+    lang_list = [
+        'en_US',
+        'zh_TW',
+    ]
+    def __init__(self):
+        super(MySettings, self).__init__('FAB', 'SAP109')
+        self.update()
+
+    def update(self):
+        self.is_fx1_checked = self.get('fixture_1', False, bool)
+        self.is_fx2_checked = self.get('fixture_2', False, bool)
+        self.lang_index = self.get('lang_index', 0, int)
+        self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
+
+    @property
+    def lang(self, lower=False):
+        language = self.lang_list[self.lang_index]
+        if lower: language = language.lower()
+        return language
+
+
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
 
-    def __init__(self, app, jsonfile, *args):
+    #  def __init__(self, app, jsonfile, *args):
+    def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -511,32 +524,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.barcode_dialog = BarcodeDialog(self)
         self.barcodes = []
         self.port_barcodes = {}
-        #  self.loading_dialog = LoadingDialog(self)
 
-        self.jsonfileroot = 'jsonfile'
-        self.jsonfilename = jsonfile
-
-        # Read UI states from app settings
-        self.settings = QSettings("FAB", "SAP109")
-        is_fx1_checked = self.settings.value("fixture_1", False, type=bool)
-        is_fx2_checked = self.settings.value("fixture_2", False, type=bool)
-        lang_index = self.settings.value("lang_index", 0, type=int)
-        is_eng_mode_on = self.settings.value("is_eng_mode_on", False, type=bool)
+        self.set_task(task)
+        self.settings = task.settings
 
         # Restore UI states
-        self.checkBoxFx1.setChecked(is_fx1_checked)
-        self.checkBoxFx2.setChecked(is_fx2_checked)
-        self.langSelectMenu.setCurrentIndex(lang_index)
-        self.on_lang_changed(lang_index)
-        self.checkBoxEngMode.setChecked(is_eng_mode_on)
-        self.toggle_engineering_mode(is_eng_mode_on)
+        self.checkBoxFx1.setChecked(self.settings.is_fx1_checked)
+        self.checkBoxFx2.setChecked(self.settings.is_fx2_checked)
+        self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
+        self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
+        self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
-        self._comports = []
-        self._comports_ps = []
+        self._comports_dut = []
+        self._comports_pwr = []
         self._comports_dmm = []
 
         self.instruments = generate_instruments(self.task.instruments())
-        update_serial(self.instruments, 'gw_powersupply', self._comports_ps)
+        update_serial(self.instruments, 'gw_powersupply', self._comports_pwr)
         update_serial(self.instruments, 'gw_dmm', self._comports_dmm)
 
         self.dut_layout = []
@@ -551,9 +555,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setsignal()
 
         self.ser_listener = SerialListener()
-        self.ser_listener.comports.connect(self.ser_update)
-        self.ser_listener.comports_ps.connect(self.ps_update)
+
+        self.ser_listener.comports_dut.connect(self.ser_update)
+        self.ser_listener.comports_pwr.connect(self.pwr_update)
         self.ser_listener.comports_dmm.connect(self.dmm_update)
+
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
 
@@ -585,7 +591,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print("btn_detect")
         self.pushDetect.setEnabled(False)
         t = threading.Thread(target=check_which_port_when_poweron,
-                             args=(self._comports, ))
+                             args=(self._comports_dut, ))
         t.start()
 
     def btn_detect_mb_after(self):
@@ -608,7 +614,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 print('please only turn on #1 power')
 
             t = threading.Thread(target=check_which_port_when_poweron,
-                                 args=(self._comports, ))
+                                 args=(self._comports_dut, ))
             t.start()
 
     def btn_detect_mb(self):
@@ -620,10 +626,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def detect_received(self, comport_when_poweron_first_dut):
         print('detect_received start')
-        if self._comports[0] != comport_when_poweron_first_dut:
+        if self._comports_dut[0] != comport_when_poweron_first_dut:
             print('reverse comport!!!')
-            self._comports[0], self._comports[1] = self._comports[
-                1], self._comports[0]
+            self._comports_dut[0], self._comports_dut[1] = self._comports_dut[
+                1], self._comports_dut[0]
         self.render_port_plot()
         self.pushDetect.setEnabled(True)
         self.port_autodecting = False
@@ -632,12 +638,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
 
     def dummy_com(self, coms):
-        self._comports = coms
+        self._comports_dut = coms
 
     def clean_power(self):
         print('clean_power start')
         # prevent from last crash and power supply not closed normally
-        update_serial(self.instruments, 'gw_powersupply', self._comports_ps)
+        update_serial(self.instruments, 'gw_powersupply', self._comports_pwr)
         for power in self.instruments['gw_powersupply']:
             if not power.is_open:
                 power.open_com()
@@ -686,9 +692,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('update_task')
         self.set_task(mainboard_task)
 
-    def auto_align_com_port(self):
-        self._comports_inst
-
     def poweron(self, power):
         print('poweron start')
         print('is_open', power.is_open)
@@ -710,9 +713,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if child.widget():
                 child.widget().deleteLater()
 
-    def ps_update(self, comports):
-        print('ps_update', comports)
-        self._comports_ps = comports
+    def pwr_update(self, comports):
+        print('pwr_update', comports)
+        self._comports_pwr = comports
         update_serial(self.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
         self.btn_detect_mb_after()
@@ -726,9 +729,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def ser_update(self, comports):
         print('ser_update', comports)
-        self._comports = comports
+        self._comports_dut = comports
         self.barcodes = []
-        for port in self._comports:
+        for port in self._comports_dut:
             self.port_barcodes[port] = None
         self.render_port_plot()
 
@@ -745,7 +748,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     font-size: 16px;
                 }""" % (color, )
         comports_map = {
-            'gw_powersupply': self._comports_ps,
+            'gw_powersupply': self._comports_pwr,
             'gw_dmm': self._comports_dmm
         }
 
@@ -753,7 +756,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clearlayout(e)
             e.addWidget(QLabel(f'#{i}'))
 
-        for i, port in enumerate(self._comports):
+        for i, port in enumerate(self._comports_dut):
             print(f'port {i}: {port}')
             lb_port = QLabel(port)
             lb_port.setStyleSheet(style_('#369'))
@@ -768,7 +771,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
                 )
 
-                #  if e.com in self._comports_inst:
                 if e.com in comports_map[name]:
                     lb_port = QLabel(e.com)
                     lb_port.setStyleSheet(style_(colors_inst[name]))
@@ -792,7 +794,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('\nNOT READY\n!')
 
     def comports(self):
-        return self._comports
+        return self._comports_dut
 
     def setsignal(self):
         self.checkBoxFx1.stateChanged.connect(self.chk_box_fx1_state_changed)
@@ -890,7 +892,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
-        if message.startswith('tasks done') and self.power_recieved:
+        #  if message.startswith('tasks done') and self.power_recieved:
+        if message.startswith('tasks done'):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
 
@@ -916,14 +919,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             #  for j in range(self.task.dut_num):
             for j in self.dut_selected:
                 res = 'Pass' if all_pass(
-                    d[d.hidden == False][d.columns[-2+j]]) else 'Fail'
+                    d[d.hidden == False][d.columns[-2 + j]]) else 'Fail'
                 self.table_view.setItem(r, self.col_dut_start + j,
                                         QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + j).setBackground(
                     self.color_check(res))
 
                 df = d[d.hidden == False]
-                dd = pd.DataFrame(df[[d.columns[-2+j]]].values.T)
+                dd = pd.DataFrame(df[[d.columns[-2 + j]]].values.T)
                 dd.index = [random.randint(1000, 9999)]
                 dd.index.name = 'pid'
                 all_res.append(res)
@@ -954,9 +957,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def btn_clicked(self):
         print('btn_clicked')
         self.barcodes = []
-        for port in self._comports:
+        for port in self._comports_dut:
             self.port_barcodes[port] = None
-        if (not self.checkBoxFx1.isChecked()) and (not self.checkBoxFx2.isChecked()):
+        if (not self.checkBoxFx1.isChecked()) and (
+                not self.checkBoxFx2.isChecked()):
             e_msg = QErrorMessage(self)
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
@@ -966,7 +970,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
-        
+
     def btn_clickedM(self):
         print('btn_clickedM')
         self.show_barcode_dialog()
@@ -980,10 +984,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         event.accept()  # let the window close
 
     def chk_box_fx1_state_changed(self, status):
-        self.settings.setValue("fixture_1", status == Qt.Checked)
+        #  self.settings.setValue("fixture_1", status == Qt.Checked)
+        self.settings.set("fixture_1", status == Qt.Checked)
+        print('chk_box_fx1_state_changed', self.settings.is_fx1_checked)
 
     def chk_box_fx2_state_changed(self, status):
-        self.settings.setValue("fixture_2", status == Qt.Checked)
+        #  self.settings.setValue("fixture_2", status == Qt.Checked)
+        self.settings.set("fixture_2", status == Qt.Checked)
+        print('chk_box_fx2_state_changed', self.settings.is_fx2_checked)
 
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if (not is_eng_mode_on):
@@ -995,7 +1003,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pwd_dialog.show()
 
     def toggle_engineering_mode(self, is_on):
-        self.settings.setValue("is_eng_mode_on", is_on)
+        #  self.settings.setValue("is_eng_mode_on", is_on)
+        self.settings.set("is_eng_mode_on", is_on)
         if is_on:
             self.splitter.show()
         else:
@@ -1005,22 +1014,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         When language is changed, update UI
         """
-        self.settings.setValue("lang_index", index)
-        lang_list = ['en_US.qm', 'zh_TW.qm']
+        self.settings.set("lang_index", index)
+        lang_list = [f'{e}.qm' for e in self.settings.lang_list]
         app = QApplication.instance()
         translator = QTranslator()
         translator.load(f"translate/{lang_list[index]}")
         app.removeTranslator(translator)
         app.installTranslator(translator)
-
         self.retranslateUi(self)
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
         self.pushDetect.setToolTip(self.push_detect_tooltip_text)
-
-        # Retrieve the translated task list(json file)
-        lang_folder = lang_list[index].split(".")[0]
-        self.update_task(lang_folder)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
@@ -1030,8 +1034,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         When the barcode(s) are ready, start testing
         """
-        is_1 = self.settings.value("fixture_1", False, type=bool)
-        is_2 = self.settings.value("fixture_2", False, type=bool)
+        is_1 = self.settings.is_fx1_checked
+        is_2 = self.settings.is_fx2_checked
+        print('is_1', is_1, 'is_2', is_2)
         dut_selected = [
             w[0] for w in filter(lambda e: e[1], enumerate([is_1, is_2]))
         ]
@@ -1042,7 +1047,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         for j, dut_i in enumerate(dut_selected):
             header[-2 + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
-            port = self._comports[dut_i]
+            port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
         print('header', header)
         print('port_barcodes', self.port_barcodes)
@@ -1090,22 +1095,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             "MainWindow",
             "Press this button and power on the first DUT to calibrate the COM ports"
         )
-        self.push_detect_tooltip_text = _translate("MainWindow", "Press this button and power on the first DUT to calibrate the COM ports")
-        self.both_fx_not_checked_err = _translate("MainWindow", "At least one of the fixture should be checked")
-
+        self.push_detect_tooltip_text = _translate(
+            "MainWindow",
+            "Press this button and power on the first DUT to calibrate the COM ports"
+        )
+        self.both_fx_not_checked_err = _translate(
+            "MainWindow", "At least one of the fixture should be checked")
 
 
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
+    mb_task = Task('v3_total_two_dut', MySettings())
+    win = MyWindow(app, mb_task)
 
-    mb_task = Task('jsonfile/v3_total_two_dut.json')
-    simu_task = TaskSimu('jsonfile/v3_simu1.json')
-
-    jsonfilename = 'v3_total_two_dut.json'
-    win = MyWindow(app, jsonfilename)
-
-    actions = [
+    actions_mb = [
         {
             'action': is_serial_ok,
             'args': (win.comports, mb_task.serial_ok)
@@ -1125,13 +1129,12 @@ if __name__ == "__main__":
             'args': ()
         },
     ]
-
-    win.task.register_action(actions)
-    print('main end')
+    mb_task.register_action(actions_mb)
 
     # for simulated tasks
     #  win.dummy_com(['COM8', 'COM3'])
 
+    print('main end')
     try:
         app.exec_()
     except Exception as ex:
