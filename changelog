@@ -1,3 +1,18 @@
+[2019.7.08 - 09:30]
+1. overhaul runeach(), remove tasktype=3 case
+	a.unify arguments 
+		from 
+			runeach(self, index, port, tasktype)
+		to 
+			runeach(self, row_idx, dut_idx, sid, tasktype)
+	b. merge all separate py into one task_runeach.py (for tasktype=1 case)
+	c. v4_total_test1.json for test, including following tests
+		(1) max_current
+		(2) speaker test
+		(3) cpu freq test
+	d. most of the tasktype=1 py still need to be moved into new task_runeach.py
+
+
 [2019.7.04 - 19:00]
 1. jsonfile verions 4
 	a. re-org

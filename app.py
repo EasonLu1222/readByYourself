@@ -120,6 +120,24 @@ def is_serial_ok(comports, signal_from):
         return True
 
 
+def set_power_simu(win):
+    win.power_recieved = True
+    win.simulation = True
+    return True
+
+
+def dummy_com(task):
+    print('\n\ndummy com!!\n\n')
+    i = 3
+    for name, items in task.instruments.items():
+        print('name', name)
+        for e in items:
+            print(' e', e)
+            e.com = f'COM{i}'
+            i += 1
+    return True
+
+
 def set_power(power_process, proc_listener):
     script = 'tasks.poweron'
     for idx in range(1, 3):
@@ -277,7 +295,8 @@ class Task(QThread):
         line = self.df.values[index]
         script = 'tasks.%s' % each['script']
         tasktype = each['tasktype']
-        args = [str(e) for e in line[1]] if each['args'] else []
+        args = [str(e) for e in each['args']]if each['args'] else []
+        #  args = each['args'] if each['args'] else None
         return each, script, tasktype, args
 
     def rungroup(self, groupname):
@@ -300,21 +319,19 @@ class Task(QThread):
                      stdout=PIPE)
         return proc
 
-    def runeach(self, index, port, tasktype):
-        each, script, tasktype, args = self.unpack_each(index)
-        msg = f'[runeach][script: {script}][index: {index}][type: {tasktype}][port: {port}][args: {args}]'
+    def runeach(self, row_idx, dut_idx, sid, tasktype):
+        port = self.window.comports()[dut_idx]
+        each, script, tasktype, args = self.unpack_each(row_idx)
+        msg = (f'[runeach][script: {script}][row_idx: {row_idx}]'
+               f'[dut_idx: {dut_idx}][port: {port}][sid: {sid}]'
+               f'[args: {args}]')
         print(msg)
-        if tasktype == 1:
-            proc = Popen(['python', '-m', script, '-p', port] + args,
-                         stdout=PIPE)
-        elif tasktype == 3:
-            ports = self.window.comports()
-            print(f'window.comports(): {self.window.comports()}')
-            power_index = self.window.comports().index(port) + 1
-            print('power_index', power_index)
-            args = [str(power_index)]
-            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
-
+        arguments = ['python', '-m', script,
+                     '-p', port,
+                     '-i', str(dut_idx),
+                     '-s', sid]
+        if args: arguments.append(args)
+        proc = Popen(arguments, stdout=PIPE)
         self.printterm_msg.emit(msg)
         return proc
 
@@ -329,11 +346,9 @@ class Task(QThread):
 
         proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
         outputs, _ = proc.communicate()
-        #  print('1. runeachports outputs', outputs)
         if not outputs:
             print('outputs is None!!!!')
         outputs = outputs.decode('utf8')
-        #  print('2. runeachports outputs', outputs)
         outputs = json.loads(outputs)
         msg2 = '[task %s][outputs: %s]' % (index, outputs)
         self.printterm_msg.emit(msg2)
@@ -398,12 +413,19 @@ class Task(QThread):
                 self.task_each.emit([i, 1])
                 if is_auto:
                     procs = {}
-                    for port, barcode in self.window.port_barcodes.items():
+                    for dut_idx, (port, barcode) in enumerate(self.window.port_barcodes.items()):
+                    #  for port, barcode in self.window.port_barcodes.items():
                         if barcode:
-                            proc = self.runeach(i, port, task_type)
+                            print('i', i)
+                            print('dut_idx', dut_idx)
+                            print('barcode', barcode)
+                            print('tasktype', task_type)
+                            proc = self.runeach(i, dut_idx, barcode, task_type)
                             procs[port] = proc
 
+                    print('procs', procs)
                     for j, (port, proc) in enumerate(procs.items()):
+                        print('j', j, 'port', port, 'proc', proc)
                         output, _ = proc.communicate()
                         output = output.decode('utf8')
                         msg2 = '[task %s][output: %s]' % (i, output)
@@ -424,40 +446,6 @@ class Task(QThread):
                 QThread.msleep(500)
         self.df = self.df.fillna('')
         self.message.emit('tasks done')
-
-
-class TaskSimu(Task):
-
-    def rungroup(self, groupname):
-        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(
-            groupname)
-        print(
-            f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]'
-        )
-        port_dmm = random.choice(f'COM{random.choice([3,5,8,9,12])}')
-        proc = Popen(['python', '-m', script, '-pm', port_dmm] +
-                     [json.dumps(args)],
-                     stdout=PIPE)
-        return proc
-
-    def runeach(self, index, port, tasktype):
-        each, script, tasktype, args = self.unpack_each(index)
-        if tasktype == 1:
-            msg = '\n[runeach][script: %s][index: %s][port: %s][args: %s]' % (
-                script, index, port, args)
-            proc = Popen(['python', '-m', script, '-p', port] + args,
-                         stdout=PIPE)
-
-        elif tasktype == 3:
-            msg = '\n[runeach3][script: %s][index: %s][args: %s]' % (
-                script, index, args)
-            x = {'COM3': 2, 'COM11': 1}  # <-- hard coded!!! To Be Modified
-            args = [str(x[port])]
-            proc = Popen(['python', '-m', script] + args, stdout=PIPE)
-
-        self.printterm_msg.emit(msg)
-        print(msg)
-        return proc
 
 
 class Settings():
@@ -497,13 +485,13 @@ class MySettings(Settings):
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
 
-    #  def __init__(self, app, jsonfile, *args):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.logfile = 'xxx.csv'
+        self.simulation = False
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
@@ -555,6 +543,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.power_process = {}
         self.power_results = {}
+
+        self.on_lang_changed(self.settings.lang_index)
 
         self.col_dut_start = len(self.task.header())
         self.table_hidden_row()
@@ -870,24 +860,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
-
-        #  if message.startswith('tasks done') and self.power_recieved:
-        if message.startswith('tasks done'):
-
+        if message.startswith('tasks done') and self.power_recieved:
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
-
-            for power in self.task.instruments['gw_powersupply']:
-                if not power.is_open:
-                    power.open_com()
-                if power.ser:
-                    power.off()
-                    power.close_com()
-
+            if not self.simulation:
+                for power in self.task.instruments['gw_powersupply']:
+                    if not power.is_open:
+                        power.open_com()
+                    if power.ser:
+                        power.off()
+                        power.close_com()
             r = self.task.len()
             all_pass = lambda results: all(
                 e.startswith('Pass') for e in results)
-
             d = self.task.df
             all_res = []
 
@@ -896,7 +881,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print(d.columns)
             print(d.columns[-2])
 
-            #  for j in range(self.task.dut_num):
             for j in self.dut_selected:
                 res = 'Pass' if all_pass(
                     d[d.hidden == False][d.columns[-2 + j]]) else 'Fail'
@@ -1082,25 +1066,28 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
-    STATION = 'MainBoard'
     STATION = 'LED'
     STATION = 'SIMULATION'
+    STATION = 'MainBoard'
 
     app = QApplication(sys.argv)
-    task_mb = Task('v4_total_two_dut', MySettings())
-    task_led = Task('v4_led', MySettings())
-    task_simu = TaskSimu('v4_simu', MySettings())
+    mysetting = MySettings()
+    #  task_mb = Task('v4_total_two_dut', mysetting)
+    task_mb = Task('v4_total_test1', mysetting)
+    task_led = Task('v4_led', mysetting)
+    task_simu = Task('v4_total_test1', mysetting)
 
-    _map = {
+    map_ = {
         'MainBoard': 'mb',
         'LED': 'led',
         'SIMULATION': 'simu'
     }
 
-    task = getattr(thismodule, f'task_{_map[STATION]}')
+    task = getattr(thismodule, f'task_{map_[STATION]}')
     win = MyWindow(app, task)
 
-    if STATION == 'SIMULATION': win.dummy_com(['COM8', 'COM3'])
+    if STATION == 'SIMULATION':
+        win.dummy_com(['COM8', 'COM3'])
 
     actions_mb = [
         {
@@ -1131,9 +1118,17 @@ if __name__ == "__main__":
             'action': enter_prompt_simu,
             'args': ()
         },
+        {
+            'action': set_power_simu,
+            'args': (win,)
+        },
+        {
+            'action': dummy_com,
+            'args': (task,)
+        }
     ]
 
-    actions = getattr(thismodule, f'actions_{_map[STATION]}')
+    actions = getattr(thismodule, f'actions_{map_[STATION]}')
     task.register_action(actions)
 
     print('main end')
@@ -1142,3 +1137,4 @@ if __name__ == "__main__":
     except Exception as ex:
         print(f'\n\ncatch!!!\n{ex}')
         raise ex
+
