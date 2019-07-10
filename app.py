@@ -653,13 +653,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setItem(self.task.len(), 0,
                                 QTableWidgetItem(self.summary_text))
 
-    def update_task(self, lang_folder):
-        #  mainboard_task = Task(self.task_path)
-        mainboard_task = Task(
-            f'{self.jsonfileroot}/{lang_folder}/{self.jsonfilename}')
-        print('update_task')
-        self.set_task(mainboard_task)
-
     def poweron(self, power):
         print('poweron start')
         print('is_open', power.is_open)
