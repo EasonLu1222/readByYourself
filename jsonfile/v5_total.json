@@ -17,6 +17,19 @@
  "structure":
     [
         {
+            "group": "Initialize",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write usid",
+            "script": "task_runeach",
+            "args": ["write_usid"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool"
+        }
+        ,{
             "group": "Power Rail",
             "hidden": false,
             "tasktype": 2,

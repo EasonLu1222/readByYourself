@@ -15,6 +15,21 @@ from mylogger import logger
 SERIAL_TIMEOUT = 0.2
 
 
+def write_usid(sid):
+    logger.info('write usid')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmd = f'''echo 1 > /sys/class/unifykeys/attach
+        echo usid > /sys/class/unifykeys/name
+        echo {sid} > /sys/class/unifykeys/write
+        '''
+        lines = issue_command(ser, cmd)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result =  f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
+        return result
+    return None
+    
+
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
     wav_file = '2ch_1khz-16b-120s.wav'
