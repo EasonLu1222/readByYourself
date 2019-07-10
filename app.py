@@ -1066,16 +1066,16 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
+    STATION = 'MainBoard'
     STATION = 'LED'
     STATION = 'SIMULATION'
-    STATION = 'MainBoard'
 
     app = QApplication(sys.argv)
     mysetting = MySettings()
-    #  task_mb = Task('v4_total_two_dut', mysetting)
-    task_mb = Task('v4_total_test1', mysetting)
+
+    task_mb = Task('v5_total', mysetting)
     task_led = Task('v4_led', mysetting)
-    task_simu = Task('v4_total_test1', mysetting)
+    task_simu = Task('v5_simu', mysetting)
 
     map_ = {
         'MainBoard': 'mb',

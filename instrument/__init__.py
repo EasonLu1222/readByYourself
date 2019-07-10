@@ -158,27 +158,6 @@ def cmd_volt(channel):
     return cmds
 
 
-#  def update_serial(instruments):
-    #  logger.info('update_serial start')
-    #  devices = get_devices()
-    #  instrument_set = set(e.NAME for e in instruments)
-    #  for e in instruments:
-        #  e.com = None
-
-    #  for instrument_name in instrument_set:
-        #  device = [e for e in devices if e['name'] == instrument_name]
-        #  #  for idx, d in enumerate(
-                #  #  sorted(device, key=lambda x: int(x['comport'][3:])), 1):
-        #  for idx, d in enumerate(device, 1):
-            #  logger.info(
-                #  f'{instrument_name}_{idx} ---> {d["comport"]} ---> {d["hwid"]}')
-            #  each = next(
-                #  filter(lambda e: e.NAME == instrument_name and e.index == idx,
-                       #  instruments))
-            #  logger.info(f'each: {each}')
-            #  each.com = d['comport']
-
-
 def update_serial(instruments, inst_type, comports):
     logger.info('update_serial start')
     for i, e in enumerate(instruments[inst_type]):
@@ -291,12 +270,6 @@ class DMM(SerialInstrument):
         logger.info(f'result: {result}')
         values = [float(e) for e in result.split(',')]
         return values
-
-    #  def measure_freqs(self, channels):
-    #  result = self.run_cmd(cmd_volts(channels), True)
-    #  logger.info(f'result: {result}')
-    #  values = [float(e) for e in result.split(',')]
-    #  return values
 
     def measure_volts_all(self):
         result = self.run_cmd(cmd(MEASURE_VOLT_ALL), True)

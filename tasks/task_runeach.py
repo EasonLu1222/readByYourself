@@ -6,20 +6,13 @@ import json
 import time
 import random
 import argparse
+import inspect
 from operator import itemgetter
 from serials import issue_command, get_serial
 
 from mylogger import logger
 
 SERIAL_TIMEOUT = 0.2
-
-
-funcmap = {
-    'check_max_current': ['dut_index'],
-    'check_cpu_freq': ['portname'],
-    'speaker_play_1kz': ['portname'],
-    'speaker_close_1kz': ['portname'],
-}
 
 
 def speaker_play_1kz(portname):
@@ -37,13 +30,75 @@ def speaker_close_1kz(portname):
         return None
 
 
+def check_wifi_if(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'pidof bsa_server')
+        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        logger.info(f'check_wifi_if: {result}')
+        return result
+    return None
+
+
+def check_bt(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'pidof bsa_server')
+        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        logger.info(f'has BT: {result}')
+        return result
+    return None
+
+
+def check_cpu_cores(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'cat /proc/cpuinfo |grep processor|wc -l')
+        result =  'Passed' if any(re.match('4\r\n', e) for e in lines) else 'Failed'
+        logger.info(f'Check CPU Cores: {result}')
+        return result
+    return None
+
 
 def check_cpu_freq(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        lines = issue_command(ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
+        lines = issue_command(
+            ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
         result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
-        logger.info('Check CPU Freq: %s' % result)
+        logger.info(f'Check CPU Freq: {result}')
+        return result
+    return None
 
+
+def check_ddr_size(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'grep MemTotal /proc/meminfo')
+        result =  'Passed' if any(re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else 'Failed'
+        logger.info(f'DDR Size: {result}')
+        return result
+    return None
+
+
+def check_i2c_tas5766(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'cat /sys/class/i2c-adapter/i2c-0/0-004e/name')
+        result =  'Passed' if any(re.match('tas5766m', e) for e in lines) else 'Failed'
+        logger.info(f'has tas5766m: {result}')
+        return result
+    return None
+
+
+def check_i2c_msp430(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'cat /sys/class/i2c-adapter/i2c-1/1-001f/name')
+        result =  'Passed' if any(re.match('msp430', e) for e in lines) else 'Failed'
+        logger.info(f'has msp430: {result}')
+        return result
+    return None
+
+
+def check_i2c_lp5018(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'cat /sys/class/i2c-adapter/i2c-1/1-0028/name')
+        result =  'Passed' if any(re.match('lp5018', e) for e in lines) else 'Failed'
+        logger.info(f'has lp5018: {result}')
         return result
     return None
 
@@ -63,11 +118,16 @@ def check_max_current(dut_idx):
                     break
         else:
             logger.info('no power_results')
-    result = x[str(dut_idx+1)]
+    result = x[str(dut_idx + 1)]
     logger.info(f'result: {result}')
     logger.info(f'check_max_current end')
     result = f'Pass({result})'
     return result
+
+
+def check_something(portname):
+    time.sleep(1.5)
+    return random.choice(['Pass', 'Fail'])
 
 
 if __name__ == "__main__":
@@ -80,23 +140,27 @@ if __name__ == "__main__":
                         '--portname',
                         help='serial com port name',
                         type=str)
-    parser.add_argument('-i', '--dut_index', help='dut #number', type=int)
+    parser.add_argument('-i', '--dut_idx', help='dut #number', type=int)
     parser.add_argument('-s', '--sid', help='serial id', type=str)
     parser.add_argument('funcname', help='serial id', type=str)
     args = parser.parse_args()
-    portname, dut_index, sid = [
-        getattr(args, e) for e in ('portname', 'dut_index', 'sid')
+    portname, dut_idx, sid = [
+        getattr(args, e) for e in ('portname', 'dut_idx', 'sid')
     ]
     funcname = args.funcname
 
     logger.info(f'portname: {portname}')
-    logger.info(f'dut_index: {dut_index}')
+    logger.info(f'dut_idx: {dut_idx}')
     logger.info(f'sid: {sid}')
     logger.info(f'args: {args}')
     logger.info(f'funcname: {funcname}')
 
     func = getattr(thismodule, funcname)
-    func_args = [getattr(thismodule, e) for e in funcmap[funcname]]
+    func_args = [
+        getattr(thismodule, arg) for arg in inspect.getargspec(func).args
+    ]
+    logger.info(f'func_args: {func_args}')
+
     result = func(*func_args)
     if result:
         sys.stdout.write(result)

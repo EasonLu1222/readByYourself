@@ -5,13 +5,6 @@ from instrument import DMM
 
 from mylogger import logger
 
-#  freq_ranges = {
-    #  107: [995, 1005],
-    #  108: [995, 1005],
-    #  115: [995, 1005],
-    #  116: [995, 1005],
-#  }
-
 
 def freq_in_range(channel, freq, limits):
     #  rng = freq_ranges[channel]

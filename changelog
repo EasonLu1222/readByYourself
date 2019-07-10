@@ -1,3 +1,9 @@
+[2019.7.10 - 17:50]
+1. jsonfile version5
+	a. add tasks/task_runeach.py to handle all tasktype=1 case
+	b. remove old jsonfile & taskfile
+	c. new jsonfile: v5_total.json & v5_simu.json
+
 [2019.7.08 - 09:30]
 1. overhaul runeach(), remove tasktype=3 case
 	a.unify arguments 

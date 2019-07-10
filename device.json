@@ -1,5 +1,7 @@
 {
     "10C4:EA60": "cygnal_cp2102",
+    "067B:2303": "prolific",
+    "0403:6001": "ftdi",
     "2184:0051": "gw_powersupply",
     "2184:001A": "gw_dmm"
 }

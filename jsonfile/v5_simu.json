@@ -7,7 +7,7 @@
     },
     "pwr": {
         "name": "gw_powersupply",
-        "num": 2
+        "num": 1
     },
     "dmm": {
         "name": "gw_dmm",
@@ -21,7 +21,7 @@
             "hidden": false,
             "tasktype": 2,
             "item": "19V",
-            "script": "simu_group1",
+            "script": "simu_group",
             "args": [101, 109],
             "auto": true,
             "min": 18.05,
@@ -34,7 +34,7 @@
             "hidden": false,
             "tasktype": 2,
             "item": "5V",
-            "script": "simu_group1",
+            "script": "simu_group",
             "args": [102, 110],
             "auto": true,
             "min": 4.75,
@@ -43,12 +43,25 @@
             "unit": "V"
         }
         ,{
-            "group": "Test",
+            "group": "BT",
             "hidden": false,
             "tasktype": 1,
-            "item": "Simulation",
-            "script": "simu_each_v4",
-            "args": null,
+            "item": "BT_Interface",
+            "script": "task_runeach",
+            "args": ["check_something"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "WiFi",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "WiFi_Interface",
+            "script": "task_runeach",
+            "args": ["check_something"],
             "auto": true,
             "min": null,
             "expect": null,
@@ -57,5 +70,4 @@
         }
     ]
 }
-
 
