@@ -337,7 +337,7 @@ def generate_instruments(task_devices, instrument_map):
         if name not in instrument_map.keys(): continue
         #  for i in range(1, num+1):
             #  instruments[name].append(instrument_map[name](i))
-        
+
         if sn_numbers: assert len(sn_numbers)==num
         for i in range(num):
             if sn_numbers:

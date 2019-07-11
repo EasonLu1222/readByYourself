@@ -153,7 +153,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
     waitwords = [
         'U-Boot',
         'Starting kernel',
-        'usb rndis & adb start: OK',
+        'usb rndis',
         'Server is ready for client connect',
         '|-----bluetooth speaker is ready for connections------|',
         '#',
