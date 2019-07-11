@@ -1,3 +1,17 @@
+[2019.7.11 - 15:10]
+1. use powersupply's serial number to find #1 & #2
+	a. v6 jsonfile: add serial numbers info to gw_powersupply
+	b. use scpi command *IDN? to get powersupply's serial number
+	c. directly get correct order of powersupply
+	d. once powersupply order is confirmed, trigger auto-detect of dut comports
+		--> this will be changed in the future (use ftdi's serial number)
+	e. auto-detect button no needed
+
+2. bugs fixed
+	a. when one dut is selected, only occupy that serial port but not both 
+	b. ignore UnicodeError in serials>issue_command()
+	   - this is important! otherwise sometimes it will cause test items error and blank in the tableview
+
 [2019.7.10 - 17:50]
 1. jsonfile version5
 	a. add tasks/task_runeach.py to handle all tasktype=1 case

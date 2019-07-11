@@ -166,12 +166,15 @@ def enter_prompt_simu():
     return True
 
 
-def enter_prompt(comports, ser_timeout=0.2):
+def enter_prompt(window, ser_timeout=0.2):
     print('enter factory image prompt start')
     t0 = time.time()
     port_ser_thread = {}
+    comports = window.comports
     print('enter_prompt: comports - ', comports)
-    for port in comports():
+    for i in window.dut_selected:
+        port = comports()[i]
+        print('i', i, 'port', port)
         ser = get_serial(port, 115200, ser_timeout)
         t = Thread(target=enter_factory_image_prompt, args=(ser, ))
         port_ser_thread[port] = [ser, t]
@@ -416,10 +419,9 @@ class Task(QThread):
                     for dut_idx, (port, barcode) in enumerate(self.window.port_barcodes.items()):
                     #  for port, barcode in self.window.port_barcodes.items():
                         if barcode:
-                            print('i', i)
-                            print('dut_idx', dut_idx)
-                            print('barcode', barcode)
-                            print('tasktype', task_type)
+                            dut_idx = self.window.comports().index(port)
+                            print('i', i, 'port', port, 'dut_idx', dut_idx,
+                                  'barcode', barcode, 'tasktype', task_type)
                             proc = self.runeach(i, dut_idx, barcode, task_type)
                             procs[port] = proc
 
@@ -538,6 +540,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
+        self.pushDetect.setEnabled(False)
 
         self.showMaximized()
 
@@ -565,31 +568,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('btn_detect_mb_after start')
         if self.port_autodecting:
             print('port_autodecting...')
-            devices = get_devices()
-            print('devices', devices)
-
-            powers = list(
-                filter(lambda x: x['name'] == 'gw_powersupply', devices))
-            if len(powers) == 1:
-                device_power1 = powers[0]
-                power1 = self.task.instruments['gw_powersupply'][0]
-                print('device_power1', device_power1)
-                print('power1', power1)
-                power1.com = device_power1['comport']
-                self.poweron(power1)
-            else:
-                print('please only turn on #1 power')
-
+            power1 = self.task.instruments['gw_powersupply'][0]
+            print('power1', power1)
+            self.poweron(power1)
             t = threading.Thread(target=check_which_port_when_poweron,
                                  args=(self._comports_dut, ))
             t.start()
 
     def btn_detect_mb(self):
         print("btn_detect_mb start")
-        self.pushDetect.setText(
-            f'#1 port auto detect... please turn on the #1 powersupply')
+        #  self.pushDetect.setText(
+            #  f'#1 port auto detect... please turn on the #1 powersupply')
         self.pushDetect.setEnabled(False)
         self.port_autodecting = True
+        self.btn_detect_mb_after()
 
     def detect_received(self, comport_when_poweron_first_dut):
         print('detect_received start')
@@ -598,7 +590,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self._comports_dut[0], self._comports_dut[1] = self._comports_dut[
                 1], self._comports_dut[0]
         self.render_port_plot()
-        self.pushDetect.setEnabled(True)
+        #  self.pushDetect.setEnabled(True)
         self.port_autodecting = False
         self.clean_power()
         self.pushDetect.setText(
@@ -611,7 +603,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def clean_power(self):
         print('clean_power start')
         # prevent from last crash and power supply not closed normally
-        update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
+        #  update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
         for power in self.task.instruments['gw_powersupply']:
             if not power.is_open:
                 power.open_com()
@@ -679,14 +671,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports_pwr = comports
         update_serial(self.task.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
-        self.btn_detect_mb_after()
 
     def dmm_update(self, comports):
         print('dmm_update', comports)
         self._comports_dmm = comports
         update_serial(self.task.instruments, 'gw_dmm', comports)
         self.render_port_plot()
-        self.btn_detect_mb_after()
 
     def ser_update(self, comports):
         print('ser_update', comports)
@@ -742,14 +732,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def instrument_ready(self, ready):
         if ready:
-            self.pushButton.setEnabled(True)
             print('\nREADY\n!')
             self.clean_power()
+            #  self.ser_listener.stop()
 
             # order: power1,power2, dmm1
             instruments_to_dump = sum(self.task.instruments.values(), [])
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
+
+            self.btn_detect_mb()
+
+            self.pushButton.setEnabled(True)
         else:
             self.pushButton.setEnabled(False)
             print('\nNOT READY\n!')
@@ -1059,14 +1053,14 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
-    STATION = 'LED'
     STATION = 'SIMULATION'
+    STATION = 'LED'
     STATION = 'MainBoard'
 
     app = QApplication(sys.argv)
     mysetting = MySettings()
 
-    task_mb = Task('v5_total', mysetting)
+    task_mb = Task('v6_total', mysetting)
     task_led = Task('v4_led', mysetting)
     task_simu = Task('v5_simu', mysetting)
 
@@ -1093,7 +1087,8 @@ if __name__ == "__main__":
         },
         {
             'action': enter_prompt,
-            'args': (win.comports, 0.2)
+            #  'args': (win.comports, 0.2)
+            'args': (win, 0.2)
         },
     ]
     actions_led = [
@@ -1103,7 +1098,8 @@ if __name__ == "__main__":
         },
         {
             'action': enter_prompt,
-            'args': (win.comports, 0.2)
+            #  'args': (win.comports, 0.2)
+            'args': (win, 0.2)
         },
     ]
     actions_simu = [
@@ -1130,4 +1126,3 @@ if __name__ == "__main__":
     except Exception as ex:
         print(f'\n\ncatch!!!\n{ex}')
         raise ex
-

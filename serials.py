@@ -124,7 +124,8 @@ class WaitPromptThread(Thread):
         logger.info('end of WaitPromptThread')
 
 
-def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
+#  def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
+def check_which_port_when_poweron(ports, prompt='Starting kernel', qsignal=True):
     logger.info('check_which_port_when_poweron start')
     serial_ports = [get_serial(port, 115200, 0.2) for port in ports]
     q = Queue()
@@ -168,11 +169,17 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
     logger.info(f'issue_command: {cmd}')
     if fetch:
         lines = serial.readlines() 
-        #  logger.info(lines)
-        #  lines = [e.decode('utf-8') for e in serial.readlines()]
-        lines = [e.decode('utf-8') for e in lines]
-        for line in lines: logger.info(f'{line.rstrip()}')
-        return lines
+        lines_encoded = []
+        for e in lines:
+            try:
+                logger.info(f'line: {e}')
+                line = e.decode('utf-8')
+            except UnicodeDecodeError as ex:
+                logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
+            else:
+                logger.info(f'{line.rstrip()}')
+                lines_encoded.append(line)
+        return lines_encoded
     else:
         return None
 
@@ -236,11 +243,13 @@ class BaseSerialListener(QThread):
                 self.if_all_ready.emit(False)
 
     def stop(self):
+        logger.info('BaseSerialListener stop start')
         # wait 1s for list_ports to finish, is it enough or too long in order
         # not to occupy com port for subsequent test scripts
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
+        logger.info('BaseSerialListener stop end')
 
 
 if __name__ == "__main__":

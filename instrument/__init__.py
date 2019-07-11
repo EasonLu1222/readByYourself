@@ -158,12 +158,30 @@ def cmd_volt(channel):
     return cmds
 
 
+def get_ordered_comports_by_gw_idn(comports, sn_numbers):
+    port_sn = {}
+    for i, port in enumerate(comports):
+        s = SerialInstrument(i, port)
+        sn = s.gw_read_idn()
+        port_sn[port] = sn
+        s.close_com()
+    sn_port = {v:k for k,v in port_sn.items()}
+    reorderd_comports = [sn_port[sn] if sn in sn_port else None for sn in sn_numbers]
+    return reorderd_comports
+
+
 def update_serial(instruments, inst_type, comports):
     logger.info('update_serial start')
-    for i, e in enumerate(instruments[inst_type]):
+    inst = instruments[inst_type]
+    for i, e in enumerate(inst):
         e.com = None
+
+    if inst_type=='gw_powersupply':
+        sn = [e.sn for e in inst]
+        comports = get_ordered_comports_by_gw_idn(comports, sn)
     for i, com in enumerate(comports):
-        instruments[inst_type][i].com = com
+        inst[i].com = com
+
     for name, items in instruments.items():
         logger.info('  name: %s', name)
         for i, e in enumerate(items):
@@ -171,15 +189,18 @@ def update_serial(instruments, inst_type, comports):
     logger.info('update_serial end\n')
 
 
+
 class SerialInstrument():
 
     def __init__(self,
                  index=1,
                  port=None,
+                 sn = None,
                  baud=115200,
                  timeout=2,
                  delay_sec=0.002):
         self.index = index
+        self.sn = sn
         self.delay_sec = delay_sec
         if port:
             self.com = port
@@ -218,6 +239,12 @@ class SerialInstrument():
                 return result
         except Exception as e:
             logger.debug("run_cmd failed!")
+
+    def gw_read_idn(self):
+        idn = self.run_cmd(['*IDN?'], True) # ignore first since it's empty (just MacOS)
+        idn = self.run_cmd(['*IDN?'], True)
+        sn = idn.split(',')[2]
+        return sn
 
 
 class PowerSupply(SerialInstrument):
@@ -306,7 +333,16 @@ def generate_instruments(task_devices, instrument_map):
     instruments = defaultdict(list)
     for dev, dev_info in task_devices.items():
         name, num = dev_info['name'], dev_info['num']
+        sn_numbers = dev_info['sn'] if 'sn' in dev_info else None
         if name not in instrument_map.keys(): continue
-        for i in range(1, num+1):
-            instruments[name].append(instrument_map[name](i))
+        #  for i in range(1, num+1):
+            #  instruments[name].append(instrument_map[name](i))
+        
+        if sn_numbers: assert len(sn_numbers)==num
+        for i in range(num):
+            if sn_numbers:
+                inst = instrument_map[name](i+1, sn=sn_numbers[i])
+            else:
+                inst = instrument_map[name](i+1)
+            instruments[name].append(inst)
     return instruments

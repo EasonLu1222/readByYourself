@@ -8,7 +8,7 @@ from mylogger import logger
 
 def volt_in_range(channel, volt, limits):
     rng = limits[channel]
-    if rng[0] < volt and volt < rng[2]: # min & max
+    if rng[0] < volt < rng[2]: # min & max
         return 'Pass(%.3f)'% volt
     else:
         return 'Fail(%.3f)'% volt

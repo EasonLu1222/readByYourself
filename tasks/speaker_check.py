@@ -7,9 +7,9 @@ from mylogger import logger
 
 
 def freq_in_range(channel, freq, limits):
-    #  rng = freq_ranges[channel]
     rng = limits[channel]
-    if rng[0] < freq and freq < rng[2]: 
+    #  if rng[0] < freq and freq < rng[2]: 
+    if rng[0] < freq < rng[2]: 
         return 'Pass(%.3f)' % freq
     else:
         return 'Fail(%.3f)' % freq
@@ -18,15 +18,12 @@ def freq_in_range(channel, freq, limits):
 if __name__ == "__main__":
     logger.info('speaker check...')
     parser = argparse.ArgumentParser()
-    #  parser.add_argument('channel', help='channel', type=str)
     parser.add_argument('channels_limits', help='channel', type=str)
     parser.add_argument('-pm',
                         '--port_dmm',
                         help='serial com port dmm',
                         type=str)
     args = parser.parse_args()
-
-    #  channel_group = json.loads(args.channel)
 
     unpacked = json.loads(args.channels_limits)
     logger.info(f'unpacked: {unpacked}')
