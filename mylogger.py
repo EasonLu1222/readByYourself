@@ -6,12 +6,12 @@ def getlogger():
     logger.setLevel(logging.INFO)
 
     # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    #  ch = logging.FileHandler(r'log.txt')
-    ch.setLevel(logging.DEBUG)
+    ch1 = logging.StreamHandler()
+    ch2 = logging.FileHandler(r'logs/error_log.txt')
+    ch1.setLevel(logging.DEBUG)
+    ch2.setLevel(logging.DEBUG)
 
     # create formatter
-    #  formatter = logging.Formatter('[%(asctime)s][%(levelname)s][pid=%(process)d][thd=%(threadName)s][%(message)s]')
     formatter = logging.Formatter(
         '[%(asctime)s]'
         '[%(levelname)s]'
@@ -22,10 +22,12 @@ def getlogger():
     )
 
     # add formatter to ch
-    ch.setFormatter(formatter)
+    ch1.setFormatter(formatter)
+    ch2.setFormatter(formatter)
 
     # add ch to logger
-    logger.addHandler(ch)
+    logger.addHandler(ch1)
+    logger.addHandler(ch2)
     return logger
 
 

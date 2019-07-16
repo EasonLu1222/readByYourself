@@ -145,7 +145,7 @@ def check_max_current(dut_idx):
 
 def check_something(portname):
     time.sleep(1.5)
-    return random.choice(['Pass', 'Fail'])
+    return random.choice(['Pass']*9+['Fail'])
 
 
 if __name__ == "__main__":

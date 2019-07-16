@@ -13,6 +13,9 @@ from queue import Queue
 from mylogger import logger
 
 
+type_ = lambda ex: f'<{type(ex).__name__}>'
+
+
 def get_serial(port_name, baudrate, timeout):
     logger.info(f'===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
@@ -30,21 +33,25 @@ def is_serial_free(port_name):
     try:
         get_serial(port_name, 115200, 1)
     except serial.serialutil.SerialException as ex:
-        logger.error(f'error in is_serial_free: {ex}')
         return False
     return True
 
 
 def get_device(comport):
     try:
+        device = None
         matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
         devices = json.load(open('device.json', 'r'))
         vid_pid = matched[8:]
         device = devices[vid_pid]
-    except Exception as e:
-        logger.debug("get_device failed!")
-        device = ""
-
+    except KeyError as ex:
+        msg = (f'\n\n{type_(ex)}, {ex}'
+               f'not defined in device.json.\n')
+        logger.warning(msg)
+    except Exception as ex:
+        logger.error(f'{type_(ex)}, {ex}')
+    finally:
+        if not device: device = ""
     return device
 
 
@@ -79,8 +86,8 @@ def wait_for_prompt(serial, prompt, thread_timeout=25):
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
             if line: print(line)
-        except UnicodeDecodeError as ex:
-            logger.error('ERR1: UnicodeDecodeError', ex)
+        except UnicodeDecodeError as ex: # ignore to proceed
+            logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
             continue
 
         se.serial_msg.emit([portname, line.strip()])
@@ -108,11 +115,9 @@ class WaitPromptThread(Thread):
                 x1 = self.ser.readline()
                 x2 = x1.decode('utf-8')
                 line = x2.rstrip('\n')
-                #  line = self.ser.readline().decode('utf-8').rstrip('\n')
                 if line: logger.info(line)
-            except UnicodeDecodeError as ex:
-                logger.error(f'ERR1: UnicodeDecodeError: {ex}')
-                logger.error(f'x1: {x1}')
+            except UnicodeDecodeError as ex: # ignore to proceed
+                logger.debug(f'x1: {x1}')
                 continue
 
             if line.startswith(self.prompt):
@@ -157,6 +162,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
         'Server is ready for client connect',
         '|-----bluetooth speaker is ready for connections------|',
         '#',
+        'aml_dai_set_bclk_ratio',
     ]
     wait_for_prompt(serial, waitwords[waitwordidx])
     if press_enter:
@@ -174,8 +180,8 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
             try:
                 logger.info(f'line: {e}')
                 line = e.decode('utf-8')
-            except UnicodeDecodeError as ex:
-                logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
+            except UnicodeDecodeError as ex: # ignore to proceed
+                logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
             else:
                 logger.info(f'{line.rstrip()}')
                 lines_encoded.append(line)

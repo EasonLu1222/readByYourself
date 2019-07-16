@@ -4,6 +4,10 @@ from collections import defaultdict
 
 from mylogger import logger
 
+
+type_ = lambda ex: f'<{type(ex).__name__}>'
+
+
 POWERON = '''
     OUTPut:PROTection:CLEar
     OUTPut 0
@@ -239,6 +243,7 @@ class SerialInstrument():
                 return result
         except Exception as e:
             logger.debug("run_cmd failed!")
+            logger.error(f'{type_(ex)}, {ex}')
 
     def gw_read_idn(self):
         idn = self.run_cmd(['*IDN?'], True) # ignore first since it's empty (just MacOS)

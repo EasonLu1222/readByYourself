@@ -2,14 +2,13 @@ import os
 import sys
 import json
 import time
-import random
+from datetime import datetime
 import pickle
-import serial
 import threading
 from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
-from threading import Thread
+
 from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
                              QAbstractItemView, QHBoxLayout, QWidget,
                              QProgressDialog)
@@ -24,12 +23,11 @@ from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
 
-from serial.tools.list_ports import comports
 from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron,
                      filter_devices, BaseSerialListener)
 
-from instrument import update_serial, open_all, generate_instruments, PowerSupply, DMM
+from instrument import update_serial, generate_instruments, PowerSupply, DMM
 from ui.design3 import Ui_MainWindow
 
 from mylogger import logger
@@ -151,10 +149,8 @@ def set_power(power_process, proc_listener):
 
 
 def enter_prompt_simu():
-
     def dummy(sec):
         time.sleep(sec)
-
     print('enter factory image prompt start')
     t0 = time.time()
     t = threading.Thread(target=dummy, args=(1.5, ))
@@ -176,7 +172,7 @@ def enter_prompt(window, ser_timeout=0.2):
         port = comports()[i]
         print('i', i, 'port', port)
         ser = get_serial(port, 115200, ser_timeout)
-        t = Thread(target=enter_factory_image_prompt, args=(ser, ))
+        t = threading.Thread(target=enter_factory_image_prompt, args=(ser,))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -207,6 +203,7 @@ class Task(QThread):
     serial_ok = QSignal(bool)
     message = QSignal(str)
     printterm_msg = QSignal(str)
+
     def __init__(self, json_name, settings, json_root='jsonfile'):
         super(Task, self).__init__()
         self.json_root = json_root
@@ -218,7 +215,7 @@ class Task(QThread):
         self.action_args = list()
         self.df = self.load()
         self.mylist = self.df.fillna('').values.tolist()
-        self.duts = []
+        #  self.duts = []
         self.instruments = generate_instruments(self.devices(), INSTRUMENT_MAP)
 
     @property
@@ -367,14 +364,16 @@ class Task(QThread):
             self.action_args.append([action, args])
 
     def run(self):
-        print('show_animation_dialog True')
+        time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
+
+        t0 = time_()
+
         for action, args in self.action_args:
             print('run action', action, args)
             if not action(*args):
                 print('return !!!!!')
                 return
-        print('show_animation_dialog False')
         QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
 
@@ -446,8 +445,17 @@ class Task(QThread):
                     ports = ','.join(self.window.comports())
                     self.runeachports(i, ports)
                 QThread.msleep(500)
+
+        t1 = time_()
+
         self.df = self.df.fillna('')
-        self.message.emit('tasks done')
+        message = {
+            'msg': 'tasks done',
+            't0': t0,
+            't1': t1,
+        }
+        #  self.message.emit('tasks done')
+        self.message.emit(json.dumps(message))
 
 
 class Settings():
@@ -492,7 +500,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.logfile = 'xxx.csv'
         self.simulation = False
 
         self.pwd_dialog = PwdDialog(self)
@@ -518,7 +525,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(self.task.instruments, 'gw_dmm', self._comports_dmm)
 
         self.dut_layout = []
-        colors = ['#edd', '#edd']
+        colors = ['#edd'] * self.task.dut_num
         for i in range(self.task.dut_num):
             c = QWidget()
             c.setStyleSheet(f'background-color:{colors[i]};')
@@ -555,6 +562,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+
+    @property
+    def logfile(self):
+        now = datetime.now()
+        y, m, d = now.year, now.month, now.day
+        path = f'logs/{y}_{m:02d}_{d:02d}.csv'
+        if not os.path.isfile(path):
+            with open(path, 'w') as f:
+                f.write('')
+        return path
 
     def btn_detect(self):
         self.pushDetect.setText(f'{self.push_detect_text}...')
@@ -613,9 +630,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('clean_power end')
 
     def table_hidden_row(self):
+        self.rowlabel_old_new = old_new = {}
+        count = 0
         for i, each in enumerate(self.task.mylist):
             is_hidden = each[4]
+            if not is_hidden: count += 1
             self.table_view.setRowHidden(i, is_hidden)
+            old_new[i] = count
+        old_new[len(old_new)] = count + 1
+        self.table_view.setVerticalHeaderLabels(str(e) for  e in old_new.values())
 
     def recieve_power(self, process_results):
         print('recieve_power', process_results)
@@ -721,7 +744,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 print(
                     f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
                 )
-
                 if e.com in comports_map[name]:
                     lb_port = QLabel(e.com)
                     lb_port.setStyleSheet(style_(colors_inst[name]))
@@ -741,7 +763,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
 
-            self.btn_detect_mb()
+            #  self.btn_detect_mb()
 
             self.pushButton.setEnabled(True)
         else:
@@ -847,7 +869,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
-        if message.startswith('tasks done') and self.power_recieved:
+        msg, t0, t1 = itemgetter('msg', 't0', 't1')(json.loads(message))
+        if msg.startswith('tasks done') and self.power_recieved:
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
             if not self.simulation:
@@ -860,33 +883,60 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             r = self.task.len()
             all_pass = lambda results: all(
                 e.startswith('Pass') for e in results)
+
+            def fail_list(series):
+                idx = series[series.fillna('').str.startswith('Fail')].index
+                d = self.task.df
+                dd = d[d.index.isin(idx)]
+                items = (dd['group'] + ': ' + dd['item']).values.tolist()
+                indexes = [self.rowlabel_old_new[i] for i in idx]
+                faillist = ','.join([ f'#{i}({j})' for i,j in zip(indexes,items)])
+                return faillist
+
             d = self.task.df
             all_res = []
+
+            dut_num = self.task.devices()['dut']['num']
 
             print('\n\n')
             print(d)
             print(d.columns)
-            print(d.columns[-2])
+            print(d.columns[-dut_num])
+            #  d.to_csv('debug.csv')
 
-            for j in self.dut_selected:
+            for j, dut_i in enumerate(self.dut_selected):
                 res = 'Pass' if all_pass(
-                    d[d.hidden == False][d.columns[-2 + j]]) else 'Fail'
-                self.table_view.setItem(r, self.col_dut_start + j,
+                    d[d.hidden == False][d.columns[-dut_num + dut_i]]) else 'Fail'
+
+                faillist = fail_list(d[d.columns[-dut_num+dut_i]])
+                print('faillist', faillist)
+                self.table_view.setItem(r, self.col_dut_start + dut_i,
                                         QTableWidgetItem(res))
-                self.table_view.item(r, self.col_dut_start + j).setBackground(
+                self.table_view.item(r, self.col_dut_start + dut_i).setBackground(
                     self.color_check(res))
+                all_res.append(res)
 
                 df = d[d.hidden == False]
-                dd = pd.DataFrame(df[[d.columns[-2 + j]]].values.T)
-                dd.index = [random.randint(1000, 9999)]
+                cols1 = (df.group + ': ' + df.item).values.tolist()
+                dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T,
+                                  columns=cols1)
+                dd.index = [self.barcodes[j]]
                 dd.index.name = 'pid'
-                all_res.append(res)
+
+                cols2_value = {
+                    'Test Pass/Fail': res,
+                    'Failed Tests': faillist,
+                    'Test Start Time': t0,
+                    'Test Stop Time': t1,
+                    'index': dut_i+1,
+                }
+                dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
+
                 with open(self.logfile, 'a') as f:
-                    dd.to_csv(f, mode='a', header=f.tell() == 0, sep=',')
+                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
 
             self.set_window_color('pass' if all(e == 'Pass'
                                                 for e in all_res) else 'fail')
-
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
             self.table_view.clearSelection()
@@ -991,8 +1041,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         header = self.task.header_ext()
 
+        dut_num = self.task.devices()['dut']['num']
         for j, dut_i in enumerate(dut_selected):
-            header[-2 + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
+            header[-dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
             port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
         print('header', header)
@@ -1053,8 +1104,8 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
-    STATION = 'SIMULATION'
     STATION = 'LED'
+    STATION = 'SIMULATION'
     STATION = 'MainBoard'
 
     app = QApplication(sys.argv)
@@ -1079,41 +1130,39 @@ if __name__ == "__main__":
     actions_mb = [
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok)
+            'args': (win.comports, task_mb.serial_ok),
         },
         {
             'action': set_power,
-            'args': (win.power_process, win.proc_listener)
+            'args': (win.power_process, win.proc_listener),
         },
         {
             'action': enter_prompt,
-            #  'args': (win.comports, 0.2)
-            'args': (win, 0.2)
+            'args': (win, 0.2),
         },
     ]
     actions_led = [
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok)
+            'args': (win.comports, task_mb.serial_ok),
         },
         {
             'action': enter_prompt,
-            #  'args': (win.comports, 0.2)
-            'args': (win, 0.2)
+            'args': (win, 0.2),
         },
     ]
     actions_simu = [
         {
             'action': enter_prompt_simu,
-            'args': ()
+            'args': (),
         },
         {
             'action': set_power_simu,
-            'args': (win,)
+            'args': (win,),
         },
         {
             'action': dummy_com,
-            'args': (task,)
+            'args': (task,),
         }
     ]
 

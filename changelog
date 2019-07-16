@@ -1,3 +1,11 @@
+[2019.7.16 - 10:30]
+1. logs for debug message
+	a. modify mylogger.py: add FileHandler, save logs at logs/error_logs.txt
+
+2. logs for testing results
+	a. save testing result 2019_xx_xx.csv at logs/ based on current date
+	b. modification app.py:MyWindow.taskdone() 
+
 [2019.7.11 - 16:00]
 1. minor change
 	a. enter_factory_image_prompt
@@ -14,7 +22,7 @@
 	e. auto-detect button no needed
 
 2. bugs fixed
-	a. when one dut is selected, only occupy that serial port but not both 
+	a. when one dut is selected, only occupy that serial port but not both
 	b. ignore UnicodeError in serials>issue_command()
 	   - this is important! otherwise sometimes it will cause test items error and blank in the tableview
 
@@ -26,10 +34,10 @@
 
 [2019.7.08 - 09:30]
 1. overhaul runeach(), remove tasktype=3 case
-	a.unify arguments 
-		from 
+	a.unify arguments
+		from
 			runeach(self, index, port, tasktype)
-		to 
+		to
 			runeach(self, row_idx, dut_idx, sid, tasktype)
 	b. merge all separate py into one task_runeach.py (for tasktype=1 case)
 	c. v4_total_test1.json for test, including following tests
@@ -46,7 +54,7 @@
 	c. delete jsonfile/en_us/* jsonfile/zh_TW/*
 	d. move INSTRUMENT_MAP from instrument/__init__.py to app.py
 
-2. accomdate both station jsonfile 
+2. accomdate both station jsonfile
 	a. choose STATION at app.py: main()
 
 [2019.7.04 - 16:40]
@@ -55,7 +63,7 @@
 	b. define instruments json and set_instruments()
 	c. json str need to be integrate into jsonfile (v4?)
 
-2. task_led 
+2. task_led
 	a. still bugs need to be fixed. all_pass logics
 	b. exit key need to be ignored
 

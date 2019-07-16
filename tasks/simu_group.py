@@ -23,7 +23,7 @@ if __name__ == "__main__":
     logger.info('simulation group1 end...')
 
     results = []
-    rnd = lambda: random.choice(['Pass', 'Fail'])
+    rnd = lambda: random.choice(['Pass']*9+['Fail'])
     for ch in channel_group:
         results.append([rnd(), rnd()])
 
