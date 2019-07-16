@@ -1,3 +1,4 @@
+import os
 import logging
 
 
@@ -5,6 +6,10 @@ def getlogger():
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
+    log_dir = 'logs'
+    if not os.path.isdir(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+    
     # create console handler and set level to debug
     ch1 = logging.StreamHandler()
     ch2 = logging.FileHandler(r'logs/error_log.txt')
