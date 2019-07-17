@@ -5,6 +5,7 @@ import json
 import time
 import serial
 from serial.tools.list_ports import comports
+import pandas as pd
 from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject, QThread
 from threading import Timer, Thread, Event
 import argparse
@@ -58,9 +59,16 @@ def get_device(comport):
 def get_devices():
     devices = [{'comport': e.device,
                 'hwid': e.hwid,
-                'name': get_device(e)}
+                'name': get_device(e),
+                'sn': e.serial_number,
+                }
                 for e in comports()]
     return devices
+
+
+def get_devices_df():
+    device_df = pd.DataFrame(get_devices())
+    return device_df
 
 
 def filter_devices(devices, name, field='comport'):
@@ -174,7 +182,7 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
     serial.write(f'{cmd}\n'.encode('utf-8'))
     logger.info(f'issue_command: {cmd}')
     if fetch:
-        lines = serial.readlines() 
+        lines = serial.readlines()
         lines_encoded = []
         for e in lines:
             try:
@@ -218,7 +226,7 @@ class BaseSerialListener(QThread):
                     devices_prev.remove(e)
             return True
         return False
-    
+
     def port_full(self, excludes=None):
         for k,v in self.devices.items():
             if excludes:
