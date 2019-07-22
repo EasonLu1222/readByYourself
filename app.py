@@ -1148,7 +1148,7 @@ if __name__ == "__main__":
     task_mb = Task('v7_ftdi_total', my_setting)
     task_led = Task('v4_led', my_setting)
     task_simu = Task('v5_simu', my_setting)
-    task_cap_touch = Task('v6_cap_touch', my_setting)
+    task_cap_touch = Task('v7_cap_touch', my_setting)
 
     map_ = {
         'MainBoard': 'mb',
