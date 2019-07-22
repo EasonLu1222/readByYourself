@@ -22,6 +22,7 @@ class TouchPolling(QThread):
         self.key_codes = key_codes
     
     def run(self):
+        # TODO: Closing the dialog without touching all keys will cause exception 
         while True:
             cmd = 'i2cget -f -y 1 0x1f 0x00'
             lines = issue_command(self.ser, cmd)
@@ -43,20 +44,23 @@ class ContentWidget(QtWidgets.QWidget):
         self.btn_labels = []
         layout = QtWidgets.QHBoxLayout(self)
 
+        # Create 5 labels corresponding to the 5 cap touch buttons and put them in the QHBoxLayout
         for i in range(5):
             self.btn_labels.append(QtWidgets.QLabel(self.key_label_texts[i]))
             layout.addWidget(self.btn_labels[i])
+        
+        # Create a map like: {'0x01': btn_label[0], '0x02': btn_label[1], ...}
         self.key_code_to_label_map = dict(zip(self.key_codes, self.btn_labels))
         self.all_color('#FFFFFF')
         self.setLayout(layout)
         
         self.set_ports(portnames)
+        self.listen_touch()
 
     def set_ports(self, portnames):
         self.iterports = iter(portnames)
         port = next(self.iterports)
         self.ser = get_serial(port, 115200, 0.04)
-        self.listen_touch()
         
     def listen_touch(self):
         self.touchPollingThread = TouchPolling(self.ser, self.key_codes)
@@ -65,13 +69,14 @@ class ContentWidget(QtWidgets.QWidget):
     def set_signal(self):
         self.father.message_each.connect(self.next_page)
         self.father.message_end.connect(self.on_close)
-        self.touchPollingThread.touchSignal.connect(self.on_touch)  # When cap touch button is touched
+        self.touchPollingThread.touchSignal.connect(self.on_touch)
 
     def all_color(self, color_code):
         for btn_label in self.btn_labels:
             btn_label.setStyleSheet(f'background-color: {color_code}')
 
     def on_touch(self, touched_key_code):
+        # When cap touch button is touched, set the corresponding label's background color to yellow
         btn_label = self.key_code_to_label_map[touched_key_code]
         btn_label.setStyleSheet('background-color: #FFEB3B')
 
