@@ -174,7 +174,7 @@ def enter_prompt(window, ser_timeout=0.2):
         port = comports()[i]
         print('i', i, 'port', port)
         ser = get_serial(port, 115200, ser_timeout)
-        t = threading.Thread(target=enter_factory_image_prompt, args=(ser,))
+        t = threading.Thread(target=enter_factory_image_prompt, args=(ser, 7))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -1073,15 +1073,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         is_1 = self.settings.is_fx1_checked
         is_2 = self.settings.is_fx2_checked
         print('is_1', is_1, 'is_2', is_2)
-        dut_selected = [
-            w[0] for w in filter(lambda e: e[1], enumerate([is_1, is_2]))
-        ]
-        self.dut_selected = dut_selected
-        print('dut_selected', dut_selected)
+        self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. ex: [False, True] => [1]
+        print('dut_selected', self.dut_selected)
 
         header = self.task.header_ext()
 
-        for j, dut_i in enumerate(dut_selected):
+        for j, dut_i in enumerate(self.dut_selected):
             header[-self.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
             port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
@@ -1140,21 +1137,24 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
-    STATION = 'LED'
     STATION = 'SIMULATION'
     STATION = 'MainBoard'
+    STATION = 'LED'
+    STATION = 'CapTouch'
 
     app = QApplication(sys.argv)
-    mysetting = MySettings()
+    my_setting = MySettings()
 
-    task_mb = Task('v7_ftdi_total', mysetting)
-    task_led = Task('v4_led', mysetting)
-    task_simu = Task('v5_simu', mysetting)
+    task_mb = Task('v7_ftdi_total', my_setting)
+    task_led = Task('v4_led', my_setting)
+    task_simu = Task('v5_simu', my_setting)
+    task_cap_touch = Task('v6_cap_touch', my_setting)
 
     map_ = {
         'MainBoard': 'mb',
         'LED': 'led',
-        'SIMULATION': 'simu'
+        'SIMULATION': 'simu',
+        'CapTouch': 'cap_touch'
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1178,6 +1178,16 @@ if __name__ == "__main__":
         },
     ]
     actions_led = [
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, task_mb.serial_ok),
+        },
+        {
+            'action': enter_prompt,
+            'args': (win, 0.2),
+        },
+    ]
+    actions_cap_touch = [
         {
             'action': is_serial_ok,
             'args': (win.comports, task_mb.serial_ok),

@@ -171,6 +171,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
         '|-----bluetooth speaker is ready for connections------|',
         '#',
         'aml_dai_set_bclk_ratio',
+        'Initializing random number generator',
     ]
     wait_for_prompt(serial, waitwords[waitwordidx])
     if press_enter:
