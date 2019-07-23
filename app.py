@@ -822,8 +822,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.pushDetect.clicked.connect(self.btn_detect)
         #  self.pushDetect.clicked.connect(self.btn_detect_mb)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
-        self.barcode_dialog.barcode_dialog_closed.connect(
-            self.on_barcode_dialog_closed)
+        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
         self.task.task_result.connect(self.taskrun)
         self.task.task_each.connect(self.taskeach)
