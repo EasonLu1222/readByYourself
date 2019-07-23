@@ -2,22 +2,20 @@ import os
 import sys
 import json
 import time
-from datetime import datetime
 import pickle
 import threading
+import pandas as pd
+from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
 
-from PyQt5.QtWidgets import (QTableWidgetItem, QLabel, QTableView,
-                             QAbstractItemView, QHBoxLayout, QWidget,
-                             QProgressDialog)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton, QErrorMessage, 
+                             QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
+                             QHBoxLayout, QWidget, QProgressDialog)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QErrorMessage
 from PyQt5.QtGui import QFont, QColor
-
-import pandas as pd
 
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
@@ -30,7 +28,6 @@ from serials import (enter_factory_image_prompt, get_serial, se, get_device,
 from forwardable import forwardable
 from instrument import update_serial, generate_instruments, PowerSupply, DMM
 from ui.design3 import Ui_MainWindow
-
 from mylogger import logger
 
 
@@ -111,7 +108,6 @@ def is_serial_ok(comports, signal_from):
     print('signal_from', signal_from)
     if not all(is_serial_free(p) for p in comports()):
         print('not all serial port are free!')
-        #  self.window.pushButton.setEnabled(True)
         signal_from.emit(False)
         return False
     else:
@@ -143,7 +139,6 @@ def set_power(power_process, proc_listener):
     for idx in range(1, 3):
         args = [str(idx)]
         proc = Popen(['python', '-m', script] + args, stdout=PIPE)
-        #  self.power_process[idx] = proc
         power_process[idx] = proc
     proc_listener.set_process(power_process)
     proc_listener.start()
@@ -273,7 +268,6 @@ class Task(QThread):
         if dut_names:
             return dut_names
         else:
-            #  pcs = self.base['pcs']
             num = self.dut_num
             header = ['#%d' % e for e in list(range(1, 1 + num))]
             return header
@@ -300,7 +294,6 @@ class Task(QThread):
         script = 'tasks.%s' % each['script']
         tasktype = each['tasktype']
         args = [str(e) for e in each['args']]if each['args'] else []
-        #  args = each['args'] if each['args'] else None
         return each, script, tasktype, args
 
     def rungroup(self, groupname):
@@ -460,7 +453,6 @@ class Task(QThread):
             't0': t0,
             't1': t1,
         }
-        #  self.message.emit('tasks done')
         self.message.emit(json.dumps(message))
 
 
@@ -574,53 +566,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 f.write('')
         return path
 
-    #  def btn_detect(self):
-        #  self.pushDetect.setText(f'{self.push_detect_text}...')
-        #  print("btn_detect")
-        #  self.pushDetect.setEnabled(False)
-        #  t = threading.Thread(target=check_which_port_when_poweron,
-                             #  args=(self._comports_dut, ))
-        #  t.start()
-
-    #  def btn_detect_mb_after(self):
-        #  print('btn_detect_mb_after start')
-        #  if self.port_autodecting:
-            #  print('port_autodecting...')
-            #  power1 = self.task.instruments['gw_powersupply'][0]
-            #  print('power1', power1)
-            #  self.poweron(power1)
-            #  t = threading.Thread(target=check_which_port_when_poweron,
-                                 #  args=(self._comports_dut, ))
-            #  t.start()
-
-    #  def btn_detect_mb(self):
-        #  print("btn_detect_mb start")
-        #  #  self.pushDetect.setText(
-            #  #  f'#1 port auto detect... please turn on the #1 powersupply')
-        #  self.pushDetect.setEnabled(False)
-        #  self.port_autodecting = True
-        #  self.btn_detect_mb_after()
-
-    #  def detect_received(self, comport_when_poweron_first_dut):
-        #  print('detect_received start')
-        #  if self._comports_dut[0] != comport_when_poweron_first_dut:
-            #  print('reverse comport!!!')
-            #  self._comports_dut[0], self._comports_dut[1] = self._comports_dut[
-                #  1], self._comports_dut[0]
-        #  self.render_port_plot()
-        #  #  self.pushDetect.setEnabled(True)
-        #  self.port_autodecting = False
-        #  self.clean_power()
-        #  self.pushDetect.setText(
-            #  f"{self.push_detect_text} ---> {comport_when_poweron_first_dut}")
-
     def dummy_com(self, coms):
         self._comports_dut = coms
         self.instrument_ready(True)
 
     def clean_power(self):
         print('clean_power start')
-        # prevent from last crash and power supply not closed normally
+        # Prevent from last crash and power supply not closed normally
         for power in self.instruments['gw_powersupply']:
             if not power.is_open:
                 power.open_com()
@@ -782,14 +734,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if ready:
             print('\nREADY\n!')
             self.clean_power()
-            #  self.ser_listener.stop()
 
             # order: power1,power2, dmm1
             instruments_to_dump = sum(self.instruments.values(), [])
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
-
-            #  self.btn_detect_mb()
 
             self.pushButton.setEnabled(True)
         else:
@@ -798,7 +747,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def comports(self):
         comports_as_list = list(filter(lambda x:x, self._comports_dut.values()))
-        #  return self._comports_dut
         return comports_as_list
 
     def setsignal(self):
@@ -807,8 +755,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
-        #  self.pushDetect.clicked.connect(self.btn_detect)
-        #  self.pushDetect.clicked.connect(self.btn_detect_mb)
         self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
         self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
         self.pushButton.clicked.connect(self.btn_clicked)
@@ -816,7 +762,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
         se.serial_msg.connect(self.printterm1)
-        #  se.detect_notice.connect(self.detect_received)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
 
@@ -876,7 +821,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('self.comports', self.comports())
             if 'port' in ret:
                 port = ret['port']
-                #  j = self.comports.index(port)
                 j = self.comports().index(port)
             elif 'idx' in ret:
                 j = ret['idx']
@@ -923,7 +867,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print(d)
             print(d.columns)
             print(d.columns[-dut_num])
-            #  d.to_csv('debug.csv')
 
             for j, dut_i in enumerate(self.dut_selected):
                 res = 'Pass' if all_pass(
