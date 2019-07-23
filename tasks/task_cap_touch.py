@@ -51,25 +51,26 @@ class ContentWidget(QtWidgets.QWidget):
         
         # Create a map like: {'0x01': btn_label[0], '0x02': btn_label[1], ...}
         self.key_code_to_label_map = dict(zip(self.key_codes, self.btn_labels))
-        self.all_color('#FFFFFF')
         self.setLayout(layout)
         
-        self.set_ports(portnames)
-        self.listen_touch()
-
-    def set_ports(self, portnames):
         self.iterports = iter(portnames)
+        self.init_test()
+        
+
+    def init_test(self):
+        if hasattr(self, 'ser') and self.ser.is_open:
+            self.ser.close()
+        self.all_color('#FFFFFF')
         port = next(self.iterports)
         self.ser = get_serial(port, 115200, 0.04)
-        
-    def listen_touch(self):
         self.touchPollingThread = TouchPolling(self.ser, self.key_codes)
+        self.touchPollingThread.touchSignal.connect(self.on_touch)
         self.touchPollingThread.start()
+        logger.info('init_test')
 
     def set_signal(self):
-        self.father.message_each.connect(self.next_page)
+        self.father.message_each.connect(self.init_test)
         self.father.message_end.connect(self.on_close)
-        self.touchPollingThread.touchSignal.connect(self.on_touch)
 
     def all_color(self, color_code):
         for btn_label in self.btn_labels:
@@ -84,11 +85,6 @@ class ContentWidget(QtWidgets.QWidget):
         logger.info('on_close')
         self.ser.close()
         sys.stdout.write(json.dumps(msg))
-
-    def next_page(self):
-        self.ser.close()
-        self.ser = get_serial(next(self.iterports), 115200, 0.04)
-        logger.info('next_page')
 
 
 if __name__ == "__main__":
