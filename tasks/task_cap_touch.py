@@ -20,10 +20,11 @@ class TouchPolling(QThread):
         super(TouchPolling, self).__init__(parent)
         self.ser = ser
         self.key_codes = key_codes[:]
+        self.kill = False
     
     def run(self):
         # TODO: Closing the dialog without touching all keys will cause exception 
-        while True:
+        while not self.kill:
             cmd = 'i2cget -f -y 1 0x1f 0x00'
             lines = issue_command(self.ser, cmd)
             if len(lines)>1:
@@ -58,15 +59,20 @@ class ContentWidget(QtWidgets.QWidget):
         
 
     def init_test(self):
-        if hasattr(self, 'ser') and self.ser.is_open:
-            self.ser.close()
-        self.all_color('#FFFFFF')
+        self.clear_test()
         port = next(self.iterports)
         self.ser = get_serial(port, 115200, 0.04)
         self.touchPollingThread = TouchPolling(self.ser, self.key_codes)
         self.touchPollingThread.touchSignal.connect(self.on_touch)
         self.touchPollingThread.start()
         logger.info('init_test')
+    
+    def clear_test(self):
+        if hasattr(self, 'touchPollingThread'):
+            self.touchPollingThread.kill = True
+        if hasattr(self, 'ser') and self.ser.is_open:
+            self.ser.close()
+        self.all_color('#FFFFFF')
 
     def set_signal(self):
         self.father.message_each.connect(self.init_test)
@@ -83,7 +89,7 @@ class ContentWidget(QtWidgets.QWidget):
 
     def on_close(self, msg):
         logger.info('on_close')
-        self.ser.close()
+        self.clear_test()
         sys.stdout.write(json.dumps(msg))
 
 
