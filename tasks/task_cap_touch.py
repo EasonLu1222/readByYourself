@@ -19,7 +19,7 @@ class TouchPolling(QThread):
     def __init__(self, ser, key_codes = [], parent=None):
         super(TouchPolling, self).__init__(parent)
         self.ser = ser
-        self.key_codes = key_codes
+        self.key_codes = key_codes[:]
     
     def run(self):
         # TODO: Closing the dialog without touching all keys will cause exception 
