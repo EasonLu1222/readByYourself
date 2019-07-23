@@ -206,12 +206,11 @@ class Task(QThread):
     message = QSignal(str)
     printterm_msg = QSignal(str)
 
-    def __init__(self, json_name, settings, json_root='jsonfile'):
+    def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
-        self.settings = settings
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
@@ -275,7 +274,7 @@ class Task(QThread):
             return dut_names
         else:
             #  pcs = self.base['pcs']
-            num = self.devices['dut']['num']
+            num = self.dut_num
             header = ['#%d' % e for e in list(range(1, 1 + num))]
             return header
 
@@ -465,38 +464,27 @@ class Task(QThread):
         self.message.emit(json.dumps(message))
 
 
-class Settings():
-    def __init__(self, key1, key2):
-        self._settings = QSettings(key1, key2)
-
-    def get(self, key, default, key_type):
-        return self._settings.value(key, default, key_type)
-
-    def set(self, key, value):
-        self._settings.setValue(key, value)
-        self.update()
-
-
-class MySettings(Settings):
+class MySettings():
     lang_list = [
         'en_US',
         'zh_TW',
     ]
     def __init__(self):
-        super(MySettings, self).__init__('FAB', 'SAP109')
+        self.settings = QSettings('FAB', 'SAP109')
         self.update()
+    
+    def get(self, key, default, key_type):
+        return self.settings.value(key, default, key_type)
+    
+    def set(self, key, value):
+        self.settings.setValue(key, value)
+        setattr(self, key, value)
 
     def update(self):
         self.is_fx1_checked = self.get('fixture_1', False, bool)
         self.is_fx2_checked = self.get('fixture_2', False, bool)
         self.lang_index = self.get('lang_index', 0, int)
         self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
-
-    @property
-    def lang(self, lower=False):
-        language = self.lang_list[self.lang_index]
-        if lower: language = language.lower()
-        return language
 
 
 @forwardable()
@@ -519,7 +507,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_barcodes = {}
 
         self.set_task(task)
-        self.settings = task.settings
+        self.settings = MySettings()
 
         # Restore UI states
         self.checkBoxFx1.setChecked(self.settings.is_fx1_checked)
@@ -1019,12 +1007,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         event.accept()  # let the window close
 
     def chk_box_fx1_state_changed(self, status):
-        #  self.settings.setValue("fixture_1", status == Qt.Checked)
         self.settings.set("fixture_1", status == Qt.Checked)
         print('chk_box_fx1_state_changed', self.settings.is_fx1_checked)
 
     def chk_box_fx2_state_changed(self, status):
-        #  self.settings.setValue("fixture_2", status == Qt.Checked)
         self.settings.set("fixture_2", status == Qt.Checked)
         print('chk_box_fx2_state_changed', self.settings.is_fx2_checked)
 
@@ -1038,7 +1024,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pwd_dialog.show()
 
     def toggle_engineering_mode(self, is_on):
-        #  self.settings.setValue("is_eng_mode_on", is_on)
         self.settings.set("is_eng_mode_on", is_on)
         if is_on:
             self.splitter.show()
@@ -1142,12 +1127,11 @@ if __name__ == "__main__":
     STATION = 'CapTouch'
 
     app = QApplication(sys.argv)
-    my_setting = MySettings()
 
-    task_mb = Task('v7_ftdi_total', my_setting)
-    task_led = Task('v4_led', my_setting)
-    task_simu = Task('v5_simu', my_setting)
-    task_cap_touch = Task('v7_cap_touch', my_setting)
+    task_mb = Task('v7_ftdi_total')
+    task_led = Task('v4_led')
+    task_simu = Task('v5_simu')
+    task_cap_touch = Task('v7_cap_touch')
 
     map_ = {
         'MainBoard': 'mb',
