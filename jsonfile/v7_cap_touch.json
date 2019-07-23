@@ -3,8 +3,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 1,
-        "sn": ["00000000A"]
+        "num": 2,
+        "sn": ["A43QHNAMA", "00000000A"]
     }
  },
  "structure":
