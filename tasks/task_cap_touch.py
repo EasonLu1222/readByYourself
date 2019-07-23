@@ -23,7 +23,6 @@ class TouchPolling(QThread):
         self.kill = False
     
     def run(self):
-        # TODO: Closing the dialog without touching all keys will cause exception 
         while not self.kill:
             cmd = 'i2cget -f -y 1 0x1f 0x00'
             lines = issue_command(self.ser, cmd)
