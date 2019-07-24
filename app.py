@@ -792,9 +792,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def color_check(self, s):
         if s.startswith('Pass'):
-            color = QColor(1, 255, 0)
+            color = QColor(139, 195, 74)
         elif s.startswith('Fail'):
-            color = QColor(255, 0, 0)
+            color = QColor(255, 87, 34)
         else:
             color = QColor(255, 255, 255)
         return color
