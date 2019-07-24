@@ -10,9 +10,9 @@ from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton, QErrorMessage, 
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QHBoxLayout, QWidget, QProgressDialog)
+                             QWidget)
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtGui import QFont, QColor
@@ -347,7 +347,7 @@ class Task(QThread):
             print('outputs is None!!!!')
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
-        msg2 = '[task %s][outputs: %s]' % (index, outputs)
+        msg2 = '[task %s][outputs: %s]' % (index, outputs)  # E.g. outputs = ['Passed', 'Failed']
         self.printterm_msg.emit(msg2)
 
         for idx, output in enumerate(outputs):
@@ -385,7 +385,6 @@ class Task(QThread):
             if len(items) > 1:
                 self.task_each.emit([i, len(items)])
                 proc = self.rungroup(group)
-                #  output, _ = proc.communicate().decode('utf8')
                 output, _ = proc.communicate()
                 print('OUTPUT', output)
 
@@ -496,7 +495,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
         self.barcodes = []
-        self.port_barcodes = {}
+        self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
 
         self.set_task(task)
         self.settings = MySettings()
@@ -509,7 +508,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
         #  self._comports_dut = []
-        self._comports_dut = dict.fromkeys(range(self.dut_num), None)
+        self._comports_dut = dict.fromkeys(range(self.dut_num), None)   # E.g. {0: None, 1: None}
         self._comports_pwr = []
         self._comports_dmm = []
 
@@ -810,11 +809,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for i in range(*idx):
                 for j in self.dut_selected:
                     x = output[i - idx[0]][j]
-                    self.table_view.setItem(i, self.col_dut_start + j,
-                                            QTableWidgetItem(x))
-                    self.table_view.item(i,
-                                         self.col_dut_start + j).setBackground(
-                                             self.color_check(x))
+                    self.table_view.setItem(i, self.col_dut_start + j, QTableWidgetItem(x))
+                    self.table_view.item(i, self.col_dut_start + j).setBackground(self.color_check(x))
         else:
             output = str(ret['output'])
             print('runeach output', output)
@@ -1000,7 +996,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         is_1 = self.settings.is_fx1_checked
         is_2 = self.settings.is_fx2_checked
         print('is_1', is_1, 'is_2', is_2)
-        self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. ex: [False, True] => [1]
+        self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. E.g.: [False, True] => [1]
         print('dut_selected', self.dut_selected)
 
         header = self.task.header_ext()
