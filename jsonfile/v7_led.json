@@ -2,8 +2,9 @@
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
  "devices": {
     "dut": {
-        "name": "cygnal_cp2102",
-        "num": 2
+        "name": "ftdi",
+        "num": 2,
+        "sn": ["A43QHNAMA", "00000000A"]
     }
  },
  "structure":

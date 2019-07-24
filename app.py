@@ -1068,7 +1068,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     task_mb = Task('v7_ftdi_total')
-    task_led = Task('v4_led')
+    task_led = Task('v7_led')
     task_simu = Task('v5_simu')
     task_cap_touch = Task('v7_cap_touch')
 
