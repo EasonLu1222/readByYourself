@@ -297,8 +297,7 @@ class Task(QThread):
         return each, script, tasktype, args
 
     def rungroup(self, groupname):
-        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(
-            groupname)
+        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
         print(
             f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]'
         )
@@ -311,9 +310,7 @@ class Task(QThread):
         print('limits', limits)
         args = {'args': args, 'limits': limits}
         port_dmm = self.instruments['gw_dmm'][0].com
-        proc = Popen(['python', '-m', script, '-pm', port_dmm] +
-                     [json.dumps(args)],
-                     stdout=PIPE)
+        proc = Popen(['python', '-m', script, '-pm', port_dmm] + [json.dumps(args)], stdout=PIPE)
         return proc
 
     def runeach(self, row_idx, dut_idx, sid, tasktype):
@@ -333,6 +330,12 @@ class Task(QThread):
         return proc
 
     def runeachports(self, index, ports):
+        '''
+        Set the window background color based on the test result
+        Args:
+            index (int): The row index of the test item
+            ports (str): The COM ports concatenated by "," e.g. "COM1,COM2"
+        '''
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
@@ -350,8 +353,9 @@ class Task(QThread):
         msg2 = '[task %s][outputs: %s]' % (index, outputs)  # E.g. outputs = ['Passed', 'Failed']
         self.printterm_msg.emit(msg2)
 
+        port_list = ports.split(',')
         for idx, output in enumerate(outputs):
-            result = json.dumps({'index': index, 'idx': idx, 'output': output})
+            result = json.dumps({'index': index, 'port': port_list[idx], 'idx': idx, 'output': output})
             self.task_result.emit(result)
 
     def register_action(self, actions):
@@ -440,8 +444,12 @@ class Task(QThread):
                         print('run: result', result)
                         self.task_result.emit(result)
                 else:
-                    ports = ','.join(self.window.comports())
-                    self.runeachports(i, ports)
+                    selected_port_list = []
+                    for selected_i in self.window.dut_selected:
+                        selected_port_list.append(self.window._comports_dut[selected_i])
+
+                    selected_port_str = ','.join(selected_port_list)
+                    self.runeachports(i, selected_port_str)
                 QThread.msleep(500)
 
         t1 = time_()
@@ -469,7 +477,7 @@ class MySettings():
     
     def set(self, key, value):
         self.settings.setValue(key, value)
-        setattr(self, key, value)
+        self.update()
 
     def update(self):
         self.is_fx1_checked = self.get('fixture_1', False, bool)
@@ -589,7 +597,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.table_view.setRowHidden(i, is_hidden)
             old_new[i] = count
         old_new[len(old_new)] = count + 1
-        self.table_view.setVerticalHeaderLabels(str(e) for  e in old_new.values())
+        self.table_view.setVerticalHeaderLabels(str(e) for e in old_new.values())
 
     def recieve_power(self, process_results):
         print('recieve_power', process_results)
@@ -616,8 +624,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for col in [0, 1, 2, 3, 4]:
             self.table_view.setColumnHidden(col, True)
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        self.table_view.setItem(self.task.len(), 0,
-                                QTableWidgetItem(self.summary_text))
+        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
 
     def poweron(self, power):
         print('poweron start')
@@ -800,7 +807,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         return color
 
     def taskrun(self, result):
-        ret = json.loads(result)
+        ret = json.loads(result)    # E.g. {'index': 0, 'idx': 0, 'output': 'Passed'}
         idx = ret['index']
 
         if type(idx) == list:
@@ -814,17 +821,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             output = str(ret['output'])
             print('runeach output', output)
-            print('self.comports', self.comports())
+            print('self.comports', self.comports()) # E.g. ['COM1', 'COM2']
             if 'port' in ret:
                 port = ret['port']
                 j = self.comports().index(port)
             elif 'idx' in ret:
                 j = ret['idx']
             print('task %s are done, j=%s' % (idx, j))
-            self.table_view.setItem(idx, self.col_dut_start + j,
-                                    QTableWidgetItem(output))
-            self.table_view.item(idx, self.col_dut_start + j).setBackground(
-                self.color_check(output))
+            self.table_view.setItem(idx, self.col_dut_start + j, QTableWidgetItem(output))
+            self.table_view.item(idx, self.col_dut_start + j).setBackground(self.color_check(output))
 
     def taskdone(self, message):
         print('taskdone start !')
@@ -919,15 +924,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         print('btn_clicked')
         self.barcodes = []
 
-        #  for port in self._comports_dut:
-            #  self.port_barcodes[port] = None
-
         for dut_i, port in self._comports_dut.items():
             if port:
                 self.port_barcodes[port] = None
 
-        if (not self.checkBoxFx1.isChecked()) and (
-                not self.checkBoxFx2.isChecked()):
+        if (not self.checkBoxFx1.isChecked()) and (not self.checkBoxFx2.isChecked()):
             e_msg = QErrorMessage(self)
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
@@ -1138,8 +1139,4 @@ if __name__ == "__main__":
     task.register_action(actions)
 
     print('main end')
-    try:
-        app.exec_()
-    except Exception as ex:
-        print(f'\n\ncatch!!!\n{ex}')
-        raise ex
+    app.exec_()

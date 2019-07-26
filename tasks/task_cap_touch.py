@@ -23,16 +23,19 @@ class TouchPolling(QThread):
         self.kill = False
     
     def run(self):
-        while not self.kill:
-            cmd = 'i2cget -f -y 1 0x1f 0x00'
-            lines = issue_command(self.ser, cmd)
-            if len(lines)>1:
-                key_code = lines[1].rstrip()
-                if key_code in self.key_codes:
-                    self.touchSignal.emit(key_code)
-                    self.key_codes.remove(key_code)
-                    if not self.key_codes:
-                        break
+        try:
+            while not self.kill:
+                cmd = 'i2cget -f -y 1 0x1f 0x00'
+                lines = issue_command(self.ser, cmd)
+                if len(lines)>1:
+                    key_code = lines[1].rstrip()
+                    if key_code in self.key_codes:
+                        self.touchSignal.emit(key_code)
+                        self.key_codes.remove(key_code)
+                        if not self.key_codes:
+                            break
+        except JSONDecodeError:
+            print("TouchPolling thread terminated!")
         self.ser.close()
 
 class ContentWidget(QtWidgets.QWidget):
