@@ -115,6 +115,9 @@ def is_serial_ok(comports, signal_from):
         signal_from.emit(True)
         return True
 
+def disable_power_check():
+    win.power_recieved = True
+    return True
 
 def set_power_simu(win):
     win.power_recieved = True
@@ -847,8 +850,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                         power.off()
                         power.close_com()
             r = self.task.len()
-            all_pass = lambda results: all(
-                e.startswith('Pass') for e in results)
+            all_pass = lambda results: all(e.startswith('Pass') for e in results)
 
             def fail_list(series):
                 idx = series[series.fillna('').str.startswith('Fail')].index
@@ -856,8 +858,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dd = d[d.index.isin(idx)]
                 items = (dd['group'] + ': ' + dd['item']).values.tolist()
                 indexes = [self.rowlabel_old_new[i] for i in idx]
-                faillist = ','.join([ f'#{i}({j})' for i,j in zip(indexes,items)])
-                return faillist
+                fail_list = ','.join([ f'#{i}({j})' for i,j in zip(indexes,items)])
+                return fail_list
 
             d = self.task.df
             all_res = []
@@ -870,27 +872,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print(d.columns[-dut_num])
 
             for j, dut_i in enumerate(self.dut_selected):
-                res = 'Pass' if all_pass(
-                    d[d.hidden == False][d.columns[-dut_num + dut_i]]) else 'Fail'
+                res = 'Pass' if all_pass(d[d.hidden == False][d.columns[-dut_num + dut_i]]) else 'Fail'
 
-                faillist = fail_list(d[d.columns[-dut_num+dut_i]])
-                print('faillist', faillist)
-                self.table_view.setItem(r, self.col_dut_start + dut_i,
-                                        QTableWidgetItem(res))
-                self.table_view.item(r, self.col_dut_start + dut_i).setBackground(
-                    self.color_check(res))
+                fail_list = fail_list(d[d.columns[-dut_num+dut_i]])
+                print('fail_list', fail_list)
+                self.table_view.setItem(r, self.col_dut_start + dut_i, QTableWidgetItem(res))
+                self.table_view.item(r, self.col_dut_start + dut_i).setBackground(self.color_check(res))
                 all_res.append(res)
 
                 df = d[d.hidden == False]
                 cols1 = (df.group + ': ' + df.item).values.tolist()
-                dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T,
-                                  columns=cols1)
+                dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
                 dd.index = [self.barcodes[j]]
                 dd.index.name = 'pid'
 
                 cols2_value = {
                     'Test Pass/Fail': res,
-                    'Failed Tests': faillist,
+                    'Failed Tests': fail_list,
                     'Test Start Time': t0,
                     'Test Stop Time': t1,
                     'index': dut_i+1,
@@ -900,8 +898,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
 
-            self.set_window_color('pass' if all(e == 'Pass'
-                                                for e in all_res) else 'fail')
+            self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
             self.table_view.clearSelection()
@@ -1102,6 +1099,10 @@ if __name__ == "__main__":
     ]
     actions_led = [
         {
+            'action': disable_power_check,
+            'args': (),
+        },
+        {
             'action': is_serial_ok,
             'args': (win.comports, task_mb.serial_ok),
         },
@@ -1111,6 +1112,10 @@ if __name__ == "__main__":
         },
     ]
     actions_cap_touch = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        },
         {
             'action': is_serial_ok,
             'args': (win.comports, task_mb.serial_ok),
