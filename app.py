@@ -359,6 +359,9 @@ class Task(QThread):
         port_list = ports.split(',')
         for idx, output in enumerate(outputs):
             result = json.dumps({'index': index, 'port': port_list[idx], 'idx': idx, 'output': output})
+            self.df.iat[index,
+                        len(self.header()) +
+                        self.window.dut_selected[idx]] = output
             self.task_result.emit(result)
 
     def register_action(self, actions):
@@ -872,7 +875,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print(d.columns[-dut_num])
 
             for j, dut_i in enumerate(self.dut_selected):
-                res = 'Pass' if all_pass(d[d.hidden == False][d.columns[-dut_num + dut_i]]) else 'Fail'
+                results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
+                res = 'Pass' if all_pass(results_) else 'Fail'
 
                 fail_list = fail_list(d[d.columns[-dut_num+dut_i]])
                 print('fail_list', fail_list)
