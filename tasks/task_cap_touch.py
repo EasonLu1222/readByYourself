@@ -6,6 +6,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QThread, pyqtSignal
 from view import task_dialog
 from serials import get_serial, issue_command
+from serial.serialutil import SerialException
+from json import JSONDecodeError
 from mylogger import logger
 
 
@@ -23,20 +25,23 @@ class TouchPolling(QThread):
         self.kill = False
     
     def run(self):
-        try:
-            while not self.kill:
-                cmd = 'i2cget -f -y 1 0x1f 0x00'
+        while not self.kill:
+            cmd = 'i2cget -f -y 1 0x1f 0x00'
+            try:
                 lines = issue_command(self.ser, cmd)
-                if len(lines)>1:
-                    key_code = lines[1].rstrip()
-                    if key_code in self.key_codes:
-                        self.touchSignal.emit(key_code)
-                        self.key_codes.remove(key_code)
-                        if not self.key_codes:
-                            break
-        except JSONDecodeError:
-            print("TouchPolling thread terminated!")
-        self.ser.close()
+            except (TypeError, JSONDecodeError, SerialException):
+                logger.info('TouchPolling thread terminated!')
+                self.kill = True
+                break
+            if len(lines)>1:
+                key_code = lines[1].rstrip()
+                if key_code in self.key_codes:
+                    self.touchSignal.emit(key_code)
+                    self.key_codes.remove(key_code)
+                    if not self.key_codes:
+                        break
+        if hasattr(self, 'ser') and self.ser.is_open:
+            self.ser.close()
 
 class ContentWidget(QtWidgets.QWidget):
     def __init__(self, portnames, *args, **kwargs):
@@ -90,7 +95,7 @@ class ContentWidget(QtWidgets.QWidget):
         btn_label.setStyleSheet('background-color: #FFEB3B')
 
     def on_close(self, msg):
-        logger.info('on_close')
+        logger.info(f'on_close {msg}')
         self.clear_test()
         sys.stdout.write(json.dumps(msg))
 
