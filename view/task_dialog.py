@@ -124,3 +124,7 @@ class MyDialog(QtWidgets.QDialog):
             self.message_end.emit(list(self.passes.values()))
             self.close()
         self.idx += 1
+    
+    def keyPressEvent(self, event):
+        if event.key() is QtCore.Qt.Key_Escape:
+            pass
