@@ -1066,6 +1066,7 @@ if __name__ == "__main__":
     STATION = 'MainBoard'
     STATION = 'LED'
     STATION = 'CapTouch'
+    STATION = 'RF'
 
     app = QApplication(sys.argv)
 
@@ -1073,12 +1074,14 @@ if __name__ == "__main__":
     task_led = Task('v7_led')
     task_simu = Task('v5_simu')
     task_cap_touch = Task('v7_cap_touch')
+    task_rf = Task('v7_rf')
 
     map_ = {
         'MainBoard': 'mb',
         'LED': 'led',
         'SIMULATION': 'simu',
-        'CapTouch': 'cap_touch'
+        'CapTouch': 'cap_touch',
+        'RF': 'rf',
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1116,6 +1119,20 @@ if __name__ == "__main__":
         },
     ]
     actions_cap_touch = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        },
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, task_mb.serial_ok),
+        },
+        {
+            'action': enter_prompt,
+            'args': (win, 0.2),
+        },
+    ]
+    actions_rf = [
         {
             'action': disable_power_check,
             'args': (),

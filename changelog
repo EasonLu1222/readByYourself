@@ -1,3 +1,7 @@
+[2019.8.12 - 17:20]
+1. prepare for RF test station development
+	a. add one jasonfile v7_rf.json & modify tasks/task_runeach.py
+
 [2019.7.17 - 13:45]
 1. auto dut comport detection using ftdi uart-usb connector
 	a. v7 jasonfile: v7_ftdi_total.json & v7_cp2102_total.json

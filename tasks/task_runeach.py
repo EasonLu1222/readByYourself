@@ -8,6 +8,7 @@ import random
 import argparse
 import inspect
 from operator import itemgetter
+from subprocess import Popen, PIPE
 from serials import issue_command, get_serial
 
 from mylogger import logger
@@ -31,7 +32,7 @@ def write_usid(sid):
         result =  f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
         return result
     return None
-    
+
 
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
@@ -146,6 +147,31 @@ def check_max_current(dut_idx):
 def check_something(portname):
     time.sleep(1.5)
     return random.choice(['Pass']*9+['Fail'])
+
+
+workdir = 'C:/LitePoint/IQfact_plus/IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin/'
+exe = 'IQfactRun_Console.exe'
+script1 = 'FIT_TEST_Sample_Flow1.txt'
+script2 = 'FIT_TEST_Sample_Flow2.txt'
+
+
+def check_rf_test1(portname, dut_idx):
+    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
+    proc = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}'], stdout=PIPE)
+    outputs, _ = proc.communicate()
+    logger.info('output: %s', outputs)
+    result = 'Pass'
+    return result
+
+
+def check_rf_test2(portname, dut_idx):
+    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
+    proc = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}'], stdout=PIPE)
+    outputs, _ = proc.communicate()
+    logger.info('output: %s', outputs)
+    result = 'Fail'
+    return result
+
 
 
 if __name__ == "__main__":
