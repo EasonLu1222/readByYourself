@@ -855,7 +855,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             r = self.task.len()
             all_pass = lambda results: all(e.startswith('Pass') for e in results)
 
-            def fail_list(series):
+            def get_fail_list(series):
                 idx = series[series.fillna('').str.startswith('Fail')].index
                 d = self.task.df
                 dd = d[d.index.isin(idx)]
@@ -878,7 +878,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
                 res = 'Pass' if all_pass(results_) else 'Fail'
 
-                fail_list = fail_list(d[d.columns[-dut_num+dut_i]])
+                fail_list = get_fail_list(d[d.columns[-dut_num+dut_i]])
                 print('fail_list', fail_list)
                 self.table_view.setItem(r, self.col_dut_start + dut_i, QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + dut_i).setBackground(self.color_check(res))
