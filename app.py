@@ -25,7 +25,6 @@ from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron,
                      filter_devices, get_devices_df, BaseSerialListener)
 
-from forwardable import forwardable
 from instrument import update_serial, generate_instruments, PowerSupply, DMM
 from ui.design3 import Ui_MainWindow
 from mylogger import logger
@@ -492,12 +491,8 @@ class MySettings():
         self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
 
 
-@forwardable()
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
-    def_delegators('task', 'dut_num')
-    def_delegators('task', 'instruments')
-    def_delegators('task', 'devices')
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -522,16 +517,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
         #  self._comports_dut = []
-        self._comports_dut = dict.fromkeys(range(self.dut_num), None)   # E.g. {0: None, 1: None}
+        self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
         self._comports_pwr = []
         self._comports_dmm = []
 
-        update_serial(self.instruments, 'gw_powersupply', self._comports_pwr)
-        update_serial(self.instruments, 'gw_dmm', self._comports_dmm)
+        update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
+        update_serial(self.task.instruments, 'gw_dmm', self._comports_dmm)
 
         self.dut_layout = []
-        colors = ['#edd'] * self.dut_num
-        for i in range(self.dut_num):
+        colors = ['#edd'] * self.task.dut_num
+        for i in range(self.task.dut_num):
             c = QWidget()
             c.setStyleSheet(f'background-color:{colors[i]};')
             layout = QHBoxLayout(c)
@@ -540,7 +535,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.setsignal()
 
-        self.ser_listener = SerialListener(devices=self.devices)
+        self.ser_listener = SerialListener(devices=self.task.devices)
         self.ser_listener.comports_dut.connect(self.ser_update)
         self.ser_listener.comports_pwr.connect(self.pwr_update)
         self.ser_listener.comports_dmm.connect(self.dmm_update)
@@ -586,7 +581,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def clean_power(self):
         print('clean_power start')
         # Prevent from last crash and power supply not closed normally
-        for power in self.instruments['gw_powersupply']:
+        for power in self.task.instruments['gw_powersupply']:
             if not power.is_open:
                 power.open_com()
             if power.ser:
@@ -656,29 +651,29 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def pwr_update(self, comports):
         print('pwr_update', comports)
         self._comports_pwr = comports
-        update_serial(self.instruments, 'gw_powersupply', comports)
+        update_serial(self.task.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
 
     def dmm_update(self, comports):
         print('dmm_update', comports)
         self._comports_dmm = comports
-        update_serial(self.instruments, 'gw_dmm', comports)
+        update_serial(self.task.instruments, 'gw_dmm', comports)
         self.render_port_plot()
 
     def ser_update(self, comports):
         print('ser_update', comports)
-        dut_name, sn_numbers = itemgetter('name', 'sn')(self.devices['dut'])
+        dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
         df = get_devices_df()
 
         if sn_numbers:
-            assert len(sn_numbers) == self.dut_num
+            assert len(sn_numbers) == self.task.dut_num
             if len(df)>0:
                 for dut_i, sn in zip(self._comports_dut, sn_numbers):
                     df_ = df[df.sn==sn]
                     comport = df_.iat[0,0] if len(df_)==1 else None
                     self._comports_dut[dut_i] = comport
             else:
-                self._comports_dut = dict.fromkeys(range(self.dut_num), None)
+                self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)
         else:
             dict_to_nonempty_list = lambda dict_: list(filter(lambda x:x, list(dict_.values())))
             list_ = dict_to_nonempty_list(self._comports_dut)
@@ -727,9 +722,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.dut_layout[i].addWidget(lb_port)
 
         colors_inst = {'gw_powersupply': '#712', 'gw_dmm': '#4a3'}
-        for name, num in self.instruments.items():
+        for name, num in self.task.instruments.items():
             print('name', name, 'num', num)
-            each_instruments = self.instruments[name]
+            each_instruments = self.task.instruments[name]
             for i, e in enumerate(each_instruments):
                 print(
                     f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
@@ -739,7 +734,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     lb_port.setStyleSheet(style_(colors_inst[name]))
                     self.dut_layout[i].addWidget(lb_port)
 
-        for i in range(self.dut_num):
+        for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
 
     def instrument_ready(self, ready):
@@ -748,7 +743,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clean_power()
 
             # order: power1,power2, dmm1
-            instruments_to_dump = sum(self.instruments.values(), [])
+            instruments_to_dump = sum(self.task.instruments.values(), [])
             with open('instruments', 'wb') as f:
                 pickle.dump(instruments_to_dump, f)
 
@@ -846,7 +841,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton.setEnabled(True)
             self.ser_listener.start()
             if not self.simulation:
-                for power in self.instruments['gw_powersupply']:
+                for power in self.task.instruments['gw_powersupply']:
                     if not power.is_open:
                         power.open_com()
                     if power.ser:
@@ -867,7 +862,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             d = self.task.df
             all_res = []
 
-            dut_num = self.dut_num
+            dut_num = self.task.dut_num
 
             print('\n\n')
             print(d)
@@ -936,13 +931,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.show_barcode_dialog()
         self.set_window_color('default')
         for i in range(self.task.len() + 1):
-            for j in range(self.dut_num):
+            for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
 
     def closeEvent(self, event):
         print('closeEvent')
-        for power in self.instruments['gw_powersupply']:
+        for power in self.task.instruments['gw_powersupply']:
             if power.is_open:
                 power.off()
         event.accept()  # let the window close
@@ -1004,7 +999,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         header = self.task.header_ext()
 
         for j, dut_i in enumerate(self.dut_selected):
-            header[-self.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
+            header[-self.task.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
             port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
         print('header', header)
