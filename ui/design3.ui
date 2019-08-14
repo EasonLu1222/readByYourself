@@ -150,31 +150,6 @@
            <property name="spacing">
             <number>-1</number>
            </property>
-           <item alignment="Qt::AlignLeft">
-            <widget class="QPushButton" name="pushDetect">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>Courier New</family>
-               <pointsize>16</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>#1 port auto detect</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>

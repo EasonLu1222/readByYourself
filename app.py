@@ -547,8 +547,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_recieved = False
 
         self.pushButton.setEnabled(False)
-        self.pushDetect.setEnabled(False)
-        self.pushDetect.setVisible(False)
 
         self.showMaximized()
 
@@ -980,7 +978,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.retranslateUi(self)
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
-        self.pushDetect.setToolTip(self.push_detect_tooltip_text)
 
     def on_barcode_entered(self, barcode):
         print(barcode)
@@ -1040,15 +1037,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
         self.summary_text = _translate("MainWindow", "Summary")
-        self.push_detect_text = _translate("MainWindow", "#1 port auto detect")
-        self.push_detect_tooltip_text = _translate(
-            "MainWindow",
-            "Press this button and power on the first DUT to calibrate the COM ports"
-        )
-        self.push_detect_tooltip_text = _translate(
-            "MainWindow",
-            "Press this button and power on the first DUT to calibrate the COM ports"
-        )
         self.both_fx_not_checked_err = _translate(
             "MainWindow", "At least one of the fixture should be checked")
 
