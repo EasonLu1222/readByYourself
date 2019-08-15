@@ -1,18 +1,8 @@
 # -*- coding=utf-8 -*-
-import os
-import re
-import sys
 import time
-import serials
-#  from serials import issue_command, ser
-from serials import issue_command, get_serial
-from PyQt5.QtCore import QTimer
-from threading import Timer
 
 from mylogger import logger
-
-
-
+from serials import issue_command, get_serial
 
 cmd = lambda brightness,num,color: \
     'echo {} > /sys/class/leds/LED{}_{}/brightness'.\

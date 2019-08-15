@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file './ui/design3.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.2
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -70,19 +71,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.hboxPorts = QtWidgets.QHBoxLayout()
         self.hboxPorts.setObjectName("hboxPorts")
-        self.pushDetect = QtWidgets.QPushButton(self.container)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushDetect.sizePolicy().hasHeightForWidth())
-        self.pushDetect.setSizePolicy(sizePolicy)
-        self.pushDetect.setMinimumSize(QtCore.QSize(200, 30))
-        font = QtGui.QFont()
-        font.setFamily("Courier New")
-        font.setPointSize(16)
-        self.pushDetect.setFont(font)
-        self.pushDetect.setObjectName("pushDetect")
-        self.hboxPorts.addWidget(self.pushDetect, 0, QtCore.Qt.AlignLeft)
         self.verticalLayout.addLayout(self.hboxPorts)
         self.splitter_2 = QtWidgets.QSplitter(self.container)
         self.splitter_2.setOrientation(QtCore.Qt.Vertical)
@@ -133,8 +121,5 @@ class Ui_MainWindow(object):
         self.langSelectMenu.setItemText(0, _translate("MainWindow", "en_US"))
         self.langSelectMenu.setItemText(1, _translate("MainWindow", "zh_TW"))
         self.checkBoxEngMode.setText(_translate("MainWindow", "Engineering mode"))
-        self.pushDetect.setText(_translate("MainWindow", "#1 port auto detect"))
         self.pushButton.setText(_translate("MainWindow", "Run"))
-
-
 from view.myview import TableView
