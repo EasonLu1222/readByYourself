@@ -1,3 +1,16 @@
+[2019.8.15 - 18:00]
+1. add msp430 download item to station captouch
+	a. modify jsonfile/v7_cap_touch.json
+	b. modify app.py > enter_prompt() add argument waitwordidx
+	c. modify tasks/task_runeach.py: add msp430_download()
+	d. modify serials.py > wait_for_prompt()
+		change from 
+			if line.startswith(prompt):
+		to 
+			if prompt in line:
+	e. modify serials.py > enter_factory_image_prompt()
+		add one waitword: 'asoc-aml-card auge_sound: tdm playback enable'
+
 [2019.8.12 - 17:20]
 1. prepare for RF test station development
 	a. add one jasonfile v7_rf.json & modify tasks/task_runeach.py

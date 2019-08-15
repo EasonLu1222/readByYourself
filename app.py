@@ -161,7 +161,7 @@ def enter_prompt_simu():
     return True
 
 
-def enter_prompt(window, ser_timeout=0.2):
+def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     print('enter factory image prompt start')
     t0 = time.time()
     port_ser_thread = {}
@@ -171,7 +171,7 @@ def enter_prompt(window, ser_timeout=0.2):
         port = comports()[i]
         print('i', i, 'port', port)
         ser = get_serial(port, 115200, ser_timeout)
-        t = threading.Thread(target=enter_factory_image_prompt, args=(ser, 7))
+        t = threading.Thread(target=enter_factory_image_prompt, args=(ser, waitwordidx))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -1060,8 +1060,8 @@ if __name__ == "__main__":
     STATION = 'SIMULATION'
     STATION = 'MainBoard'
     STATION = 'LED'
-    STATION = 'CapTouch'
     STATION = 'RF'
+    STATION = 'CapTouch'
 
     app = QApplication(sys.argv)
 
@@ -1124,7 +1124,7 @@ if __name__ == "__main__":
         },
         {
             'action': enter_prompt,
-            'args': (win, 0.2),
+            'args': (win, 0.2, 7),
         },
     ]
     actions_rf = [

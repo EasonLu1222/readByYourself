@@ -84,7 +84,7 @@ se = SerialEmit()
 
 
 
-def wait_for_prompt(serial, prompt, thread_timeout=25):
+def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
     logger.info(f'\n\nwait_for_prompt: {prompt}\n\n')
     portname = serial.name
     logger.info(f'portname: {portname}')
@@ -93,13 +93,14 @@ def wait_for_prompt(serial, prompt, thread_timeout=25):
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
-            if line: print(line)
+            if line and printline: print(line)
         except UnicodeDecodeError as ex: # ignore to proceed
             logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
             continue
 
         se.serial_msg.emit([portname, line.strip()])
-        if line.startswith(prompt):
+        #  if line.startswith(prompt):
+        if prompt in line:
             logger.info('get %s' % prompt)
             break
 
@@ -162,7 +163,7 @@ def check_which_port_when_poweron(ports, prompt='Starting kernel', qsignal=True)
     #  return port
 
 
-def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
+def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printline=True):
     waitwords = [
         'U-Boot',
         'Starting kernel',
@@ -172,8 +173,9 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True):
         '#',
         'aml_dai_set_bclk_ratio',
         'Initializing random number generator',
+        'asoc-aml-card auge_sound: tdm playback enable',
     ]
-    wait_for_prompt(serial, waitwords[waitwordidx])
+    wait_for_prompt(serial, waitwords[waitwordidx], printline=printline)
     if press_enter:
         for _ in range(3): serial.write(os.linesep.encode('ascii'))
 
@@ -192,7 +194,7 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
             except UnicodeDecodeError as ex: # ignore to proceed
                 logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
             else:
-                logger.info(f'{line.rstrip()}')
+                #  logger.info(f'{line.rstrip()}')
                 lines_encoded.append(line)
         return lines_encoded
     else:

@@ -3,13 +3,26 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 2,
-        "sn": ["A43QHNAMA", "00000000A"]
+        "num": 1,
+        "sn": ["AI069IAVA"]
     }
  },
  "structure":
     [
         {
+            "group": "Cap Touch FW Download",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["msp430_download"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
             "group": "Cap Touch Test",
             "hidden": false,
             "tasktype": 2,

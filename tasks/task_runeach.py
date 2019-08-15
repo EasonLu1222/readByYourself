@@ -9,7 +9,8 @@ import argparse
 import inspect
 from operator import itemgetter
 from subprocess import Popen, PIPE
-from serials import issue_command, get_serial
+from serials import issue_command, get_serial, enter_factory_image_prompt
+
 
 from mylogger import logger
 
@@ -172,6 +173,19 @@ def check_rf_test2(portname, dut_idx):
     result = 'Fail'
     return result
 
+
+def msp430_download(portname):
+    result = None
+    with get_serial(portname, 115200, timeout=2) as ser:
+        lines = issue_command(ser, '/usr/share/msp430Upgrade_v03')
+        result =  'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
+        logger.info(f'msp430 fw download: {result}')
+        # wait for reboot
+        issue_command(ser, 'reboot', fetch=False)
+        logger.info(f'reboot')
+        enter_factory_image_prompt(ser, waitwordidx=7, press_enter=True, printline=False)
+        logger.info(f'wait_for_prompt done')
+    return result
 
 
 if __name__ == "__main__":
