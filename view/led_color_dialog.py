@@ -1,9 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QShortcut
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from ui.led_color_dialog import Ui_LedColorDialog
 from serials import issue_command, get_serial
+from view.led_result_marker_dialog import LedResultMarkerDialog
 
 
 class LedColorDialog(QDialog, Ui_LedColorDialog):
@@ -14,6 +15,8 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.setWindowModality(Qt.ApplicationModal)
+
+        self.result_dialog = LedResultMarkerDialog(dut_num=dut_num)
         self.ser_list = ser_list
         self.dut_num = dut_num  # Number of devices to test
         self.color_block_list = []
@@ -61,6 +64,8 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
             self.set_color(color=current_color)
             self.set_led_color(color=current_color)
         else:
+            self.close()
+            self.result_dialog.show()
             print("Finished")
 
     def set_led_color(self, color=Qt.red):
@@ -75,12 +80,12 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # com_list = ['/dev/cu.usbserial-00000000']
-    com_list = ['COM']
+    com_list = ['/dev/cu.usbserial-00000000']
+    # com_list = ['COM3']
     ser_list = []
     for com in com_list:
         s = get_serial(com, 115200, 0)
         ser_list.append(s)
     d = LedColorDialog(ser_list=ser_list, dut_num=2)
     d.show()
-    app.exec_()
+    sys.exit(app.exec_())
