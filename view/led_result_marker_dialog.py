@@ -39,6 +39,9 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         elif event.key() == Qt.Key_Return:
             print(self.pass_list)
             self.close()
+        # Ignore Esc key
+        elif event.key() == Qt.Key_Escape:
+            return
         else:
             super(LedResultMarkerDialog, self).keyPressEvent(event)
 

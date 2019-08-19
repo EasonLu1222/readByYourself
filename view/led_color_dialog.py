@@ -35,8 +35,12 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         self.next_color()
 
     def keyPressEvent(self, event):
+        # If Space is pressed, show next color
         if event.key() == Qt.Key_Space:
             self.next_color()
+        # Ignore Esc key
+        elif event.key() == Qt.Key_Escape:
+            return
         else:
             super(LedColorDialog, self).keyPressEvent(event)
 
