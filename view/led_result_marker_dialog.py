@@ -1,4 +1,5 @@
 import sys
+import json
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -12,7 +13,6 @@ num_key_list = [
 class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
     def __init__(self, parent=None, dut_num=1):
         super().__init__(parent)
-        print('LedColorDialog init')
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -24,6 +24,7 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         self.dut_num = dut_num  # Number of devices to test
         self.result_block_list = []
         self.pass_list = []  # Stores a list of True/False to represent pass/fail of each DUT
+        self.result_str = ''   # Json dump of pass/fail list. e.g. "['Pass', 'Fail']"
 
         for i in range(dut_num):
             self.add_result_block(i)
@@ -37,13 +38,22 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
             self.toggle_pass_fail(self.result_block_list[idx])
         # If return key is pressed
         elif event.key() == Qt.Key_Return:
-            print(self.pass_list)
             self.close()
         # Ignore Esc key
         elif event.key() == Qt.Key_Escape:
             return
         else:
             super(LedResultMarkerDialog, self).keyPressEvent(event)
+
+    def closeEvent(self, event):
+        pass_fail_str_list = []
+        for b in self.pass_list:
+            if b:
+                pass_fail_str_list.append('Passed')
+            else:
+                pass_fail_str_list.append('Failed')
+        self.result_str = json.dumps(pass_fail_str_list)
+        sys.stdout.write(self.result_str)
 
     def add_result_block(self, dut_idx):
         lb = QLabel()

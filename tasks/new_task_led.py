@@ -1,4 +1,5 @@
 import sys
+import argparse
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -10,7 +11,6 @@ from view.led_result_marker_dialog import LedResultMarkerDialog
 class LedColorDialog(QDialog, Ui_LedColorDialog):
     def __init__(self, parent=None, ser_list=[], dut_num=1):
         super().__init__(parent)
-        print('LedColorDialog init')
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -71,7 +71,6 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         else:
             self.close()
             self.result_dialog.showMaximized()
-            print("Finished")
 
     def set_led_color(self, color=Qt.red):
         c = QColor(color)
@@ -82,15 +81,19 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
                     cmd = f'echo {rgb[j]} > /sys/class/leds/LED{i}_{k}/brightness'
                     issue_command(ser, cmd)
 
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-pp', '--portnames', help='serial com port names', type=str)
+    args = parser.parse_args()
+    com_list = args.portnames.split(',') if args.portnames else []
+    # com_list = ['/dev/cu.usbserial-00000000']
+
     app = QApplication(sys.argv)
-    com_list = ['/dev/cu.usbserial-00000000']
-    # com_list = ['COM3']
+
     ser_list = []
     for com in com_list:
         s = get_serial(com, 115200, 0)
         ser_list.append(s)
-    d = LedColorDialog(ser_list=ser_list, dut_num=2)
+    d = LedColorDialog(ser_list=ser_list, dut_num=len(com_list))
     d.showMaximized()
     sys.exit(app.exec_())
