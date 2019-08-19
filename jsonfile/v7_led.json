@@ -14,7 +14,7 @@
             "hidden": false,
             "tasktype": 2,
             "item": "",
-            "script": "new_task_led",
+            "script": "task_led",
             "args": null,
             "auto": false,
             "min": null,
