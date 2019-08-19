@@ -14,7 +14,8 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowModality(Qt.ApplicationModal)
 
         self.result_dialog = LedResultMarkerDialog(dut_num=dut_num)
         self.ser_list = ser_list
@@ -65,7 +66,7 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
             self.set_led_color(color=current_color)
         else:
             self.close()
-            self.result_dialog.show()
+            self.result_dialog.showMaximized()
             print("Finished")
 
     def set_led_color(self, color=Qt.red):
@@ -87,5 +88,5 @@ if __name__ == "__main__":
         s = get_serial(com, 115200, 0)
         ser_list.append(s)
     d = LedColorDialog(ser_list=ser_list, dut_num=2)
-    d.show()
+    d.showMaximized()
     sys.exit(app.exec_())

@@ -16,7 +16,8 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowModality(Qt.ApplicationModal)
 
         self.color_pass = QColor("#8BC34A")  # Green
         self.color_fail = QColor("#FF5722")  # Red
@@ -72,6 +73,6 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     d = LedResultMarkerDialog(dut_num=2)
-    d.show()
+    d.showMaximized()
     app.exec_()
 
