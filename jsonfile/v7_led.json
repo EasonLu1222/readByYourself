@@ -12,7 +12,7 @@
         {
             "group": "LED Test",
             "hidden": false,
-            "tasktype": 2,
+            "tasktype": 3,
             "item": "",
             "script": "task_led",
             "args": null,
