@@ -166,10 +166,9 @@ def check_rf_test2(portname, dut_idx):
 
 
 def msp430_download(portname):
-    result = None
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, '/usr/share/msp430Upgrade_v03')
-        result =  'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
+        result = 'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
         logger.info(f'msp430 fw download: {result}')
         # wait for reboot
         issue_command(ser, 'reboot', fetch=False)
