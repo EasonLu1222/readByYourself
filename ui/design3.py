@@ -32,22 +32,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-
-        #  self.checkBoxFx1 = QtWidgets.QCheckBox(self.container)
-        #  font = QtGui.QFont()
-        #  font.setFamily("Courier New")
-        #  font.setPointSize(14)
-        #  self.checkBoxFx1.setFont(font)
-        #  self.checkBoxFx1.setObjectName("checkBoxFx1")
-        #  self.horizontalLayout.addWidget(self.checkBoxFx1)
-        #  self.checkBoxFx2 = QtWidgets.QCheckBox(self.container)
-        #  font = QtGui.QFont()
-        #  font.setFamily("Courier New")
-        #  font.setPointSize(14)
-        #  self.checkBoxFx2.setFont(font)
-        #  self.checkBoxFx2.setObjectName("checkBoxFx2")
-        #  self.horizontalLayout.addWidget(self.checkBoxFx2)
-
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
@@ -118,10 +102,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-
-        #  self.checkBoxFx1.setText(_translate("MainWindow", "Test on fixture 1"))
-        #  self.checkBoxFx2.setText(_translate("MainWindow", "Test on fixture 2"))
-
         self.langSelectMenu.setItemText(0, _translate("MainWindow", "en_US"))
         self.langSelectMenu.setItemText(1, _translate("MainWindow", "zh_TW"))
         self.checkBoxEngMode.setText(_translate("MainWindow", "Engineering mode"))
