@@ -25,7 +25,7 @@ from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron,
                      filter_devices, get_devices_df, BaseSerialListener)
 
-from instrument import update_serial, generate_instruments, PowerSupply, DMM
+from instrument import update_serial, generate_instruments, PowerSupply, DMM, Eloader
 from ui.design3 import Ui_MainWindow
 from mylogger import logger
 
@@ -33,8 +33,8 @@ from mylogger import logger
 INSTRUMENT_MAP = {
     'gw_powersupply': PowerSupply,
     'gw_dmm': DMM,
+    'gw_eloader': Eloader,
 }
-
 
 
 class ProcessListener(QThread):
@@ -63,9 +63,11 @@ class ProcessListener(QThread):
 class ComportDUT(): comports_dut = QSignal(list)
 class ComportPWR(): comports_pwr = QSignal(list)
 class ComportDMM(): comports_dmm = QSignal(list)
+class ComportELD(): comports_eld = QSignal(list)
 
 
-class SerialListener(BaseSerialListener, ComportDUT, ComportPWR, ComportDMM):
+class SerialListener(BaseSerialListener,
+                     ComportDUT, ComportPWR, ComportDMM, ComportELD):
     def __init__(self, *args, **kwargs):
         devices = kwargs.pop('devices')
         super(SerialListener, self).__init__(*args, **kwargs)
@@ -311,12 +313,20 @@ class Task(QThread):
             limits.update(xx)
         print('limits', limits)
         args = {'args': args, 'limits': limits}
-        port_dmm = self.instruments['gw_dmm'][0].com
-        proc = Popen(['python', '-m', script, '-pm', port_dmm] + [json.dumps(args)], stdout=PIPE)
+
+        coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
+        coms = json.dumps(coms)
+        print('coms', coms)
+        proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE)
+
         return proc
 
     def runeach(self, row_idx, dut_idx, sid, tasktype):
-        port = self.window.comports()[dut_idx]
+        if dut_idx==-1:
+            port = 'null' # UGLY, mainly for wpc test, only 1 dut
+            dut_idx = 0
+        else:
+            port = self.window.comports()[dut_idx]
         each, script, tasktype, args = self.unpack_each(row_idx)
         msg = (f'[runeach][script: {script}][row_idx: {row_idx}]'
                f'[dut_idx: {dut_idx}][port: {port}][sid: {sid}]'
@@ -390,8 +400,10 @@ class Task(QThread):
 
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
+            is_auto, task_type = next_item['auto'], next_item['tasktype']
             print('i', i, 'next_item', next_item)
-            if len(items) > 1:
+            #  if len(items) > 1:
+            if task_type == 2:
                 self.task_each.emit([i, len(items)])
                 proc = self.rungroup(group)
                 output, _ = proc.communicate()
@@ -399,7 +411,6 @@ class Task(QThread):
 
                 output = output.decode('utf8')
                 print('OUTPUT', output)
-
 
                 msg2 = '[task %s][output: %s]' % ([i, i + len(items)], output)
                 self.printterm_msg.emit(msg2)
@@ -413,21 +424,22 @@ class Task(QThread):
 
                 output = json.loads(output)
                 if len(self.window.dut_selected) == 1:
-                    output = [[
-                        e
-                    ] for e in get_col(output, self.window.dut_selected[0])]
+                    output = [[e] for e in get_col(output, self.window.dut_selected[0])]
                 print('OUTPUT', output)
 
                 self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
+
             else:
-                is_auto, task_type = next_item['auto'], next_item['tasktype']
                 self.task_each.emit([i, 1])
                 if is_auto:
                     procs = {}
                     for port, barcode in self.window.port_barcodes.items():
                         if barcode:
-                            dut_idx = self.window.comports().index(port)
+                            if not port:
+                                dut_idx = -1 # UGLY, mainly for wpc test, only 1 dut
+                            else:
+                                dut_idx = self.window.comports().index(port)
                             proc = self.runeach(i, dut_idx, barcode, task_type)
                             procs[port] = proc
 
@@ -476,10 +488,10 @@ class MySettings():
     def __init__(self):
         self.settings = QSettings('FAB', 'SAP109')
         self.update()
-    
+
     def get(self, key, default, key_type):
         return self.settings.value(key, default, key_type)
-    
+
     def set(self, key, value):
         self.settings.setValue(key, value)
         self.update()
@@ -520,9 +532,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
         self._comports_pwr = []
         self._comports_dmm = []
+        self._comports_eld = []
 
         update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
         update_serial(self.task.instruments, 'gw_dmm', self._comports_dmm)
+        update_serial(self.task.instruments, 'gw_eloader', self._comports_eld)
 
         self.dut_layout = []
         colors = ['#edd'] * self.task.dut_num
@@ -535,10 +549,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.setsignal()
 
+        #  print('\n\n')
+        #  for k,v in self.task.devices.items():
+            #  print(k,v)
+        #  print('\n\n')
+
         self.ser_listener = SerialListener(devices=self.task.devices)
         self.ser_listener.comports_dut.connect(self.ser_update)
         self.ser_listener.comports_pwr.connect(self.pwr_update)
         self.ser_listener.comports_dmm.connect(self.dmm_update)
+        self.ser_listener.comports_eld.connect(self.eld_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
 
@@ -658,6 +678,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(self.task.instruments, 'gw_dmm', comports)
         self.render_port_plot()
 
+    def eld_update(self, comports):
+        print('eld_update', comports)
+        self._comports_eld = comports
+        update_serial(self.task.instruments, 'gw_eloader', comports)
+        self.render_port_plot()
+
     def ser_update(self, comports):
         print('ser_update', comports)
         dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
@@ -706,7 +732,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 }""" % (color, )
         comports_map = {
             'gw_powersupply': self._comports_pwr,
-            'gw_dmm': self._comports_dmm
+            'gw_dmm': self._comports_dmm,
+            'gw_eloader': self._comports_eld,
         }
 
         for i, e in enumerate(self.dut_layout, 1):
@@ -719,7 +746,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 lb_port.setStyleSheet(style_('#369'))
                 self.dut_layout[i].addWidget(lb_port)
 
-        colors_inst = {'gw_powersupply': '#712', 'gw_dmm': '#4a3'}
+        colors_inst = {'gw_powersupply': '#712',
+                       'gw_dmm': '#4a3',
+                       'gw_eloader': '#a31'}
+
         for name, num in self.task.instruments.items():
             print('name', name, 'num', num)
             each_instruments = self.task.instruments[name]
@@ -1046,10 +1076,11 @@ if __name__ == "__main__":
     thismodule = sys.modules[__name__]
 
     STATION = 'SIMULATION'
-    STATION = 'MainBoard'
     STATION = 'LED'
     STATION = 'RF'
     STATION = 'CapTouch'
+    STATION = 'MainBoard'
+    STATION = 'WPC'
 
     app = QApplication(sys.argv)
 
@@ -1058,6 +1089,7 @@ if __name__ == "__main__":
     task_simu = Task('v5_simu')
     task_cap_touch = Task('v7_cap_touch')
     task_rf = Task('v7_rf')
+    task_wpc = Task('v7_wpc')
 
     map_ = {
         'MainBoard': 'mb',
@@ -1065,6 +1097,7 @@ if __name__ == "__main__":
         'SIMULATION': 'simu',
         'CapTouch': 'cap_touch',
         'RF': 'rf',
+        'WPC': 'wpc',
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1084,7 +1117,7 @@ if __name__ == "__main__":
         },
         {
             'action': enter_prompt,
-            'args': (win, 0.2),
+            'args': (win, 0.2, 7),
         },
     ]
     actions_led = [
@@ -1127,6 +1160,16 @@ if __name__ == "__main__":
         {
             'action': enter_prompt,
             'args': (win, 0.2),
+        },
+    ]
+    actions_wpc = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        },
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, task_mb.serial_ok),
         },
     ]
     actions_simu = [

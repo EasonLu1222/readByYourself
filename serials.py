@@ -232,6 +232,10 @@ class BaseSerialListener(QThread):
 
     def port_full(self, excludes=None):
         for k,v in self.devices.items():
+
+            if not v['name']: 
+                continue
+
             if excludes:
                 for e in excludes:
                     if k==e: continue

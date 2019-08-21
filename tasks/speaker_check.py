@@ -19,10 +19,11 @@ if __name__ == "__main__":
     logger.info('speaker check...')
     parser = argparse.ArgumentParser()
     parser.add_argument('channels_limits', help='channel', type=str)
-    parser.add_argument('-pm',
-                        '--port_dmm',
-                        help='serial com port dmm',
-                        type=str)
+
+    #  parser.add_argument('-pm', '--port_dmm', help='serial com port dmm', type=str)
+    parser.add_argument('-p', '--ports',
+                        help='serial com port for instruments', type=str)
+
     args = parser.parse_args()
 
     unpacked = json.loads(args.channels_limits)
@@ -30,7 +31,10 @@ if __name__ == "__main__":
     channel_group = unpacked['args']
     limits = {int(k):v for k,v in unpacked['limits'].items()}
     
-    port_dmm = args.port_dmm
+    #  port_dmm = args.port_dmm
+    ports = json.loads(args.ports)
+    logger.info(ports)
+    port_dmm = ports['gw_dmm'][0]
 
     logger.info('speaker check start. [channel_group: %s]' % channel_group)
 

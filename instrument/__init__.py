@@ -19,6 +19,20 @@ POWERON = '''
     OUTPut 1
 '''
 
+POWER_INIT = '''
+    OUTPut:PROTection:CLEar
+    OUTPut 0
+    OUTPut:DELay:ON 0.00
+    OUTPut:DELay:OFF 0.00
+    OUTPut:TRIGgered 0
+    VOLT 19
+    CURR 3.5
+'''
+
+POWER_START = '''
+    OUTPut 1
+'''
+
 POWEROFF = '''
     OUTPut:PROTection:CLEar
     OUTPut 0
@@ -136,6 +150,27 @@ MEASURE_VOLT_B = '''
 '''
 
 
+ELOADER_INIT = '''
+    FACTory
+    MODE CC
+    CRANge HIGH
+    VRANge HIGH
+    MODE:DYNamic STAT
+    CURRent:SRATe 10
+    CURRent:VA 1.1
+    CURRent:VB 1.1
+    INPut:MODE LOAD
+'''
+
+ELOADER_START = '''
+    INPut ON
+'''
+
+ELOADER_STOP = '''
+    INPut OFF
+'''
+
+
 def cmd(command_constant):
     return [e.strip() for e in command_constant.strip().split('\n')]
 
@@ -183,6 +218,9 @@ def update_serial(instruments, inst_type, comports):
     if inst_type=='gw_powersupply':
         sn = [e.sn for e in inst]
         comports = get_ordered_comports_by_gw_idn(comports, sn)
+
+    logger.info(instruments)
+
     for i, com in enumerate(comports):
         inst[i].com = com
 
@@ -257,6 +295,14 @@ class PowerSupply(SerialInstrument):
     StartFetchTime = 2
     MeasureTime = 10
 
+    def init(self):
+        logger.info(f'power_{self.index}({self}) init!')
+        self.run_cmd(cmd(POWER_INIT))
+
+    def start(self):
+        logger.info(f'power_{self.index}({self}) start!')
+        self.run_cmd(cmd(POWER_START))
+
     def on(self):
         logger.info(f'power_{self.index}({self}) on!')
         self.run_cmd(cmd(POWERON))
@@ -264,6 +310,16 @@ class PowerSupply(SerialInstrument):
     def off(self):
         logger.info(f'power_{self.index}({self}) off!')
         self.run_cmd(cmd(POWEROFF))
+
+    def measure_voltage(self):
+        line = self.run_cmd(['MEASure:VOLTage:DC?'], True)
+        volt = float(line)
+        return volt
+
+    def measure_cur(self):
+        line = self.run_cmd(['MEASure:CURRent:DC?'], True)
+        current = float(line)
+        return current
 
     def measure_current(self):
         t0 = time.perf_counter()
@@ -281,6 +337,31 @@ class PowerSupply(SerialInstrument):
                 self.max_current = currents[0]
                 break
         return currents
+
+
+class Eloader(SerialInstrument):
+    NAME = 'gw_eloader'
+    StartFetchTime = 2
+    MeasureTime = 10
+
+    def init(self):
+        self.run_cmd(cmd(ELOADER_INIT), False)
+
+    def start(self):
+        self.run_cmd(cmd(ELOADER_START), False)
+
+    def stop(self):
+        self.run_cmd(cmd(ELOADER_STOP), False)
+
+    def measure_voltage(self):
+        line = self.run_cmd(['MEASure:VOLTage:DC?'], True)
+        voltage = float(line)
+        return voltage
+
+    def measure_current(self):
+        line = self.run_cmd(['MEASure:CURRent:DC?'], True)
+        current = float(line)
+        return current
 
 
 class DMM(SerialInstrument):
@@ -340,9 +421,6 @@ def generate_instruments(task_devices, instrument_map):
         name, num = dev_info['name'], dev_info['num']
         sn_numbers = dev_info['sn'] if 'sn' in dev_info else None
         if name not in instrument_map.keys(): continue
-        #  for i in range(1, num+1):
-            #  instruments[name].append(instrument_map[name](i))
-
         if sn_numbers: assert len(sn_numbers)==num
         for i in range(num):
             if sn_numbers:
@@ -351,3 +429,8 @@ def generate_instruments(task_devices, instrument_map):
                 inst = instrument_map[name](i+1)
             instruments[name].append(inst)
     return instruments
+
+
+
+if __name__ == "__main__":
+    pass
