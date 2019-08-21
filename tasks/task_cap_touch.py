@@ -29,7 +29,7 @@ class TouchPolling(QThread):
             cmd = 'i2cget -f -y 1 0x1f 0x00'
             try:
                 lines = issue_command(self.ser, cmd)
-            except (TypeError, JSONDecodeError, SerialException):
+            except (OSError, TypeError, JSONDecodeError, SerialException):
                 logger.info('TouchPolling thread terminated!')
                 self.kill = True
                 break
@@ -41,7 +41,10 @@ class TouchPolling(QThread):
                     if not self.key_codes:
                         break
         if hasattr(self, 'ser') and self.ser.is_open:
-            self.ser.close()
+            try:
+                self.ser.close()
+            except OSError:
+                logger.info('TouchPolling thread terminated!')
 
 class ContentWidget(QtWidgets.QWidget):
     def __init__(self, portnames, *args, **kwargs):
