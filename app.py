@@ -12,9 +12,11 @@ from subprocess import Popen, PIPE
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget)
+                             QWidget, QCheckBox)
+from PyQt5 import QtCore
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
+
 from PyQt5.QtGui import QFont, QColor
 
 from view.pwd_dialog import PwdDialog
@@ -485,8 +487,9 @@ class MySettings():
         'en_US',
         'zh_TW',
     ]
-    def __init__(self):
+    def __init__(self, dut_num):
         self.settings = QSettings('FAB', 'SAP109')
+        self.dut_num = dut_num
         self.update()
 
     def get(self, key, default, key_type):
@@ -497,8 +500,13 @@ class MySettings():
         self.update()
 
     def update(self):
-        self.is_fx1_checked = self.get('fixture_1', False, bool)
-        self.is_fx2_checked = self.get('fixture_2', False, bool)
+        #  self.is_fx1_checked = self.get('fixture_1', False, bool)
+        #  self.is_fx2_checked = self.get('fixture_2', False, bool)
+        for i in range(1, self.dut_num+1):
+            print('MySettings update i', i)
+            print(self.get(f'fixture_{i}', False, bool))
+            setattr(self, f'is_fx{i}_checked',
+                self.get(f'fixture_{i}', False, bool))
         self.lang_index = self.get('lang_index', 0, int)
         self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
 
@@ -519,11 +527,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
 
         self.set_task(task)
-        self.settings = MySettings()
+        self.settings = MySettings(dut_num=self.task.dut_num)
+        self.make_checkboxes()
 
         # Restore UI states
-        self.checkBoxFx1.setChecked(self.settings.is_fx1_checked)
-        self.checkBoxFx2.setChecked(self.settings.is_fx2_checked)
+        #  self.checkBoxFx1.setChecked(self.settings.is_fx1_checked)
+        #  self.checkBoxFx2.setChecked(self.settings.is_fx2_checked)
+
         self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
         self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
@@ -581,6 +591,25 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+
+    def make_checkboxes(self):
+        self.checkboxes = []
+        font = QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(14)
+        _translate = QtCore.QCoreApplication.translate
+        cbox_text_translate = _translate('MainWindow', 'DUT')
+        for i in range(1, self.task.dut_num+1):
+            cbox = QCheckBox(self.container)
+            cbox.setFont(font)
+            self.checkboxes.append(cbox)
+            self.horizontalLayout.addWidget(cbox)
+            cbox.setChecked(getattr(self.settings, f'is_fx{i}_checked'))
+            cbox.setText(f'{cbox_text_translate}#{i}')
+
+    def get_checkboxes_status(self):
+        status_all = [self.checkboxes[i].isChecked() for i in range(self.task.dut_num)]
+        return status_all
 
     @property
     def logfile(self):
@@ -785,8 +814,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         return comports_as_list
 
     def setsignal(self):
-        self.checkBoxFx1.stateChanged.connect(self.chk_box_fx1_state_changed)
-        self.checkBoxFx2.stateChanged.connect(self.chk_box_fx2_state_changed)
+        for i, b in enumerate(self.checkboxes, 1):
+            chk_box_state_changed = lambda state, i=i: self.chk_box_fx_state_changed(state, i)
+            b.stateChanged.connect(chk_box_state_changed)
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
@@ -937,8 +967,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def show_barcode_dialog(self):
         print('show_barcode_dialog start')
-        s = [self.checkBoxFx1.isChecked(), self.checkBoxFx2.isChecked()]
-        num = len(list(filter(lambda x: x == True, s)))
+        status_all = self.get_checkboxes_status()
+        num = len(list(filter(lambda x: x == True, status_all)))
         self.barcode_dialog.set_total_barcode(num)
         if num > 0:
             self.barcode_dialog.show()
@@ -947,12 +977,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def btn_clicked(self):
         print('btn_clicked')
         self.barcodes = []
-
         for dut_i, port in self._comports_dut.items():
             if port:
                 self.port_barcodes[port] = None
-
-        if (not self.checkBoxFx1.isChecked()) and (not self.checkBoxFx2.isChecked()):
+        if not any(self.get_checkboxes_status()):
             e_msg = QErrorMessage(self)
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
@@ -970,6 +998,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 power.off()
         event.accept()  # let the window close
 
+    def chk_box_fx_state_changed(self, status, idx):
+        print('status', status, 'idx', idx)
+        self.settings.set(f'fixture_{idx}', status == Qt.Checked)
+        print(f'chk_box_fx{idx}_state_changed',
+            getattr(self.settings ,f'is_fx{idx}_checked'))
+
     def chk_box_fx1_state_changed(self, status):
         self.settings.set("fixture_1", status == Qt.Checked)
         print('chk_box_fx1_state_changed', self.settings.is_fx1_checked)
@@ -977,6 +1011,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def chk_box_fx2_state_changed(self, status):
         self.settings.set("fixture_2", status == Qt.Checked)
         print('chk_box_fx2_state_changed', self.settings.is_fx2_checked)
+
 
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if (not is_eng_mode_on):
@@ -1017,10 +1052,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         When the barcode(s) are ready, start testing
         """
-        is_1 = self.settings.is_fx1_checked
-        is_2 = self.settings.is_fx2_checked
-        print('is_1', is_1, 'is_2', is_2)
-        self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. E.g.: [False, True] => [1]
+
+        #  is_1 = self.settings.is_fx1_checked
+        #  is_2 = self.settings.is_fx2_checked
+        #  print('is_1', is_1, 'is_2', is_2)
+
+        #  self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. E.g.: [False, True] => [1]
+
+        # Return the index of Trues. E.g.: [False, True] => [1]
+        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x] 
         print('dut_selected', self.dut_selected)
 
         header = self.task.header_ext()
@@ -1076,11 +1116,11 @@ if __name__ == "__main__":
     thismodule = sys.modules[__name__]
 
     STATION = 'SIMULATION'
-    STATION = 'LED'
     STATION = 'RF'
     STATION = 'CapTouch'
     STATION = 'MainBoard'
     STATION = 'WPC'
+    STATION = 'LED'
 
     app = QApplication(sys.argv)
 

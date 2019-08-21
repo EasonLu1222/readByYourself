@@ -3,8 +3,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 1,
-        "sn": ["00000000A"]
+        "num": 2,
+        "sn": ["00000000A", "A43QHNAMA"]
     }
  },
  "structure":
@@ -12,7 +12,7 @@
         {
             "group": "LED Test",
             "hidden": false,
-            "tasktype": 2,
+            "tasktype": 3,
             "item": "",
             "script": "task_led",
             "args": null,
