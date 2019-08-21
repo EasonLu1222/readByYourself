@@ -32,7 +32,6 @@ def write_usid(sid):
         lines = issue_command(ser, cmd)
         result =  f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
         return result
-    return None
 
 
 def speaker_play_1kz(portname):
@@ -56,7 +55,6 @@ def check_wifi_if(portname):
         result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
         logger.info(f'check_wifi_if: {result}')
         return result
-    return None
 
 
 def check_bt(portname):
@@ -65,7 +63,6 @@ def check_bt(portname):
         result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
         logger.info(f'has BT: {result}')
         return result
-    return None
 
 
 def check_cpu_cores(portname):
@@ -74,7 +71,6 @@ def check_cpu_cores(portname):
         result =  'Passed' if any(re.match('4\r\n', e) for e in lines) else 'Failed'
         logger.info(f'Check CPU Cores: {result}')
         return result
-    return None
 
 
 def check_cpu_freq(portname):
@@ -84,7 +80,6 @@ def check_cpu_freq(portname):
         result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
         logger.info(f'Check CPU Freq: {result}')
         return result
-    return None
 
 
 def check_ddr_size(portname):
@@ -93,7 +88,6 @@ def check_ddr_size(portname):
         result =  'Passed' if any(re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else 'Failed'
         logger.info(f'DDR Size: {result}')
         return result
-    return None
 
 
 def check_i2c_tas5766(portname):
@@ -102,7 +96,6 @@ def check_i2c_tas5766(portname):
         result =  'Passed' if any(re.match('tas5766m', e) for e in lines) else 'Failed'
         logger.info(f'has tas5766m: {result}')
         return result
-    return None
 
 
 def check_i2c_msp430(portname):
@@ -111,7 +104,6 @@ def check_i2c_msp430(portname):
         result =  'Passed' if any(re.match('msp430', e) for e in lines) else 'Failed'
         logger.info(f'has msp430: {result}')
         return result
-    return None
 
 
 def check_i2c_lp5018(portname):
@@ -120,7 +112,6 @@ def check_i2c_lp5018(portname):
         result =  'Passed' if any(re.match('lp5018', e) for e in lines) else 'Failed'
         logger.info(f'has lp5018: {result}')
         return result
-    return None
 
 
 def check_max_current(dut_idx):
