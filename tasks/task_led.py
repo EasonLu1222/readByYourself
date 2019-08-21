@@ -1,113 +1,178 @@
 import sys
 import json
 import argparse
-from PyQt5 import QtWidgets, QtCore, QtGui
-from view import task_dialog
-from tasks import led
-from serials import get_serial
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel
+from ui.led_color_dialog import Ui_LedColorDialog
+from ui.led_result_marker_dialog import Ui_LedResultMarkerDialog
+from serials import issue_command, get_serial
 
-from mylogger import logger
-
-
-LED_TIMEOUT = 1000
-
-def setcolor(widget, widget_name, code):
-    widget.setStyleSheet("""
-        %s {
-            background: %s;
-        }
-    """ % (widget_name, code))
+num_key_list = [
+    Qt.Key_1, Qt.Key_2, Qt.Key_3, Qt.Key_4, Qt.Key_5, Qt.Key_6, Qt.Key_7, Qt.Key_8, Qt.Key_9
+]
 
 
-class ContentWidget(QtWidgets.QWidget):
-    rgb = ['#ff6e6e', '#00cc00', '#6363ff']
-    cmds = [led.led_all_red, led.led_all_green, led.led_all_blue]
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.idx = 0
-        layout = QtWidgets.QHBoxLayout(self)
+class LedColorDialog(QDialog, Ui_LedColorDialog):
+    def __init__(self, parent=None, ser_list=[], dut_num=1):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowModality(Qt.ApplicationModal)
 
-        self.leds = []
-        led1 = QtWidgets.QLabel('LED')
-        led2 = QtWidgets.QLabel('LED')
-        led3 = QtWidgets.QLabel('LED')
-        led4 = QtWidgets.QLabel('LED')
-        leds = [led1, led2, led3, led4]
-        self.leds.extend([led1, led2, led3, led4])
-        self.all_color('#ffffff')
+        self.result_dialog = LedResultMarkerDialog(dut_num=dut_num)
+        self.ser_list = ser_list
+        self.dut_num = dut_num  # Number of devices to test
+        self.color_block_list = []
+        self.color_list = [  # Colors to test
+            Qt.red,
+            Qt.green,
+            Qt.blue,
+            Qt.white
+        ]
+        self.color_idx = -1
 
-        layout.addWidget(led1)
-        layout.addWidget(led2)
-        layout.addWidget(led3)
-        layout.addWidget(led4)
+        for i in range(dut_num):
+            self.add_color_block()
 
-        self.setLayout(layout)
+        self.next_color()
 
-        self.timer = timer = QtCore.QTimer(self)
-        self.timer.start(LED_TIMEOUT)
-
-    def setports(self, portnames):
-        #  print('serports start')
-        self.iterports = iter(portnames)
-        port = next(self.iterports)
-        self.ser = get_serial(port, 115200, 0)
-        #  print('serports end')
-
-    def setsignal(self):
-        self.father.message_each.connect(self.nextpage)
-        self.father.message_end.connect(self.onclose)
-        self.timer.timeout.connect(self.time_check)
-
-    def all_color(self, color_code):
-        for led in self.leds:
-            setcolor(led, 'QWidget', color_code)
-
-    def time_check(self):
-        if self.idx >= 3:
-            self.timer.stop()
+    def keyPressEvent(self, event):
+        # If Space is pressed, show next color
+        if event.key() == Qt.Key_Space:
+            self.next_color()
+        # Ignore Esc key
+        elif event.key() == Qt.Key_Escape:
             return
-        logger.info('time check idx: %s' % self.idx)
-        if self.idx >= 0:
-            self.all_color(self.rgb[self.idx])
-            self.cmds[self.idx](self.ser, 10)
-        self.idx += 1
+        else:
+            super(LedColorDialog, self).keyPressEvent(event)
 
-    def onclose(self, msg):
-        logger.info('onclose')
-        led.led_all_clear(self.ser)
-        self.ser.close()
-        sys.stdout.write(json.dumps(msg))
+    def closeEvent(self, event):
+        for ser in self.ser_list:
+            ser.close()
 
-    def nextpage(self, idx):
-        #  print('nextpage start')
-        self.ser.close()
-        self.ser = get_serial(next(self.iterports), 115200, 0)
-        self.idx = 0
-        logger.info('nextpage - idx:%s' % idx)
-        self.all_color('#ffffff')
-        led.led_all_clear(self.ser)
-        self.timer = timer = QtCore.QTimer(self)
-        timer.start(LED_TIMEOUT)
-        timer.timeout.connect(self.time_check)
-        #  print('nextpage end')
+    def add_color_block(self):
+        """
+        Add a color block to the horizontal layout.
+        Each block represents a DUT(Device Under Test).
+        """
+        lb = QLabel()
+        self.color_block_list.append(lb)
+        self.horizontalLayout.addWidget(lb)
+
+    def set_color(self, color=Qt.red):
+        c = QColor(color)
+        for lb in self.color_block_list:
+            lb.setStyleSheet(f"background-color:{c.name()}")
+
+    def next_color(self):
+        self.color_idx += 1
+        if self.color_idx < len(self.color_list):
+            current_color = self.color_list[self.color_idx]
+            self.set_color(color=current_color)
+            self.set_led_color(color=current_color)
+        else:
+            self.close()
+            self.result_dialog.showMaximized()
+
+    def set_led_color(self, color=Qt.red):
+        c = QColor(color)
+        rgb = list(c.getRgb())[:3]
+        for ser in self.ser_list:
+            for i in range(1, 5):
+                for j, k in enumerate(['R', 'G', 'B']):
+                    cmd = f'echo {rgb[j]} > /sys/class/leds/LED{i}_{k}/brightness'
+                    issue_command(ser, cmd)
+
+
+class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
+    def __init__(self, parent=None, dut_num=1):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # self.setWindowModality(Qt.ApplicationModal)
+
+        self.color_pass = QColor("#8BC34A")  # Green
+        self.color_fail = QColor("#FF5722")  # Red
+        self.dut_num = dut_num  # Number of devices to test
+        self.result_block_list = []
+        self.pass_list = []  # Stores a list of True/False to represent pass/fail of each DUT
+        self.result_str = ''   # Json dump of pass/fail list. e.g. "['Pass', 'Fail']"
+
+        for i in range(dut_num):
+            self.add_result_block(i)
+
+        self.set_color()
+
+    def keyPressEvent(self, event):
+        # If number key is pressed
+        if event.key() in num_key_list[:self.dut_num]:
+            idx = num_key_list.index(event.key())
+            self.toggle_pass_fail(self.result_block_list[idx])
+        # If return key is pressed
+        elif event.key() == Qt.Key_Return:
+            self.close()
+        # Ignore Esc key
+        elif event.key() == Qt.Key_Escape:
+            return
+        else:
+            super(LedResultMarkerDialog, self).keyPressEvent(event)
+
+    def closeEvent(self, event):
+        pass_fail_str_list = []
+        for b in self.pass_list:
+            if b:
+                pass_fail_str_list.append('Passed')
+            else:
+                pass_fail_str_list.append('Failed')
+        self.result_str = json.dumps(pass_fail_str_list)
+        sys.stdout.write(self.result_str)
+
+    def add_result_block(self, dut_idx):
+        lb = QLabel()
+        lb.setText(str(dut_idx))
+        self.result_block_list.append(lb)
+        self.horizontalLayout.addWidget(lb)
+        self.pass_list.append(True)
+
+    def set_color(self):
+        """
+        Set the color of all result blocks
+        """
+        for lb in self.result_block_list:
+            lb.setStyleSheet(f"background-color:{self.color_pass.name()}")
+
+    def toggle_pass_fail(self, result_block):
+        """
+        Toggles the color of the result block based on the True/False value in pass_list
+
+        Args:
+            result_block: A QLabel indicating pass or fail by its background color
+        """
+        i = self.result_block_list.index(result_block)
+        self.pass_list[i] = not self.pass_list[i]
+
+        color = self.color_pass.name() if self.pass_list[i] else self.color_fail.name()
+        result_block.setStyleSheet(f"background-color:{color}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-pp', '--portnames', help='serial com port names', type=str)
     args = parser.parse_args()
-    portnames = args.portnames.split(',')
+    com_list = args.portnames.split(',') if args.portnames else []
+    # com_list = ['/dev/cu.usbserial-00000000']
 
-    app = QtWidgets.QApplication([])
-    w = ContentWidget()
-    w.setports(portnames)
+    app = QApplication(sys.argv)
 
-    img1 = 'images/fixture_dummy1.png'
-    img2 = 'images/fixture_dummy2.png'
-    image_info = [('No.1', 'Meyoko',  img1),
-                  ('No.2', 'Nyaruko', img2),]
-    #  img1 = 'images/fixture_dummy1.png'
-    #  image_info = [('No.1', 'Meyoko',  img1)]
-    d = task_dialog.MyDialog(number=len(portnames), content_widget=w, img_info=image_info)
-    w.setsignal()
-    app.exec_()
+    serial_list = []
+    for com in com_list:
+        s = get_serial(com, 115200, 0)
+        serial_list.append(s)
+    d = LedColorDialog(ser_list=serial_list, dut_num=len(com_list))
+    d.showMaximized()
+    sys.exit(app.exec_())
