@@ -1,0 +1,45 @@
+{"header": 
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 1,
+        "sn": ["AM00L7CRA"]
+    }
+ },
+ "behaviors": {
+     "barcode-scan": true
+ },
+ "test_items":
+    [
+        {
+            "group": "RF_item1",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "RF WiFi Tx/Rx",
+            "script": "task_runeach",
+            "args": ["check_rf_test1"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF_item2",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "RF BT Tx/Rx",
+            "script": "task_runeach",
+            "args": ["check_rf_test2"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+
+

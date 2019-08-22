@@ -1,3 +1,14 @@
+[2019.8.22 - 20:45]
+New jsonfile format (v08) & barcode-scan attribute
+
+1. jsonfile v08
+	- change structure to test_items
+	- add new attributes: behaviors > barcode_scan
+
+2. based on barcode_scan to toggle barcode scanner dialog
+
+3. add new task_runeach function: read_pid()
+
 [2019.8.22 - 08:25]
 Remove model.py
 

@@ -17,6 +17,29 @@ from mylogger import logger
 SERIAL_TIMEOUT = 0.2
 
 
+def read_pid(portname, dut_idx):
+    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo usid > /sys/class/unifykeys/name',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+        logger.info(lines)
+        response = lines[-1]
+        logger.info(f'response: {response}')
+        if response == '/ # ':
+            result = 'Fail(no pid found)'
+        else:
+            pid = response[:4]
+            logger.info(f'pid: {pid}')
+            result = f'Pass({pid})'
+    return result
+
+
 def write_usid(sid):
     logger.info('write usid')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:

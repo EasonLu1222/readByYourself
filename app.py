@@ -87,7 +87,7 @@ def parse_json(jsonfile):
     x = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     groups = defaultdict(list)
     cur_group = None
-    x = x['structure']
+    x = x['test_items']
     group_orders = []
     for e in x:
         group_name = e['group']
@@ -229,7 +229,7 @@ class Task(QThread):
     def load(self):
         header = self.base['header']
         header_dut = self.header_dut()
-        df = pd.DataFrame(self.base['structure'])
+        df = pd.DataFrame(self.base['test_items'])
         self.df = df = df[header]
         for col in header_dut:
             df[col] = None
@@ -269,6 +269,10 @@ class Task(QThread):
     @property
     def devices(self):
         return self.base['devices']
+
+    @property
+    def behaviors(self):
+        return self.base['behaviors']
 
     def header_dut(self, dut_names=None):
         if dut_names:
@@ -324,11 +328,7 @@ class Task(QThread):
         return proc
 
     def runeach(self, row_idx, dut_idx, sid, tasktype):
-        if dut_idx==-1:
-            port = 'null' # UGLY, mainly for wpc test, only 1 dut
-            dut_idx = 0
-        else:
-            port = self.window.comports()[dut_idx]
+        port = self.window.comports()[dut_idx]
         each, script, tasktype, args = self.unpack_each(row_idx)
         msg = (f'[runeach][script: {script}][row_idx: {row_idx}]'
                f'[dut_idx: {dut_idx}][port: {port}][sid: {sid}]'
@@ -405,11 +405,19 @@ class Task(QThread):
             self.task_each.emit([i, len(items)])
             if task_type == 1:
                 procs = {}
-                for port, barcode in self.window.port_barcodes.items():
-                    if barcode:
-                        dut_idx = self.window.comports().index(port)
-                        proc = self.runeach(i, dut_idx, barcode, task_type)
+                if any(self.window.port_barcodes.values()):
+                    for port, barcode in self.window.port_barcodes.items():
+                        if barcode:
+                            dut_idx = self.window.comports().index(port)
+                            proc = self.runeach(i, dut_idx, barcode, task_type)
+                            procs[port] = proc
+                else:
+                    for dut_idx in self.window.dut_selected:
+                        proc = self.runeach(i, dut_idx, '', task_type)
+                        port = self.window.comports()[dut_idx]
+                        print('port SADSADASD', port)
                         procs[port] = proc
+
                 print('procs', procs)
                 for j, (port, proc) in enumerate(procs.items()):
                     output, _ = proc.communicate()
@@ -425,6 +433,18 @@ class Task(QThread):
                                 len(self.header()) +
                                 self.window.dut_selected[j]] = output
                     print('run: result', result)
+
+                    if not any(self.window.port_barcodes.values()):
+                        script = next_item['script']
+                        func = next_item['args'][0]
+                        to_read_pid = (script=='task_runeach' and func=='read_pid')
+                        if output.startswith('Pass') and to_read_pid:
+                            pid = output[5:-1]
+                            header = self.header_ext()
+                            dut_i = self.window.dut_selected[j]
+                            header[-self.dut_num + dut_i] = f'#{dut_i+1} - {pid}'
+                            self.window.table_view.setHorizontalHeaderLabels(header)
+
                     self.task_result.emit(result)
 
             elif task_type == 2:
@@ -911,7 +931,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 df = d[d.hidden == False]
                 cols1 = (df.group + ': ' + df.item).values.tolist()
                 dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
-                dd.index = [self.barcodes[j]]
+
+                if self.barcodes:
+                    dd.index = [self.barcodes[j]]
                 dd.index.name = 'pid'
 
                 cols2_value = {
@@ -956,12 +978,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
 
-        self.show_barcode_dialog()
-        self.set_window_color('default')
+        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
+        print('dut_selected', self.dut_selected)
         for i in range(self.task.len() + 1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
+        self.set_window_color('default')
+
+        if self.task.behaviors['barcode-scan']:
+            self.show_barcode_dialog()
+        else:
+            self.pushButton.setEnabled(False)
+            self.ser_listener.stop()
+            self.task.start()
 
     def closeEvent(self, event):
         print('closeEvent')
@@ -1025,8 +1055,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         When the barcode(s) are ready, start testing
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
-        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
-        print('dut_selected', self.dut_selected)
+        #  self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
+        #  print('dut_selected', self.dut_selected)
         header = self.task.header_ext()
         for j, dut_i in enumerate(self.dut_selected):
             header[-self.task.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
@@ -1080,17 +1110,17 @@ if __name__ == "__main__":
     STATION = 'RF'
     STATION = 'CapTouch'
     STATION = 'MainBoard'
-    STATION = 'WPC'
     STATION = 'LED'
+    STATION = 'WPC'
 
     app = QApplication(sys.argv)
 
-    task_mb = Task('v7_ftdi_total')
-    task_led = Task('v7_led')
-    task_simu = Task('v5_simu')
-    task_cap_touch = Task('v7_cap_touch')
-    task_rf = Task('v7_rf')
-    task_wpc = Task('v7_wpc')
+    task_mb = Task('v8_ftdi_total')
+    task_led = Task('v8_led')
+    task_simu = Task('v8_simu')
+    task_cap_touch = Task('v8_cap_touch')
+    task_rf = Task('v8_rf')
+    task_wpc = Task('v8_wpc')
 
     map_ = {
         'MainBoard': 'mb',
