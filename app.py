@@ -384,9 +384,7 @@ class Task(QThread):
     def run(self):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
-
         t0 = time_()
-
         for action, args in self.action_args:
             print('run action', action, args)
             if not action(*args):
@@ -398,22 +396,42 @@ class Task(QThread):
         get_col = lambda arr, col: map(lambda x: x[col], arr)
 
         c1 = len(self.header())
-        self.df.iloc[:, c1:c1 + 2] = ""
+        #  self.df.iloc[:, c1:c1 + 2] = ""
+        self.df.iloc[:, c1:c1 + self.dut_num] = ""
 
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             is_auto, task_type = next_item['auto'], next_item['tasktype']
-            print('i', i, 'next_item', next_item)
-            #  if len(items) > 1:
-            if task_type == 2:
-                self.task_each.emit([i, len(items)])
+            self.task_each.emit([i, len(items)])
+            if task_type == 1:
+                procs = {}
+                for port, barcode in self.window.port_barcodes.items():
+                    if barcode:
+                        dut_idx = self.window.comports().index(port)
+                        proc = self.runeach(i, dut_idx, barcode, task_type)
+                        procs[port] = proc
+                print('procs', procs)
+                for j, (port, proc) in enumerate(procs.items()):
+                    output, _ = proc.communicate()
+                    output = output.decode('utf8')
+                    msg2 = '[task %s][output: %s]' % (i, output)
+                    self.printterm_msg.emit(msg2)
+                    result = json.dumps({
+                        'index': i,
+                        'port': port,
+                        'output': output
+                    })
+                    self.df.iat[i,
+                                len(self.header()) +
+                                self.window.dut_selected[j]] = output
+                    print('run: result', result)
+                    self.task_result.emit(result)
+
+            elif task_type == 2:
                 proc = self.rungroup(group)
                 output, _ = proc.communicate()
-                print('OUTPUT', output)
-
                 output = output.decode('utf8')
                 print('OUTPUT', output)
-
                 msg2 = '[task %s][output: %s]' % ([i, i + len(items)], output)
                 self.printterm_msg.emit(msg2)
                 result = json.dumps({
@@ -423,56 +441,23 @@ class Task(QThread):
                 r1, r2 = i, i + len(items)
                 c1 = len(self.header()) + self.window.dut_selected[0]
                 c2 = c1 + len(self.window.dut_selected)
-
                 output = json.loads(output)
                 if len(self.window.dut_selected) == 1:
                     output = [[e] for e in get_col(output, self.window.dut_selected[0])]
                 print('OUTPUT', output)
-
                 self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
 
-            else:
-                self.task_each.emit([i, 1])
-                if is_auto:
-                    procs = {}
-                    for port, barcode in self.window.port_barcodes.items():
-                        if barcode:
-                            if not port:
-                                dut_idx = -1 # UGLY, mainly for wpc test, only 1 dut
-                            else:
-                                dut_idx = self.window.comports().index(port)
-                            proc = self.runeach(i, dut_idx, barcode, task_type)
-                            procs[port] = proc
+            elif task_type == 3:
+                selected_port_list = []
+                for selected_i in self.window.dut_selected:
+                    selected_port_list.append(self.window._comports_dut[selected_i])
 
-                    print('procs', procs)
-                    for j, (port, proc) in enumerate(procs.items()):
-                        print('j', j, 'port', port, 'proc', proc)
-                        output, _ = proc.communicate()
-                        output = output.decode('utf8')
-                        msg2 = '[task %s][output: %s]' % (i, output)
-                        self.printterm_msg.emit(msg2)
-                        result = json.dumps({
-                            'index': i,
-                            'port': port,
-                            'output': output
-                        })
-                        self.df.iat[i,
-                                    len(self.header()) +
-                                    self.window.dut_selected[j]] = output
-                        print('run: result', result)
-                        self.task_result.emit(result)
-                else:
-                    selected_port_list = []
-                    for selected_i in self.window.dut_selected:
-                        selected_port_list.append(self.window._comports_dut[selected_i])
-
-                    selected_port_str = ','.join(selected_port_list)
-                    self.runeachports(i, selected_port_str)
-                QThread.msleep(500)
+                selected_port_str = ','.join(selected_port_list)
+                self.runeachports(i, selected_port_str)
+            QThread.msleep(500)
 
         t1 = time_()
-
         self.df = self.df.fillna('')
         message = {
             'msg': 'tasks done',
@@ -500,11 +485,7 @@ class MySettings():
         self.update()
 
     def update(self):
-        #  self.is_fx1_checked = self.get('fixture_1', False, bool)
-        #  self.is_fx2_checked = self.get('fixture_2', False, bool)
         for i in range(1, self.dut_num+1):
-            print('MySettings update i', i)
-            print(self.get(f'fixture_{i}', False, bool))
             setattr(self, f'is_fx{i}_checked',
                 self.get(f'fixture_{i}', False, bool))
         self.lang_index = self.get('lang_index', 0, int)
@@ -530,15 +511,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings = MySettings(dut_num=self.task.dut_num)
         self.make_checkboxes()
 
-        # Restore UI states
-        #  self.checkBoxFx1.setChecked(self.settings.is_fx1_checked)
-        #  self.checkBoxFx2.setChecked(self.settings.is_fx2_checked)
-
         self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
         self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
-        #  self._comports_dut = []
         self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
         self._comports_pwr = []
         self._comports_dmm = []
@@ -558,11 +534,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.dut_layout.append(layout)
 
         self.setsignal()
-
-        #  print('\n\n')
-        #  for k,v in self.task.devices.items():
-            #  print(k,v)
-        #  print('\n\n')
 
         self.ser_listener = SerialListener(devices=self.task.devices)
         self.ser_listener.comports_dut.connect(self.ser_update)
@@ -984,6 +955,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             e_msg = QErrorMessage(self)
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
+
         self.show_barcode_dialog()
         self.set_window_color('default')
         for i in range(self.task.len() + 1):
@@ -1052,28 +1024,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         When the barcode(s) are ready, start testing
         """
-
-        #  is_1 = self.settings.is_fx1_checked
-        #  is_2 = self.settings.is_fx2_checked
-        #  print('is_1', is_1, 'is_2', is_2)
-
-        #  self.dut_selected = [i for i, x in enumerate([is_1, is_2]) if x] # Return the index of Trues. E.g.: [False, True] => [1]
-
         # Return the index of Trues. E.g.: [False, True] => [1]
-        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x] 
+        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
         print('dut_selected', self.dut_selected)
-
         header = self.task.header_ext()
-
         for j, dut_i in enumerate(self.dut_selected):
             header[-self.task.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
             port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
         print('header', header)
         print('port_barcodes', self.port_barcodes)
-
         self.table_view.setHorizontalHeaderLabels(header)
-
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
         self.task.start()
