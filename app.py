@@ -1088,15 +1088,29 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         return color
 
     def taskrun(self, result):
-        ret = json.loads(result)    # E.g. {'index': 0, 'idx': 0, 'output': 'Passed'}
-        idx = ret['index']
+        """
+        Set background color of specified table cells to indicate pass/fail
 
-        if type(idx) == list:
+        Args:
+            result: A dict with the following fields:
+
+                index(int or [int, int]): Row or row range
+                idx(int): The (idx)th DUT
+                port(str): The port name, used to inference idx
+                output(str): 'Passed' or 'Failed'
+
+                e.g. {'index': 0, 'idx': 0, 'port':'COM1', 'output': 'Passed'}
+        """
+        ret = json.loads(result)
+        row = ret['index']
+
+        # The pass/fail result applies for the jth DUT of rows from index[0] to index[1]
+        if type(row) == list:
             print('output', ret['output'])
             output = json.loads(ret['output'])
-            for i in range(*idx):
+            for i in range(*row):
                 for j in self.dut_selected:
-                    x = output[i - idx[0]][j]
+                    x = output[i - row[0]][j]
                     self.table_view.setItem(i, self.col_dut_start + j, QTableWidgetItem(x))
                     self.table_view.item(i, self.col_dut_start + j).setBackground(self.color_check(x))
         else:
@@ -1108,9 +1122,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 j = self.comports().index(port)
             elif 'idx' in ret:
                 j = ret['idx']
-            print('task %s are done, j=%s' % (idx, j))
-            self.table_view.setItem(idx, self.col_dut_start + j, QTableWidgetItem(output))
-            self.table_view.item(idx, self.col_dut_start + j).setBackground(self.color_check(output))
+
+            print('task %s are done, j=%s' % (row, j))
+            self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
+            self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
+
 
     def taskdone(self, message):
         print('taskdone start !')
