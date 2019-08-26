@@ -1113,7 +1113,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     x = output[i - row[0]][j]
                     self.table_view.setItem(i, self.col_dut_start + j, QTableWidgetItem(x))
                     self.table_view.item(i, self.col_dut_start + j).setBackground(self.color_check(x))
-        else:
+
+        # The pass/fail result applies for the jth DUT of the specified row
+        elif ('port' in ret) or ('idx' in ret):
             output = str(ret['output'])
             print('runeach output', output)
             print('self.comports', self.comports()) # E.g. ['COM1', 'COM2']
@@ -1126,6 +1128,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('task %s are done, j=%s' % (row, j))
             self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
             self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
+
+        # The pass/fail result applies for all selected DUT of the specified row
+        else:
+            output = ret['output']
+            for j in self.dut_selected:
+                self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
+                self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
 
 
     def taskdone(self, message):
