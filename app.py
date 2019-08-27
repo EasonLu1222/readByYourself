@@ -5,10 +5,12 @@ import time
 import pickle
 import threading
 import pandas as pd
+import importlib
 from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
+from threading import Thread
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
@@ -32,6 +34,7 @@ from instrument import (update_serial, generate_instruments, PowerSupply, DMM,
                         Eloader, PowerSensor)
 from ui.design3 import Ui_MainWindow
 from mylogger import logger
+from tasks.task_mic import play_tone
 
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
@@ -487,7 +490,6 @@ class Task(QThread):
         print('limits', limits)
         args = {'args': args, 'limits': limits}
 
-
         #  coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
         coms = {}
         for k,v in self.instruments.items():
@@ -498,6 +500,7 @@ class Task(QThread):
                 com_to_extract = 'visa_addr'
             if len(v) > 0 :
                 coms.update({k: [getattr(e, com_to_extract) for e in v]})
+
         coms = json.dumps(coms)
         print('coms', coms)
         proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE)
@@ -592,7 +595,7 @@ class Task(QThread):
                     for dut_idx in self.window.dut_selected:
                         proc = self.runeach(i, dut_idx, '', task_type)
                         port = self.window.comports()[dut_idx]
-                        print('port SADSADASD', port)
+                        print('port: ', port)
                         procs[port] = proc
 
                 print('procs', procs)
@@ -652,6 +655,28 @@ class Task(QThread):
 
                 selected_port_str = ','.join(selected_port_list)
                 self.runeachports(i, selected_port_str)
+
+            elif task_type == 4:
+                line = self.df.values[i]
+                mod_name = f'tasks.{line[0]}'
+                mod = importlib.import_module(mod_name)
+
+                func_list = [str(e) for e in line[1]] if line[1] else []
+
+                func = getattr(mod, func_list[0])
+                t = Thread(target=func)
+                t.start()
+                r1, r2 = i, i+1
+                c1 = len(self.header()) + self.window.dut_selected[0]
+                c2 = c1 + len(self.window.dut_selected)
+                self.df.iloc[r1:r2, c1:c2] = "Passed"
+
+                result = json.dumps({
+                    'index': i,
+                    'output': "Passed"
+                })
+                self.task_result.emit(result)
+
             QThread.msleep(500)
 
         t1 = time_()
@@ -1177,7 +1202,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
                 res = 'Pass' if all_pass(results_) else 'Fail'
-
                 fail_list = get_fail_list(d[d.columns[-dut_num+dut_i]])
                 print('fail_list', fail_list)
                 self.table_view.setItem(r, self.col_dut_start + dut_i, QTableWidgetItem(res))
@@ -1429,14 +1453,14 @@ if __name__ == "__main__":
             'action': disable_power_check,
             'args': (),
         },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
-        },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2, 7),
-        },
+        # {
+        #     'action': is_serial_ok,
+        #     'args': (win.comports, task_mb.serial_ok),
+        # },
+        # {
+        #     'action': enter_prompt,
+        #     'args': (win, 0.2, 7),
+        # },
     ]
     actions_rf = [
         {

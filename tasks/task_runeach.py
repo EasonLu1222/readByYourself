@@ -7,7 +7,6 @@ import time
 import random
 import argparse
 import inspect
-from operator import itemgetter
 from subprocess import Popen, PIPE
 from serials import issue_command, get_serial, enter_factory_image_prompt
 
@@ -53,9 +52,34 @@ def write_usid(sid):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result =  f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
+        result = f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
         return result
 
+
+def record_sound(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        wav_file_path = '/usr/share/recorded_sound.wav'
+
+        # Remove previously recorded file
+        cmd = f'rm {wav_file_path}'
+        lines = issue_command(ser, cmd)
+
+        # Start recording
+        cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d 1 {wav_file_path}'
+        lines = issue_command(ser, cmd)
+        # TODO: Check if WAV file exists
+        time.sleep(1)
+        return 'Passed'
+
+
+def get_mic_test_result(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        test_result_path = '/usr/share/mic_test_result'
+        cmd = f'cat {test_result_path}'
+        lines = issue_command(ser, cmd)
+        logger.error(lines)
+        result = f'Passed' if any(re.match('Passed', e) for e in lines) else 'Failed'
+        return result
 
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
@@ -213,7 +237,7 @@ if __name__ == "__main__":
                         type=str)
     parser.add_argument('-i', '--dut_idx', help='dut #number', type=int)
     parser.add_argument('-s', '--sid', help='serial id', type=str)
-    parser.add_argument('funcname', help='serial id', type=str)
+    parser.add_argument('funcname', help='function name', type=str)
     args = parser.parse_args()
     portname, dut_idx, sid = [
         getattr(args, e) for e in ('portname', 'dut_idx', 'sid')
