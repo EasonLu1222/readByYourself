@@ -42,8 +42,11 @@ def is_serial_free(port_name):
 def get_device(comport):
     try:
         device = None
-        matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
-        vid_pid = matched[8:]
+        matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid)
+        if not matched:
+            return
+        group = matched.group()
+        vid_pid = group[8:]
         device, _ = DEVICES[vid_pid]
     except KeyError as ex:
         msg = (f'\n\n{type_(ex)}, {ex}'
