@@ -8,7 +8,7 @@
     }
  },
  "behaviors": {
-     "barcode-scan": true
+     "barcode-scan": false
  },
  "test_items":
     [
@@ -28,7 +28,7 @@
         ,{
             "group": "Cap Touch Test",
             "hidden": false,
-            "tasktype": 2,
+            "tasktype": 3,
             "item": "",
             "script": "task_cap_touch",
             "args": null,

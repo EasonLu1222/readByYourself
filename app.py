@@ -27,16 +27,142 @@ from serials import (enter_factory_image_prompt, get_serial, se, get_device,
                      get_devices, is_serial_free, check_which_port_when_poweron,
                      filter_devices, get_devices_df, BaseSerialListener)
 
-from instrument import update_serial, generate_instruments, PowerSupply, DMM, Eloader
+import visa
+from instrument import (update_serial, generate_instruments, PowerSupply, DMM,
+                        Eloader, PowerSensor)
 from ui.design3 import Ui_MainWindow
 from mylogger import logger
+
+from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
+                    SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 
 
 INSTRUMENT_MAP = {
     'gw_powersupply': PowerSupply,
     'gw_dmm': DMM,
     'gw_eloader': Eloader,
+    'ks_powersensor': PowerSensor,
 }
+
+
+def get_visa_devices():
+    dll_32 = 'C:/Windows/System32/visa32.dll'
+    rm = visa.ResourceManager(dll_32)
+    resource_names = rm.list_resources()
+    resource_names = [e for e in resource_names if e.startswith('USB')]
+    devices = []
+    for resource_name in resource_names:
+        usb_idx, name, sn = get_visa_device(resource_name)
+        devices.append({
+            'comport': usb_idx,
+            'name': name,
+            'sn': sn
+        })
+    return devices
+
+
+def get_visa_device(resource_name):
+    usb_idx, vid, pid, sn, _ = resource_name.split('::')
+    vid_pid = f'{vid[2:]}:{pid[2:]}'
+    name, _ = DEVICES[vid_pid]
+    return usb_idx, name, sn
+
+
+
+class BaseVisaListener(QThread):
+    update_msec = 500
+    if_all_ready = QSignal(bool)
+    def __init__(self, *args, **kwargs):
+        super(BaseVisaListener, self).__init__(*args, **kwargs)
+        self.is_reading = False
+        self.is_instrument_ready = False
+
+    def filter_devices(self, devices, name, field='comport'):
+        filtered = [e[field] for e in [e for e in devices if e['name']==name]]
+        return filtered
+
+    def get_update_ports_map(self):
+        devices = get_visa_devices()
+        ports_map = {}
+        for k,v in self.devices.items():
+            ports = self.filter_devices(devices, v['name'])
+            ports_map[k] = ports
+        return ports_map
+
+    def update(self, devices_prev, devices):
+        set_prev, set_now = set(devices_prev), set(devices)
+        if set_prev != set_now:
+            if set_now > set_prev:
+                d = set_now - set_prev
+                devices_prev.extend(list(d))
+            else:
+                d = set_prev - set_now
+                for e in d:
+                    devices_prev.remove(e)
+            return True
+        return False
+
+    def port_full(self, excludes=None):
+        for k,v in self.devices.items():
+
+            if not v['name']:
+                continue
+
+            if excludes:
+                for e in excludes:
+                    if k==e: continue
+            if len(getattr(self, f'ports_{k}')) < v['num']:
+                return False
+        return True
+
+    def run(self):
+        while True:
+            QThread.msleep(BaseSerialListener.update_msec)
+            self.is_reading = True
+            ports_map = self.get_update_ports_map()
+            for k in self.devices.keys():
+                ports = ports_map[k]
+                self_ports = getattr(self, f'ports_{k}')
+                self_comports = getattr(self, f'comports_{k}')
+                if self.update(self_ports, ports):
+                    self_comports.emit(self_ports)
+            self.is_reading = False
+
+            if not self.is_instrument_ready and self.port_full():
+                self.is_instrument_ready = True
+                self.if_all_ready.emit(True)
+            if self.is_instrument_ready and not self.port_full():
+                self.is_instrument_ready = False
+                self.if_all_ready.emit(False)
+
+    def stop(self):
+        logger.info('BaseSerialListener stop start')
+        # wait 1s for list_ports to finish, is it enough or too long in order
+        # not to occupy com port for subsequent test scripts
+        if self.is_reading:
+            QThread.msleep(1000)
+        self.terminate()
+        logger.info('BaseSerialListener stop end')
+
+
+
+class UsbPowerSensor(): comports_pws = QSignal(list)
+
+class VisaListener(BaseVisaListener, UsbPowerSensor):
+    def __init__(self, *args, **kwargs):
+        devices = kwargs.pop('devices')
+        super(VisaListener, self).__init__(*args, **kwargs)
+        self.is_reading = False
+        self.is_instrument_ready = False
+        self.set_devices(devices)
+
+    def set_devices(self, devices):
+        self.devices = devices
+        for k,v in devices.items():
+            print('k', k, 'v', v)
+            setattr(self, f'ports_{k}', [])
+
+
 
 
 class ProcessListener(QThread):
@@ -79,7 +205,7 @@ class SerialListener(BaseSerialListener,
 
     def set_devices(self, devices):
         self.devices = devices
-        for k,v in self.devices.items():
+        for k,v in devices.items():
             setattr(self, f'ports_{k}', [])
 
 
@@ -216,7 +342,27 @@ class Task(QThread):
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
         self.df = self.load()
+        #  self.instruments = generate_instruments(self.serial_devices, INSTRUMENT_MAP)
         self.instruments = generate_instruments(self.devices, INSTRUMENT_MAP)
+        print('Task.instruments')
+        for k,v in self.instruments.items():
+            print(f'{k} ---> {v}')
+
+    @property
+    def serial_instruments(self):
+        name_int = dict(DEVICES.values()) # {intrument_name: interface}
+        filtered = {k:v for k,v in self.instruments.items() if name_int[k]=='serial'}
+        serial_inst = defaultdict(list)
+        serial_inst.update(filtered)
+        return serial_inst
+
+    @property
+    def visa_instruments(self):
+        name_int = dict(DEVICES.values()) # {intrument_name: interface}
+        filtered = {k:v for k,v in self.instruments.items() if name_int[k]=='visa'}
+        visa_inst = defaultdict(list)
+        visa_inst.update(filtered)
+        return visa_inst
 
     @property
     def mylist(self):
@@ -224,7 +370,7 @@ class Task(QThread):
 
     @property
     def dut_num(self):
-        return self.devices['dut']['num']
+        return self.base['devices']['dut']['num']
 
     def load(self):
         header = self.base['header']
@@ -266,9 +412,30 @@ class Task(QThread):
         min_, expect, max_ = itemgetter('min', 'expect', 'max')(each)
         return (min_, expect, max_)
 
+    #  @property
+    #  def devices(self):
+        #  return self.base['devices']
+
     @property
     def devices(self):
-        return self.base['devices']
+        all_devices = {}
+        if self.serial_devices:
+            all_devices.update(self.serial_devices)
+        if self.visa_devices:
+            all_devices.update(self.visa_devices)
+        return all_devices
+
+    @property
+    def serial_devices(self):
+        devices = self.base['devices']
+        serial_devices = {k:v for k,v in devices.items() if v['name'] in SERIAL_DEVICE_NAME}
+        return serial_devices
+
+    @property
+    def visa_devices(self):
+        devices = self.base['devices']
+        visa_devices = {k:v for k,v in devices.items() if v['name'] in VISA_DEVICE_NAME}
+        return visa_devices
 
     @property
     def behaviors(self):
@@ -320,7 +487,17 @@ class Task(QThread):
         print('limits', limits)
         args = {'args': args, 'limits': limits}
 
-        coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
+
+        #  coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
+        coms = {}
+        for k,v in self.instruments.items():
+            interface = dict(DEVICES.values())[k]
+            if interface == 'serial':
+                com_to_extract = 'com'
+            elif interface == 'visa':
+                com_to_extract = 'visa_addr'
+            if len(v) > 0 :
+                coms.update({k: [getattr(e, com_to_extract) for e in v]})
         coms = json.dumps(coms)
         print('coms', coms)
         proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE)
@@ -539,10 +716,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self._comports_pwr = []
         self._comports_dmm = []
         self._comports_eld = []
+        self._comports_pws = []
 
-        update_serial(self.task.instruments, 'gw_powersupply', self._comports_pwr)
-        update_serial(self.task.instruments, 'gw_dmm', self._comports_dmm)
-        update_serial(self.task.instruments, 'gw_eloader', self._comports_eld)
+        if self.task.serial_instruments:
+            update_serial(self.task.serial_instruments, 'gw_powersupply', self._comports_pwr)
+            update_serial(self.task.serial_instruments, 'gw_dmm', self._comports_dmm)
+            update_serial(self.task.serial_instruments, 'gw_eloader', self._comports_eld)
 
         self.dut_layout = []
         colors = ['#edd'] * self.task.dut_num
@@ -555,13 +734,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.setsignal()
 
-        self.ser_listener = SerialListener(devices=self.task.devices)
+        #  self.ser_listener = SerialListener(devices=self.task.devices)
+        self.ser_listener = SerialListener(devices=self.task.serial_devices)
         self.ser_listener.comports_dut.connect(self.ser_update)
         self.ser_listener.comports_pwr.connect(self.pwr_update)
         self.ser_listener.comports_dmm.connect(self.dmm_update)
         self.ser_listener.comports_eld.connect(self.eld_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
         self.ser_listener.start()
+        self.serial_ready = False
+
+        if self.task.visa_devices:
+            self.visa_listener = VisaListener(devices=self.task.visa_devices)
+            self.visa_listener.comports_pws.connect(self.pws_update)
+            self.visa_listener.if_all_ready.connect(self.visa_instrument_ready)
+            self.visa_listener.start()
+            self.visa_ready = False
+        else:
+            self.visa_ready = True
 
         self.proc_listener = ProcessListener()
         self.proc_listener.process_results.connect(self.recieve_power)
@@ -704,9 +894,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(self.task.instruments, 'gw_eloader', comports)
         self.render_port_plot()
 
+    def pws_update(self, comports):
+        print('pws_update', comports)
+        self._comports_pws = comports
+        update_serial(self.task.instruments, 'ks_powersensor', comports)
+        self.render_port_plot()
+
     def ser_update(self, comports):
         print('ser_update', comports)
-        dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
+        #  dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
+        dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.serial_devices['dut'])
         df = get_devices_df()
 
         if sn_numbers:
@@ -719,6 +916,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)
         else:
+            print('dut does not have sn number')
             dict_to_nonempty_list = lambda dict_: list(filter(lambda x:x, list(dict_.values())))
             list_ = dict_to_nonempty_list(self._comports_dut)
             if len(comports) > len(list_):
@@ -727,7 +925,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self._comports_dut = dict(zip(range(len(x)), x))
             else:
                 self._comports_dut = dict(zip(range(len(comports)), comports))
-            print(self._comports_dut)
 
         self.barcodes = []
 
@@ -754,6 +951,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             'gw_powersupply': self._comports_pwr,
             'gw_dmm': self._comports_dmm,
             'gw_eloader': self._comports_eld,
+            'ks_powersensor': self._comports_pws,
         }
 
         for i, e in enumerate(self.dut_layout, 1):
@@ -766,39 +964,72 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 lb_port.setStyleSheet(style_('#369'))
                 self.dut_layout[i].addWidget(lb_port)
 
-        colors_inst = {'gw_powersupply': '#712',
-                       'gw_dmm': '#4a3',
-                       'gw_eloader': '#a31'}
+        colors_inst = {
+            'gw_powersupply': '#712',
+            'gw_dmm': '#4a3',
+            'gw_eloader': '#a31',
+            'ks_powersensor': '#1a3',
+        }
 
-        for name, num in self.task.instruments.items():
-            print('name', name, 'num', num)
+        for name, items in self.task.instruments.items():
             each_instruments = self.task.instruments[name]
             for i, e in enumerate(each_instruments):
-                print(
-                    f'[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]'
-                )
-                if e.com in comports_map[name]:
-                    lb_port = QLabel(e.com)
-                    lb_port.setStyleSheet(style_(colors_inst[name]))
-                    self.dut_layout[i].addWidget(lb_port)
+
+                if e.interface=='serial':
+                    print(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
+                    if e.com in comports_map[name]:
+                        lb_port = QLabel(e.com)
+                        lb_port.setStyleSheet(style_(colors_inst[name]))
+                        self.dut_layout[i].addWidget(lb_port)
+
+                elif e.interface=='visa':
+                    print(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
+                    if comports_map[name]:
+                        lb_port = QLabel(e.com)
+                        lb_port.setStyleSheet(style_(colors_inst[name]))
+                        self.dut_layout[i].addWidget(lb_port)
+
+                #  lb_port.setStyleSheet(style_(colors_inst[name]))
+                #  self.dut_layout[i].addWidget(lb_port)
 
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
 
+    def visa_instrument_ready(self, ready):
+        if ready:
+            self.visa_ready = True
+            print('\nVISA READY\n')
+        else:
+            self.visa_ready = False
+            self.pushButton.setEnabled(False)
+            print('\nVISA NOT READY\n')
+
+        if self.serial_ready and self.visa_ready:
+            print('\n===READY===')
+            self.pushButton.setEnabled(True)
+
     def instrument_ready(self, ready):
         if ready:
-            print('\nREADY\n!')
+            print('\nSERIAL READY\n!')
+            self.serial_ready = True
             self.clean_power()
 
             # order: power1,power2, dmm1
-            instruments_to_dump = sum(self.task.instruments.values(), [])
-            with open('instruments', 'wb') as f:
-                pickle.dump(instruments_to_dump, f)
+            #  instruments_to_dump = sum(self.task.instruments.values(), [])
+            if self.task.serial_instruments:
+                instruments_to_dump = sum(self.task.serial_instruments.values(), [])
+                with open('instruments', 'wb') as f:
+                    pickle.dump(instruments_to_dump, f)
+        else:
+            self.serial_ready = False
+            print('\nSERIAL NOT READY\n!')
 
+        if self.serial_ready and self.visa_ready:
+            print('\n===READY===')
             self.pushButton.setEnabled(True)
         else:
+            print('\n===NOT READY===')
             self.pushButton.setEnabled(False)
-            print('\nNOT READY\n!')
 
     def comports(self):
         comports_as_list = list(filter(lambda x:x, self._comports_dut.values()))
@@ -1108,19 +1339,21 @@ if __name__ == "__main__":
 
     STATION = 'SIMULATION'
     STATION = 'RF'
-    STATION = 'CapTouch'
     STATION = 'MainBoard'
+    STATION = 'CapTouch'
     STATION = 'LED'
     STATION = 'WPC'
+    STATION = 'PowerSensor'
 
     app = QApplication(sys.argv)
 
-    task_mb = Task('v8_ftdi_total')
     task_led = Task('v8_led')
     task_simu = Task('v8_simu')
     task_cap_touch = Task('v8_cap_touch')
     task_rf = Task('v8_rf')
     task_wpc = Task('v8_wpc')
+    task_ps = Task('v8_power_sensor')
+    task_mb = Task('v8_ftdi_total')
 
     map_ = {
         'MainBoard': 'mb',
@@ -1129,6 +1362,7 @@ if __name__ == "__main__":
         'CapTouch': 'cap_touch',
         'RF': 'rf',
         'WPC': 'wpc',
+        'PowerSensor': 'ps',
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1201,6 +1435,16 @@ if __name__ == "__main__":
         {
             'action': is_serial_ok,
             'args': (win.comports, task_mb.serial_ok),
+        },
+    ]
+    actions_ps = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        },
+        {
+            'action': enter_prompt,
+            'args': (win, 0.2),
         },
     ]
     actions_simu = [

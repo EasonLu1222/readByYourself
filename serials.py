@@ -11,6 +11,7 @@ from threading import Timer, Thread, Event
 import argparse
 from queue import Queue
 
+from config import DEVICES
 from mylogger import logger
 
 
@@ -42,9 +43,8 @@ def get_device(comport):
     try:
         device = None
         matched = re.search('VID:PID=[0-9A-Z]{4}:[0-9A-Z]{4}', comport.hwid).group()
-        devices = json.load(open('device.json', 'r'))
         vid_pid = matched[8:]
-        device = devices[vid_pid]
+        device, _ = DEVICES[vid_pid]
     except KeyError as ex:
         msg = (f'\n\n{type_(ex)}, {ex}'
                f'not defined in device.json.\n')
@@ -67,12 +67,16 @@ def get_devices():
 
 
 def get_devices_df():
-    device_df = pd.DataFrame(get_devices())
+    dfes = get_devices()
+    device_df = pd.DataFrame(dfes)
     return device_df
 
 
-def filter_devices(devices, name, field='comport'):
-    filtered = [e[field] for e in [e for e in devices if e['name']==name]]
+def filter_devices(devices, name, sn_numbers=None, field='comport'):
+    if sn_numbers:
+        filtered = [e[field] for e in [e for e in devices if e['name']==name and e['sn'] in sn_numbers]]
+    else:
+        filtered = [e[field] for e in [e for e in devices if e['name']==name]]
     return filtered
 
 
@@ -213,6 +217,12 @@ class BaseSerialListener(QThread):
         devices = get_devices()
         ports_map = {}
         for k,v in self.devices.items():
+
+            # add below two lines will only allow comports which sn_numbers 
+            # lies in jsonfile definition, but only for dut, not for instruments
+            #  sn_numbers = v['sn']
+            #  ports = filter_devices(devices, v['name'], sn_numbers)
+
             ports = filter_devices(devices, v['name'])
             ports_map[k] = ports
         return ports_map
@@ -233,7 +243,7 @@ class BaseSerialListener(QThread):
     def port_full(self, excludes=None):
         for k,v in self.devices.items():
 
-            if not v['name']: 
+            if not v['name']:
                 continue
 
             if excludes:

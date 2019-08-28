@@ -1,8 +1,14 @@
 import time
 from serials import (get_serial, get_devices)
+import json
+import visa
 from collections import defaultdict
 
 from mylogger import logger
+
+
+from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, 
+                    SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
@@ -171,7 +177,16 @@ ELOADER_STOP = '''
 '''
 
 
-def cmd(command_constant):
+POWERSENSOR_INIT = '''
+    SYST:PRES DEF
+    CAL:ZERO:TYPE INT
+    CAL
+    *OPC?
+    INIT:CONT ON
+'''
+
+
+def cmd(command_constant, add_newline=True):
     return [e.strip() for e in command_constant.strip().split('\n')]
 
 
@@ -211,6 +226,7 @@ def get_ordered_comports_by_gw_idn(comports, sn_numbers):
 
 def update_serial(instruments, inst_type, comports):
     logger.info('update_serial start')
+    logger.info(f'inst_type: {inst_type}')
     inst = instruments[inst_type]
     for i, e in enumerate(inst):
         e.com = None
@@ -231,8 +247,92 @@ def update_serial(instruments, inst_type, comports):
     logger.info('update_serial end\n')
 
 
+class Instrument():
+    @property
+    def interface(self):
+        filtered = [e[1] for e in DEVICES.values() if self.NAME==e[0]]
+        if len(filtered)==1:
+            return filtered[0]
+        else:
+            return 'unknown'
 
-class SerialInstrument():
+
+visa_addr = 'USB0::0x2A8D::0x2D18::MY57420015::0::INSTR'
+class VisaInstrument(Instrument):
+    dll_32 = 'C:/Windows/System32/visa32.dll'
+    dll_64 = 'C:/Windows/System32/visa64.dll'
+
+    #  def __init__(self, index, visa_addr=None, delay_sec=0.002):
+    def __init__(self, index, sn=None, delay_sec=0.002):
+        self.index = index
+        vid_pid = [k for k,v in DEVICES.items() if v[0]=='ks_powersensor'][0]
+        vid, pid = [f'0x{e}' for e in vid_pid.split(':')]
+        self.visa_addr = '::'.join([
+            f'USB{index-1}', vid, pid, sn, 'INSTR'])
+        self.delay_sec = delay_sec
+        self.rm = visa.ResourceManager(self.dll_32)
+
+    def open(self):
+        try:
+            self.dev = self.rm.open_resource(self.visa_addr)
+            self.dev.timeout = 30000
+            self.dev.clear()
+        except Exception as ex:
+            return False
+        else:
+            return True
+
+    def close(self):
+        self.dev.close()
+
+    def run_cmd(self, items, fetch=False):
+        try:
+            for cmd in items:
+                logger.info(f'cmd: {cmd}')
+                if '?' in cmd:
+                    result = self.dev.query(cmd)
+                else:
+                    self.dev.write(cmd)
+                if self.delay_sec:
+                    time.sleep(self.delay_sec)
+            if fetch:
+                return result
+        except Exception as ex:
+            logger.error("run_cmd failed!")
+            logger.error(f'{type_(ex)}, {ex}')
+
+    def read_idn(self):
+        idn = self.run_cmd(['*IDN?'], True)
+        sn = idn.split(',')[2]
+        return sn
+
+
+class PowerSensor(VisaInstrument):
+    NAME = 'ks_powersensor'
+    StartFetchTime = 0
+    MeasureTime = 0.3
+
+    def init(self):
+        line = self.run_cmd(cmd(POWERSENSOR_INIT), True)
+
+    def measure_power(self, freq):
+        t0 = time.perf_counter()
+        elapsed = lambda: time.perf_counter() - t0
+        line = self.run_cmd([f'FREQ {freq}', 'FREQ?'], True)
+        powers = []
+        while (True):
+            if elapsed() >= self.StartFetchTime:
+                line = self.run_cmd(['FETC?'], True)
+                if not line: continue
+                result = float(line)
+                powers.append(result)
+            if elapsed() > self.MeasureTime:
+                self.ave_power = sum(powers)/len(powers)
+                break
+        return self.ave_power
+
+
+class SerialInstrument(Instrument):
 
     def __init__(self,
                  index=1,
@@ -416,6 +516,7 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
 
 
 def generate_instruments(task_devices, instrument_map):
+    print('\n\ngenerate_instruments ->', task_devices)
     instruments = defaultdict(list)
     for dev, dev_info in task_devices.items():
         name, num = dev_info['name'], dev_info['num']
