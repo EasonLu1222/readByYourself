@@ -59,16 +59,17 @@ def write_usid(sid):
 def record_sound(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         wav_file_path = '/usr/share/recorded_sound.wav'
+        wav_duration = 12   # In seconds
 
         # Remove previously recorded file
         cmd = f'rm {wav_file_path}'
         lines = issue_command(ser, cmd)
 
         # Start recording
-        cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d 1 {wav_file_path}'
+        cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d {wav_duration+1} {wav_file_path}'
         lines = issue_command(ser, cmd)
         # TODO: Check if WAV file exists
-        time.sleep(1)
+        time.sleep(wav_duration+2)
         return 'Passed'
 
 
@@ -77,9 +78,14 @@ def get_mic_test_result(portname):
         test_result_path = '/usr/share/mic_test_result'
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
-        logger.error(lines)
         result = f'Passed' if any(re.match('Passed', e) for e in lines) else 'Failed'
+
+        # Delete test result
+        cmd = f'rm {test_result_path}'
+        lines = issue_command(ser, cmd)
+
         return result
+
 
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
