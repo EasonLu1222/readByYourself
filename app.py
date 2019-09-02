@@ -36,6 +36,7 @@ from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 
+from soundcheck import BSndChk
 
 INSTRUMENT_MAP = {
     'gw_powersupply': PowerSupply,
@@ -43,6 +44,27 @@ INSTRUMENT_MAP = {
     'gw_eloader': Eloader,
     'ks_powersensor': PowerSensor,
 }
+
+
+def soundcheck_init(sqz_path=None):
+    print('soundcheck_init start')
+    b = BSndChk()
+    cases = ['all pass', 'all failed', 'one failed']
+    case = cases[0]
+    try:
+        b.LinkSC()
+        sqz_path = os.path.join(os.path.abspath(os.path.curdir),
+                                'soundcheck_sequence',
+                                f'test_20181030_{case}',
+                                f"test_{case.replace(' ', '_')}.sqc")
+        b.Open_Sequence(sqz_path)
+        setattr(thismodule, 'snd_chk', b)
+        time.sleep(1)
+    except Exception as ex:
+        print(ex)
+        return False
+    print('soundcheck_init end')
+    return True
 
 
 def get_visa_devices():
@@ -652,6 +674,24 @@ class Task(QThread):
 
                 selected_port_str = ','.join(selected_port_list)
                 self.runeachports(i, selected_port_str)
+
+            elif task_type == 9:
+                obj_name, method_name = next_item['args']
+                obj = getattr(thismodule, obj_name)
+                output = getattr(obj, method_name)()
+                r1, r2 = i, i + len(items)
+                c1 = len(self.header()) + self.window.dut_selected[0]
+                c2 = c1 + len(self.window.dut_selected)
+                if len(self.window.dut_selected) == 1:
+                    output = [[e] for e in output]
+                result = json.dumps({
+                    'index': [i, i + len(items)],
+                    'output': output
+                })
+                self.df.iloc[r1:r2, c1:c2] = output
+                self.task_result.emit(result)
+
+
             QThread.msleep(500)
 
         t1 = time_()
@@ -772,6 +812,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+
+        self.prepare_args = list()
+
+    def register_prepare(self, prepares):
+        print('register_prepares')
+        for e in prepares:
+            prepare, args = e['prepare'], e['args']
+            self.prepare_args.append([prepare, args])
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -995,7 +1043,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
 
+    def prepare(self):
+        print('prepare start')
+        for action, args in self.prepare_args:
+            print('run prepare', action, args)
+            if not action(*args):
+                print('return !!!!!')
+                return
+        print('prepare end')
+
     def visa_instrument_ready(self, ready):
+        print('visa_instrument_ready start')
         if ready:
             self.visa_ready = True
             print('\nVISA READY\n')
@@ -1007,8 +1065,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             print('\n===READY===')
             self.pushButton.setEnabled(True)
+            self.prepare()
 
     def instrument_ready(self, ready):
+        print('instrument_ready start')
         if ready:
             print('\nSERIAL READY\n!')
             self.serial_ready = True
@@ -1027,6 +1087,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             print('\n===READY===')
             self.pushButton.setEnabled(True)
+            self.prepare()
         else:
             print('\n===NOT READY===')
             self.pushButton.setEnabled(False)
@@ -1092,8 +1153,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         idx = ret['index']
 
         if type(idx) == list:
-            print('output', ret['output'])
-            output = json.loads(ret['output'])
+            output = ret['output']
+            if type(output) == str:
+                output = json.loads(output)
+            print('output', output)
             for i in range(*idx):
                 for j in self.dut_selected:
                     x = output[i - idx[0]][j]
@@ -1339,11 +1402,12 @@ if __name__ == "__main__":
 
     STATION = 'SIMULATION'
     STATION = 'RF'
-    STATION = 'MainBoard'
     STATION = 'CapTouch'
     STATION = 'LED'
     STATION = 'WPC'
     STATION = 'PowerSensor'
+    STATION = 'MainBoard'
+    STATION = 'Audio'
 
     app = QApplication(sys.argv)
 
@@ -1354,6 +1418,7 @@ if __name__ == "__main__":
     task_wpc = Task('v8_wpc')
     task_ps = Task('v8_power_sensor')
     task_mb = Task('v8_ftdi_total')
+    task_audio = Task('v8_audio')
 
     map_ = {
         'MainBoard': 'mb',
@@ -1363,6 +1428,7 @@ if __name__ == "__main__":
         'RF': 'rf',
         'WPC': 'wpc',
         'PowerSensor': 'ps',
+        'Audio': 'audio',
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1371,10 +1437,13 @@ if __name__ == "__main__":
     if STATION == 'SIMULATION':
         win.dummy_com(['COM8', 'COM3'])
 
+    prepares_mb = prepares_led = prepares_cap_touch = prepares_rf = []
+    prepares_wpc = prepares_ps = prepares_simu = []
+
     actions_mb = [
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': set_power,
@@ -1385,6 +1454,7 @@ if __name__ == "__main__":
             'args': (win, 0.2, 7),
         },
     ]
+
     actions_led = [
         {
             'action': disable_power_check,
@@ -1392,7 +1462,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': enter_prompt,
@@ -1406,7 +1476,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': enter_prompt,
@@ -1420,7 +1490,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': enter_prompt,
@@ -1434,7 +1504,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
     ]
     actions_ps = [
@@ -1445,6 +1515,18 @@ if __name__ == "__main__":
         {
             'action': enter_prompt,
             'args': (win, 0.2),
+        },
+    ]
+    actions_audio = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        }
+    ]
+    prepares_audio = [
+        {
+            'prepare': soundcheck_init,
+            'args': (),
         },
     ]
     actions_simu = [
@@ -1463,7 +1545,10 @@ if __name__ == "__main__":
     ]
 
     actions = getattr(thismodule, f'actions_{map_[STATION]}')
+    prepares = getattr(thismodule, f'prepares_{map_[STATION]}')
+
     task.register_action(actions)
+    win.register_prepare(prepares)
 
     print('main end')
     app.exec_()

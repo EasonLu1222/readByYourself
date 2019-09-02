@@ -188,6 +188,12 @@ def check_rf_test2(portname, dut_idx):
     return result
 
 
+def open_spdif(portname):
+    logger.info(f'portname: {portname}')
+    result = 'Pass'
+    return result
+
+
 def msp430_download(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, '/usr/share/msp430Upgrade_v03')

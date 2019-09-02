@@ -1,3 +1,19 @@
+[2019.9.2 - 19:25]
+New station: Audio at FATP (Preliminary)
+
+1. port ACD brad's codes into soundcheck.py
+
+2. jsonfile/v8_audio.json added
+
+3. add new task_type=9. no script.py needed.
+   use instance & it's method in the program
+
+4. add prepares_args mechanism
+   once duts & instruments are ready, button will be enabled.
+   but before clicking the button, do prepares action first.
+   you can define these actions using register_prepares()
+
+
 [2019.8.28 - 17:30]
 New station: Power Sensor at FATP
 
