@@ -5,10 +5,12 @@ import time
 import pickle
 import threading
 import pandas as pd
+import importlib
 from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
 from subprocess import Popen, PIPE
+from threading import Thread
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
@@ -17,7 +19,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QPixmap
 
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
@@ -32,6 +34,7 @@ from instrument import (update_serial, generate_instruments, PowerSupply, DMM,
                         Eloader, PowerSensor)
 from ui.design3 import Ui_MainWindow
 from mylogger import logger
+from tasks.task_mic import play_tone
 
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
@@ -509,7 +512,6 @@ class Task(QThread):
         print('limits', limits)
         args = {'args': args, 'limits': limits}
 
-
         #  coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
         coms = {}
         for k,v in self.instruments.items():
@@ -520,6 +522,7 @@ class Task(QThread):
                 com_to_extract = 'visa_addr'
             if len(v) > 0 :
                 coms.update({k: [getattr(e, com_to_extract) for e in v]})
+
         coms = json.dumps(coms)
         print('coms', coms)
         proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE)
@@ -614,7 +617,7 @@ class Task(QThread):
                     for dut_idx in self.window.dut_selected:
                         proc = self.runeach(i, dut_idx, '', task_type)
                         port = self.window.comports()[dut_idx]
-                        print('port SADSADASD', port)
+                        print('port: ', port)
                         procs[port] = proc
 
                 print('procs', procs)
@@ -675,6 +678,27 @@ class Task(QThread):
                 selected_port_str = ','.join(selected_port_list)
                 self.runeachports(i, selected_port_str)
 
+            elif task_type == 4:
+                line = self.df.values[i]
+                mod_name = f'tasks.{line[0]}'
+                mod = importlib.import_module(mod_name)
+
+                func_list = [str(e) for e in line[1]] if line[1] else []
+
+                func = getattr(mod, func_list[0])
+                t = Thread(target=func)
+                t.start()
+                r1, r2 = i, i+1
+                c1 = len(self.header()) + self.window.dut_selected[0]
+                c2 = c1 + len(self.window.dut_selected)
+                self.df.iloc[r1:r2, c1:c2] = "Passed"
+
+                result = json.dumps({
+                    'index': i,
+                    'output': "Passed"
+                })
+                self.task_result.emit(result)
+
             elif task_type == 9:
                 obj_name, method_name = next_item['args']
                 obj = getattr(thismodule, obj_name)
@@ -690,7 +714,6 @@ class Task(QThread):
                 })
                 self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
-
 
             QThread.msleep(500)
 
@@ -738,6 +761,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.simulation = False
+
+        logo_img = QPixmap("./images/fit_logo.png")
+        self.logo.setPixmap(logo_img.scaled(self.logo.width(), self.logo.height(), Qt.KeepAspectRatio))
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
@@ -1149,20 +1175,36 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         return color
 
     def taskrun(self, result):
-        ret = json.loads(result)    # E.g. {'index': 0, 'idx': 0, 'output': 'Passed'}
-        idx = ret['index']
+        """
+        Set background color of specified table cells to indicate pass/fail
 
-        if type(idx) == list:
+        Args:
+            result: A dict with the following fields:
+
+                index(int or [int, int]): Row or row range
+                idx(int): The (idx)th DUT
+                port(str): The port name, used to inference idx
+                output(str): 'Passed' or 'Failed'
+
+                e.g. {'index': 0, 'idx': 0, 'port':'COM1', 'output': 'Passed'}
+        """
+        ret = json.loads(result)
+        row = ret['index']
+
+        # The pass/fail result applies for the jth DUT of rows from index[0] to index[1]
+        if type(row) == list:
             output = ret['output']
             if type(output) == str:
                 output = json.loads(output)
             print('output', output)
-            for i in range(*idx):
+            for i in range(*row):
                 for j in self.dut_selected:
-                    x = output[i - idx[0]][j]
+                    x = output[i - row[0]][j]
                     self.table_view.setItem(i, self.col_dut_start + j, QTableWidgetItem(x))
                     self.table_view.item(i, self.col_dut_start + j).setBackground(self.color_check(x))
-        else:
+
+        # The pass/fail result applies for the jth DUT of the specified row
+        elif ('port' in ret) or ('idx' in ret):
             output = str(ret['output'])
             print('runeach output', output)
             print('self.comports', self.comports()) # E.g. ['COM1', 'COM2']
@@ -1171,9 +1213,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 j = self.comports().index(port)
             elif 'idx' in ret:
                 j = ret['idx']
-            print('task %s are done, j=%s' % (idx, j))
-            self.table_view.setItem(idx, self.col_dut_start + j, QTableWidgetItem(output))
-            self.table_view.item(idx, self.col_dut_start + j).setBackground(self.color_check(output))
+
+            print('task %s are done, j=%s' % (row, j))
+            self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
+            self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
+
+        # The pass/fail result applies for all selected DUT of the specified row
+        else:
+            output = ret['output']
+            for j in self.dut_selected:
+                self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
+                self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
+
 
     def taskdone(self, message):
         print('taskdone start !')
@@ -1215,7 +1266,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
                 res = 'Pass' if all_pass(results_) else 'Fail'
-
                 fail_list = get_fail_list(d[d.columns[-dut_num+dut_i]])
                 print('fail_list', fail_list)
                 self.table_view.setItem(r, self.col_dut_start + dut_i, QTableWidgetItem(res))

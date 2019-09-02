@@ -4,7 +4,7 @@
     "dut": {
         "name": "ftdi",
         "num": 1,
-        "sn": ["AI069IAVA"]
+        "sn": ["00000000A"]
     }
  },
  "behaviors": {
@@ -33,6 +33,58 @@
             "script": "task_cap_touch",
             "args": null,
             "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Mic Test",
+            "hidden": false,
+            "tasktype": 4,
+            "item": "play sweep tone from computer",
+            "script": "task_mic",
+            "args": ["play_tone"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Mic Test2",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "record tone from mics",
+            "script": "task_runeach",
+            "args": ["record_sound"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Mic Test3",
+            "hidden": false,
+            "tasktype": 4,
+            "item": "pull the record tone to computer",
+            "script": "task_mic",
+            "args": ["pull_recorded_sound"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Mic Test4",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "get FFT result",
+            "script": "task_runeach",
+            "args": ["get_mic_test_result"],
+            "auto": true,
             "min": null,
             "expect": null,
             "max": null,
