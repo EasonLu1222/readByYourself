@@ -19,7 +19,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QPixmap
 
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
@@ -723,6 +723,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.simulation = False
+
+        logo_img = QPixmap("./images/fit_logo.png")
+        self.logo.setPixmap(logo_img.scaled(self.logo.width(), self.logo.height(), Qt.KeepAspectRatio))
 
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
