@@ -38,6 +38,7 @@ from tasks.task_mic import play_tone
 
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
+from utils import resource_path
 
 
 INSTRUMENT_MAP = {
@@ -213,7 +214,7 @@ class SerialListener(BaseSerialListener,
 
 
 def parse_json(jsonfile):
-    x = json.loads(open(jsonfile, 'r', encoding='utf8').read())
+    x = json.loads(open(resource_path(jsonfile), 'r', encoding='utf8').read())
     groups = defaultdict(list)
     cur_group = None
     x = x['test_items']
@@ -341,7 +342,7 @@ class Task(QThread):
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
-        self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
+        self.base = json.loads(open(resource_path(self.jsonfile), 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
         self.df = self.load()
@@ -724,7 +725,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.simulation = False
 
-        logo_img = QPixmap("./images/fit_logo.png")
+        logo_img = QPixmap(resource_path("./images/fit_logo.png"))
         self.logo.setPixmap(logo_img.scaled(self.logo.width(), self.logo.height(), Qt.KeepAspectRatio))
 
         self.pwd_dialog = PwdDialog(self)
@@ -861,7 +862,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.proc_listener.stop()
         self.power_results = process_results
 
-        with open('power_results', 'w+') as f:
+        with open(resource_path('power_results'), 'w+') as f:
             f.write(json.dumps(process_results))
         print('recieve_power write power_results')
 
@@ -1046,7 +1047,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             #  instruments_to_dump = sum(self.task.instruments.values(), [])
             if self.task.serial_instruments:
                 instruments_to_dump = sum(self.task.serial_instruments.values(), [])
-                with open('instruments', 'wb') as f:
+                with open(resource_path('instruments'), 'wb') as f:
                     pickle.dump(instruments_to_dump, f)
         else:
             self.serial_ready = False
@@ -1322,7 +1323,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         lang_list = [f'{e}.qm' for e in self.settings.lang_list]
         app = QApplication.instance()
         translator = QTranslator()
-        translator.load(f"translate/{lang_list[index]}")
+        translator.load(resource_path(f"translate/{lang_list[index]}"))
         app.removeTranslator(translator)
         app.installTranslator(translator)
         self.retranslateUi(self)

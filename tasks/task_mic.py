@@ -11,6 +11,7 @@ from playsound import playsound
 from subprocess import Popen, PIPE
 
 from mylogger import logger
+from utils import resource_path
 
 wav_dir = './wav'
 
@@ -32,8 +33,8 @@ def pull_recorded_sound():
         match = re.search(r"transport_id:(\d+)", line)   # extract "336855040X" from the above example
         if match:
             transport_id = match.groups()[0]
-            wav_file_path = f"{wav_dir}/tmp/{transport_id}.wav"
-            test_result_path = f"{wav_dir}/tmp/mic_test_result"
+            wav_file_path = resource_path(f"{wav_dir}/tmp/{transport_id}.wav")
+            test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result")
 
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             proc = Popen(cmd.split(" "), stdout=PIPE)

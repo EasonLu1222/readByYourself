@@ -4,6 +4,7 @@ import argparse
 import pickle
 
 from mylogger import logger
+from utils import resource_path
 
 
 if __name__ == "__main__":
@@ -15,7 +16,7 @@ if __name__ == "__main__":
 
     logger.info(f'power_index: {power_index}')
 
-    with open('instruments', 'rb') as f:
+    with open(resource_path('instruments'), 'rb') as f:
         #  _, power1, power2 = pickle.load(f)
         power1, power2, _ = pickle.load(f)
 
@@ -25,10 +26,6 @@ if __name__ == "__main__":
         power.open_com()
         power.on()
         power.measure_current()
-
-    #  result = f'{power_index}, {power.max_current}\n'
-    #  with open('power_results' , 'a+') as f:
-        #  f.write(result)
 
     result = power.max_current
 

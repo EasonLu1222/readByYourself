@@ -9,7 +9,7 @@ import argparse
 import inspect
 from subprocess import Popen, PIPE
 from serials import issue_command, get_serial, enter_factory_image_prompt
-
+from utils import resource_path
 
 from mylogger import logger
 
@@ -173,11 +173,12 @@ def check_max_current(dut_idx):
             content = f.read()
             return False if content else True
     logger.info(f'check_max_current start')
+    power_results_path = resource_path('power_results')
     while True:
-        if os.path.isfile('power_results'):
+        if os.path.isfile(power_results_path):
             logger.info('has power_results')
-            if not is_file_empty('power_results'):
-                with open('power_results', 'r') as f:
+            if not is_file_empty(power_results_path):
+                with open(power_results_path, 'r') as f:
                     x = json.load(f)
                     break
         else:
