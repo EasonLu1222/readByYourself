@@ -17,7 +17,7 @@ wav_dir = './wav'
 
 
 def play_tone():
-    playsound(f"{wav_dir}/100Hz_to_20000Hz_mono.wav")
+    playsound(resource_path(f"{wav_dir}/100Hz_to_20000Hz_mono.wav"))
 
 
 def pull_recorded_sound():

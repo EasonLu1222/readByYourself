@@ -520,7 +520,12 @@ class Task(QThread):
                      '-i', str(dut_idx),
                      '-s', sid]
         if args: arguments.append(args)
-        proc = Popen(arguments, stdout=PIPE)
+
+        env = os.environ.copy()
+        if hasattr(sys, '_MEIPASS'):
+            env['PYTHONPATH'] = env['PATH']
+            env['_MEIPASS'] = sys._MEIPASS
+        proc = Popen(arguments, stdout=PIPE, env=env)
         self.printterm_msg.emit(msg)
         return proc
 
@@ -1394,9 +1399,9 @@ if __name__ == "__main__":
     STATION = 'RF'
     STATION = 'MainBoard'
     STATION = 'CapTouch'
-    STATION = 'LED'
-    STATION = 'WPC'
-    STATION = 'PowerSensor'
+    # STATION = 'LED'
+    # STATION = 'WPC'
+    # STATION = 'PowerSensor'
 
     app = QApplication(sys.argv)
 
@@ -1405,7 +1410,7 @@ if __name__ == "__main__":
     task_cap_touch = Task('v8_cap_touch')
     task_rf = Task('v8_rf')
     task_wpc = Task('v8_wpc')
-    task_ps = Task('v8_power_sensor')
+    # task_ps = Task('v8_power_sensor')
     task_mb = Task('v8_ftdi_total')
 
     map_ = {

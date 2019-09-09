@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 
 def test_data(csv_file):
@@ -18,8 +19,11 @@ def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
+        base_path = Path(sys._MEIPASS).resolve()
     except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
+        try:
+            env = os.environ
+            base_path = Path(env['_MEIPASS']).resolve()
+        except Exception:
+            base_path = Path(".").resolve()
+    return str(base_path.joinpath(base_path, Path(relative_path)))
