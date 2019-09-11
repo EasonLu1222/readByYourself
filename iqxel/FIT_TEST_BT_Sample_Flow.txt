@@ -138,45 +138,6 @@ BT:
 		<DUT_NAME [String]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<IMAGE_FILE_NAME [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = kill -9  $(ps | grep bsa_server | awk '{print $1}'); 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = kill -9 $(pidof brcm_patchram_plus); 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = echo 0 > /sys/class/rfkill/rfkill0/state && echo 1 > /sys/class/rfkill/rfkill0/state 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 8000 
-		>DUT_COMMAND [String]  = /etc/wifi/AP6398/brcm_patchram_plus --enable_hci --no2bytes --tosleep 200000 --baudrate 115200 --patchram /etc/wifi/AP6398/BCM4359C0_003.001.006.0163.0393.hcd /dev/ttyS1 & 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
 	TX_BDR
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
@@ -231,63 +192,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>ANALYZE_POWER_ONLY [Integer]  = 0 
-		>FREQ_MHZ [Integer]  = 2441 
-		>PACKET_LENGTH [Integer]  = 0 
-		>TRANSMIT_0XF0_SEQUENCE_FOR_DELTA_F1_AVG [Integer]  = 1 
-		>TX_POWER_LEVEL [Integer]  = 1 
-		>CABLE_LOSS_DB [Double]  = 0.00 
-		>EXPECTED_TX_POWER_DBM [Double]  = 4 
-		>SAMPLING_TIME_US [Double]  = 0.00 
-		>OPTION_STRING [String]  =  
-		>PACKET_TYPE [String]  = 1DH3 
-		#Return Values:
-		<PAYLOAD_ERRORS [Integer]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-1 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-2 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-3 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-4 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-5 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_0 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_1 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_10 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_11 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_12 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_13 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_14 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_15 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_2 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_3 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_4 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_5 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_6 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_7 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_8 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_9 [Double]  = <,>
-		<BANDWIDTH_20DB [Double]  = <,>
-		<CABLE_LOSS_DB [Double]  = <,>
-		<DATA_RATE_DETECT [Double]  = <,>
-		<DELTA_F1_AVERAGE [Double]  = <,>
-		<DELTA_F2_AVERAGE [Double]  = <,>
-		<DELTA_F2_AV_ACCESS [Double]  = <,>
-		<DELTA_F2_F1_AV_RATIO [Double]  = <,>
-		<DELTA_F2_MAX [Double]  = <,>
-		<DELTA_F2_MAX_ACCESS [Double]  = <,>
-		<FREQ_DEVIATION [Double]  = <,>
-		<FREQ_DEVIATION_PK_TO_PK [Double]  = <,>
-		<FREQ_DRIFT [Double]  = <,>
-		<FREQ_EST [Double]  = <,>
-		<FREQ_EST_HEADER [Double]  = <,>
-		<MAX_FREQ_DRIFT_RATE [Double]  = <,>
-		<POWER_AVERAGE_DBM [Double]  = <,>
-		<POWER_PEAK_DBM [Double]  = <,>
-		<TARGET_POWER_DBM [Double]  = <,>
-		<ERROR_MESSAGE [String]  = <,>
-	TX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_EDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2403 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -337,99 +242,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>FREQ_MHZ [Integer]  = 2441 
-		>PACKET_LENGTH [Integer]  = 0 
-		>TX_POWER_LEVEL [Integer]  = 1 
-		>CABLE_LOSS_DB [Double]  = 0.00 
-		>EXPECTED_TX_POWER_DBM [Double]  = 4 
-		>SAMPLING_TIME_US [Double]  = 0.00 
-		>OPTION_STRING [String]  =  
-		>PACKET_TYPE [String]  = 3DH5 
-		#Return Values:
-		<PAYLOAD_ERRORS [Integer]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-2 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-3 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-4 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_-5 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_0 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_10 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_11 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_12 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_13 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_14 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_15 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_2 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_3 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_4 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_5 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_6 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_7 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_8 [Double]  = <,>
-		<ACP_MAX_POWER_DBM_OFFSET_9 [Double]  = <,>
-		<ACP_MAX_POWER_DB_OFFSET_-1 [Double]  = <,>
-		<ACP_MAX_POWER_DB_OFFSET_1 [Double]  = <,>
-		<CABLE_LOSS_DB [Double]  = <,>
-		<DATA_RATE_DETECT [Double]  = <,>
-		<EDR_EVM_AV [Double]  = <,>
-		<EDR_EVM_PK [Double]  = <,>
-		<EDR_EXTREME_OMEGA_0 [Double]  = <,>
-		<EDR_EXTREME_OMEGA_I0 [Double]  = <,>
-		<EDR_OMEGA_I [Double]  = <,>
-		<EDR_POW_DIFF_DB [Double]  = <,>
-		<EDR_PROB_EVM_99_PASS [Double]  = <,>
-		<FREQ_DEVIATION [Double]  = <,>
-		<FREQ_DEVIATION_PK_TO_PK [Double]  = <,>
-		<FREQ_EST [Double]  = <,>
-		<FREQ_EST_HEADER [Double]  = <,>
-		<POWER_AVERAGE_DBM [Double]  = <,>
-		<POWER_PEAK_DBM [Double]  = <,>
-		<TARGET_POWER_DBM [Double]  = <,>
-		<ERROR_MESSAGE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = kill -9 $(pidof brcm_patchram_plus); 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = echo 0 > /sys/class/rfkill/rfkill0/state && echo 1 > /sys/class/rfkill/rfkill0/state 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 8000 
-		>DUT_COMMAND [String]  = brcm_patchram_plus --enable_hci --no2bytes --tosleep 200000 --baudrate 115200 --patchram /system/etc/Wireless/ap6356/BCM4359C0_003.001.006.0163.0393.hcd /dev/ttyS1 & 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	TX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_LE
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2402 
@@ -483,48 +296,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = kill -9 $(pidof brcm_patchram_plus); 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = echo 0 > /sys/class/rfkill/rfkill0/state && echo 1 > /sys/class/rfkill/rfkill0/state 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 8000 
-		>DUT_COMMAND [String]  = brcm_patchram_plus --enable_hci --no2bytes --tosleep 200000 --baudrate 115200 --patchram /system/etc/Wireless/ap6356/BCM4359C0_003.001.006.0163.0393.hcd /dev/ttyS1 & 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_BDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2402 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -542,27 +314,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>FREQ_MHZ [Integer]  = 2441 
-		>PACKET_LENGTH [Integer]  = 0 
-		>TIMEOUT [Integer]  = 10 
-		>CABLE_LOSS_DB [Double]  = 0.00 
-		>RX_BIT_NUMBER [Double]  = 160000.00 
-		>RX_POWER_LEVEL [Double]  = -50.00 
-		>OPTION_STRING [String]  =  
-		>PACKET_TYPE [String]  = 1DH3 
-		#Return Values:
-		<BER [Double]  = <,>
-		<CABLE_LOSS_DB [Double]  = <,>
-		<GOOD_BITS [Double]  = <,>
-		<RSSI [Double]  = <,>
-		<RX_POWER_LEVEL [Double]  = <,>
-		<TOTAL_BITS [Double]  = <,>
-		<ERROR_MESSAGE [String]  = <,>
-	RX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_EDR
 		#Input Parameters:
 		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2402 
@@ -583,88 +335,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
-		>FREQ_MHZ [Integer]  = 2441 
-		>PACKET_LENGTH [Integer]  = 0 
-		>TIMEOUT [Integer]  = 10 
-		>CABLE_LOSS_DB [Double]  = 0.00 
-		>RX_BER_THRESHOLD_LIMIT_LEVEL1 [Double]  = 0.01 
-		>RX_BIT_NUMBER_LEVEL1 [Double]  = 160000.00 
-		>RX_BIT_NUMBER_LEVEL2 [Double]  = 160000.00 
-		>RX_POWER_LEVEL [Double]  = -50.00 
-		>OPTION_STRING [String]  =  
-		>PACKET_TYPE [String]  = 3DH5 
-		#Return Values:
-		<BER [Double]  = <,>
-		<CABLE_LOSS_DB [Double]  = <,>
-		<GOOD_BITS [Double]  = <,>
-		<RSSI [Double]  = <,>
-		<RX_POWER_LEVEL [Double]  = <,>
-		<TOTAL_BITS [Double]  = <,>
-		<ERROR_MESSAGE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = kill -9 $(pidof brcm_patchram_plus); 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 0 
-		>DUT_COMMAND [String]  = echo 0 > /sys/class/rfkill/rfkill0/state && echo 1 > /sys/class/rfkill/rfkill0/state 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 8000 
-		>DUT_COMMAND [String]  = brcm_patchram_plus --enable_hci --no2bytes --tosleep 200000 --baudrate 115200 --patchram /system/etc/Wireless/ap6356/BCM4359C0_003.001.006.0163.0393.hcd /dev/ttyS1 & 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RUN_DUT_COMMAND ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>WAIT_TIME_MS [Integer]  = 1000 
-		>DUT_COMMAND [String]  = hciconfig hci0 up 
-		#Return Values:
-		<ERROR_MESSAGE [String]  = <,>
-		<RESPONSE [String]  = <,>
-	RX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
-		#Input Parameters:
-		>FREQ_MHZ [Integer]  = 2402 
-		>CABLE_LOSS_DB [Double]  = 0.00 
-		>RX_PACKET_NUMBER [Double]  = 1500.00 
-		>RX_POWER_LEVEL [Double]  = -50.00 
-		>OPTION_STRING [String]  =  
-		>PACKET_TYPE [String]  = 1LE 
-		>WAVEFORM_NAME [String]  = 1LE.mod 
-		#Return Values:
-		<CABLE_LOSS_DB [Double]  = <,>
-		<GOOD_PACKETS [Double]  = <,>
-		<PER [Double]  = <,>
-		<RSSI [Double]  = <,>
-		<RX_POWER_LEVEL [Double]  = <,>
-		<TOTAL_PACKETS [Double]  = <,>
-		<ERROR_MESSAGE [String]  = <,>
-	RX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_LE
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2402 
 		>CABLE_LOSS_DB [Double]  = 0.00 

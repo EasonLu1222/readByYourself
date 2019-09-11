@@ -1,3 +1,13 @@
+[2019.9.11 - 16:50]
+Add template testflow files
+
+1. add testflow files
+	- iqxel/FIT_Wifi_Testflow.txt
+	- iqxel/FIT_BT_Testflow.txt
+	- iqxel/FIT_Wifi_Testflow_simplex.txt
+	- iqxel/FIT_BT_Testflow_simplex.txt
+
+
 [2019.9.11 - 11:15]
 New station: RF at FATP (Preliminary) & 3 DUTs work
 

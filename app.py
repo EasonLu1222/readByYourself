@@ -560,10 +560,10 @@ class Task(QThread):
         script2 = 'FIT_TEST_BT_Sample_Flow.txt'
         print(f'workdir: {workdir}')
         def run():
-            #  process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}', '-exit'],
-                         #  stdout=PIPE, cwd=workdir, shell=True)
-            process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}', '-exit'],
+            process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}', '-exit'],
                          stdout=PIPE, cwd=workdir, shell=True)
+            #  process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}', '-exit'],
+                         #  stdout=PIPE, cwd=workdir, shell=True)
             ended = False
             while True:
                 line = process.stdout.readline()
@@ -1563,7 +1563,7 @@ if __name__ == "__main__":
     task_led = Task('v8_led')
     task_simu = Task('v8_simu')
     task_cap_touch = Task('v8_cap_touch')
-    task_rf = Task('v8_rf_bt')
+    task_rf = Task('v8_rf_wifi')
     task_wpc = Task('v8_wpc')
     task_ps = Task('v8_power_sensor')
     task_mb = Task('v8_ftdi_total')
