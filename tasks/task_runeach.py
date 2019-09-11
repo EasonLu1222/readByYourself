@@ -167,6 +167,15 @@ def check_i2c_lp5018(portname):
         return result
 
 
+def hciup(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        issue_command(ser, 'hciconfig hci0 up')
+        lines = issue_command(ser, 'hciconfig')
+        result =  'Pass' if any(re.search('UP RUNNING', e) for e in lines) else 'Fail'
+        logger.info(f'hciup succeed: {result}')
+        return result
+
+
 def check_max_current(dut_idx):
     def is_file_empty(fl):
         with open(fl, 'r') as f:
@@ -192,30 +201,6 @@ def check_max_current(dut_idx):
 def check_something(portname):
     time.sleep(1.5)
     return random.choice(['Pass']*9+['Fail'])
-
-
-workdir = 'C:/LitePoint/IQfact_plus/IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin/'
-exe = 'IQfactRun_Console.exe'
-script1 = 'FIT_TEST_Sample_Flow1.txt'
-script2 = 'FIT_TEST_Sample_Flow2.txt'
-
-
-def check_rf_test1(portname, dut_idx):
-    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
-    proc = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}'], stdout=PIPE)
-    outputs, _ = proc.communicate()
-    logger.info('output: %s', outputs)
-    result = 'Pass'
-    return result
-
-
-def check_rf_test2(portname, dut_idx):
-    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
-    proc = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}'], stdout=PIPE)
-    outputs, _ = proc.communicate()
-    logger.info('output: %s', outputs)
-    result = 'Fail'
-    return result
 
 
 def open_spdif(portname):

@@ -1,3 +1,12 @@
+[2019.9.11 - 11:15]
+New station: RF at FATP (Preliminary) & 3 DUTs work
+
+1. v8_rf_wifi.json & v8_rf_bt.json added
+
+2. add new task_type=11. no script.py needed.
+	- using 3 threads to call Task.run_iqfactrun_console()
+
+
 [2019.9.2 - 19:25]
 New station: Audio at FATP (Preliminary)
 

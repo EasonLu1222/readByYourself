@@ -1,0 +1,111 @@
+{"header": 
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 3,
+        "sn": ["AI069IAVA", "6", "00000000A"]
+    }
+ },
+ "behaviors": {
+     "barcode-scan": false
+ },
+ "test_items":
+    [
+        {
+            "group": "RF-Setup",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "hciconfig hci0 up",
+            "script": "task_runeach",
+            "args": ["hciup"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "CONNECT_IQ_TESTER",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "GLOBAL_SETTINGS",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "LOAD_PATH_LOSS_TABLE",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "INSERT_DUT",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "INITIALIZE_DUT",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_BDR  2402 1DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+
+
+

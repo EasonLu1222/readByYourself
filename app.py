@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import time
@@ -541,9 +542,93 @@ class Task(QThread):
                      '-i', str(dut_idx),
                      '-s', sid]
         if args: arguments.append(args)
-        proc = Popen(arguments, stdout=PIPE)
+        #  proc = Popen(arguments, stdout=PIPE)
+        proc = Popen(arguments, stdout=PIPE, stderr=PIPE, stdin=PIPE)
         self.printterm_msg.emit(msg)
         return proc
+
+    def run_iqfactrun_console(self, dut_idx, port, groupname):
+        print('run_iqfactrun_console start')
+        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
+        print(
+            f'[run_iqfactrun_console][eachgroup: {eachgroup}][script: {script}][index: {index}][len: {item_len}][args: {args}]'
+        )
+        workdir = (f'C:/LitePoint/IQfact_plus/'
+                   f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
+        exe = 'IQfactRun_Console.exe'
+        script1 = 'FIT_TEST_Sample_Flow.txt'
+        script2 = 'FIT_TEST_BT_Sample_Flow.txt'
+        print(f'workdir: {workdir}')
+        def run():
+            #  process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}', '-exit'],
+                         #  stdout=PIPE, cwd=workdir, shell=True)
+            process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}', '-exit'],
+                         stdout=PIPE, cwd=workdir, shell=True)
+            ended = False
+            while True:
+                line = process.stdout.readline()
+                line = line.decode('utf8').rstrip()
+                if 'In This Run' in line:
+                    ended = True
+                if ended and not line:
+                    break
+                yield line
+        items = [e['item'] for e in eachgroup]
+        processing_item = False
+        item_idx = 0
+        pattern1 = '[\d]{1,4}\.%s' % items[0]
+        pattern2 = '[\d]{1,4}\..+_____'
+        print('pattern1', pattern1)
+        print('pattern2', pattern2)
+
+        items_lines = []
+        for line in run():
+            print(line)
+            matched = re.search(pattern1, line)
+            matched2 = re.search(pattern2, line)
+            if matched:
+                if not processing_item:
+                    print('pattern1 found [case1]')
+                    processing_item = True
+                    self.task_each.emit([index, 1])
+                    index += 1
+                    item_idx += 1
+            elif processing_item:
+                if matched2:
+                    print('pattern2 found')
+                    processing_item = False
+                    output = 'Pass'
+                    for e in items_lines:
+                        if '--- [Failed]' in e:
+                            err_msg = [e for e in items_lines if e.startswith('ERROR_MESSAGE')][0]
+                            err_msg = err_msg.split(':')[1].strip()
+                            output = f'Fail({err_msg})'
+                            break
+                    self.df.iat[index-1, len(self.header()) + dut_idx] = output
+
+                    result = json.dumps({
+                        'index': index-1,
+                        'port': port,
+                        'output': output
+                    })
+                    self.task_result.emit(result)
+                    items_lines = []
+
+                    # change pattern
+                    if item_idx < len(items):
+                        pattern1 = '[\d]{1,4}\.%s' % items[item_idx]
+                        print('change pattern1!!!!!', pattern1)
+
+                    if re.search(pattern1, line):
+                        print('pattern1 found [case2]')
+                        processing_item = True
+                        self.task_each.emit([index, 1])
+                        index += 1
+                        item_idx += 1
+                else:
+                    items_lines.append(line)
+
+        print('run_iqfactrun_console end')
 
     def runeachports(self, index, ports):
         '''
@@ -604,7 +689,9 @@ class Task(QThread):
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             is_auto, task_type = next_item['auto'], next_item['tasktype']
-            self.task_each.emit([i, len(items)])
+            if task_type != 11:
+                self.task_each.emit([i, len(items)])
+
             if task_type == 1:
                 procs = {}
                 if any(self.window.port_barcodes.values()):
@@ -648,6 +735,18 @@ class Task(QThread):
                             self.window.table_view.setHorizontalHeaderLabels(header)
 
                     self.task_result.emit(result)
+
+            elif task_type == 11:
+                threads = {}
+                for dut_idx in self.window.dut_selected:
+                    port = self.window.comports()[dut_idx]
+                    print('dut_idx: ', dut_idx)
+                    print('port: ', port)
+                    threads[dut_idx] = th = threading.Thread(target=self.run_iqfactrun_console,
+                                                        args=(dut_idx, port, group,))
+                    th.start()
+                for dut_idx, th in threads.items():
+                    th.join()
 
             elif task_type == 2:
                 proc = self.rungroup(group)
@@ -1451,20 +1550,20 @@ if __name__ == "__main__":
     thismodule = sys.modules[__name__]
 
     STATION = 'SIMULATION'
-    STATION = 'RF'
-    STATION = 'CapTouch'
-    STATION = 'LED'
     STATION = 'WPC'
+    STATION = 'Audio'
     STATION = 'PowerSensor'
     STATION = 'MainBoard'
-    STATION = 'Audio'
+    STATION = 'LED'
+    STATION = 'CapTouch'
+    STATION = 'RF'
 
     app = QApplication(sys.argv)
 
     task_led = Task('v8_led')
     task_simu = Task('v8_simu')
     task_cap_touch = Task('v8_cap_touch')
-    task_rf = Task('v8_rf')
+    task_rf = Task('v8_rf_bt')
     task_wpc = Task('v8_wpc')
     task_ps = Task('v8_power_sensor')
     task_mb = Task('v8_ftdi_total')
@@ -1542,10 +1641,10 @@ if __name__ == "__main__":
             'action': is_serial_ok,
             'args': (win.comports, task.serial_ok),
         },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2),
-        },
+        #  {
+            #  'action': enter_prompt,
+            #  'args': (win, 0.2),
+        #  },
     ]
     actions_wpc = [
         {
