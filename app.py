@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import time
@@ -42,6 +43,7 @@ from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 from utils import resource_path
 
+from soundcheck import BSndChk
 
 INSTRUMENT_MAP = {
     'gw_powersupply': PowerSupply,
@@ -49,6 +51,27 @@ INSTRUMENT_MAP = {
     'gw_eloader': Eloader,
     'ks_powersensor': PowerSensor,
 }
+
+
+def soundcheck_init(sqz_path=None):
+    print('soundcheck_init start')
+    b = BSndChk()
+    cases = ['all pass', 'all failed', 'one failed']
+    case = cases[0]
+    try:
+        b.LinkSC()
+        sqz_path = os.path.join(os.path.abspath(os.path.curdir),
+                                'soundcheck_sequence',
+                                f'test_20181030_{case}',
+                                f"test_{case.replace(' ', '_')}.sqc")
+        b.Open_Sequence(sqz_path)
+        setattr(thismodule, 'snd_chk', b)
+        time.sleep(1)
+    except Exception as ex:
+        print(ex)
+        return False
+    print('soundcheck_init end')
+    return True
 
 
 def get_visa_devices():
@@ -531,9 +554,93 @@ class Task(QThread):
                      '-s', sid]
         if args: arguments.append(args)
 
-        proc = Popen(arguments, stdout=PIPE, env=self.env)
+        proc = Popen(arguments, stdout=PIPE, stderr=PIPE, stdin=PIPE, env=self.env)
+
         self.printterm_msg.emit(msg)
         return proc
+
+    def run_iqfactrun_console(self, dut_idx, port, groupname):
+        print('run_iqfactrun_console start')
+        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
+        print(
+            f'[run_iqfactrun_console][eachgroup: {eachgroup}][script: {script}][index: {index}][len: {item_len}][args: {args}]'
+        )
+        workdir = (f'C:/LitePoint/IQfact_plus/'
+                   f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
+        exe = 'IQfactRun_Console.exe'
+        script1 = 'FIT_TEST_Sample_Flow.txt'
+        script2 = 'FIT_TEST_BT_Sample_Flow.txt'
+        print(f'workdir: {workdir}')
+        def run():
+            process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script1}', '-exit'],
+                         stdout=PIPE, cwd=workdir, shell=True)
+            #  process = Popen([f'{workdir}{exe}', '-RUN', f'{workdir}{script2}', '-exit'],
+                         #  stdout=PIPE, cwd=workdir, shell=True)
+            ended = False
+            while True:
+                line = process.stdout.readline()
+                line = line.decode('utf8').rstrip()
+                if 'In This Run' in line:
+                    ended = True
+                if ended and not line:
+                    break
+                yield line
+        items = [e['item'] for e in eachgroup]
+        processing_item = False
+        item_idx = 0
+        pattern1 = '[\d]{1,4}\.%s' % items[0]
+        pattern2 = '[\d]{1,4}\..+_____'
+        print('pattern1', pattern1)
+        print('pattern2', pattern2)
+
+        items_lines = []
+        for line in run():
+            print(line)
+            matched = re.search(pattern1, line)
+            matched2 = re.search(pattern2, line)
+            if matched:
+                if not processing_item:
+                    print('pattern1 found [case1]')
+                    processing_item = True
+                    self.task_each.emit([index, 1])
+                    index += 1
+                    item_idx += 1
+            elif processing_item:
+                if matched2:
+                    print('pattern2 found')
+                    processing_item = False
+                    output = 'Pass'
+                    for e in items_lines:
+                        if '--- [Failed]' in e:
+                            err_msg = [e for e in items_lines if e.startswith('ERROR_MESSAGE')][0]
+                            err_msg = err_msg.split(':')[1].strip()
+                            output = f'Fail({err_msg})'
+                            break
+                    self.df.iat[index-1, len(self.header()) + dut_idx] = output
+
+                    result = json.dumps({
+                        'index': index-1,
+                        'port': port,
+                        'output': output
+                    })
+                    self.task_result.emit(result)
+                    items_lines = []
+
+                    # change pattern
+                    if item_idx < len(items):
+                        pattern1 = '[\d]{1,4}\.%s' % items[item_idx]
+                        print('change pattern1!!!!!', pattern1)
+
+                    if re.search(pattern1, line):
+                        print('pattern1 found [case2]')
+                        processing_item = True
+                        self.task_each.emit([index, 1])
+                        index += 1
+                        item_idx += 1
+                else:
+                    items_lines.append(line)
+
+        print('run_iqfactrun_console end')
 
     def runeachports(self, index, ports):
         '''
@@ -594,7 +701,9 @@ class Task(QThread):
         for group, items in self.groups.items():
             i, next_item = items[0]['index'], items[0]
             is_auto, task_type = next_item['auto'], next_item['tasktype']
-            self.task_each.emit([i, len(items)])
+            if task_type != 11:
+                self.task_each.emit([i, len(items)])
+
             if task_type == 1:
                 procs = {}
                 if any(self.window.port_barcodes.values()):
@@ -638,6 +747,18 @@ class Task(QThread):
                             self.window.table_view.setHorizontalHeaderLabels(header)
 
                     self.task_result.emit(result)
+
+            elif task_type == 11:
+                threads = {}
+                for dut_idx in self.window.dut_selected:
+                    port = self.window.comports()[dut_idx]
+                    print('dut_idx: ', dut_idx)
+                    print('port: ', port)
+                    threads[dut_idx] = th = threading.Thread(target=self.run_iqfactrun_console,
+                                                        args=(dut_idx, port, group,))
+                    th.start()
+                for dut_idx, th in threads.items():
+                    th.join()
 
             elif task_type == 2:
                 proc = self.rungroup(group)
@@ -687,6 +808,23 @@ class Task(QThread):
                     'index': i,
                     'output': "Passed"
                 })
+                self.task_result.emit(result)
+
+
+            elif task_type == 9:
+                obj_name, method_name = next_item['args']
+                obj = getattr(thismodule, obj_name)
+                output = getattr(obj, method_name)()
+                r1, r2 = i, i + len(items)
+                c1 = len(self.header()) + self.window.dut_selected[0]
+                c2 = c1 + len(self.window.dut_selected)
+                if len(self.window.dut_selected) == 1:
+                    output = [[e] for e in output]
+                result = json.dumps({
+                    'index': [i, i + len(items)],
+                    'output': output
+                })
+                self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
 
             elif task_type == 40:
@@ -820,6 +958,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+        self.prepare_args = list()
 
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
@@ -848,6 +987,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                         len(self.task.header()) + self.dut_selected[idx]] = output
             self.taskrun(result)
         self.task.pause = False
+
+    def register_prepare(self, prepares):
+        print('register_prepares')
+        for e in prepares:
+            prepare, args = e['prepare'], e['args']
+            self.prepare_args.append([prepare, args])
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -1071,7 +1216,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
 
+    def prepare(self):
+        print('prepare start')
+        for action, args in self.prepare_args:
+            print('run prepare', action, args)
+            if not action(*args):
+                print('return !!!!!')
+                return
+        print('prepare end')
+
     def visa_instrument_ready(self, ready):
+        print('visa_instrument_ready start')
         if ready:
             self.visa_ready = True
             print('\nVISA READY\n')
@@ -1083,8 +1238,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             print('\n===READY===')
             self.pushButton.setEnabled(True)
+            self.prepare()
 
     def instrument_ready(self, ready):
+        print('instrument_ready start')
         if ready:
             print('\nSERIAL READY\n!')
             self.serial_ready = True
@@ -1103,6 +1260,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             print('\n===READY===')
             self.pushButton.setEnabled(True)
+            self.prepare()
         else:
             print('\n===NOT READY===')
             self.pushButton.setEnabled(False)
@@ -1183,8 +1341,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         # The pass/fail result applies for the jth DUT of rows from index[0] to index[1]
         if type(row) == list:
-            print('output', ret['output'])
-            output = json.loads(ret['output'])
+            output = ret['output']
+            if type(output) == str:
+                output = json.loads(output)
+            print('output', output)
             for i in range(*row):
                 for j in self.dut_selected:
                     x = output[i - row[0]][j]
@@ -1451,10 +1611,11 @@ if __name__ == "__main__":
     task_led = Task('v8_led')
     task_simu = Task('v8_simu')
     task_cap_touch = Task('v8_cap_touch')
-    task_rf = Task('v8_rf')
+    task_rf = Task('v8_rf_wifi')
     task_wpc = Task('v8_wpc')
     # task_ps = Task('v8_power_sensor')
     task_mb = Task('v8_ftdi_total')
+    task_audio = Task('v8_audio')
 
     map_ = {
         'MainBoard': 'mb',
@@ -1464,6 +1625,7 @@ if __name__ == "__main__":
         'RF': 'rf',
         'WPC': 'wpc',
         'PowerSensor': 'ps',
+        'Audio': 'audio',
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
@@ -1472,10 +1634,13 @@ if __name__ == "__main__":
     if STATION == 'SIMULATION':
         win.dummy_com(['COM8', 'COM3'])
 
+    prepares_mb = prepares_led = prepares_cap_touch = prepares_rf = []
+    prepares_wpc = prepares_ps = prepares_simu = []
+
     actions_mb = [
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': set_power,
@@ -1486,6 +1651,7 @@ if __name__ == "__main__":
             'args': (win, 0.2, 7),
         },
     ]
+
     actions_led = [
         {
             'action': disable_power_check,
@@ -1493,7 +1659,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
         {
             'action': enter_prompt,
@@ -1505,14 +1671,14 @@ if __name__ == "__main__":
             'action': disable_power_check,
             'args': (),
         },
-        # {
-        #     'action': is_serial_ok,
-        #     'args': (win.comports, task_mb.serial_ok),
-        # },
-        # {
-        #     'action': enter_prompt,
-        #     'args': (win, 0.2, 7),
-        # },
+        {
+            'action': is_serial_ok,
+            'args': (win.comports, task.serial_ok),
+        },
+        {
+            'action': enter_prompt,
+            'args': (win, 0.2, 7),
+        },
     ]
     actions_rf = [
         {
@@ -1521,12 +1687,12 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2),
-        },
+        #  {
+            #  'action': enter_prompt,
+            #  'args': (win, 0.2),
+        #  },
     ]
     actions_wpc = [
         {
@@ -1535,7 +1701,7 @@ if __name__ == "__main__":
         },
         {
             'action': is_serial_ok,
-            'args': (win.comports, task_mb.serial_ok),
+            'args': (win.comports, task.serial_ok),
         },
     ]
     actions_ps = [
@@ -1546,6 +1712,18 @@ if __name__ == "__main__":
         {
             'action': enter_prompt,
             'args': (win, 0.2),
+        },
+    ]
+    actions_audio = [
+        {
+            'action': disable_power_check,
+            'args': (),
+        }
+    ]
+    prepares_audio = [
+        {
+            'prepare': soundcheck_init,
+            'args': (),
         },
     ]
     actions_simu = [
@@ -1564,7 +1742,10 @@ if __name__ == "__main__":
     ]
 
     actions = getattr(thismodule, f'actions_{map_[STATION]}')
+    prepares = getattr(thismodule, f'prepares_{map_[STATION]}')
+
     task.register_action(actions)
+    win.register_prepare(prepares)
 
     print('main end')
     app.exec_()

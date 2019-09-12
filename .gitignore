@@ -1,5 +1,9 @@
 power_results
 logs/
+Log/
+Result_LP/
+Result_User/
+path_loss.csv
 
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
