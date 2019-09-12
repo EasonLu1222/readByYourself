@@ -1,15 +1,12 @@
-import sys
 import json
-import argparse
-import time
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
-from view import task_dialog
-from serials import get_serial, issue_command
-from serial.serialutil import SerialException
 from json import JSONDecodeError
-from mylogger import logger
 
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QThread, pyqtSignal as QSignal
+from serial.serialutil import SerialException
+
+from mylogger import logger
+from serials import get_serial, issue_command
 
 
 class TouchPolling(QThread):
@@ -17,7 +14,8 @@ class TouchPolling(QThread):
     This class detects which cap touch key is pressed
     by polling the cap touch's i2c address.
     '''
-    touchSignal = pyqtSignal(str)
+    touchSignal = QSignal(str)
+
     def __init__(self, ser, key_codes = [], parent=None):
         super(TouchPolling, self).__init__(parent)
         self.ser = ser
@@ -46,7 +44,10 @@ class TouchPolling(QThread):
             except OSError:
                 logger.info('TouchPolling thread terminated!')
 
+
 class ContentWidget(QtWidgets.QWidget):
+    runeachportResult = QSignal(str)
+
     def __init__(self, portnames, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -66,7 +67,6 @@ class ContentWidget(QtWidgets.QWidget):
         
         self.iterports = iter(portnames)
         self.init_test()
-        
 
     def init_test(self):
         self.clear_test()
@@ -100,7 +100,7 @@ class ContentWidget(QtWidgets.QWidget):
     def on_close(self, msg):
         logger.info(f'on_close {msg}')
         self.clear_test()
-        sys.stdout.write(json.dumps(msg))
+        self.runeachportResult.emit(json.dumps(msg))
 
 
 if __name__ == "__main__":

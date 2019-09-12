@@ -14,13 +14,15 @@ from threading import Thread
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox)
+                             QWidget, QCheckBox, QDialog)
 from PyQt5 import QtCore
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 
 from PyQt5.QtGui import QFont, QColor, QPixmap
 
+from view import task_dialog
+from tasks.task_cap_touch import ContentWidget
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
@@ -336,9 +338,12 @@ class Task(QThread):
     serial_ok = QSignal(bool)
     message = QSignal(str)
     printterm_msg = QSignal(str)
+    show_task_dialog = QSignal(list)
+
 
     def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
+        self.pause = False
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
@@ -351,6 +356,11 @@ class Task(QThread):
         print('Task.instruments')
         for k,v in self.instruments.items():
             print(f'{k} ---> {v}')
+
+        self.env = os.environ.copy()
+        if hasattr(sys, '_MEIPASS'):
+            self.env['PYTHONPATH'] = self.env['PATH']
+            self.env['_MEIPASS'] = sys._MEIPASS
 
     @property
     def serial_instruments(self):
@@ -521,11 +531,7 @@ class Task(QThread):
                      '-s', sid]
         if args: arguments.append(args)
 
-        env = os.environ.copy()
-        if hasattr(sys, '_MEIPASS'):
-            env['PYTHONPATH'] = env['PATH']
-            env['_MEIPASS'] = sys._MEIPASS
-        proc = Popen(arguments, stdout=PIPE, env=env)
+        proc = Popen(arguments, stdout=PIPE, env=self.env)
         self.printterm_msg.emit(msg)
         return proc
 
@@ -544,7 +550,7 @@ class Task(QThread):
         print(msg1)
         self.printterm_msg.emit(msg1)
 
-        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE)
+        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=self.env)
         outputs, _ = proc.communicate()
         if not outputs:
             print('outputs is None!!!!')
@@ -683,6 +689,14 @@ class Task(QThread):
                 })
                 self.task_result.emit(result)
 
+            elif task_type == 40:
+                # Cap touch
+                self.pause = True
+                self.show_task_dialog.emit([i, task_type])
+
+            while self.pause:
+                QThread.msleep(100)
+
             QThread.msleep(500)
 
         t1 = time_()
@@ -806,6 +820,34 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+
+    def show_dialog(self, index_tasktype):
+        index, tasktype = index_tasktype
+        print('in mainwindow', 'special_task', index, tasktype)
+        self.index_for_captouch = index
+
+        port_list = []
+        for selected_i in self.dut_selected:
+            port_list.append(self._comports_dut[selected_i])
+        w = ContentWidget(port_list)
+
+        image_info = [('No.1', 'Meyoko', resource_path("./images/fixture_dummy1.png")),
+                      ('No.2', 'Nyaruko', resource_path("./images/fixture_dummy2.png")), ]
+        d = task_dialog.MyDialog(self, number=len(port_list), content_widget=w, img_info=image_info)
+        w.set_signal()
+        w.runeachportResult.connect(self.captouch_results)
+
+    def captouch_results(self, outputs):
+        print('captouch_results', outputs)
+        outputs = json.loads(outputs)
+        index = self.index_for_captouch
+        port_list = self.comports()
+        for idx, output in enumerate(outputs):
+            result = json.dumps({'index': index, 'port': port_list[idx], 'idx': idx, 'output': output})
+            self.task.df.iat[index,
+                        len(self.task.header()) + self.dut_selected[idx]] = output
+            self.taskrun(result)
+        self.task.pause = False
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -1085,6 +1127,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         se.serial_msg.connect(self.printterm1)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
+        self.task.show_task_dialog.connect(self.show_dialog)
 
     def serial_ok(self, ok):
         if ok:

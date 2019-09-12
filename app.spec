@@ -16,10 +16,10 @@ added_files = [
 ]
 
 a = Analysis(['app.py'],
-             pathex=['T:\\Desktop\\mb_test_gui'],
+             pathex=['N:\\Desktop\\mb_test_gui'],
              binaries=[],
              datas=added_files,
-             hiddenimports=['tasks'],
+             hiddenimports=['tasks.task_cap_touch'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
