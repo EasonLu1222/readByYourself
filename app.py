@@ -554,7 +554,7 @@ class Task(QThread):
                      '-s', sid]
         if args: arguments.append(args)
 
-        proc = Popen(arguments, stdout=PIPE, stderr=PIPE, stdin=PIPE, env=self.env)
+        proc = Popen(arguments, stdout=PIPE, env=self.env, cwd=resource_path('.'))
 
         self.printterm_msg.emit(msg)
         return proc
@@ -1600,8 +1600,8 @@ if __name__ == "__main__":
 
     STATION = 'SIMULATION'
     STATION = 'RF'
-    STATION = 'MainBoard'
     STATION = 'CapTouch'
+    STATION = 'MainBoard'
     # STATION = 'LED'
     # STATION = 'WPC'
     # STATION = 'PowerSensor'
@@ -1614,7 +1614,7 @@ if __name__ == "__main__":
     task_rf = Task('v8_rf_wifi')
     task_wpc = Task('v8_wpc')
     # task_ps = Task('v8_power_sensor')
-    task_mb = Task('v8_ftdi_total')
+    task_mb = Task('v8_mb_temp')
     task_audio = Task('v8_audio')
 
     map_ = {
@@ -1639,17 +1639,21 @@ if __name__ == "__main__":
 
     actions_mb = [
         {
+            'action': disable_power_check,
+            'args': (),
+        },
+        {
             'action': is_serial_ok,
             'args': (win.comports, task.serial_ok),
         },
-        {
-            'action': set_power,
-            'args': (win.power_process, win.proc_listener),
-        },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2, 7),
-        },
+        #  {
+            #  'action': set_power,
+            #  'args': (win.power_process, win.proc_listener),
+        #  },
+        #  {
+            #  'action': enter_prompt,
+            #  'args': (win, 0.2, 7),
+        #  },
     ]
 
     actions_led = [
