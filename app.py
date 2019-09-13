@@ -239,7 +239,7 @@ class SerialListener(BaseSerialListener,
 
 
 def parse_json(jsonfile):
-    x = json.loads(open(resource_path(jsonfile), 'r', encoding='utf8').read())
+    x = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     groups = defaultdict(list)
     cur_group = None
     x = x['test_items']
@@ -370,7 +370,7 @@ class Task(QThread):
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
-        self.base = json.loads(open(resource_path(self.jsonfile), 'r', encoding='utf8').read())
+        self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
         self.df = self.load()
