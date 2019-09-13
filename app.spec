@@ -18,6 +18,7 @@ added_files = [
     ('view/*', 'view'),
     ('device.json', '.'),
     ('*.py', '.'),
+    ('jsonfile/*.json', 'jsonfile'),
     ('images/*', 'images'),
     ('wav/*', 'wav'),
     ('wav/tmp/*', 'wav/tmp'),

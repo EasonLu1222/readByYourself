@@ -15,7 +15,7 @@ from threading import Thread
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox, QDialog)
+                             QWidget, QCheckBox, QDialog, QMessageBox)
 from PyQt5 import QtCore
 from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
@@ -51,6 +51,42 @@ INSTRUMENT_MAP = {
     'gw_eloader': Eloader,
     'ks_powersensor': PowerSensor,
 }
+
+
+def check_json_integrity(filename):
+    path1 = resource_path(f'jsonfile/{filename}.json')
+    path2 = os.path.join(os.path.abspath(os.path.curdir), 'jsonfile', f'{filename}.json')
+    print('path1', path1)
+    print('path2', path2)
+
+    def check_each_json(path):
+        try:
+            j = json.loads(open(path, 'r').read())
+        except json.JSONDecodeError as ex:
+            print('==ERROR==', ex)
+            return False
+
+        for dev, v in j['devices'].items():
+            num, sn = v['num'], v['sn']
+            if type(sn) != list:
+                return False
+            elif sn and len(sn) != num:
+                return False
+            del j['devices'][dev]['sn']
+        return j
+
+    j1 = check_each_json(path1)
+    j2 = check_each_json(path2)
+    if j1 and j2:
+        if path1 == path2:
+            # do not check integrity before pyinstaller deployment
+            return True # json file integrity is good
+        else:
+            print('j1', j1['devices'])
+            print('j2', j2['devices'])
+            return True if j1==j2 else False
+    else:
+        return False
 
 
 def soundcheck_init(sqz_path=None):
@@ -370,6 +406,14 @@ class Task(QThread):
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
+        logger.info(self.jsonfile)
+        if not check_json_integrity(self.json_name):
+            if QMessageBox.warning(None, 'Warning',
+                   'You can not change jsonfile content besides the serial numbers',
+                   QMessageBox.Yes):
+                self.base = None
+                return
+
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
         self.action_args = list()
@@ -959,6 +1003,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.statusBar().hide()
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
+
+        print('AABB', self.task.json_name)
+        #  if not check_json_integrity(self.task.json_name):
+            #  if QMessageBox.warning(None, 'Warning',
+                   #  'You can not change jsonfile content besides the serial numbers',
+                   #  QMessageBox.Yes):
+                #  sys.exit()
 
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
@@ -1629,6 +1680,8 @@ if __name__ == "__main__":
     }
 
     task = getattr(thismodule, f'task_{map_[STATION]}')
+    if not task.base: sys.exit()
+
     win = MyWindow(app, task)
 
     if STATION == 'SIMULATION':

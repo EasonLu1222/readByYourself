@@ -3,15 +3,18 @@
  "devices": {
     "dut": {
         "name": "cygnal_cp2102",
-        "num": 2
+        "num": 2,
+        "sn": []
     },
     "pwr": {
         "name": "gw_powersupply",
-        "num": 1
+        "num": 1,
+        "sn": []
     },
     "dmm": {
         "name": "gw_dmm",
-        "num": 1
+        "num": 1,
+        "sn": []
     }
  },
  "behaviors": {
