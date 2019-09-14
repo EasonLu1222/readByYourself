@@ -18,7 +18,22 @@
     }
  },
  "behaviors": {
-     "barcode-scan": true
+     "barcode-scan": false,
+     "actions": [
+         {
+            "action": "enter_prompt_simu",
+            "args": []
+         }
+         ,{
+            "action": "set_power_simu",
+            "args": ["win"]
+         }
+         ,{
+            "action": "dummy_com",
+            "args": ["task"]
+         }
+     ],
+     "prepares": []
  },
  "test_items":
     [
@@ -76,3 +91,4 @@
         }
     ]
 }
+

@@ -8,7 +8,19 @@
     }
  },
  "behaviors": {
-     "barcode-scan": false
+     "barcode-scan": false,
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": []
+         }
+     ],
+     "prepares": [
+         {
+            "prepare": "soundcheck_init",
+            "args": []
+         }
+     ]
  },
  "test_items":
     [
@@ -53,3 +65,4 @@
         }
     ]
 }
+

@@ -40,7 +40,8 @@ from mylogger import logger
 from tasks.task_mic import play_tone
 
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
-                    SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
+                    SERIAL_DEVICE_NAME, VISA_DEVICE_NAME,
+                    station_json)
 from utils import resource_path
 
 from soundcheck import BSndChk
@@ -67,6 +68,8 @@ def check_json_integrity(filename):
             return False
 
         for dev, v in j['devices'].items():
+            print('dev', dev)
+            print('v', v)
             num, sn = v['num'], v['sn']
             if type(sn) != list:
                 return False
@@ -1004,13 +1007,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
 
-        print('AABB', self.task.json_name)
-        #  if not check_json_integrity(self.task.json_name):
-            #  if QMessageBox.warning(None, 'Warning',
-                   #  'You can not change jsonfile content besides the serial numbers',
-                   #  QMessageBox.Yes):
-                #  sys.exit()
-
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
         print('in mainwindow', 'special_task', index, tasktype)
@@ -1645,163 +1641,32 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             "MainWindow", "At least one of the fixture should be checked")
 
 
+def parse_for_register(task, actions_or_prepares):
+    items = task.base['behaviors'][actions_or_prepares]
+    for e in items:
+        item_name = actions_or_prepares[:-1] # sigular not plural
+        item, args = e[item_name], e['args']
+        item = eval(item)
+        if args: args = [eval(e) if type(e)==str else e for e in args]
+        e[item_name] = item
+        e['args'] = args
+    return items
+
+
 if __name__ == "__main__":
-
-    thismodule = sys.modules[__name__]
-
-    STATION = 'SIMULATION'
-    STATION = 'RF'
-    STATION = 'CapTouch'
     STATION = 'MainBoard'
-    # STATION = 'LED'
-    # STATION = 'WPC'
-    # STATION = 'PowerSensor'
 
     app = QApplication(sys.argv)
-
-    task_led = Task('v8_led')
-    task_simu = Task('v8_simu')
-    task_cap_touch = Task('v8_cap_touch')
-    task_rf = Task('v8_rf_wifi')
-    task_wpc = Task('v8_wpc')
-    # task_ps = Task('v8_power_sensor')
-    task_mb = Task('v8_mb_temp')
-    task_audio = Task('v8_audio')
-
-    map_ = {
-        'MainBoard': 'mb',
-        'LED': 'led',
-        'SIMULATION': 'simu',
-        'CapTouch': 'cap_touch',
-        'RF': 'rf',
-        'WPC': 'wpc',
-        'PowerSensor': 'ps',
-        'Audio': 'audio',
-    }
-
-    task = getattr(thismodule, f'task_{map_[STATION]}')
+    thismodule = sys.modules[__name__]
+    task = Task(station_json[STATION])
     if not task.base: sys.exit()
 
     win = MyWindow(app, task)
 
-    if STATION == 'SIMULATION':
-        win.dummy_com(['COM8', 'COM3'])
-
-    prepares_mb = prepares_led = prepares_cap_touch = prepares_rf = []
-    prepares_wpc = prepares_ps = prepares_simu = []
-
-    actions_mb = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task.serial_ok),
-        },
-        #  {
-            #  'action': set_power,
-            #  'args': (win.power_process, win.proc_listener),
-        #  },
-        #  {
-            #  'action': enter_prompt,
-            #  'args': (win, 0.2, 7),
-        #  },
-    ]
-
-    actions_led = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task.serial_ok),
-        },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2),
-        },
-    ]
-    actions_cap_touch = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task.serial_ok),
-        },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2, 7),
-        },
-    ]
-    actions_rf = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task.serial_ok),
-        },
-        #  {
-            #  'action': enter_prompt,
-            #  'args': (win, 0.2),
-        #  },
-    ]
-    actions_wpc = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': is_serial_ok,
-            'args': (win.comports, task.serial_ok),
-        },
-    ]
-    actions_ps = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        },
-        {
-            'action': enter_prompt,
-            'args': (win, 0.2),
-        },
-    ]
-    actions_audio = [
-        {
-            'action': disable_power_check,
-            'args': (),
-        }
-    ]
-    prepares_audio = [
-        {
-            'prepare': soundcheck_init,
-            'args': (),
-        },
-    ]
-    actions_simu = [
-        {
-            'action': enter_prompt_simu,
-            'args': (),
-        },
-        {
-            'action': set_power_simu,
-            'args': (win,),
-        },
-        {
-            'action': dummy_com,
-            'args': (task,),
-        }
-    ]
-
-    actions = getattr(thismodule, f'actions_{map_[STATION]}')
-    prepares = getattr(thismodule, f'prepares_{map_[STATION]}')
-
+    actions = parse_for_register(task, 'actions')
     task.register_action(actions)
+
+    prepares = parse_for_register(task, 'prepares')
     win.register_prepare(prepares)
 
     print('main end')

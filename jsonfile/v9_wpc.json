@@ -18,7 +18,18 @@
     }
  },
  "behaviors": {
-     "barcode-scan": false
+     "barcode-scan": false,
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": []
+         }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win.comports", "task.serial_ok"]
+         }
+     ],
+     "prepares": []
  },
  "test_items":
     [
@@ -37,3 +48,4 @@
         }
     ]
 }
+

@@ -1,3 +1,14 @@
+[2019.9.14 - 21:00]
+Move actions & prepares into each jsonfile & cleanup app.py
+
+1. jsonfile version 9
+	- define actions & prepares (moved from app.py)
+
+2. define station_json at config.py and only STATION needed at app.py
+	- define each station & related jsonfile using station_json
+	- hardcode STATION at app.py to determine the opend station
+
+
 [2019.9.11 - 16:50]
 Add template testflow files
 

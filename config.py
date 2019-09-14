@@ -8,3 +8,31 @@ VISA_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='visa'}
 SERIAL_DEVICE_NAME = [e[0] for e in SERIAL_DEVICES.values()]
 VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
+
+''' === choose one of following station ===
+
+    STATION = 'SIMULATION'
+
+    --- SMT ---
+    STATION = 'MainBoard'
+    STATION = 'CapTouch'
+    STATION = 'LED'
+
+    --- FATP ---
+    STATION = 'RF'
+    STATION = 'WPC'
+    STATION = 'Audio'
+    STATION = 'PowerSensor'
+
+'''
+
+station_json = {
+    'SIMULATION': 'v9_simu',
+    'MainBoard': 'v9_mb',
+    'LED': 'v9_led',
+    'CapTouch': 'v9_cap_touch',
+    'RF': 'v9_rf_wifi',
+    'WPC': 'v9_wpc',
+    'PowerSensor': 'v9_power_sensor',
+    'Audio': 'v9_audio',
+}

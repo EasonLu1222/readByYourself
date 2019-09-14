@@ -3,12 +3,28 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 2,
-        "sn": ["A43QHNAMA", "AI069IAVA"]
+        "num": 1,
+        "sn": ["A43QHNAMA"]
+    },
+    "pws": {
+        "name": "ks_powersensor",
+        "num": 1,
+        "sn": ["MY57420015"]
     }
  },
  "behaviors": {
-     "barcode-scan": false
+     "barcode-scan": false,
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": []
+         }
+         ,{
+            "action": "enter_prompt",
+            "args": ["win", 0.2]
+         }
+     ],
+     "prepares": []
  },
  "test_items":
     [
@@ -26,17 +42,18 @@
             "unit": null
         }
         ,{
-            "group": "LED Test",
+            "group": "Power Sensor",
             "hidden": false,
-            "tasktype": 3,
-            "item": "",
-            "script": "task_led",
-            "args": null,
-            "auto": false,
-            "min": null,
+            "tasktype": 2,
+            "item": "measure TX power",
+            "script": "task_powersensor",
+            "args": [null],
+            "auto": true,
+            "min": -60,
             "expect": null,
             "max": null,
             "unit": null
         }
     ]
 }
+
