@@ -1,3 +1,15 @@
+[2019.9.15 - 10:35]
+Refactoring app.py
+
+1. app.py refactoring
+	- move class Task & related functions into core.py
+	- move actions related functions into actions.py
+	- adjust args fields for jsonfile
+	- move soundcheck_init() into soundcheck.py
+	- move get_visa_devices() etc into instrument/__init__.py
+	- move all STATION descriptions into app.py from config.py
+
+
 [2019.9.14 - 21:00]
 Move actions & prepares into each jsonfile & cleanup app.py
 

@@ -1,17 +1,38 @@
 import time
-from serials import (get_serial, get_devices)
 import json
 import visa
 from collections import defaultdict
 
 from mylogger import logger
-
-
-from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, 
+from serials import (get_serial, get_devices)
+from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
+
+
+def get_visa_devices():
+    dll_32 = 'C:/Windows/System32/visa32.dll'
+    rm = visa.ResourceManager(dll_32)
+    resource_names = rm.list_resources()
+    resource_names = [e for e in resource_names if e.startswith('USB')]
+    devices = []
+    for resource_name in resource_names:
+        usb_idx, name, sn = get_visa_device(resource_name)
+        devices.append({
+            'comport': usb_idx,
+            'name': name,
+            'sn': sn
+        })
+    return devices
+
+
+def get_visa_device(resource_name):
+    usb_idx, vid, pid, sn, _ = resource_name.split('::')
+    vid_pid = f'{vid[2:]}:{pid[2:]}'
+    name, _ = DEVICES[vid_pid]
+    return usb_idx, name, sn
 
 
 POWERON = '''
@@ -531,6 +552,13 @@ def generate_instruments(task_devices, instrument_map):
             instruments[name].append(inst)
     return instruments
 
+
+INSTRUMENT_MAP = {
+    'gw_powersupply': PowerSupply,
+    'gw_dmm': DMM,
+    'gw_eloader': Eloader,
+    'ks_powersensor': PowerSensor,
+}
 
 
 if __name__ == "__main__":

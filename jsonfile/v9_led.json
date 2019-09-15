@@ -12,7 +12,7 @@
      "actions": [
          {
             "action": "disable_power_check",
-            "args": []
+            "args": ["win"]
          }
          ,{
             "action": "is_serial_ok",

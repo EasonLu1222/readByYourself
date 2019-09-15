@@ -12,13 +12,13 @@
      "actions": [
          {
             "action": "disable_power_check",
-            "args": []
+            "args": ["win"]
          }
      ],
      "prepares": [
          {
             "prepare": "soundcheck_init",
-            "args": []
+            "args": ["thismodule"]
          }
      ]
  },

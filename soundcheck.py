@@ -1,9 +1,12 @@
 import os
 import sys
+import time
 import json
 import pythoncom
 import win32com.client as client
 import pandas as pd
+
+from mylogger import logger
 
 
 class BSndChk(object):
@@ -97,6 +100,28 @@ class BSndChk(object):
         return df
 
 
+def soundcheck_init(module, sqz_path=None):
+    logger.info('soundcheck_init start')
+    b = BSndChk()
+    cases = ['all pass', 'all failed', 'one failed']
+    case = cases[2]
+    try:
+        b.LinkSC()
+        sqz_path = os.path.join(os.path.abspath(os.path.curdir),
+                                'soundcheck_sequence',
+                                f'test_20181030_{case}',
+                                f"test_{case.replace(' ', '_')}.sqc")
+        b.Open_Sequence(sqz_path)
+        setattr(module, 'snd_chk', b)
+        logger.info(f'module: {module}')
+        time.sleep(1)
+    except Exception as ex:
+        logger.error(ex)
+        return False
+    logger.info('soundcheck_init end')
+    return True
+
+
 if __name__ == "__main__":
     b = BSndChk()
     b.LinkSC()
@@ -106,4 +131,3 @@ if __name__ == "__main__":
     b.Open_Sequence(sqz_path)
     import time; time.sleep(1)
     b.Run_Sequence()
-

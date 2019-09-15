@@ -6,8 +6,8 @@ import time
 import serial
 from serial.tools.list_ports import comports
 import pandas as pd
-from PyQt5.QtCore import QTimer, pyqtSignal as QSignal, QObject, QThread
-from threading import Timer, Thread, Event
+from PyQt5.QtCore import pyqtSignal as QSignal, QObject, QThread
+from threading import Thread
 import argparse
 from queue import Queue
 
@@ -90,7 +90,6 @@ class SerialEmit(QObject):
 se = SerialEmit()
 
 
-
 def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
     logger.info(f'\n\nwait_for_prompt: {prompt}\n\n')
     portname = serial.name
@@ -166,8 +165,6 @@ def check_which_port_when_poweron(ports, prompt='Starting kernel', qsignal=True)
         sp.close()
     logger.info('close each serial end')
     logger.info('check_which_port_when_poweron end')
-
-    #  return port
 
 
 def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printline=True):
@@ -294,9 +291,3 @@ if __name__ == "__main__":
 
     print('ports', ports)
     check_which_port_when_poweron(ports)
-
-
-    #  port_name = 'COM3'
-    #  ser = get_serial(port_name, 115200, 0.2)
-    #  enter_factory_image_prompt(ser, 0)
-
