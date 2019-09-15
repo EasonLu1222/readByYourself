@@ -181,7 +181,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.taskdone_first = False
         self.port_autodecting = False
-        self.statusBar().hide()
+        #  self.statusBar().hide()
+
+        lb1 = QLabel(f'Program version: {getattr(thismodule, "version")}')
+        lb2 = QLabel(f'Station version: {self.task.base["version"]}')
+        lb1.setObjectName('lb1')
+        lb2.setObjectName('lb2')
+        for lb in [lb1, lb2]:
+            self.statusbar.addWidget(lb, 1)
+            lb.setAlignment(QtCore.Qt.AlignCenter)
+            lb.setStyleSheet("QLabel#%s {background-color: #444; color: white;"
+                             "font-weight: bold}" % lb.objectName())
+
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
 
