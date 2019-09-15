@@ -1,3 +1,7 @@
+[2019.9.15 - 10:50]
+Allow only DUT comports which serial numbers are in jsonfile definition
+
+
 [2019.9.15 - 10:35]
 Refactoring app.py
 

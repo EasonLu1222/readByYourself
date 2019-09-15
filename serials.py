@@ -220,10 +220,10 @@ class BaseSerialListener(QThread):
 
             # add below two lines will only allow comports which sn_numbers 
             # lies in jsonfile definition, but only for dut, not for instruments
-            #  sn_numbers = v['sn']
-            #  ports = filter_devices(devices, v['name'], sn_numbers)
+            sn_numbers = v['sn'] if k=='dut' else None
+            ports = filter_devices(devices, v['name'], sn_numbers)
+            #  ports = filter_devices(devices, v['name'])
 
-            ports = filter_devices(devices, v['name'])
             ports_map[k] = ports
         return ports_map
 
