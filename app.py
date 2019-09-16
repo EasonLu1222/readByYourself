@@ -174,10 +174,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton.setEnabled(False)
 
-        # maximized trick added. 2019.9.16
-        self.resize(800, 600)
-        self.showMaximized();self.showMaximized()
-
         self.power_process = {}
         self.power_results = {}
 
@@ -202,6 +198,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
         self.after_args = list()
+        self.showMaximized()
 
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
