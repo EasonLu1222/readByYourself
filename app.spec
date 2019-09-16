@@ -16,6 +16,7 @@ exec_before = exec_statement('''
 added_files = [
     ('tasks/*', 'tasks'),
     ('view/*', 'view'),
+    ('ui/*.py', 'ui'),
     ('device.json', '.'),
     ('*.py', '.'),
     ('jsonfile/*.json', 'jsonfile'),
@@ -25,8 +26,13 @@ added_files = [
     ('translate/*', 'translate'),
     ('instrument/*', 'instrument'),
     ('site-packages/serial/*.py', 'serial'),
-    ('site-packages/serial/tools/*py', 'serial/tools'),
-    ('site-packages/PyQt5/*py', 'PyQt5'),
+    ('site-packages/serial/tools/*.py', 'serial/tools'),
+    ('site-packages/PyQt5/*.py', 'PyQt5'),
+    ('site-packages/visa.py', '.'),
+    ('site-packages/pyvisa/*.py', 'pyvisa'),
+    ('site-packages/pyvisa/compat/*.py', 'pyvisa/compat'),
+    ('site-packages/pyvisa/resources/*.py', 'pyvisa/resources'),
+    ('site-packages/pyvisa/ctwrapper/*.py', 'pyvisa/ctwrapper'),
 ]
 
 a = Analysis(['app.py'],

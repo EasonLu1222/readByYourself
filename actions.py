@@ -1,5 +1,7 @@
 from subprocess import Popen, PIPE
 from serials import is_serial_free
+from utils import resource_path, get_env
+
 
 def disable_power_check(win):
     win.power_recieved = True
@@ -24,7 +26,7 @@ def set_power(power_process, proc_listener):
     script = 'tasks.poweron'
     for idx in range(1, 3):
         args = [str(idx)]
-        proc = Popen(['python', '-m', script] + args, stdout=PIPE)
+        proc = Popen(['python', '-m', script] + args, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
         power_process[idx] = proc
     proc_listener.set_process(power_process)
     proc_listener.start()

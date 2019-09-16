@@ -12,7 +12,7 @@ import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
 
-from utils import resource_path
+from utils import resource_path, get_env
 from instrument import  get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
@@ -240,7 +240,7 @@ class Task(QThread):
         self.pause = False
         self.json_root = json_root
         self.json_name = json_name
-        self.jsonfile = f'{json_root}/{json_name}.json'
+        self.jsonfile = resource_path(f'{json_root}/{json_name}.json')
         logger.info(self.jsonfile)
         if not check_json_integrity(self.json_name):
             if QMessageBox.warning(None, 'Warning',
@@ -257,11 +257,6 @@ class Task(QThread):
         print('Task.instruments')
         for k,v in self.instruments.items():
             print(f'{k} ---> {v}')
-
-        self.env = os.environ.copy()
-        if hasattr(sys, '_MEIPASS'):
-            self.env['PYTHONPATH'] = self.env['PATH']
-            self.env['_MEIPASS'] = sys._MEIPASS
 
     @property
     def serial_instruments(self):
@@ -411,7 +406,7 @@ class Task(QThread):
 
         coms = json.dumps(coms)
         print('coms', coms)
-        proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE)
+        proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
 
         return proc
 
@@ -428,7 +423,7 @@ class Task(QThread):
                      '-s', sid]
         if args: arguments.append(args)
 
-        proc = Popen(arguments, stdout=PIPE, env=self.env, cwd=resource_path('.'))
+        proc = Popen(arguments, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
 
         self.printterm_msg.emit(msg)
         return proc
@@ -531,7 +526,7 @@ class Task(QThread):
         print(msg1)
         self.printterm_msg.emit(msg1)
 
-        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=self.env)
+        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
         outputs, _ = proc.communicate()
         if not outputs:
             print('outputs is None!!!!')
