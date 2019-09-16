@@ -170,8 +170,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton.setEnabled(False)
 
-        self.showMaximized()
-
         self.power_process = {}
         self.power_results = {}
 
@@ -195,6 +193,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
+        self.showMaximized()
 
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
