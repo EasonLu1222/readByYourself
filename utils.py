@@ -27,3 +27,11 @@ def resource_path(relative_path):
         except Exception:
             base_path = Path(".").resolve()
     return str(base_path.joinpath(base_path, Path(relative_path)))
+
+def get_env():
+    pyi_env = os.environ.copy()
+    if hasattr(sys, '_MEIPASS'):
+        pyi_env['PYTHONPATH'] = pyi_env['PATH']
+        pyi_env['_MEIPASS'] = sys._MEIPASS
+
+    return pyi_env
