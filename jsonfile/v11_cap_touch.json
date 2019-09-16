@@ -45,9 +45,9 @@
         ,{
             "group": "Cap Touch Test",
             "hidden": false,
-            "tasktype": 40,
+            "tasktype": 3,
             "item": "",
-            "script": "",
+            "script": "task_cap_touch",
             "args": null,
             "auto": false,
             "min": null,

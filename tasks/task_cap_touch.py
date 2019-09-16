@@ -1,4 +1,6 @@
+import argparse
 import json
+import sys
 from json import JSONDecodeError
 
 from PyQt5 import QtWidgets
@@ -7,6 +9,8 @@ from serial.serialutil import SerialException
 
 from mylogger import logger
 from serials import get_serial, issue_command
+from view import task_dialog
+from utils import resource_path
 
 
 class TouchPolling(QThread):
@@ -27,7 +31,7 @@ class TouchPolling(QThread):
             cmd = 'i2cget -f -y 1 0x1f 0x00'
             try:
                 lines = issue_command(self.ser, cmd)
-            except (OSError, TypeError, JSONDecodeError, SerialException):
+            except (AttributeError, OSError, TypeError, JSONDecodeError, SerialException):
                 logger.info('TouchPolling thread terminated!')
                 self.kill = True
                 break
@@ -46,8 +50,6 @@ class TouchPolling(QThread):
 
 
 class ContentWidget(QtWidgets.QWidget):
-    runeachportResult = QSignal(str)
-
     def __init__(self, portnames, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -81,7 +83,10 @@ class ContentWidget(QtWidgets.QWidget):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
         if hasattr(self, 'ser') and self.ser.is_open:
-            self.ser.close()
+            try:
+                self.ser.close()
+            except AttributeError:
+                logger.info('TouchPolling thread terminated!')
         self.all_color('#FFFFFF')
 
     def set_signal(self):
@@ -100,7 +105,7 @@ class ContentWidget(QtWidgets.QWidget):
     def on_close(self, msg):
         logger.info(f'on_close {msg}')
         self.clear_test()
-        self.runeachportResult.emit(json.dumps(msg))
+        sys.stdout.write(json.dumps(msg))
 
 
 if __name__ == "__main__":
@@ -112,8 +117,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     w = ContentWidget(portnames)
 
-    image_info = [('No.1', 'Meyoko', 'images/fixture_dummy1.png'),
-                  ('No.2', 'Nyaruko', 'images/fixture_dummy2.png'),]
+    image_info = [('No.1', 'Meyoko', resource_path('images/fixture_dummy1.png')),
+                  ('No.2', 'Nyaruko', resource_path('images/fixture_dummy2.png')),]
     d = task_dialog.MyDialog(number=len(portnames), content_widget=w, img_info=image_info)
     w.set_signal()
     app.exec_()

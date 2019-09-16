@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import time
@@ -13,11 +14,11 @@ from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
 
 from utils import resource_path, get_env
-from instrument import  get_visa_devices, generate_instruments, INSTRUMENT_MAP
+from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
-from serials import enter_factory_image_prompt, get_serial, filter_devices
+from serials import enter_factory_image_prompt, get_serial
 
 
 def enter_prompt_simu():
@@ -237,7 +238,6 @@ class Task(QThread):
 
     def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
-        self.pause = False
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = resource_path(f'{json_root}/{json_name}.json')
@@ -695,14 +695,6 @@ class Task(QThread):
                 })
                 self.df.iloc[r1:r2, c1:c2] = output
                 self.task_result.emit(result)
-
-            elif task_type == 40:
-                # Cap touch
-                self.pause = True
-                self.show_task_dialog.emit([i, task_type])
-
-            while self.pause:
-                QThread.msleep(100)
 
             QThread.msleep(500)
 
