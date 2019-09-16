@@ -240,7 +240,7 @@ class Task(QThread):
         super(Task, self).__init__()
         self.json_root = json_root
         self.json_name = json_name
-        self.jsonfile = resource_path(f'{json_root}/{json_name}.json')
+        self.jsonfile = f'{json_root}/{json_name}.json'
         logger.info(self.jsonfile)
         if not check_json_integrity(self.json_name):
             if QMessageBox.warning(None, 'Warning',

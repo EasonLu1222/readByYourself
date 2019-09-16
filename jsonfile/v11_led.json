@@ -21,7 +21,7 @@
          }
          ,{
             "action": "enter_prompt",
-            "args": ["win", 0.2]
+            "args": ["win", 0.2, 7]
          }
      ],
      "prepares": [],

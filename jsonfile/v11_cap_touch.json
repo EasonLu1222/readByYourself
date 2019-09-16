@@ -15,14 +15,7 @@
             "action": "disable_power_check",
             "args": ["win"]
          }
-         ,{
-            "action": "is_serial_ok",
-            "args": ["win.comports", "task.serial_ok"]
-         }
-         ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 7]
-         }
+
      ],
      "prepares": [],
      "afters": []

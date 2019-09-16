@@ -14,7 +14,6 @@ exec_before = exec_statement('''
 ''')
 
 added_files = [
-    ('python.exe', 'python.exe'),
     ('tasks/*', 'tasks'),
     ('view/*', 'view'),
     ('ui/*.py', 'ui'),
@@ -40,7 +39,7 @@ a = Analysis(['app.py'],
              pathex=[curdir],
              binaries=[],
              datas=added_files,
-             hiddenimports=[],
+             hiddenimports=['scipy.io', 'scipy.io.wavfile', 'playsound', 'playsound.playsound'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

@@ -11,7 +11,7 @@ from playsound import playsound
 from subprocess import Popen, PIPE
 
 from mylogger import logger
-from utils import resource_path
+from utils import resource_path, get_env
 
 wav_dir = './wav'
 
@@ -22,7 +22,7 @@ def play_tone():
 
 def pull_recorded_sound():
     cmd = "adb devices -l"
-    proc = Popen(cmd.split(" "), stdout=PIPE)
+    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
     output, _ = proc.communicate()
     decoded_output = output.decode('utf-8').strip()
     lines = decoded_output.split('\n')[1:]
@@ -37,7 +37,7 @@ def pull_recorded_sound():
             test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result")
 
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
-            proc = Popen(cmd.split(" "), stdout=PIPE)
+            proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
             proc.communicate()
 
             top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
@@ -110,7 +110,7 @@ def push_result_to_device(transport_id, test_result_path):
 
     file_path = "/usr/share/"
     cmd = f"adb -t {transport_id} push {test_result_path} {file_path}"
-    proc = Popen(cmd.split(" "), stdout=PIPE)
+    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
     output, _ = proc.communicate()
 
     os.remove(test_result_path)
