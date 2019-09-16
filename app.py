@@ -8,11 +8,11 @@ from operator import itemgetter
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont, QColor, QPixmap
-from PyQt5.QtCore import (QSettings, QThread, Qt, QTranslator, QCoreApplication,
+from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox, QDialog)
+                             QWidget, QCheckBox)
 
 from view import task_dialog
 from view.pwd_dialog import PwdDialog
