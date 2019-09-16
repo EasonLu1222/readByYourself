@@ -1,3 +1,4 @@
+from subprocess import Popen, PIPE
 from serials import is_serial_free
 
 def disable_power_check(win):
