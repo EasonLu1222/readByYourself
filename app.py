@@ -35,6 +35,10 @@ from actions import (disable_power_check, set_power_simu, dummy_com,
 from soundcheck import soundcheck_init
 
 
+def window_click_run(win):
+    win.btn_clicked()
+
+
 class UsbPowerSensor(): comports_pws = QSignal(list)
 
 class VisaListener(BaseVisaListener, UsbPowerSensor):
@@ -170,7 +174,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton.setEnabled(False)
 
-        self.showMaximized()
+        # maximized trick added. 2019.9.16
+        self.resize(800, 600)
+        self.showMaximized();self.showMaximized()
 
         self.power_process = {}
         self.power_results = {}
@@ -195,6 +201,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.prepare_args = list()
+        self.after_args = list()
 
     def show_dialog(self, index_tasktype):
         index, tasktype = index_tasktype
@@ -229,6 +236,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for e in prepares:
             prepare, args = e['prepare'], e['args']
             self.prepare_args.append([prepare, args])
+
+    def register_after(self, afters):
+        print('register_afters')
+        for e in afters:
+            after, args = e['after'], e['args']
+            self.after_args.append([after, args])
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -461,6 +474,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 return
         print('prepare end')
 
+    def after(self):
+        print('after start')
+        for action, args in self.after_args:
+            print('run after', action, args)
+            if not action(*args):
+                print('return !!!!!')
+                return
+        print('after end')
+
     def visa_instrument_ready(self, ready):
         print('visa_instrument_ready start')
         if ready:
@@ -685,6 +707,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if os.path.isfile('power_results'):
                 os.remove('power_results')
+        self.after()
 
     def show_barcode_dialog(self):
         print('show_barcode_dialog start')
@@ -833,8 +856,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 def parse_for_register(task, actions_or_prepares):
     items = task.base['behaviors'][actions_or_prepares]
     for e in items:
+        print('e', e)
         item_name = actions_or_prepares[:-1] # sigular not plural
         item, args = e[item_name], e['args']
+
+        print('item', item)
+        print('args', args)
+
         item = eval(item)
         if args: args = [eval(e) if type(e)==str else e for e in args]
         e[item_name] = item
@@ -860,9 +888,14 @@ if __name__ == "__main__":
         STATION = 'WPC'
         STATION = 'Audio'
         STATION = 'PowerSensor'
+        STATION = 'Download'
 
     '''
-    STATION = 'MainBoard'
+    #  STATION = 'Download'
+
+    # temporary approach, for convenient development
+    STATION = json.loads(open('jsonfile/station.json', 'r').\
+                         read())['STATION']
 
     app = QApplication(sys.argv)
     task = Task(station_json[STATION])
@@ -875,6 +908,9 @@ if __name__ == "__main__":
 
     prepares = parse_for_register(task, 'prepares')
     win.register_prepare(prepares)
+
+    afters = parse_for_register(task, 'afters')
+    win.register_after(afters)
 
     print('main end')
     app.exec_()

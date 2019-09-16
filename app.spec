@@ -14,6 +14,7 @@ exec_before = exec_statement('''
 ''')
 
 added_files = [
+    ('python.exe', 'python.exe'),
     ('tasks/*', 'tasks'),
     ('view/*', 'view'),
     ('device.json', '.'),

@@ -10,12 +10,13 @@ VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
 station_json = {
-    'SIMULATION': 'v10_simu',
-    'MainBoard': 'v10_mb',
-    'LED': 'v10_led',
-    'CapTouch': 'v10_cap_touch',
-    'RF': 'v10_rf_wifi',
-    'WPC': 'v10_wpc',
-    'PowerSensor': 'v10_power_sensor',
-    'Audio': 'v10_audio',
+    'SIMULATION': 'v11_simu',
+    'Download': 'v11_download',
+    'MainBoard': 'v11_mb',
+    'LED': 'v11_led',
+    'CapTouch': 'v11_cap_touch',
+    'RF': 'v11_rf_wifi',
+    'WPC': 'v11_wpc',
+    'PowerSensor': 'v11_power_sensor',
+    'Audio': 'v11_audio',
 }

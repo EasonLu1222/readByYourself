@@ -16,6 +16,15 @@ from mylogger import logger
 SERIAL_TIMEOUT = 0.2
 
 
+def enter_burn_mode(portname, dut_idx):
+    logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        lines = issue_command(ser, 'update')
+        logger.info(lines)
+        result = f'Pass'
+    return result
+
+
 def read_pid(portname, dut_idx):
     logger.info(f'portname: {portname}, dut_idx: {dut_idx}')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
