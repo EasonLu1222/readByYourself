@@ -847,7 +847,7 @@ def parse_for_register(task, actions_or_prepares):
 
 
 if __name__ == "__main__":
-    version = "1.0.0"
+    version = "0.1.0"
     thismodule = sys.modules[__name__]
 
     ''' === choose one of following station ===
