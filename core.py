@@ -256,12 +256,12 @@ class Task(QThread):
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
         logger.info(self.jsonfile)
-        if not check_json_integrity(self.json_name):
-            if QMessageBox.warning(None, 'Warning',
-                   'You can not change jsonfile content besides the serial numbers',
-                   QMessageBox.Yes):
-                self.base = None
-                return
+        #  if not check_json_integrity(self.json_name):
+            #  if QMessageBox.warning(None, 'Warning',
+                   #  'You can not change jsonfile content besides the serial numbers',
+                   #  QMessageBox.Yes):
+                #  self.base = None
+                #  return
 
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
@@ -414,7 +414,12 @@ class Task(QThread):
                 coms.update({k: [getattr(e, com_to_extract) for e in v]})
 
         coms = json.dumps(coms)
-        proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+
+        py_interpreter = os.path.join(resource_path('.'), 'python')
+        print('py_interpreter', py_interpreter)
+        proc = Popen([py_interpreter, '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        #  proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+
         return proc
 
     def runeach(self, row_idx, dut_idx, sid):
@@ -422,7 +427,11 @@ class Task(QThread):
         each, script, args = self.unpack_each(row_idx)
         msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(sid)}][{s_(args)}]'
         print(msg)
-        arguments = ['python', '-m', script,
+
+        py_interpreter = os.path.join(resource_path('.'), 'python')
+        print('py_interpreter', py_interpreter)
+        arguments = [py_interpreter, '-m', script,
+        #  arguments = ['python', '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
                      '-s', sid]
@@ -528,7 +537,10 @@ class Task(QThread):
         print(msg)
         self.printterm_msg.emit(msg)
 
-        proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
+        py_interpreter = os.path.join(resource_path('.'), 'python')
+        print('py_interpreter', py_interpreter)
+        proc = Popen([py_interpreter, '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
+        #  proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
 
         outputs, _ = proc.communicate()
         if not outputs:
@@ -610,6 +622,7 @@ class Task(QThread):
         c1 = len(self.header()) + self.window.dut_selected[0]
         c2 = c1 + len(self.window.dut_selected)
         output = json.loads(output)
+        get_col = lambda arr, col: map(lambda x: x[col], arr)
         if len(self.window.dut_selected) == 1:
             output = [[e] for e in get_col(output, self.window.dut_selected[0])]
         print('OUTPUT', output)
@@ -688,7 +701,6 @@ class Task(QThread):
 
         QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
-        get_col = lambda arr, col: map(lambda x: x[col], arr)
         c1 = len(self.header())
         self.df.iloc[:, c1:c1 + self.dut_num] = ""
         for group, items in self.groups.items():

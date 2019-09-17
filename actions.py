@@ -1,3 +1,4 @@
+import os
 from subprocess import Popen, PIPE
 from serials import is_serial_free
 from utils import resource_path, get_env
@@ -26,7 +27,12 @@ def set_power(power_process, proc_listener):
     script = 'tasks.poweron'
     for idx in range(1, 3):
         args = [str(idx)]
-        proc = Popen(['python', '-m', script] + args, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+
+        py_interpreter = os.path.join(resource_path('.'), 'python')
+        print('py_interpreter', py_interpreter)
+        proc = Popen([py_interpreter, '-m', script] + args, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        #  proc = Popen(['python', '-m', script] + args, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+
         power_process[idx] = proc
     proc_listener.set_process(power_process)
     proc_listener.start()

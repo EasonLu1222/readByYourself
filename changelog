@@ -1,3 +1,17 @@
+[2019.9.17 - 16:15]
+Test packaged app.exe to work on clean window env
+
+1. package embedded python interpreter to allow Popen to use
+	- python-3.7.3-embed-amd64/
+
+2. three station tested: mb, captouch, led
+
+3. local app.py compatibility --> TBD
+
+4. comment out check_json_integrity() temporarily 
+
+
+
 [2019.9.17 - 11:15]
 Refactoring core.py
 
