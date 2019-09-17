@@ -258,9 +258,7 @@ if __name__ == "__main__":
     logger.info(f'funcname: {funcname}')
 
     func = getattr(thismodule, funcname)
-    func_args = [
-        getattr(thismodule, arg) for arg in inspect.getargspec(func).args
-    ]
+    func_args = [getattr(thismodule, arg) for arg in inspect.getfullargspec(func).args]
     logger.info(f'func_args: {func_args}')
 
     result = func(*func_args)

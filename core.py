@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import time
+import inspect
 import threading
 import importlib
 from datetime import datetime
@@ -19,6 +20,19 @@ from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
                     SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
 from serials import enter_factory_image_prompt, get_serial
+
+
+def s_(var):
+    '''
+        name = "tom"
+        s_(name) = "name: tom"
+
+        pi = 3.1415
+        s_(pi) = "pi: 3.1415"
+    '''
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    var_name = [var_name for var_name, var_val in callers_local_vars if var_val is var][0]
+    return f'{var_name}: {var}'
 
 
 def enter_prompt_simu():
@@ -375,17 +389,13 @@ class Task(QThread):
         each = self.each(index)
         line = self.df.values[index]
         script = 'tasks.%s' % each['script']
-        tasktype = each['tasktype']
         args = [str(e) for e in each['args']]if each['args'] else []
-        return each, script, tasktype, args
+        return each, script, args
 
     def rungroup(self, groupname):
         eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
-        print(
-            f'[rungroup][script: {script}][index: {index}][len: {item_len}][args: {args}]'
-        )
+        print(f'[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
         limits_group = [self.limits(groupname, i) for i in range(item_len)]
-        print('limits_group', limits_group)
         limits = {}
         for e in zip(*args):
             xx = {i: j for i, j in zip(e, limits_group)}
@@ -393,7 +403,6 @@ class Task(QThread):
         print('limits', limits)
         args = {'args': args, 'limits': limits}
 
-        #  coms = {k:[e.com for e in v] for k,v in self.instruments.items() if len(v)>0}
         coms = {}
         for k,v in self.instruments.items():
             interface = dict(DEVICES.values())[k]
@@ -405,26 +414,20 @@ class Task(QThread):
                 coms.update({k: [getattr(e, com_to_extract) for e in v]})
 
         coms = json.dumps(coms)
-        print('coms', coms)
         proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-
         return proc
 
-    def runeach(self, row_idx, dut_idx, sid, tasktype):
+    def runeach(self, row_idx, dut_idx, sid):
         port = self.window.comports()[dut_idx]
-        each, script, tasktype, args = self.unpack_each(row_idx)
-        msg = (f'[runeach][script: {script}][row_idx: {row_idx}]'
-               f'[dut_idx: {dut_idx}][port: {port}][sid: {sid}]'
-               f'[args: {args}]')
+        each, script, args = self.unpack_each(row_idx)
+        msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(sid)}][{s_(args)}]'
         print(msg)
         arguments = ['python', '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
                      '-s', sid]
         if args: arguments.append(args)
-
         proc = Popen(arguments, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-
         self.printterm_msg.emit(msg)
         return proc
 
@@ -521,12 +524,12 @@ class Task(QThread):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
-        msg1 = '\n[runeachports][script: %s][index: %s][ports: %s][args: %s]' % (
-            script, index, ports, args)
-        print(msg1)
-        self.printterm_msg.emit(msg1)
+        msg = f'[rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
+        print(msg)
+        self.printterm_msg.emit(msg)
 
         proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
+
         outputs, _ = proc.communicate()
         if not outputs:
             print('outputs is None!!!!')
@@ -549,153 +552,152 @@ class Task(QThread):
             action, args = e['action'], e['args']
             self.action_args.append([action, args])
 
+    def run_task1(self, group, items):
+        row_idx, next_item = items[0]['index'], items[0]
+        procs = {}
+        if any(self.window.port_barcodes.values()):
+            for port, barcode in self.window.port_barcodes.items():
+                if barcode:
+                    dut_idx = self.window.comports().index(port)
+                    proc = self.runeach(row_idx, dut_idx, barcode)
+                    procs[port] = proc
+        else:
+            for dut_idx in self.window.dut_selected:
+                proc = self.runeach(row_idx, dut_idx, '')
+                port = self.window.comports()[dut_idx]
+                procs[port] = proc
+
+        print('procs', procs)
+        for j, (port, proc) in enumerate(procs.items()):
+            output, _ = proc.communicate()
+            output = output.decode('utf8')
+            msg2 = '[task %s][output: %s]' % (row_idx, output)
+            self.printterm_msg.emit(msg2)
+            result = json.dumps({
+                'index': row_idx,
+                'port': port,
+                'output': output
+            })
+            self.df.iat[row_idx,
+                        len(self.header()) +
+                        self.window.dut_selected[j]] = output
+
+            if not any(self.window.port_barcodes.values()):
+                script = next_item['script']
+                func = next_item['args'][0]
+                to_read_pid = (script=='task_runeach' and func=='read_pid')
+                if output.startswith('Pass') and to_read_pid:
+                    pid = output[5:-1]
+                    header = self.header_ext()
+                    dut_i = self.window.dut_selected[j]
+                    header[-self.dut_num + dut_i] = f'#{dut_i+1} - {pid}'
+                    self.window.table_view.setHorizontalHeaderLabels(header)
+            self.task_result.emit(result)
+
+    def run_task2(self, group, items):
+        row = items[0]['index']
+        proc = self.rungroup(group)
+        output, _ = proc.communicate()
+        output = output.decode('utf8')
+        print('OUTPUT', output)
+        msg2 = '[task %s][output: %s]' % ([row, row + len(items)], output)
+        self.printterm_msg.emit(msg2)
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': output
+        })
+        r1, r2 = row, row + len(items)
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+        output = json.loads(output)
+        if len(self.window.dut_selected) == 1:
+            output = [[e] for e in get_col(output, self.window.dut_selected[0])]
+        print('OUTPUT', output)
+        self.df.iloc[r1:r2, c1:c2] = output
+        self.task_result.emit(result)
+
+    def run_task3(self, group, items):
+        row = items[0]['index']
+        selected_port_list = []
+        for selected_i in self.window.dut_selected:
+            selected_port_list.append(self.window._comports_dut[selected_i])
+        selected_port_str = ','.join(selected_port_list)
+        self.runeachports(row, selected_port_str)
+
+    def run_task4(self, group, items):
+        row = items[0]['index']
+        line = self.df.values[row]
+        mod_name = f'tasks.{line[0]}'
+        mod = importlib.import_module(mod_name)
+
+        func_list = [str(e) for e in line[1]] if line[1] else []
+
+        func = getattr(mod, func_list[0])
+        t = threading.Thread(target=func)
+        t.start()
+        r1, r2 = row, row+1
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+        self.df.iloc[r1:r2, c1:c2] = "Passed"
+
+        result = json.dumps({
+            'index': row,
+            'output': "Passed"
+        })
+        self.task_result.emit(result)
+
+    def run_task9(self, group, items):
+        row, next_item = items[0]['index'], items[0]
+        obj_name, method_name = next_item['args']
+        obj = getattr(sys.modules['__main__'], obj_name)
+        output = getattr(obj, method_name)()
+        r1, r2 = row, row + len(items)
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+        if len(self.window.dut_selected) == 1:
+            output = [[e] for e in output]
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': output
+        })
+        self.df.iloc[r1:r2, c1:c2] = output
+        self.task_result.emit(result)
+
+    def run_task11(self, group, items):
+        threads = {}
+        for dut_idx in self.window.dut_selected:
+            port = self.window.comports()[dut_idx]
+            print('dut_idx: ', dut_idx)
+            print('port: ', port)
+            threads[dut_idx] = th = threading.Thread(target=self.run_iqfactrun_console,
+                                                args=(dut_idx, port, group,))
+            th.start()
+        for dut_idx, th in threads.items():
+            th.join()
+
     def run(self):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
         t0 = time_()
+
         for action, args in self.action_args:
             print('run action', action, args)
             if not action(*args):
                 print('return !!!!!')
                 return
+
         QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
-
         get_col = lambda arr, col: map(lambda x: x[col], arr)
-
         c1 = len(self.header())
         self.df.iloc[:, c1:c1 + self.dut_num] = ""
-
         for group, items in self.groups.items():
-            i, next_item = items[0]['index'], items[0]
+            row, next_item = items[0]['index'], items[0]
             is_auto, task_type = next_item['auto'], next_item['tasktype']
             if task_type != 11:
-                self.task_each.emit([i, len(items)])
-
-            if task_type == 1:
-                procs = {}
-                if any(self.window.port_barcodes.values()):
-                    for port, barcode in self.window.port_barcodes.items():
-                        if barcode:
-                            dut_idx = self.window.comports().index(port)
-                            proc = self.runeach(i, dut_idx, barcode, task_type)
-                            procs[port] = proc
-                else:
-                    for dut_idx in self.window.dut_selected:
-                        proc = self.runeach(i, dut_idx, '', task_type)
-                        port = self.window.comports()[dut_idx]
-                        print('port: ', port)
-                        procs[port] = proc
-
-                print('procs', procs)
-                for j, (port, proc) in enumerate(procs.items()):
-                    output, _ = proc.communicate()
-                    output = output.decode('utf8')
-                    msg2 = '[task %s][output: %s]' % (i, output)
-                    self.printterm_msg.emit(msg2)
-                    result = json.dumps({
-                        'index': i,
-                        'port': port,
-                        'output': output
-                    })
-                    self.df.iat[i,
-                                len(self.header()) +
-                                self.window.dut_selected[j]] = output
-                    print('run: result', result)
-
-                    if not any(self.window.port_barcodes.values()):
-                        script = next_item['script']
-                        func = next_item['args'][0]
-                        to_read_pid = (script=='task_runeach' and func=='read_pid')
-                        if output.startswith('Pass') and to_read_pid:
-                            pid = output[5:-1]
-                            header = self.header_ext()
-                            dut_i = self.window.dut_selected[j]
-                            header[-self.dut_num + dut_i] = f'#{dut_i+1} - {pid}'
-                            self.window.table_view.setHorizontalHeaderLabels(header)
-
-                    self.task_result.emit(result)
-
-            elif task_type == 11:
-                threads = {}
-                for dut_idx in self.window.dut_selected:
-                    port = self.window.comports()[dut_idx]
-                    print('dut_idx: ', dut_idx)
-                    print('port: ', port)
-                    threads[dut_idx] = th = threading.Thread(target=self.run_iqfactrun_console,
-                                                        args=(dut_idx, port, group,))
-                    th.start()
-                for dut_idx, th in threads.items():
-                    th.join()
-
-            elif task_type == 2:
-                proc = self.rungroup(group)
-                output, _ = proc.communicate()
-                output = output.decode('utf8')
-                print('OUTPUT', output)
-                msg2 = '[task %s][output: %s]' % ([i, i + len(items)], output)
-                self.printterm_msg.emit(msg2)
-                result = json.dumps({
-                    'index': [i, i + len(items)],
-                    'output': output
-                })
-                r1, r2 = i, i + len(items)
-                c1 = len(self.header()) + self.window.dut_selected[0]
-                c2 = c1 + len(self.window.dut_selected)
-                output = json.loads(output)
-                if len(self.window.dut_selected) == 1:
-                    output = [[e] for e in get_col(output, self.window.dut_selected[0])]
-                print('OUTPUT', output)
-                self.df.iloc[r1:r2, c1:c2] = output
-                self.task_result.emit(result)
-
-            elif task_type == 3:
-                selected_port_list = []
-                for selected_i in self.window.dut_selected:
-                    selected_port_list.append(self.window._comports_dut[selected_i])
-
-                selected_port_str = ','.join(selected_port_list)
-                self.runeachports(i, selected_port_str)
-
-            elif task_type == 4:
-                line = self.df.values[i]
-                mod_name = f'tasks.{line[0]}'
-                mod = importlib.import_module(mod_name)
-
-                func_list = [str(e) for e in line[1]] if line[1] else []
-
-                func = getattr(mod, func_list[0])
-                t = threading.Thread(target=func)
-                t.start()
-                r1, r2 = i, i+1
-                c1 = len(self.header()) + self.window.dut_selected[0]
-                c2 = c1 + len(self.window.dut_selected)
-                self.df.iloc[r1:r2, c1:c2] = "Passed"
-
-                result = json.dumps({
-                    'index': i,
-                    'output': "Passed"
-                })
-                self.task_result.emit(result)
-
-
-            elif task_type == 9:
-                obj_name, method_name = next_item['args']
-                #  obj = getattr(thismodule, obj_name)
-                obj = getattr(sys.modules['__main__'], obj_name)
-                output = getattr(obj, method_name)()
-                r1, r2 = i, i + len(items)
-                c1 = len(self.header()) + self.window.dut_selected[0]
-                c2 = c1 + len(self.window.dut_selected)
-                if len(self.window.dut_selected) == 1:
-                    output = [[e] for e in output]
-                result = json.dumps({
-                    'index': [i, i + len(items)],
-                    'output': output
-                })
-                self.df.iloc[r1:r2, c1:c2] = output
-                self.task_result.emit(result)
-
+                self.task_each.emit([row, len(items)])
+            print()
+            getattr(self, f'run_task{task_type}')(group, items)
             QThread.msleep(500)
 
         t1 = time_()
