@@ -15,6 +15,16 @@ def move_mainwindow_centered(app, window):
     window.move(desktop.screen().rect().center() - window.rect().center())
 
 
+def python_path():
+    rtn = 'python'
+    try:
+        base_path = Path(sys._MEIPASS).resolve()
+        rtn = str(base_path.joinpath(base_path, rtn))
+    except Exception:
+        pass
+    return rtn
+
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -26,7 +36,8 @@ def resource_path(relative_path):
             base_path = Path(env['_MEIPASS']).resolve()
         except Exception:
             base_path = Path(".").resolve()
-    return str(base_path.joinpath(base_path, Path(relative_path)))
+    return str(base_path.joinpath(Path(relative_path)))
+
 
 def get_env():
     pyi_env = os.environ.copy()

@@ -14,7 +14,7 @@ import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
 
-from utils import resource_path, get_env
+from utils import resource_path, get_env, python_path
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
@@ -415,10 +415,7 @@ class Task(QThread):
 
         coms = json.dumps(coms)
 
-        py_interpreter = os.path.join(resource_path('.'), 'python')
-        print('py_interpreter', py_interpreter)
-        proc = Popen([py_interpreter, '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-        #  proc = Popen(['python', '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        proc = Popen([python_path(), '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
 
         return proc
 
@@ -428,10 +425,7 @@ class Task(QThread):
         msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(sid)}][{s_(args)}]'
         print(msg)
 
-        py_interpreter = os.path.join(resource_path('.'), 'python')
-        print('py_interpreter', py_interpreter)
-        arguments = [py_interpreter, '-m', script,
-        #  arguments = ['python', '-m', script,
+        arguments = [python_path(), '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
                      '-s', sid]
@@ -537,10 +531,7 @@ class Task(QThread):
         print(msg)
         self.printterm_msg.emit(msg)
 
-        py_interpreter = os.path.join(resource_path('.'), 'python')
-        print('py_interpreter', py_interpreter)
-        proc = Popen([py_interpreter, '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
-        #  proc = Popen(['python', '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
+        proc = Popen([python_path(), '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
 
         outputs, _ = proc.communicate()
         if not outputs:
