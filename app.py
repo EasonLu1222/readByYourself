@@ -123,6 +123,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
         self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
+
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
         self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
@@ -144,6 +145,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             layout = QHBoxLayout(c)
             self.hboxPorts.addWidget(c)
             self.dut_layout.append(layout)
+        self.set_hbox_visible(self.settings.is_eng_mode_on)
 
         self.setsignal()
 
@@ -197,6 +199,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.prepare_args = list()
         self.after_args = list()
         self.showMaximized()
+
+    def set_hbox_visible(self, is_visible):
+        for i in range(self.hboxPorts.count()):
+            if is_visible:
+                self.hboxPorts.itemAt(i).widget().show()
+            else:
+                self.hboxPorts.itemAt(i).widget().hide()
 
     def register_prepare(self, prepares):
         print('register_prepares')
@@ -738,6 +747,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.toggle_engineering_mode(status == Qt.Checked)
         if (status == Qt.Checked):
             self.pwd_dialog.show()
+            self.set_hbox_visible(True)
+        else:
+            self.set_hbox_visible(False)
 
     def toggle_engineering_mode(self, is_on):
         self.settings.set("is_eng_mode_on", is_on)

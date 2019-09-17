@@ -424,7 +424,6 @@ class Task(QThread):
         each, script, args = self.unpack_each(row_idx)
         msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(sid)}][{s_(args)}]'
         print(msg)
-
         arguments = [python_path(), '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
@@ -437,9 +436,7 @@ class Task(QThread):
     def run_iqfactrun_console(self, dut_idx, port, groupname):
         print('run_iqfactrun_console start')
         eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
-        print(
-            f'[run_iqfactrun_console][eachgroup: {eachgroup}][script: {script}][index: {index}][len: {item_len}][args: {args}]'
-        )
+        print(f'[run_iqfactrun_console][{s_(eachgroup)}][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
         workdir = (f'C:/LitePoint/IQfact_plus/'
                    f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
         exe = 'IQfactRun_Console.exe'
