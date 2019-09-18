@@ -14,12 +14,17 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--ports',
                         help='serial com port for instruments', type=str)
     args = parser.parse_args()
-
     unpacked = json.loads(args.channels_limits)
     logger.info(f'unpacked: {unpacked}')
-    channel_group = unpacked['args']
+    channel_group = str(unpacked['args'][0])
 
-    limits = unpacked['limits']['null']
+    StartIndex=channel_group.find('[')
+    Endindex=channel_group.find(']')
+    Frequency=channel_group[StartIndex+2:Endindex-1]
+    logger.info(f'Frequency: {Frequency}')
+
+    #  limits = unpacked['limits']['null']
+    limits = unpacked['limits'][Frequency]
 
     ports = json.loads(args.ports)
     logger.info(ports)
@@ -40,7 +45,7 @@ if __name__ == "__main__":
     p.init()
 
     logger.info('power sensor measure')
-    ave_power = p.measure_power('2.4GHz')
+    ave_power = p.measure_power(Frequency)
 
     logger.info(f'ave_power: {ave_power}')
 
@@ -49,4 +54,3 @@ if __name__ == "__main__":
     ifpass = ave_power > limits[0]
     result = [[f'Pass({ave_power})' if ifpass else f'Fail({ave_power})']]
     sys.stdout.write(json.dumps(result))
-

@@ -232,6 +232,38 @@ def msp430_download(portname):
     return result
 
 
+def tx_power_11n_2442mhz_ch1(portname):
+    with get_serial(portname, 115200, timeout=2) as ser:
+        lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-1')
+        result = 'Passed' if any(re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        logger.info(f'TX_POWER_11n_2442MHZ: {result}')
+    return result
+
+
+def tx_power_11n_2442mhz_ch2(portname):
+    with get_serial(portname, 115200, timeout=2) as ser:
+        lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-2')
+        result = 'Passed' if any(re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        logger.info(f'TX_POWER_11n_2442MHZ: {result}')
+    return result
+
+
+def tx_power_11ac_5500mhz_ch1(portname):
+    with get_serial(portname, 115200, timeout=2) as ser:
+        lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-1')
+        result = 'Passed' if any(re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        logger.info(f'TX_POWER_11ac_5500MHZ: {result}')
+    return result
+
+
+def tx_power_11ac_5500mhz_ch2(portname):
+    with get_serial(portname, 115200, timeout=2) as ser:
+        lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-2')
+        result = 'Passed' if any(re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        logger.info(f'TX_POWER_11ac_5500MHZ: {result}')
+    return result
+
+
 if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]

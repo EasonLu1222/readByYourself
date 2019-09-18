@@ -1,3 +1,17 @@
+[2019.9.18 - 13:55]
+New Station: Power Sensor at FATP
+
+1. WiFiTest4U2xxxx needed on DUT board
+
+2. update v11_power_sensor.json
+	- modify task_powersensor.py
+	- modify task/task_runeach.py
+
+3. pyvisa hack to bypass pkg_resources no module found error
+	- modify pyvisa/__init__.py, comment out "import pkg_resources"
+	- define this file-copy at app.spec
+
+
 [2019.9.17 - 18:15]
 Show hboxPorts only in EngMode On
 
@@ -12,7 +26,7 @@ Test packaged app.exe to work on clean window env
 
 3. local app.py compatibility --> TBD
 
-4. comment out check_json_integrity() temporarily 
+4. comment out check_json_integrity() temporarily
 
 
 
