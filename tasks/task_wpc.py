@@ -48,9 +48,10 @@ if __name__ == "__main__":
 
     logger.info('measure loop start')
     while True:
-        time.sleep(0.5)
+        time.sleep(0.2)
         i_out = e.measure_current()
-        if not is_loading(i_out): continue
+        if not i_out: continue
+        elif not is_loading(i_out): continue
         v_in = p.measure_voltage()
         i_in = p.measure_cur()
         v_out = e.measure_voltage()

@@ -94,7 +94,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2412 CCK-11 BW-20 TX1",
+            "item": "TX_BDR  2402 1DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -107,7 +107,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2437 CCK-11 BW-20 TX1",
+            "item": "TX_BDR  2441 1DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -120,7 +120,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2472 CCK-11 BW-20 TX1",
+            "item": "TX_BDR  2480 1DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -133,7 +133,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2412 OFDM-54 BW-20 TX1",
+            "item": "TX_EDR  2402 2DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -146,7 +146,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2437 OFDM-54 BW-20 TX1",
+            "item": "TX_EDR  2441 2DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -159,7 +159,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2472 OFDM-54 BW-20 TX1",
+            "item": "TX_EDR  2480 2DH1",
             "script": null,
             "args": null,
             "auto": true,
@@ -172,7 +172,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2412 MCS7 BW-20 TX1",
+            "item": "TX_LE  2402 1LE",
             "script": null,
             "args": null,
             "auto": true,
@@ -185,7 +185,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2437 MCS7 BW-20 TX1",
+            "item": "TX_LE  2444 1LE",
             "script": null,
             "args": null,
             "auto": true,
@@ -198,124 +198,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  2472 MCS7 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 OFDM-54 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5500 OFDM-54 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5805 OFDM-54 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS7 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS7 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS7 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS8 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS8 BW-20 TX1",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "RF",
-            "hidden": false,
-            "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS8 BW-20 TX1",
+            "item": "TX_LE  2480 1LE",
             "script": null,
             "args": null,
             "auto": true,
@@ -352,3 +235,4 @@
         }
     ]
 }
+

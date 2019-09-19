@@ -479,8 +479,15 @@ class Eloader(SerialInstrument):
         return voltage
 
     def measure_current(self):
-        line = self.run_cmd(['MEASure:CURRent:DC?'], True)
-        current = float(line)
+        try:
+            line = self.run_cmd(['MEASure:CURRent:DC?'], True)
+            current = float(line)
+        except ValueError as ex:
+            logger.error(ex)
+            logger.error(line)
+            return None
+        #  line = self.run_cmd(['MEASure:CURRent:DC?'], True)
+        #  current = float(line)
         return current
 
 

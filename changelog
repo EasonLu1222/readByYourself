@@ -1,3 +1,10 @@
+[2019.9.19 - 16:55]
+WPC station bugs fixed
+
+1. fix crashing bug
+	- error handling to instrument/__init__.py > Eloader.measure_current()
+
+
 [2019.9.18 - 13:55]
 New Station: Power Sensor at FATP
 
