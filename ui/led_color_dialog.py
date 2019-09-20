@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_LedColorDialog(object):
     def setupUi(self, LedColorDialog):
         LedColorDialog.setObjectName("LedColorDialog")
-        LedColorDialog.resize(320, 240)
+        LedColorDialog.resize(502, 240)
         self.gridLayout = QtWidgets.QGridLayout(LedColorDialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -22,8 +22,12 @@ class Ui_LedColorDialog(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.label = QtWidgets.QLabel(LedColorDialog)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(36)
+        self.label.setFont(font)
         self.label.setObjectName("label")
-        self.verticalLayout.addWidget(self.label, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignBottom)
+        self.verticalLayout.addWidget(self.label, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
         self.retranslateUi(LedColorDialog)
