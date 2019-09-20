@@ -84,12 +84,13 @@ def record_sound(portname):
 
 def get_mic_test_result(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        test_result_path = '/usr/share/mic_test_result'
+        test_result_path = '/usr/share/mic_test_result*'
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
         result = f'Passed' if any(re.match('Passed', e) for e in lines) else 'Failed'
 
         # Delete test result
+        logger.info(f"deleting {test_result_path}")
         cmd = f'rm {test_result_path}'
         lines = issue_command(ser, cmd)
 
