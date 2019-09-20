@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
+    <width>827</width>
     <height>240</height>
    </rect>
   </property>
@@ -19,19 +19,35 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout"/>
      </item>
-     <item alignment="Qt::AlignHCenter">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Press number key to mark pass or fail</string>
-       </property>
-      </widget>
-     </item>
-     <item alignment="Qt::AlignHCenter">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Press Enter to proceed</string>
-       </property>
-      </widget>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <pointsize>36</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Press number key to mark pass or fail</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <pointsize>36</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Press Enter to proceed</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
