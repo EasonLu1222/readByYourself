@@ -1,6 +1,7 @@
 import sys
 import json
 import argparse
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel
@@ -133,7 +134,11 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         sys.stdout.write(self.result_str)
 
     def add_result_block(self, dut_idx):
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(36)
         lb = QLabel()
+        lb.setFont(font)
         lb.setText(str(dut_idx))
         self.result_block_list.append(lb)
         self.horizontalLayout.addWidget(lb)
