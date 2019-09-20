@@ -99,16 +99,18 @@ def get_mic_test_result(portname):
 
 def load_led_driver(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        # TODO: load the led driver
-        result = 'Failed'
+        cmd = f'insmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.search('probe', e) for e in lines) or any(re.search('File exists', e) for e in lines) else 'Failed'
 
         return result
 
 
 def unload_led_driver(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        # TODO: unload the led driver
-        result = 'Failed'
+        cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
+        lines = issue_command(ser, cmd)
+        result = f'Failed' if any(re.search('leds_lp50xx', e) for e in lines) else 'Passed'
 
         return result
 
