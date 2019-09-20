@@ -41,14 +41,40 @@
             "expect": null,
             "max": null,
             "unit": null
+        },
+        {
+            "group": "Load LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["load_led_driver"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
         }
         ,{
             "group": "LED Test",
             "hidden": false,
             "tasktype": 3,
-            "item": "",
+            "item": "set all led color to Red/Green/Blue/White ",
             "script": "task_led",
             "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Unload LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["unload_led_driver"],
             "auto": false,
             "min": null,
             "expect": null,

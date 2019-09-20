@@ -97,6 +97,22 @@ def get_mic_test_result(portname):
         return result
 
 
+def load_led_driver(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        # TODO: load the led driver
+        result = 'Failed'
+
+        return result
+
+
+def unload_led_driver(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        # TODO: unload the led driver
+        result = 'Failed'
+
+        return result
+
+
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
     wav_file = '2ch_1khz-16b-120s.wav'
