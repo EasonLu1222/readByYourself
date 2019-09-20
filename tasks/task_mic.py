@@ -34,7 +34,7 @@ def pull_recorded_sound():
         if match:
             transport_id = match.groups()[0]
             wav_file_path = resource_path(f"{wav_dir}/tmp/{transport_id}.wav")
-            test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result")
+            test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result_{transport_id}")
 
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
@@ -69,9 +69,12 @@ def analyze_recorded_sound(wav_file_path):
     total_seconds = data_len / sample_rate
 
     abs_fft = abs(fft_data[:(half_fft_data_len - 1)])
-    peaks, _ = find_peaks(abs_fft, height=10, width=11, distance=200)
+    peaks, _ = find_peaks(abs_fft, height=1, width=1, distance=200)
     peak_amplitudes = [int(abs_fft[p]) for p in peaks]
     peak_freqs = [ceil(p / total_seconds) for p in peaks]
+
+    logger.info(f'deleting {wav_file_path}')
+    os.remove(wav_file_path)
 
     return dict(zip(peak_freqs, peak_amplitudes))
 
@@ -85,6 +88,7 @@ def judge_fft_result(freq_and_amp_dict):
         'Passed' or 'Failed'
     """
     freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
+    logger.info(f'Frequency to amplitude dict: {freq_and_amp_dict}')
     amp_threshold = [1] * len(freq_list)    # TODO: Have to test on multiple DUTs to adjust the criteria
     freq_amp_threshold_dict = dict(zip(freq_list, amp_threshold))
     rtn = 'Passed'
@@ -95,6 +99,7 @@ def judge_fft_result(freq_and_amp_dict):
                 amp_threshold > freq_and_amp_dict[freq]):
             rtn = 'Failed'
             break
+
     return rtn
 
 
