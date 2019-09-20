@@ -419,15 +419,15 @@ class Task(QThread):
 
         return proc
 
-    def runeach(self, row_idx, dut_idx, sid):
+    def runeach(self, row_idx, dut_idx, dynamic_info):
         port = self.window.comports()[dut_idx]
         each, script, args = self.unpack_each(row_idx)
-        msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(sid)}][{s_(args)}]'
+        msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(dynamic_info)}][{s_(args)}]'
         print(msg)
         arguments = [python_path(), '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
-                     '-s', sid]
+                     '-s', dynamic_info]
         if args: arguments.append(args)
         proc = Popen(arguments, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
         self.printterm_msg.emit(msg)
@@ -562,8 +562,17 @@ class Task(QThread):
                     proc = self.runeach(row_idx, dut_idx, barcode)
                     procs[port] = proc
         else:
+            func = next_item['args'][0]
+            dynamic_info = ''
+            if (func == 'write_mac_wifi'):
+                dynamic_info = 'fa:23:34:89:45:22'
+            if (func == 'write_mac_bt'):
+                dynamic_info = 'fa:8f:ca:52:f3:38'
+            if (func == 'write_country_code'):
+                dynamic_info = 'CN01'
+
             for dut_idx in self.window.dut_selected:
-                proc = self.runeach(row_idx, dut_idx, '')
+                proc = self.runeach(row_idx, dut_idx, dynamic_info)
                 port = self.window.comports()[dut_idx]
                 procs[port] = proc
 

@@ -1,3 +1,14 @@
+[2019.9.20 - 16:20]
+New Station: SA (Semi Assembly)
+
+1. new jsonfile v11_sa.json
+
+2. change task_runeach.py & core.py
+	- add write_mac_wifi(), write_mac_bt(), write_country_code()
+	- change argument sid to dynamic_info to accomodate sid, mac_wifi, mac_bt & ccode
+
+
+
 [2019.9.19 - 16:55]
 WPC station bugs fixed
 

@@ -48,7 +48,8 @@ def read_pid(portname, dut_idx):
     return result
 
 
-def write_usid(sid):
+def write_usid(dynamic_info):
+    sid = dynamic_info
     logger.info('write usid')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
@@ -62,6 +63,114 @@ def write_usid(sid):
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
         result = f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_mac_wifi(dynamic_info):
+    mac_wifi_addr = dynamic_info
+    logger.info('write mac_wifi')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_wifi > /sys/class/unifykeys/name',
+            f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(mac_wifi_addr, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_mac_bt(dynamic_info):
+    mac_bt_addr = dynamic_info
+    logger.info('write mac_bt')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_bt > /sys/class/unifykeys/name',
+            f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(mac_bt_addr, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_country_code(dynamic_info):
+    ccode = dynamic_info
+    logger.info('write country_code')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac > /sys/class/unifykeys/name',
+            f'echo {ccode} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(ccode, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_mac_wifi(dynamic_info):
+    mac_wifi_addr = dynamic_info
+    logger.info('write mac_wifi')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_wifi > /sys/class/unifykeys/name',
+            f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(mac_wifi_addr, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_mac_bt(dynamic_info):
+    mac_bt_addr = dynamic_info
+    logger.info('write mac_bt')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_bt > /sys/class/unifykeys/name',
+            f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(mac_bt_addr, e) for e in lines) else 'Failed'
+        return result
+
+
+def write_country_code(dynamic_info):
+    ccode = dynamic_info
+    logger.info('write country_code')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac > /sys/class/unifykeys/name',
+            f'echo {ccode} > /sys/class/unifykeys/write',
+        ]
+        for cmd in cmds:
+            logger.info(f'cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Passed' if any(re.match(ccode, e) for e in lines) else 'Failed'
         return result
 
 
@@ -84,14 +193,31 @@ def record_sound(portname):
 
 def get_mic_test_result(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        test_result_path = '/usr/share/mic_test_result'
+        test_result_path = '/usr/share/mic_test_result*'
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
         result = f'Passed' if any(re.match('Passed', e) for e in lines) else 'Failed'
 
         # Delete test result
+        logger.info(f"deleting {test_result_path}")
         cmd = f'rm {test_result_path}'
         lines = issue_command(ser, cmd)
+
+        return result
+
+
+def load_led_driver(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        # TODO: load the led driver
+        result = 'Failed'
+
+        return result
+
+
+def unload_led_driver(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        # TODO: unload the led driver
+        result = 'Failed'
 
         return result
 
@@ -275,17 +401,17 @@ if __name__ == "__main__":
                         help='serial com port name',
                         type=str)
     parser.add_argument('-i', '--dut_idx', help='dut #number', type=int)
-    parser.add_argument('-s', '--sid', help='serial id', type=str)
+    parser.add_argument('-s', '--dynamic_info', help='serial id', type=str)
     parser.add_argument('funcname', help='function name', type=str)
     args = parser.parse_args()
-    portname, dut_idx, sid = [
-        getattr(args, e) for e in ('portname', 'dut_idx', 'sid')
+    portname, dut_idx, dynamic_info = [
+        getattr(args, e) for e in ('portname', 'dut_idx', 'dynamic_info')
     ]
     funcname = args.funcname
 
     logger.info(f'portname: {portname}')
     logger.info(f'dut_idx: {dut_idx}')
-    logger.info(f'sid: {sid}')
+    logger.info(f'dynamic_info: {dynamic_info}')
     logger.info(f'args: {args}')
     logger.info(f'funcname: {funcname}')
 

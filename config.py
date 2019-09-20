@@ -23,4 +23,5 @@ station_json = {
     'PowerSensor': 'v11_power_sensor',
     'Audio': 'v11_audio',
     'Download': 'v11_download',
+    'SA': 'v11_sa',
 }
