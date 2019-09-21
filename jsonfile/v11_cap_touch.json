@@ -78,7 +78,7 @@
             "group": "Mic Test3",
             "hidden": false,
             "tasktype": 4,
-            "item": "pull the record tone to computer",
+            "item": "pull the recorded tone to computer",
             "script": "task_mic",
             "args": ["pull_recorded_sound"],
             "auto": true,

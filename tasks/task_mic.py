@@ -69,7 +69,7 @@ def analyze_recorded_sound(wav_file_path):
     total_seconds = data_len / sample_rate
 
     abs_fft = abs(fft_data[:(half_fft_data_len - 1)])
-    peaks, _ = find_peaks(abs_fft, height=1, width=1, distance=200)
+    peaks, _ = find_peaks(abs_fft, height=10, width=11, distance=200)
     peak_amplitudes = [int(abs_fft[p]) for p in peaks]
     peak_freqs = [ceil(p / total_seconds) for p in peaks]
 
