@@ -9,6 +9,37 @@
     </message>
 </context>
 <context>
+    <name>LedColorDialog</name>
+    <message>
+        <location filename="../ui/led_color_dialog.py" line="38"/>
+        <source>Dialog</source>
+        <translation type="unfinished">對話框</translation>
+    </message>
+    <message>
+        <location filename="../ui/led_color_dialog.py" line="39"/>
+        <source>Press space to proceed</source>
+        <translation type="unfinished">請按空白鍵繼續</translation>
+    </message>
+</context>
+<context>
+    <name>LedResultMarkerDialog</name>
+    <message>
+        <location filename="../ui/led_result_marker_dialog.py" line="48"/>
+        <source>Dialog</source>
+        <translation type="unfinished">對話框</translation>
+    </message>
+    <message>
+        <location filename="../ui/led_result_marker_dialog.py" line="49"/>
+        <source>Press number key to mark pass or fail</source>
+        <translation type="unfinished">請按數字鍵標記通過或不通過</translation>
+    </message>
+    <message>
+        <location filename="../ui/led_result_marker_dialog.py" line="50"/>
+        <source>Press Enter to proceed</source>
+        <translation type="unfinished">按Enter鍵繼續</translation>
+    </message>
+</context>
+<context>
     <name>LoadingDialog</name>
     <message>
         <location filename="../ui/loading_dialog.py" line="38"/>
@@ -29,59 +60,54 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="130"/>
+        <location filename="../ui/design3.py" line="111"/>
         <source>MainWindow</source>
-        <translation type="unfinished">主視窗</translation>
+        <translation type="unfinished">主视窗</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="131"/>
-        <source>Test on fixture 1</source>
-        <translation type="unfinished">使用治具1測試</translation>
-    </message>
-    <message>
-        <location filename="../ui/design3.py" line="132"/>
-        <source>Test on fixture 2</source>
-        <translation type="unfinished">使用治具2測試</translation>
-    </message>
-    <message>
-        <location filename="../ui/design3.py" line="133"/>
+        <location filename="../ui/design3.py" line="112"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="134"/>
+        <location filename="../ui/design3.py" line="113"/>
         <source>zh_TW</source>
-        <translation type="unfinished">中文</translation>
+        <translation type="unfinished">繁中</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="135"/>
+        <location filename="../ui/design3.py" line="116"/>
         <source>Engineering mode</source>
         <translation type="unfinished">工程模式</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1023"/>
+        <location filename="../app.py" line="829"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1024"/>
-        <source>#1 port auto detect</source>
-        <translation type="unfinished">第一連接埠自動偵測</translation>
-    </message>
-    <message>
-        <location filename="../app.py" line="1025"/>
-        <source>Press this button and power on the first DUT to calibrate the COM ports</source>
-        <translation type="unfinished">按此按鈕後將第一台待測物上電，以校準連接埠</translation>
-    </message>
-    <message>
-        <location filename="../ui/design3.py" line="137"/>
+        <location filename="../ui/design3.py" line="117"/>
         <source>Run</source>
         <translation type="unfinished">開始測試</translation>
     </message>
     <message>
-        <location filename="../app.py" line="1026"/>
+        <location filename="../app.py" line="830"/>
         <source>At least one of the fixture should be checked</source>
         <translation type="unfinished">至少要勾選一個治具</translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="828"/>
+        <source>DUT</source>
+        <translation type="unfinished">待測物</translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="114"/>
+        <source>zh_CN</source>
+        <translation type="unfinished">简中</translation>
+    </message>
+    <message>
+        <location filename="../ui/design3.py" line="115"/>
+        <source>vi</source>
+        <translation type="unfinished">Tiếng Việt</translation>
     </message>
 </context>
 <context>

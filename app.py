@@ -78,6 +78,8 @@ class MySettings():
     lang_list = [
         'en_US',
         'zh_TW',
+        'zh_CN',
+        'vi'
     ]
     def __init__(self, dut_num):
         self.settings = QSettings('FAB', 'SAP109')
@@ -224,15 +226,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         font = QFont()
         font.setFamily("Courier New")
         font.setPointSize(14)
-        _translate = QtCore.QCoreApplication.translate
-        cbox_text_translate = _translate('MainWindow', 'DUT')
+
         for i in range(1, self.task.dut_num+1):
             cbox = QCheckBox(self.container)
             cbox.setFont(font)
             self.checkboxes.append(cbox)
             self.horizontalLayout.addWidget(cbox)
             cbox.setChecked(getattr(self.settings, f'is_fx{i}_checked'))
-            cbox.setText(f'{cbox_text_translate}#{i}')
+            cbox.setText(f'{self.cbox_text_translate}#{i}')
 
     def get_checkboxes_status(self):
         status_all = [self.checkboxes[i].isChecked() for i in range(self.task.dut_num)]
@@ -824,6 +825,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def retranslateUi(self, MyWindow):
         super().retranslateUi(self)
         _translate = QCoreApplication.translate
+        self.cbox_text_translate = _translate('MainWindow', 'DUT')
         self.summary_text = _translate("MainWindow", "Summary")
         self.both_fx_not_checked_err = _translate(
             "MainWindow", "At least one of the fixture should be checked")

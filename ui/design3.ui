@@ -95,6 +95,16 @@
                <string>zh_TW</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>zh_CN</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>vi</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
