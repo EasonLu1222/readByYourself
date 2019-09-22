@@ -19,29 +19,12 @@
             "action": "is_serial_ok",
             "args": ["win.comports", "task.serial_ok"]
          }
-         ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 7]
-         }
      ],
      "prepares": [],
      "afters": []
  },
  "test_items":
     [
-        {
-            "group": "Read ProductID",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "",
-            "script": "task_runeach",
-            "args": ["read_pid"],
-            "auto": false,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        },
         {
             "group": "Load LED driver",
             "hidden": false,

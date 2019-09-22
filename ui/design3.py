@@ -45,6 +45,8 @@ class Ui_MainWindow(object):
         self.langSelectMenu.setObjectName("langSelectMenu")
         self.langSelectMenu.addItem("")
         self.langSelectMenu.addItem("")
+        self.langSelectMenu.addItem("")
+        self.langSelectMenu.addItem("")
         self.horizontalLayout_2.addWidget(self.langSelectMenu)
         self.checkBoxEngMode = QtWidgets.QCheckBox(self.container)
         self.checkBoxEngMode.setMaximumSize(QtCore.QSize(582, 16777215))
@@ -109,6 +111,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.langSelectMenu.setItemText(0, _translate("MainWindow", "en_US"))
         self.langSelectMenu.setItemText(1, _translate("MainWindow", "zh_TW"))
+        self.langSelectMenu.setItemText(2, _translate("MainWindow", "zh_CN"))
+        self.langSelectMenu.setItemText(3, _translate("MainWindow", "vi"))
         self.checkBoxEngMode.setText(_translate("MainWindow", "Engineering mode"))
         self.pushButton.setText(_translate("MainWindow", "Run"))
 from view.myview import TableView

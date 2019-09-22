@@ -80,23 +80,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="829"/>
-        <source>Summary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../ui/design3.py" line="117"/>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="830"/>
-        <source>At least one of the fixture should be checked</source>
+        <location filename="../app.py" line="828"/>
+        <source>DUT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="828"/>
-        <source>DUT</source>
+        <location filename="../app.py" line="829"/>
+        <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="830"/>
+        <source>At least one of the fixture should be checked</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
