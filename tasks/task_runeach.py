@@ -135,8 +135,8 @@ def speaker_close_1kz(portname):
 
 def check_wifi_if(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        lines = issue_command(ser, 'pidof bsa_server')
-        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        lines = issue_command(ser, 'ifconfig -a')
+        result = 'Passed' if any(re.match('wlan[\d]+', e) for e in lines) else 'Failed'
         logger.info(f'check_wifi_if: {result}')
         return result
 
