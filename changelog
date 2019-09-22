@@ -1,3 +1,31 @@
+[2019.9.23 - 00:55]
+Jsonfile v12 & winpty trick to recieve iqfact output
+
+1. Jsonfile version 12
+	- add firsts attribute under behaviors
+	- add dummy_com_first() at app.py to simulate com ports
+	- add 12 jsonfiles
+
+2. Capture realtime output from IQfactRun_Console
+	- previously iqfact output is buffered, so not realy in realtime
+	- use winpty to force iqfact program's stdout to be unbuffered
+	- copy dll & exe to iqxel/
+		- msys-2.0.dll
+		- winpty.dll
+		- winpty.exe , etc...
+	- change Popen arguments
+
+3. Move run_iqfactrun_console() from core.py to iqxel/__init__.py
+
+4. Three testflow files to copy into three iqfact bin/ respectively
+	- In this commit, rf station is simulated using dummy_com_first
+	  which 3 dummy com ports are com11, com87, com5. Three testflow
+	  files at iqxel/ are based on these com ports. For test, please
+	  copy these files into workdir of IQfactRun_Console. That should
+	  be bin1/ bin2/ bin3/ 
+
+
+
 [2019.9.20 - 16:20]
 New Station: SA (Semi Assembly)
 

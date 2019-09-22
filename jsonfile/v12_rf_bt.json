@@ -1,0 +1,240 @@
+{"header": 
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "version": "12.0",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 3,
+        "sn": ["AI069IAVA", "6", "00000000A"]
+    }
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win.comports", "task.serial_ok"]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "CONNECT_IQ_TESTER",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "GLOBAL_SETTINGS",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "LOAD_PATH_LOSS_TABLE",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "INSERT_DUT",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "INITIALIZE_DUT",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_BDR  2402 1DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_BDR  2441 1DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_BDR  2480 1DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_EDR  2402 2DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_EDR  2441 2DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_EDR  2480 2DH1",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_LE  2402 1LE",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_LE  2444 1LE",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "TX_LE  2480 1LE",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "REMOVE_DUT",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "DISCONNECT_IQ_TESTER",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+

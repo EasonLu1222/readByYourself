@@ -33,6 +33,12 @@ from actions import (disable_power_check, set_power_simu, dummy_com,
 from soundcheck import soundcheck_init
 
 
+def dummy_com_first(win, *coms):
+    win._comports_dut = dict(zip(range(len(coms)), coms))
+    win.instrument_ready(True)
+    win.render_port_plot()
+
+
 def window_click_run(win):
     win.btn_clicked()
 
@@ -196,6 +202,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                              "font-weight: bold}" % lb.objectName())
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+        self.first_args = list()
         self.prepare_args = list()
         self.after_args = list()
         self.showMaximized()
@@ -212,6 +219,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for e in prepares:
             prepare, args = e['prepare'], e['args']
             self.prepare_args.append([prepare, args])
+
+    def register_first(self, firsts):
+        print('register_firsts')
+        for e in firsts:
+            first, args = e['first'], e['args']
+            self.first_args.append([first, args])
 
     def register_after(self, afters):
         print('register_afters')
@@ -440,6 +453,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
+
+    def first(self):
+        print('first start')
+        for action, args in self.first_args:
+            print('run first', action, args)
+            if not action(*args):
+                print('return !!!!!')
+                return
+        print('first end')
 
     def prepare(self):
         print('prepare start')
@@ -840,9 +862,15 @@ def parse_for_register(task, actions_or_prepares):
         print('args', args)
 
         item = eval(item)
-        if args: args = [eval(e) if type(e)==str else e for e in args]
+        args_parsed = []
+        if args:
+            for a in args:
+                try:
+                    args_parsed.append(eval(a))
+                except Exception as ex:
+                    args_parsed.append(a)
         e[item_name] = item
-        e['args'] = args
+        e['args'] = args_parsed
     return items
 
 
@@ -879,14 +907,17 @@ if __name__ == "__main__":
 
     win = MyWindow(app, task)
 
-    actions = parse_for_register(task, 'actions')
-    task.register_action(actions)
+    firsts = parse_for_register(task, 'firsts')
+    win.register_first(firsts)
 
     prepares = parse_for_register(task, 'prepares')
     win.register_prepare(prepares)
 
+    actions = parse_for_register(task, 'actions')
+    task.register_action(actions)
+
     afters = parse_for_register(task, 'afters')
     win.register_after(afters)
 
-    print('main end')
+    win.first()
     app.exec_()

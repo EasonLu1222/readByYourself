@@ -10,18 +10,18 @@ VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
 station_json = {
-    'SIMULATION': 'v11_simu',
+    'SIMULATION': 'v12_simu',
 
     # --- SMT ---
-    'MainBoard': 'v11_mb',
-    'LED': 'v11_led',
-    'CapTouch': 'v11_cap_touch',
+    'MainBoard': 'v12_mb',                  # pyinstaller exe  tested on clean windows
+    'LED': 'v12_led',                       # pyinstaller exe  tested on clean windows
+    'CapTouch': 'v12_cap_touch',            # pyinstaller exe  tested on clean windows
 
     # --- FATP ---
-    'RF': 'v11_rf_wifi',
-    'WPC': 'v11_wpc',
-    'PowerSensor': 'v11_power_sensor',
-    'Audio': 'v11_audio',
-    'Download': 'v11_download',
-    'SA': 'v11_sa',
+    'SA': 'v12_sa',                         # pyinstaller exe  tested on clean windows
+    'RF': 'v12_rf_wifi',
+    'WPC': 'v12_wpc',                       # pyinstaller exe  tested on clean windows
+    'PowerSensor': 'v12_power_sensor',      # pyinstaller exe  tested on clean windows
+    'Audio': 'v12_audio',
+    'Download': 'v12_download',
 }

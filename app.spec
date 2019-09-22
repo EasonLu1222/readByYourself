@@ -34,6 +34,8 @@ added_files = [
     ('site-packages/pyvisa/resources/*.py', 'pyvisa/resources'),
     ('site-packages/pyvisa/ctwrapper/*.py', 'pyvisa/ctwrapper'),
     ('python-3.7.3-embed-amd64/*', '.'),
+    ('iqxel/*.dll', 'iqxel'),
+    ('iqxel/*.exe', 'iqxel'),
 ]
 
 a = Analysis(['app.py'],

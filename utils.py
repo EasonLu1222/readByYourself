@@ -1,6 +1,20 @@
 import os
 import sys
+import inspect
 from pathlib import Path
+
+
+def s_(var):
+    '''
+        name = "tom"
+        s_(name) = "name: tom"
+
+        pi = 3.1415
+        s_(pi) = "pi: 3.1415"
+    '''
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    var_name = [var_name for var_name, var_val in callers_local_vars if var_val is var][0]
+    return f'{var_name}: {var}'
 
 
 def test_data(csv_file):
