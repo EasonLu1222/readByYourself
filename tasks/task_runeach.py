@@ -350,7 +350,7 @@ def open_spdif(portname):
 
 def msp430_download(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
-        lines = issue_command(ser, '/usr/share/msp430Upgrade_v03')
+        lines = issue_command(ser, '/usr/share/msp430Upgrade_V05')
         result = 'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
         logger.info(f'msp430 fw download: {result}')
         # wait for reboot
