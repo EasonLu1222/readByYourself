@@ -5,12 +5,12 @@
     "dut": {
         "name": "ftdi",
         "num": 2,
-        "sn": ["12341111A", "12342222A"]
+        "sn": ["A50285BIA", "12343333A"]
     },
     "pwr": {
         "name": "gw_powersupply",
         "num": 2,
-        "sn": ["PR000010", "TW1234567"]
+        "sn": ["GET140969", "GET140974"]
     },
     "dmm": {
         "name": "gw_dmm",
@@ -29,10 +29,6 @@
          ,{
             "action": "set_power",
             "args": ["win.power_process", "win.proc_listener"]
-         }
-         ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 7]
          }
      ],
      "prepares": [],
@@ -59,7 +55,7 @@
             "tasktype": 2,
             "item": "19V",
             "script": "power_check",
-            "args": [101, 109],
+            "args": [109, 101],
             "auto": true,
             "min": 18.05,
             "expect": 19,
@@ -72,7 +68,7 @@
             "tasktype": 2,
             "item": "5V",
             "script": "power_check",
-            "args": [102, 110],
+            "args": [114, 106],
             "auto": true,
             "min": 4.75,
             "expect": 5,
@@ -85,7 +81,7 @@
             "tasktype": 2,
             "item": "3.3V",
             "script": "power_check",
-            "args": [103, 111],
+            "args": [110, 102],
             "auto": true,
             "min": 3.135,
             "expect": 3.3,
@@ -98,7 +94,7 @@
             "tasktype": 2,
             "item": "1.35V",
             "script": "power_check",
-            "args": [104, 112],
+            "args": [111, 103],
             "auto": true,
             "min": 1.282,
             "expect": 1.35,
@@ -111,7 +107,7 @@
             "tasktype": 2,
             "item": "0.95V",
             "script": "power_check",
-            "args": [105, 113],
+            "args": [113, 105],
             "auto": true,
             "min": 0.81,
             "expect": 0.95,
@@ -124,7 +120,7 @@
             "tasktype": 2,
             "item": "1.1V",
             "script": "power_check",
-            "args": [106, 114],
+            "args": [112, 104],
             "auto": true,
             "min": 0.86,
             "expect": 1.1,
@@ -142,7 +138,7 @@
             "min": null,
             "expect": null,
             "max": 0.08,
-            "unit": "V"
+            "unit": "A"
         }
         ,{
             "group": "SpeakerSetup1",
@@ -163,7 +159,7 @@
             "tasktype": 2,
             "item": "sp1 frequency",
             "script": "speaker_check",
-            "args": [107, 115],
+            "args": [115, 107],
             "auto": true,
             "min": 995,
             "expect": null,
@@ -176,7 +172,7 @@
             "tasktype": 2,
             "item": "sp2 frequency",
             "script": "speaker_check",
-            "args": [108, 116],
+            "args": [116, 108],
             "auto": true,
             "min": 995,
             "expect": null,
@@ -196,109 +192,6 @@
             "max": 1005,
             "unit": null
         }
-        ,{
-            "group": "WiFi",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "WiFi_Interface",
-            "script": "task_runeach",
-            "args": ["check_wifi_if"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "BT",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "BT_Interface",
-            "script": "task_runeach",
-            "args": ["check_bt"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "CPU1",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "CPU_Freq",
-            "script": "task_runeach",
-            "args": ["check_cpu_freq"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "CPU2",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "CPU_Core_Num",
-            "script": "task_runeach",
-            "args": ["check_cpu_cores"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "DDR",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "DDR Size",
-            "script": "task_runeach",
-            "args": ["check_ddr_size"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "I2C1",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "I2C_Amp_TAS5766",
-            "script": "task_runeach",
-            "args": ["check_i2c_tas5766"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "I2C2",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "I2C_Cap_MSP430",
-            "script": "task_runeach",
-            "args": ["check_i2c_msp430"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "I2C3",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "I2C_LED_LP5018",
-            "script": "task_runeach",
-            "args": ["check_i2c_lp5018"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
+
     ]
 }

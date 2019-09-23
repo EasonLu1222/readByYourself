@@ -227,9 +227,11 @@ def unload_led_driver(portname):
 
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
-    wav_file = '2ch_1khz-16b-120s.wav'
+    wav_file = '/usr/share/1k_30s.wav'
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        issue_command(ser, f'aplay /{wav_file}', fetch=False)
+        issue_command(ser, f'aplay -Dhw:0,2 {wav_file}', fetch=False)
+        # TODO
+        time.sleep(1)
         return None
 
 
