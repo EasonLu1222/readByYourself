@@ -56,6 +56,7 @@ if __name__ == "__main__":
 
     dmm.measure_volt(101)
     volts = dmm.measure_volts(channels)
+    dmm.close_com()
 
     #  volts_passfail = [volt_in_range(ch,e) for ch, e in zip(channels, volts)]
     volts_passfail = [volt_in_range(ch, e, limits) for ch, e in zip(channels, volts)]

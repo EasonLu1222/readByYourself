@@ -187,6 +187,8 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
 
 def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
     logger.info('issue_command: write')
+    serial.reset_output_buffer()
+    serial.reset_input_buffer()
     serial.write(f'{cmd}\n'.encode('utf-8'))
     logger.info(f'issue_command: {cmd}')
     if fetch:
@@ -197,7 +199,9 @@ def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
                 logger.info(f'line: {e}')
                 line = e.decode('utf-8')
             except UnicodeDecodeError as ex: # ignore to proceed
-                logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
+                logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
+            except Exception as ex:
+                logger.error(f'{type_(ex)}:{ex}')
             else:
                 #  logger.info(f'{line.rstrip()}')
                 lines_encoded.append(line)

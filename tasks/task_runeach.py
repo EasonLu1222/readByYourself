@@ -13,7 +13,7 @@ from utils import resource_path
 
 from mylogger import logger
 
-SERIAL_TIMEOUT = 0.2
+SERIAL_TIMEOUT = 0.8
 
 
 def enter_burn_mode(portname, dut_idx):
@@ -62,14 +62,14 @@ def write_usid(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(sid, e) for e in lines) else 'Failed'
+        result = f'Passed' if any(re.search(sid, e) for e in lines) else 'Failed'
         return result
 
 
 def write_mac_wifi(dynamic_info):
     mac_wifi_addr = dynamic_info
     logger.info('write mac_wifi')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+    with get_serial(portname, 115200, timeout=3) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo mac_wifi > /sys/class/unifykeys/name',
@@ -225,13 +225,23 @@ def unload_led_driver(portname):
         return result
 
 
+def ls_test(portname):
+    with get_serial(portname, 115200, timeout=1) as ser:
+        ser.reset_output_buffer()
+        cmd = f'ls'
+        lines = issue_command(ser, cmd)
+        for e in lines:
+            logger.info(e)
+        return 'Pass'
+
+
 def speaker_play_1kz(portname):
     logger.info('play_1khz start')
-    wav_file = '/usr/share/1k_30s.wav'
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        issue_command(ser, f'aplay -Dhw:0,2 {wav_file}', fetch=False)
-        # TODO
-        time.sleep(1)
+    wav_file = '/usr/share/2ch_1khz-16b-120s.wav'
+    with get_serial(portname, 115200, timeout=3) as ser:
+        lines = issue_command(ser, f'aplay {wav_file}', fetch=True)
+        for e in lines:
+            logger.info(e)
         return None
 
 
@@ -243,7 +253,7 @@ def speaker_close_1kz(portname):
 
 
 def check_wifi_if(portname):
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+    with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, 'ifconfig -a')
         result = 'Passed' if any(re.match('wlan[\d]+', e) for e in lines) else 'Failed'
         logger.info(f'check_wifi_if: {result}')
@@ -252,8 +262,10 @@ def check_wifi_if(portname):
 
 def check_bt(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        lines = issue_command(ser, 'pidof bsa_server')
-        result =  'Passed' if any(re.match('[\d]+', e) for e in lines) else 'Failed'
+        lines = issue_command(ser, 'hciconfig hci0 up')
+        lines = issue_command(ser, 'hciconfig')
+        result = 'Passed' if any(re.search('UP RUNNING', e) for e in lines) else 'Failed'
+        lines = issue_command(ser, 'hciconfig hci0 down')
         logger.info(f'has BT: {result}')
         return result
 
