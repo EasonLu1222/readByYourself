@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import shutil
 from subprocess import Popen, PIPE
 from utils import s_
 
@@ -10,14 +11,24 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
     eachgroup, script, index, item_len, tasktype, args = task.unpack_group(groupname)
     print(f'[run_iqfactrun_console][{s_(eachgroup)}][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
     workdir = (f'C:/LitePoint/IQfact_plus/'
-               f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
+               #  f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
+               f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng19_Lock/bin{dut_idx+1}/')
 
     iqxel_dir = os.path.join(os.path.abspath(os.path.curdir), 'iqxel')
     script_dir = os.path.abspath(os.path.curdir)
-    script_path = os.path.join(workdir, f'testflow{dut_idx+1}.txt')
+    script_path = os.path.join(workdir, f'FAB_Test_Flow.txt')
     exe = 'IQfactRun_Console.exe'
     exe_winpty = os.path.join(iqxel_dir, 'winpty.exe')
     def run():
+        # clean log
+        try:
+            shutil.rmtree(f'{workdir}LOG')
+        except OSError as e:
+            print(e)
+        else:
+            #  print(f'The directory ({workdir}LOG) is deleted successfully')
+            os.mkdir(f'{workdir}LOG')
+
         process = Popen([exe_winpty, "-Xallow-non-tty", "-Xplain",
                          f'{workdir}{exe}', '-RUN', f'{script_path}', '-exit'],
                         stdout=PIPE, stdin=PIPE, shell=True, cwd=workdir)
