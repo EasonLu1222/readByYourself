@@ -96,13 +96,13 @@
             "group": "Power Rail",
             "hidden": false,
             "tasktype": 2,
-            "item": "1.35V",
+            "item": "1.5V",
             "script": "power_check",
             "args": [111, 103],
             "auto": true,
-            "min": 1.282,
-            "expect": 1.35,
-            "max": 1.4175,
+            "min": 1.425,
+            "expect": 1.5,
+            "max": 1.575,
             "unit": "V"
         }
         ,{
@@ -128,7 +128,7 @@
             "auto": true,
             "min": 0.86,
             "expect": 1.1,
-            "max": 1.14,
+            "max": 1.161,
             "unit": "V"
         }
         ,{
