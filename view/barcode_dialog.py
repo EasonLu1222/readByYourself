@@ -1,3 +1,4 @@
+import re
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.barcode_dialog import Ui_BarcodeDialog
@@ -16,10 +17,10 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         self.setWindowModality(Qt.ApplicationModal)
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)
         self.barcodeLineEdit.setFocus()
-    
+
     def set_total_barcode(self, num):
         self.total_barcode = num
-        
+
     def on_input_done(self):
         barcode = self.barcodeLineEdit.text()
         if (self.is_valid(barcode)):
@@ -31,15 +32,15 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
                 self.barcodeLineEdit.clear()
         else:
             self.barcodeLineEdit.clear()
-        
+
     def is_valid(self, barcode):
         """
         Verify if the input is a valid barcode
         """
-        # TODO: Modify this when the actual barcode format is defined
-        return len(barcode)==4
-    
+        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+        matches = re.match(regex, barcode)
+
+        return matches is not None
+
     def closeEvent(self, evnt):
         self.barcode_dialog_closed.emit()
-
-        
