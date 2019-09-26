@@ -19,7 +19,7 @@ station_json = {
 
     # --- FATP ---
     'SA': 'v12_sa',                         # pyinstaller exe  tested on clean windows
-    'RF': 'v12_rf_wifi',
+    'RF': 'v12_rf',
     'WPC': 'v12_wpc',                       # pyinstaller exe  tested on clean windows
     'PowerSensor': 'v12_power_sensor',      # pyinstaller exe  tested on clean windows
     'Audio': 'v12_audio',

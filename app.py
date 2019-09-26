@@ -26,12 +26,16 @@ from utils import resource_path
 from ui.design3 import Ui_MainWindow
 from config import station_json
 
-# for actions
-from actions import (disable_power_check, set_power_simu, dummy_com,
-                     is_serial_ok, set_power)
+# for very begin before Task initialization
+from iqxel import generate_jsonfile
 
 # for prepares
 from soundcheck import soundcheck_init
+from iqxel import prepare_for_testflow_files
+
+# for actions
+from actions import (disable_power_check, set_power_simu, dummy_com,
+                     is_serial_ok, set_power)
 
 
 def dummy_com_first(win, *coms):
@@ -308,7 +312,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task_results = []
         self.table_view.set_data(self.task.mylist, self.task.header_ext())
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
-        widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * 2
+        widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * task.dut_num
         for idx, w in zip(range(len(widths)), widths):
             self.table_view.setColumnWidth(idx, w)
         for col in [0, 1, 2, 3, 4]:
@@ -388,87 +392,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self._comports_dut = dict(zip(range(len(comports)), comports))
 
         self.barcodes = []
-
-        match_s1 = r"\t\t>APP_ID \[Integer]  = \d"
-        match_s2 = r"\t\t>IQTESTER_MODULE_01 \[String]  = 192.168.100.254:A"
-        match_s3 = r"\t\t>VSA_PORT \[Integer]  = \d"
-        match_s4 = r"\t\t>VSG_PORT \[Integer]  = \d"
-        match_s5 = r"\t\t>CONNECTION_STRING \[String]  = com"
-        match_s6 = r"\t\t>CONNECTION_NAME \[String]  = com"
-        appid = 4
-
         for dut_i, port in self._comports_dut.items():
             if port:
                 self.port_barcodes[port] = None
-
-            ### update testflow file here ###
-            workdir = (f'C:/LitePoint/IQfact_plus/'
-                       #  f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock/bin{dut_idx+1}/')
-                       f'IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng19_Lock/bin{dut_i+1}/')
-            orgtf = 'iqxel/FIT_TEST_Sample_Flow_Tommy.txt'
-            tf1 = 'FAB_Test_Flow.txt'
-
-            with open(orgtf, 'r') as f:
-                f2 = open(f'{workdir}{tf1}', 'w')
-                for line in f.readlines():
-                    if re.search(match_s1, line):
-                        # APP_ID
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {dut_i+appid}\n'
-                        appid += 1
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    elif re.search(match_s2, line):
-                        # IQTESTER_MODULE_01
-                        if (dut_i+1) != 2:
-                            iqtester = '192.168.100.254:A'
-                        else:
-                            iqtester = '192.168.100.254:B'
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {iqtester}\n'
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    elif re.search(match_s3, line):
-                        # VSA_PORT
-                        if (dut_i+1) != 3:
-                            vsaport = '2'
-                        else:
-                            vsaport = '3'
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {vsaport}\n'
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    elif re.search(match_s4, line):
-                        # VSG_PORT
-                        if (dut_i+1) != 3:
-                            vsgport = '2'
-                        else:
-                            vsgport = '3'
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {vsgport}\n'
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    elif re.search(match_s5, line):
-                        # CONNECTION_STRING
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {port}\n'
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    elif re.search(match_s6, line):
-                        # CONNECTION_NAME
-                        old_str = line
-                        l = line.split()
-                        replace_str = f'\t\t{l[0]} {l[1]}  {l[2]} {port}\n'
-                        line = line.replace(old_str, replace_str)
-                        print(line, end='')
-                    f2.write(line)
-            print('-----------------------------------------------------------')
-            f2.close()
 
         print(self._comports_dut)
         self.render_port_plot()
@@ -982,6 +908,8 @@ if __name__ == "__main__":
                          read())['STATION']
 
     app = QApplication(sys.argv)
+
+    if STATION == 'RF': generate_jsonfile()
     task = Task(station_json[STATION])
     if not task.base: sys.exit()
 
