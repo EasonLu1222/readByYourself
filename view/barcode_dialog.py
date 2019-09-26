@@ -1,5 +1,7 @@
 import re
-from PyQt5.QtWidgets import QDialog
+import sys
+
+from PyQt5.QtWidgets import QDialog, QApplication, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.barcode_dialog import Ui_BarcodeDialog
 
@@ -43,4 +45,21 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         return matches is not None
 
     def closeEvent(self, evnt):
+        self.show_start_test_dialog()
+
+    def show_start_test_dialog(self):
+        infoBox = QMessageBox()  ##Message Box that doesn't run
+        print("Im here")
+        infoBox.setIcon(QMessageBox.Information)
+        infoBox.setText("将待测物放回治具后，按回车键开始测试")
+        infoBox.exec_()
         self.barcode_dialog_closed.emit()
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+
+    d = BarcodeDialog()
+    d.set_total_barcode(2)
+    d.show()
+    sys.exit(app.exec_())
