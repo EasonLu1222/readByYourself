@@ -5,7 +5,7 @@
     "dut": {
         "name": "ftdi",
         "num": 2,
-        "sn": ["A50285BIA", "A1111111A"]
+        "sn": ["A50285BIA", "22222222A"]
     },
     "pwr": {
         "name": "gw_powersupply",
