@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import time
 from json import JSONDecodeError
 
 from PyQt5 import QtWidgets
@@ -42,11 +43,6 @@ class TouchPolling(QThread):
                     self.key_codes.remove(key_code)
                     if not self.key_codes:
                         break
-        if hasattr(self, 'ser') and self.ser.is_open:
-            try:
-                self.ser.close()
-            except OSError:
-                logger.info('TouchPolling thread terminated!')
 
 
 class ContentWidget(QtWidgets.QWidget):
@@ -82,12 +78,13 @@ class ContentWidget(QtWidgets.QWidget):
     def clear_test(self):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
-        if hasattr(self, 'ser') and self.ser.is_open:
-            try:
-                self.ser.close()
-            except AttributeError:
-                logger.info('TouchPolling thread terminated!')
+        logger.info('TouchPolling thread terminated!')
         self.all_color('#FFFFFF')
+        time.sleep(1)
+        try:
+            self.ser.close()
+        except Exception:
+            logger.error("Close serial port failed")
 
     def set_signal(self):
         self.father.message_each.connect(self.init_test)

@@ -42,7 +42,8 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
         matches = re.match(regex, barcode)
 
-        return matches is not None
+        # return matches is not None
+        return True
 
     def closeEvent(self, evnt):
         self.show_start_test_dialog()
