@@ -9,8 +9,13 @@ import os
 curdir = os.path.abspath(os.path.curdir)
 
 exec_before = exec_statement('''
+    import os
+    import shutil
     from distutils.dir_util import copy_tree
     copy_tree('jsonfile', 'dist/jsonfile')
+    os.makedirs('dist/iqxel', exist_ok=True)
+    shutil.copyfile('iqxel/FAB_Test_Flow.txt',
+                    'dist/iqxel/FAB_Test_Flow.txt')
 ''')
 
 added_files = [
