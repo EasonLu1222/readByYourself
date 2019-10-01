@@ -1,3 +1,17 @@
+[2019.9.26 - 23:55]
+Generate jsonfile based on testflow file
+
+1. generate rf jsonfile based on testflow file
+	- source_testflow: iqxel/FAB_Test_Flow.txt
+	- source_jsonfile: jsonfile/v12_rf_base.json
+	- generated_jsonfile: jsonfile/v12_rf.json
+
+2. delete all jsonfiles which's version < 11
+
+3. deploy on windows10 tested
+	- testflow can be modified after deployed
+
+
 [2019.9.23 - 00:55]
 Jsonfile v12 & winpty trick to recieve iqfact output
 
