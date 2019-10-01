@@ -185,7 +185,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
         for _ in range(3): serial.write(os.linesep.encode('ascii'))
 
 
-def issue_command(serial, cmd, timeout_for_readlines=0, fetch=True):
+def issue_command(serial, cmd, fetch=True):
     logger.info('issue_command: write')
     serial.reset_output_buffer()
     serial.reset_input_buffer()
