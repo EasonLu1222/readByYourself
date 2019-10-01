@@ -13,7 +13,7 @@ from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox)
+                             QWidget, QCheckBox, QMessageBox)
 
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
@@ -553,6 +553,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.pushButton.setEnabled(True)
             print('serial is not ok!!!')
+
+    def show_serial_not_ok_dialog(self):
+        # TODO: Build a dialog helper that works with the translation library
+        infoBox = QMessageBox()
+        infoBox.setIcon(QMessageBox.Information)
+        infoBox.setText("Something went wring, please try again")
+        infoBox.exec_()
 
     def printterm1(self, port_msg):
         port, msg = port_msg
