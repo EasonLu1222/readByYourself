@@ -367,11 +367,6 @@ def msp430_download(portname):
         lines = issue_command(ser, '/usr/share/msp430Upgrade_V05')
         result = 'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
         logger.info(f'msp430 fw download: {result}')
-        # wait for reboot
-        issue_command(ser, 'reboot', fetch=False)
-        logger.info(f'reboot')
-        enter_factory_image_prompt(ser, waitwordidx=7, press_enter=True, printline=False)
-        logger.info(f'wait_for_prompt done')
     return result
 
 
