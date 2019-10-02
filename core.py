@@ -596,12 +596,17 @@ class Task(QThread):
     def run(self):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
+        self.toggle_loading_dialog(False)
+        self.show_serial_not_ok_dialog()
+
         t0 = time_()
 
         for action, args in self.action_args:
             print('run action', action, args)
             if not action(*args):
                 print('return !!!!!')
+                self.window.show_animation_dialog.emit(False)
+                self.window.show_serial_not_ok_dialog()
                 return
 
         QThread.msleep(500)
