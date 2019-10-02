@@ -114,6 +114,7 @@ class MySettings():
 
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
+    msg_dialog_signal = QSignal(str)
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -209,6 +210,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                              "font-weight: bold}" % lb.objectName())
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
+        self.msg_dialog_signal.connect(self.show_message_dialog)
         self.first_args = list()
         self.prepare_args = list()
         self.after_args = list()
@@ -554,11 +556,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton.setEnabled(True)
             print('serial is not ok!!!')
 
-    def show_serial_not_ok_dialog(self):
+    def show_message_dialog(self, msg):
         # TODO: Build a dialog helper that works with the translation library
         infoBox = QMessageBox()
         infoBox.setIcon(QMessageBox.Information)
-        infoBox.setText("Something went wring, please try again")
+        infoBox.setText(msg)
         infoBox.exec_()
 
     def printterm1(self, port_msg):

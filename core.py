@@ -603,7 +603,7 @@ class Task(QThread):
             if not action(*args):
                 print('return !!!!!')
                 self.window.show_animation_dialog.emit(False)
-                self.window.show_serial_not_ok_dialog()
+                self.window.msg_dialog_signal.emit("Something went wrong, please try again")
                 return
 
         QThread.msleep(500)
