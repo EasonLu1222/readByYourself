@@ -60,22 +60,22 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/design3.py" line="111"/>
+        <location filename="../ui/main.py" line="111"/>
         <source>MainWindow</source>
         <translation type="unfinished">主视窗</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="112"/>
+        <location filename="../ui/main.py" line="112"/>
         <source>en_US</source>
         <translation type="unfinished">English</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="113"/>
+        <location filename="../ui/main.py" line="113"/>
         <source>zh_TW</source>
         <translation type="unfinished">繁中</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="116"/>
+        <location filename="../ui/main.py" line="116"/>
         <source>Engineering mode</source>
         <translation type="unfinished">工程模式</translation>
     </message>
@@ -85,7 +85,7 @@
         <translation type="unfinished">總結</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="117"/>
+        <location filename="../ui/main.py" line="117"/>
         <source>Run</source>
         <translation type="unfinished">開始測試</translation>
     </message>
@@ -100,12 +100,12 @@
         <translation type="unfinished">待測物</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="114"/>
+        <location filename="../ui/main.py" line="114"/>
         <source>zh_CN</source>
         <translation type="unfinished">简中</translation>
     </message>
     <message>
-        <location filename="../ui/design3.py" line="115"/>
+        <location filename="../ui/main.py" line="115"/>
         <source>vi</source>
         <translation type="unfinished">Tiếng Việt</translation>
     </message>

@@ -23,7 +23,7 @@ from core import (Task, ProcessListener, BaseVisaListener,
 from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path
-from ui.design3 import Ui_MainWindow
+from ui.main import Ui_MainWindow
 from config import station_json
 
 # for very begin before Task initialization
