@@ -1,6 +1,4 @@
 import os
-import sys
-import numpy as np
 import re
 import subprocess
 from math import ceil
@@ -30,7 +28,7 @@ def pull_recorded_sound():
         # Sample output of "adb devices -l"
         # 0123456789ABCDEF       device usb:336855040X product:occam model:Nexus_4 device:mako transport_id:9
 
-        match = re.search(r"transport_id:(\d+)", line)   # extract "336855040X" from the above example
+        match = re.search(r"transport_id:(\d+)", line)   # extract "9" from the above example
         if match:
             transport_id = match.groups()[0]
             wav_file_path = resource_path(f"{wav_dir}/tmp/{transport_id}.wav")
