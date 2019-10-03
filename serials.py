@@ -35,6 +35,7 @@ def is_serial_free(port_name):
     try:
         get_serial(port_name, 115200, 1)
     except serial.serialutil.SerialException as ex:
+        logger.error(f'Port {port_name} is not free: {ex}')
         return False
     return True
 

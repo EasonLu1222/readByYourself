@@ -1,8 +1,10 @@
 import argparse
 import json
+import re
 import sys
 import time
 from json import JSONDecodeError
+from subprocess import Popen, PIPE
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal
@@ -11,7 +13,7 @@ from serial.serialutil import SerialException
 from mylogger import logger
 from serials import get_serial, issue_command
 from view import task_dialog
-from utils import resource_path
+from utils import resource_path, get_env
 
 
 class TouchPolling(QThread):
@@ -103,6 +105,34 @@ class ContentWidget(QtWidgets.QWidget):
         logger.info(f'on_close {msg}')
         self.clear_test()
         sys.stdout.write(json.dumps(msg))
+
+
+def check_fw():
+    #TODO: Make sure all adb devices are listed
+    cmd = "adb devices -l"
+    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+    output, _ = proc.communicate()
+    decoded_output = output.decode('utf-8').strip()
+    lines = decoded_output.split('\n')[1:]
+    for line in lines:
+        match = re.search(r"transport_id:(\d+)", line)
+        if match:
+            transport_id = match.groups()[0]
+
+            cmd = f"adb -t {transport_id} shell ls /usr/share/msp430Upgrade_V05"
+            proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+            outputs, _ = proc.communicate()
+            outputs = outputs.decode('utf8')
+            match = re.search('ls:', outputs)
+            if match:
+                logger.info("Cap touch fw doesn't exist, downloading from app to fixture")
+                fw_file_path = resource_path(f"./firmware/msp430Upgrade_V05")
+                cmd = f"adb -t {transport_id} push {fw_file_path} /usr/share"
+                proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+                output, _ = proc.communicate()
+                logger.info(output.decode('utf8'))
+            else:
+                logger.info("Cap touch fw exists in fixture")
 
 
 if __name__ == "__main__":
