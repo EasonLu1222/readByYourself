@@ -15,6 +15,10 @@
          {
             "action": "disable_power_check",
             "args": ["win"]
+         },
+         {
+            "action": "is_serial_ok",
+            "args": ["win.comports", "task.serial_ok"]
          }
 
      ],
