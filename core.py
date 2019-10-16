@@ -435,8 +435,9 @@ class Task(QThread):
         msg = f'[rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
         print(msg)
         self.printterm_msg.emit(msg)
+        selected_duts = ','.join([str(s) for s in self.window.dut_selected])    # E.g. '0,1'
 
-        proc = Popen([python_path(), '-m', script, '-pp', ports] + args, stdout=PIPE, env=get_env())
+        proc = Popen([python_path(), '-m', script, '-pp', ports, '-ds', selected_duts] + args, stdout=PIPE, env=get_env())
 
         outputs, _ = proc.communicate()
         if not outputs:
