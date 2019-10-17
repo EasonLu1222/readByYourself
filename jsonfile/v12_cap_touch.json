@@ -41,6 +41,19 @@
             "unit": null
         },
         {
+            "group": "Check FW Availability",
+            "hidden": false,
+            "tasktype": 4,
+            "item": "check if firmware is in the fixture",
+            "script": "task_cap_touch",
+            "args": ["check_fw"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "Cap Touch FW Download",
             "hidden": false,
             "tasktype": 1,
