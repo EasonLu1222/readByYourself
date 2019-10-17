@@ -25,3 +25,5 @@ station_json = {
     'Audio': 'v12_audio',
     'Download': 'v12_download',
 }
+
+CAP_TOUCH_FW = 'msp430Upgrade_V05'

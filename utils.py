@@ -2,6 +2,9 @@ import os
 import sys
 import inspect
 from pathlib import Path
+from subprocess import Popen, PIPE
+
+from mylogger import logger
 
 
 def s_(var):
@@ -52,6 +55,16 @@ def resource_path(relative_path):
             base_path = Path(".").resolve()
     return str(base_path.joinpath(Path(relative_path)))
 
+
+def run(cmd, strip=False):
+    logger.error(cmd)
+    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+    output, _ = proc.communicate()
+    decoded_output = output.decode('utf-8')
+    if strip:
+        decoded_output = decoded_output.strip()
+    logger.info(decoded_output)
+    return decoded_output
 
 def get_env():
     pyi_env = os.environ.copy()

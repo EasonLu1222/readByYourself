@@ -7,6 +7,7 @@ import time
 import random
 import argparse
 import inspect
+import config
 from subprocess import Popen, PIPE
 from serials import issue_command, get_serial, enter_factory_image_prompt
 from utils import resource_path
@@ -363,8 +364,9 @@ def open_spdif(portname):
 
 
 def msp430_download(portname):
+    time.sleep(5)
     with get_serial(portname, 115200, timeout=2) as ser:
-        lines = issue_command(ser, '/usr/share/msp430Upgrade_V05')
+        lines = issue_command(ser, f'/usr/share/{config.CAP_TOUCH_FW}')
         result = 'Passed' if any(re.search('Firmware updated without issue', e) for e in lines) else 'Failed'
         logger.info(f'msp430 fw download: {result}')
     return result

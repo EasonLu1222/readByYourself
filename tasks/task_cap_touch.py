@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import time
+import config
 from json import JSONDecodeError
 from subprocess import Popen, PIPE
 
@@ -14,7 +15,7 @@ from serial.serialutil import SerialException
 from mylogger import logger
 from serials import get_serial, issue_command
 from ui.cap_touch_dialog import Ui_CapTouchDialog
-from utils import get_env, resource_path
+from utils import get_env, resource_path, run
 
 
 class TouchPolling(QThread):
@@ -142,27 +143,26 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
 def check_fw():
     #TODO: Make sure all adb devices are listed
     cmd = "adb devices -l"
-    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-    output, _ = proc.communicate()
-    decoded_output = output.decode('utf-8').strip()
+    decoded_output = run(cmd, strip=True)
     lines = decoded_output.split('\n')[1:]
     for line in lines:
         match = re.search(r"transport_id:(\d+)", line)
         if match:
             transport_id = match.groups()[0]
 
-            cmd = f"adb -t {transport_id} shell ls /usr/share/msp430Upgrade_V05"
-            proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-            outputs, _ = proc.communicate()
-            outputs = outputs.decode('utf8')
+            cmd = f"adb -t {transport_id} shell ls /usr/share/{config.CAP_TOUCH_FW}"
+            outputs = run(cmd)
             match = re.search('ls:', outputs)
             if match:
+                # Push the firmware from app to fixture's mainboard
                 logger.info("Cap touch fw doesn't exist, downloading from app to fixture")
-                fw_file_path = resource_path(f"./firmware/msp430Upgrade_V05")
+                fw_file_path = resource_path(f"./firmware/{config.CAP_TOUCH_FW}")
                 cmd = f"adb -t {transport_id} push {fw_file_path} /usr/share"
-                proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-                output, _ = proc.communicate()
-                logger.info(output.decode('utf8'))
+                run(cmd)
+
+                # Change firmware permission to make it executable
+                cmd = f"adb -t {transport_id} shell chmod 777 /usr/share/{config.CAP_TOUCH_FW}"
+                run(cmd)
             else:
                 logger.info("Cap touch fw exists in fixture")
 
