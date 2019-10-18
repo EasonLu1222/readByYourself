@@ -73,3 +73,9 @@ def get_env():
         pyi_env['_MEIPASS'] = sys._MEIPASS
 
     return pyi_env
+
+def set_property(widget, attr, val):
+    widget.setProperty(attr, val)
+    widget.style().unpolish(widget)
+    widget.style().polish(widget)
+    widget.update()
