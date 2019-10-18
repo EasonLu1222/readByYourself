@@ -7,7 +7,7 @@ import config
 from json import JSONDecodeError
 from subprocess import Popen, PIPE
 
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtGui import QKeySequence, QCursor
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal, Qt
 from PyQt5.QtWidgets import QDialog, QApplication, QShortcut
 from serial.serialutil import SerialException
@@ -15,7 +15,7 @@ from serial.serialutil import SerialException
 from mylogger import logger
 from serials import get_serial, issue_command
 from ui.cap_touch_dialog import Ui_CapTouchDialog
-from utils import get_env, resource_path, run
+from utils import get_env, resource_path, run, set_property
 
 
 class TouchPolling(QThread):
@@ -73,13 +73,23 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
             dict(zip(self.key_codes, self.btn_list[0])),
             dict(zip(self.key_codes, self.btn_list[1]))
         ]
+        self.pass_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.fail_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.pass_button.clicked.connect(self.pass_clicked)
         self.fail_button.clicked.connect(self.fail_clicked)
         QShortcut(QKeySequence(Qt.Key_Return), self, self.pass_clicked)
         QShortcut(QKeySequence(Qt.Key_Space), self, self.fail_clicked)
 
+        self.fade_disabled_duts()
+
         if self.next():
             self.start_test()
+
+    def fade_disabled_duts(self):
+        if 0 in self.dut_idx_list:
+            set_property(self.bc1, "disabled", False)
+        if 1 in self.dut_idx_list:
+            set_property(self.bc2, "disabled", False)
 
     def next(self):
         if len(self.dut_idx_list) > 0 and len(self.portnames) > 0:
@@ -98,12 +108,12 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         logger.info('cap touch start_test')
 
     def set_focus(self, dut_num=0):
+        set_property(self.bc1, "active", False)
+        set_property(self.bc2, "active", False)
         if dut_num == 0:
-            self.setStyleSheet("#bc1{border: 3px solid #8BC34A;} #bc2{border: none;}")
+            set_property(self.bc1, "active", True)
         elif dut_num == 1:
-            self.setStyleSheet("#bc1{border: none;} #bc2{border: 3px solid #8BC34A;}")
-        else:
-            self.setStyleSheet("#bc1{border: none;} #bc2{border: none;}")
+            set_property(self.bc2, "active", True)
 
     def all_color(self, btn_labels, color_code):
         for btn_label in btn_labels:
@@ -123,7 +133,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
     def on_touch(self, touched_key_code):
         # When cap touch button is touched, set the corresponding label's background color to yellow
         btn_label = self.key_code_to_label_map[self.dut_ptr][touched_key_code]
-        btn_label.setStyleSheet('background-color: #FFEB3B')
+        btn_label.setStyleSheet('background-color: #FDD835')
 
     def pass_clicked(self):
         self.test_results.append("Passed")
@@ -141,7 +151,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
             self.close()
 
 def check_fw():
-    #TODO: Make sure all adb devices are listed
+    # TODO: Make sure all adb devices are listed
     cmd = "adb devices -l"
     decoded_output = run(cmd, strip=True)
     lines = decoded_output.split('\n')[1:]

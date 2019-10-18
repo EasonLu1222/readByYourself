@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget[active=true]{
-	border: 3px solid #8BC34A;
+	border: 5px solid #8BC34A;
 	border-radius: 5px;
 }
 QWidget[active=false]{
@@ -370,7 +370,6 @@ QWidget[disabled=false] QLabel[class=&quot;touchBtn&quot;]{
        <property name="styleSheet">
         <string notr="true">QPushButton {
 	color:#FFFFFF;
-	cursor:pointer;
 	padding:5px;
 	border-radius:5px;
 	background-color:#8BC34A;

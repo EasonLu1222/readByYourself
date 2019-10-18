@@ -20,7 +20,7 @@ class Ui_CapTouchDialog(object):
         sizePolicy.setHeightForWidth(CapTouchDialog.sizePolicy().hasHeightForWidth())
         CapTouchDialog.setSizePolicy(sizePolicy)
         CapTouchDialog.setStyleSheet("QWidget[active=true]{\n"
-"    border: 3px solid #8BC34A;\n"
+"    border: 5px solid #8BC34A;\n"
 "    border-radius: 5px;\n"
 "}\n"
 "QWidget[active=false]{\n"
@@ -191,7 +191,6 @@ class Ui_CapTouchDialog(object):
         self.pass_button.setFont(font)
         self.pass_button.setStyleSheet("QPushButton {\n"
 "    color:#FFFFFF;\n"
-"    cursor:pointer;\n"
 "    padding:5px;\n"
 "    border-radius:5px;\n"
 "    background-color:#8BC34A;\n"

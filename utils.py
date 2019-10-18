@@ -57,7 +57,7 @@ def resource_path(relative_path):
 
 
 def run(cmd, strip=False):
-    logger.error(cmd)
+    logger.info(cmd)
     proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
     output, _ = proc.communicate()
     decoded_output = output.decode('utf-8')
