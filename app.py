@@ -551,6 +551,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         se.serial_msg.connect(self.printterm1)
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
+        self.task.adb_ok.connect(self.adb_ok)
 
     def serial_ok(self, ok):
         if ok:
@@ -558,6 +559,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.pushButton.setEnabled(True)
             print('serial is not ok!!!')
+
+    def adb_ok(self, ok):
+        if not ok:
+            self.pushButton.setEnabled(True)
 
     def show_message_dialog(self, msg):
         # TODO: Build a dialog helper that works with the translation library

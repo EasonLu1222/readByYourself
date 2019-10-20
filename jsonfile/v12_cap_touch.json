@@ -22,7 +22,7 @@
          },
          {
             "action": "is_adb_ok",
-            "args": ["win.get_dut_selected"]
+            "args": ["win.get_dut_selected", "task.adb_ok"]
          }
      ],
      "prepares": [],

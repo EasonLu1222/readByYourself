@@ -24,7 +24,7 @@ def is_serial_ok(comports, signal_from):
         return True
 
 
-def is_adb_ok(dut_selected):
+def is_adb_ok(dut_selected, signal_from):
     print('is_adb_ok start')
     cmd = "adb start-server"
     output = run(cmd)
@@ -42,8 +42,10 @@ def is_adb_ok(dut_selected):
         run(cmd)
         cmd = "adb start-server"
         run(cmd)
+        signal_from.emit(False)
     else:
         print('adb devices ready')
+        signal_from.emit(True)
 
     return rtn
 

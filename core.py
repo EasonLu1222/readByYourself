@@ -235,6 +235,7 @@ class Task(QThread):
     task_each = QSignal(list)
     task_result = QSignal(str)
     serial_ok = QSignal(bool)
+    adb_ok = QSignal(bool)
     message = QSignal(str)
     printterm_msg = QSignal(str)
     show_task_dialog = QSignal(list)
@@ -604,7 +605,7 @@ class Task(QThread):
             if not action(*args):
                 print('return !!!!!')
                 self.window.show_animation_dialog.emit(False)
-                self.window.msg_dialog_signal.emit("Something went wrong, please try again")
+                self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
                 return
 
         QThread.msleep(500)
