@@ -19,8 +19,11 @@
          {
             "action": "is_serial_ok",
             "args": ["win.comports", "task.serial_ok"]
+         },
+         {
+            "action": "is_adb_ok",
+            "args": ["win.get_dut_selected"]
          }
-
      ],
      "prepares": [],
      "afters": []

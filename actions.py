@@ -1,7 +1,8 @@
 import os
+import re
 from subprocess import Popen, PIPE
 from serials import is_serial_free
-from utils import resource_path, get_env, python_path
+from utils import resource_path, get_env, python_path, run
 
 
 def disable_power_check(win):
@@ -21,6 +22,30 @@ def is_serial_ok(comports, signal_from):
         print('all serial port are free!')
         signal_from.emit(True)
         return True
+
+
+def is_adb_ok(dut_selected):
+    print('is_adb_ok start')
+    cmd = "adb start-server"
+    output = run(cmd)
+    cmd = "adb devices -l"
+    output = run(cmd, strip=True)
+    lines = output.split('\n')[1:]
+
+    # Count the number of devices that are not offline and has transport_id
+    result = sum([(not re.search('offline', l)) and (re.search('transport_id', l) is not None) for l in lines])
+    ds = len(dut_selected())
+    rtn = result >= ds
+    if not rtn:
+        print('adb devices not ready, restarting adb')
+        cmd = "adb kill-server"
+        run(cmd)
+        cmd = "adb start-server"
+        run(cmd)
+    else:
+        print('adb devices ready')
+
+    return rtn
 
 
 def set_power(power_process, proc_listener):

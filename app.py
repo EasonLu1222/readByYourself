@@ -35,7 +35,7 @@ from iqxel import prepare_for_testflow_files
 
 # for actions
 from actions import (disable_power_check, set_power_simu, dummy_com,
-                     is_serial_ok, set_power)
+                     is_serial_ok, set_power, is_adb_ok)
 
 
 def dummy_com_first(win, *coms):
@@ -532,6 +532,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         comports_as_list = list(filter(lambda x:x, self._comports_dut.values()))
         return comports_as_list
 
+    def get_dut_selected(self):
+        return [i for i, x in enumerate(self.get_checkboxes_status()) if x]
+
     def setsignal(self):
         for i, b in enumerate(self.checkboxes, 1):
             chk_box_state_changed = lambda state, i=i: self.chk_box_fx_state_changed(state, i)
@@ -738,7 +741,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             e_msg.showMessage(self.both_fx_not_checked_err)
             return
 
-        self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
+        self.dut_selected = self.get_dut_selected()
         print('dut_selected', self.dut_selected)
         for i in range(self.task.len() + 1):
             for j in range(self.task.dut_num):
