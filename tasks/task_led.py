@@ -168,6 +168,7 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-pp', '--portnames', help='serial com port names', type=str)
+    parser.add_argument('-ds', '--dutselected', help='selected duts', type=str)
     args = parser.parse_args()
     com_list = args.portnames.split(',') if args.portnames else []
     # com_list = ['/dev/cu.usbserial-00000000']
