@@ -2,4 +2,4 @@
 lrelease translate/zh_TW.ts
 lrelease translate/zh_CN.ts
 lrelease translate/en_US.ts
-lrelease translate/vn.ts
+lrelease translate/vi.ts
