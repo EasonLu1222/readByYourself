@@ -9,6 +9,64 @@
     </message>
 </context>
 <context>
+    <name>CapTouchDialog</name>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="234"/>
+        <source>Dialog</source>
+        <translation type="unfinished">對話框</translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="235"/>
+        <source>DUT2</source>
+        <translation type="unfinished">待測物2</translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="247"/>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="256"/>
+        <source>touchBtn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="249"/>
+        <source>V+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="251"/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="253"/>
+        <source>V-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="255"/>
+        <source>BT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="246"/>
+        <source>DUT1</source>
+        <translation type="unfinished">待測物1</translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="257"/>
+        <source>PASS</source>
+        <translation type="unfinished">通過</translation>
+    </message>
+    <message>
+        <location filename="../ui/cap_touch_dialog.py" line="258"/>
+        <source>FAIL</source>
+        <translation type="unfinished">不通過</translation>
+    </message>
+</context>
+<context>
     <name>LedColorDialog</name>
     <message>
         <location filename="../ui/led_color_dialog.py" line="38"/>
@@ -80,7 +138,7 @@
         <translation type="unfinished">工程模式</translation>
     </message>
     <message>
-        <location filename="../app.py" line="829"/>
+        <location filename="../app.py" line="872"/>
         <source>Summary</source>
         <translation type="unfinished">總結</translation>
     </message>
@@ -90,12 +148,12 @@
         <translation type="unfinished">開始測試</translation>
     </message>
     <message>
-        <location filename="../app.py" line="830"/>
+        <location filename="../app.py" line="873"/>
         <source>At least one of the fixture should be checked</source>
         <translation type="unfinished">至少要勾選一個治具</translation>
     </message>
     <message>
-        <location filename="../app.py" line="828"/>
+        <location filename="../app.py" line="871"/>
         <source>DUT</source>
         <translation type="unfinished">待測物</translation>
     </message>
