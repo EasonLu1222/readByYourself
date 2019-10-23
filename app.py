@@ -36,6 +36,7 @@ from iqxel import prepare_for_testflow_files
 # for actions
 from actions import (disable_power_check, set_power_simu, dummy_com,
                      is_serial_ok, set_power, is_adb_ok)
+from mylogger import logger
 
 
 def dummy_com_first(win, *coms):
@@ -61,7 +62,6 @@ class VisaListener(BaseVisaListener, UsbPowerSensor):
     def set_devices(self, devices):
         self.devices = devices
         for k,v in devices.items():
-            print('k', k, 'v', v)
             setattr(self, f'ports_{k}', [])
 
 
@@ -224,19 +224,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.hboxPorts.itemAt(i).widget().hide()
 
     def register_prepare(self, prepares):
-        print('register_prepares')
+        logger.debug('register_prepares')
         for e in prepares:
             prepare, args = e['prepare'], e['args']
             self.prepare_args.append([prepare, args])
 
     def register_first(self, firsts):
-        print('register_firsts')
+        logger.debug('register_firsts')
         for e in firsts:
             first, args = e['first'], e['args']
             self.first_args.append([first, args])
 
     def register_after(self, afters):
-        print('register_afters')
+        logger.debug('register_afters')
         for e in afters:
             after, args = e['after'], e['args']
             self.after_args.append([after, args])
@@ -274,7 +274,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.instrument_ready(True)
 
     def clean_power(self):
-        print('clean_power start')
+        logger.debug('clean_power start')
         # Prevent from last crash and power supply not closed normally
         for power in self.task.instruments['gw_powersupply']:
             if not power.is_open:
@@ -282,7 +282,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if power.ser:
                 power.off()
                 power.close_com()
-        print('clean_power end')
+        logger.debug('clean_power end')
 
     def table_hidden_row(self):
         self.rowlabel_old_new = old_new = {}
@@ -296,13 +296,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setVerticalHeaderLabels(str(e) for e in old_new.values())
 
     def recieve_power(self, process_results):
-        print('recieve_power', process_results)
+        logger.debug(f'recieve_power->process_results: {process_results}')
         self.proc_listener.stop()
         self.power_results = process_results
 
         with open(resource_path('power_results'), 'w+') as f:
             f.write(json.dumps(process_results))
-        print('recieve_power write power_results')
+        logger.debug('recieve_power write power_results')
 
         self.power_recieved = True
         if self.taskdone_first:
@@ -323,16 +323,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
 
     def poweron(self, power):
-        print('poweron start')
-        print('is_open', power.is_open)
+        logger.debug('poweron start')
         if not power.is_open:
-            print("poweron, power.com", power.com)
-            print('open_com')
             power.open_com()
-            print('power on')
             power.on()
 
     def poweroff(self, power):
+        logger.debug('poweroff start')
         if power.ser:
             power.off()
             power.close_com()
@@ -344,31 +341,31 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 child.widget().deleteLater()
 
     def pwr_update(self, comports):
-        print('pwr_update', comports)
+        logger.debug(f'pwr_update {comports}')
         self._comports_pwr = comports
         update_serial(self.task.instruments, 'gw_powersupply', comports)
         self.render_port_plot()
 
     def dmm_update(self, comports):
-        print('dmm_update', comports)
+        logger.debug(f'dmm_update {comports}')
         self._comports_dmm = comports
         update_serial(self.task.instruments, 'gw_dmm', comports)
         self.render_port_plot()
 
     def eld_update(self, comports):
-        print('eld_update', comports)
+        logger.debug(f'eld_update {comports}')
         self._comports_eld = comports
         update_serial(self.task.instruments, 'gw_eloader', comports)
         self.render_port_plot()
 
     def pws_update(self, comports):
-        print('pws_update', comports)
+        logger.debug(f'pws_update {comports}')
         self._comports_pws = comports
         update_serial(self.task.instruments, 'ks_powersensor', comports)
         self.render_port_plot()
 
     def ser_update(self, comports):
-        print('ser_update', comports)
+        logger.debug(f'ser_update {comports}')
         #  dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
         dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.serial_devices['dut'])
         df = get_devices_df()
@@ -383,7 +380,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)
         else:
-            print('dut does not have sn number')
+            logger.info('dut does not have sn number')
             dict_to_nonempty_list = lambda dict_: list(filter(lambda x:x, list(dict_.values())))
             list_ = dict_to_nonempty_list(self._comports_dut)
             if len(comports) > len(list_):
@@ -398,7 +395,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if port:
                 self.port_barcodes[port] = None
 
-        print(self._comports_dut)
+        logger.debug(self._comports_dut)
         self.render_port_plot()
 
     def render_port_plot(self):
@@ -442,14 +439,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for i, e in enumerate(each_instruments):
 
                 if e.interface=='serial':
-                    print(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
+                    logger.info(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
                     if e.com in comports_map[name]:
                         lb_port = QLabel(e.com)
                         lb_port.setStyleSheet(style_(colors_inst[name]))
                         self.dut_layout[i].addWidget(lb_port)
 
                 elif e.interface=='visa':
-                    print(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
+                    logger.info(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
                     if comports_map[name]:
                         lb_port = QLabel(e.com)
                         lb_port.setStyleSheet(style_(colors_inst[name]))
@@ -462,51 +459,51 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.dut_layout[i].addStretch()
 
     def first(self):
-        print('first start')
+        logger.debug('first start')
         for action, args in self.first_args:
-            print('run first', action, args)
+            logger.debug(f'run first {action} {args}')
             if not action(*args):
-                print('return !!!!!')
+                logger.debug('first action {action} {args} returned False')
                 return
-        print('first end')
+        logger.debug('first end')
 
     def prepare(self):
-        print('prepare start')
+        logger.debug('prepare start')
         for action, args in self.prepare_args:
-            print('run prepare', action, args)
+            logger.debug(f'run prepare {action} {args}')
             if not action(*args):
-                print('return !!!!!')
+                logger.debug('prepare action {action} {args} returned False')
                 return
-        print('prepare end')
+        logger.debug('prepare end')
 
     def after(self):
-        print('after start')
+        logger.debug('after start')
         for action, args in self.after_args:
-            print('run after', action, args)
+            logger.debug(f'run after {action} {args}')
             if not action(*args):
-                print('return !!!!!')
+                logger.debug('after action {action} {args} returned False')
                 return
-        print('after end')
+        logger.debug('after end')
 
     def visa_instrument_ready(self, ready):
-        print('visa_instrument_ready start')
+        logger.debug('visa_instrument_ready start')
         if ready:
             self.visa_ready = True
-            print('\nVISA READY\n')
+            logger.debug('\nVISA READY\n')
         else:
             self.visa_ready = False
             self.pushButton.setEnabled(False)
-            print('\nVISA NOT READY\n')
+            logger.debug('\nVISA NOT READY\n')
 
         if self.serial_ready and self.visa_ready:
-            print('\n===READY===')
+            logger.debug('\n===READY===')
             self.pushButton.setEnabled(True)
             self.prepare()
 
     def instrument_ready(self, ready):
-        print('instrument_ready start')
+        logger.debug('instrument_ready start')
         if ready:
-            print('\nSERIAL READY\n!')
+            logger.debug('\nSERIAL READY\n!')
             self.serial_ready = True
             self.clean_power()
 
@@ -518,14 +515,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     pickle.dump(instruments_to_dump, f)
         else:
             self.serial_ready = False
-            print('\nSERIAL NOT READY\n!')
+            logger.debug('\nSERIAL NOT READY\n!')
 
         if self.serial_ready and self.visa_ready:
-            print('\n===READY===')
+            logger.debug('\n===READY===')
             self.pushButton.setEnabled(True)
             self.prepare()
         else:
-            print('\n===NOT READY===')
+            logger.debug('\n===NOT READY===')
             self.pushButton.setEnabled(False)
 
     def comports(self):
@@ -555,10 +552,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def serial_ok(self, ok):
         if ok:
-            print('serial is ok!!!!')
+            logger.debug('serial is ok!!!!')
         else:
             self.pushButton.setEnabled(True)
-            print('serial is not ok!!!')
+            logger.debug('serial is not ok!!!')
 
     def adb_ok(self, ok):
         if not ok:
@@ -600,7 +597,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         return color
 
     def taskrun(self, result):
-        print('taskrun result', result)
+        logger.debug(f'taskrun result {result}')
         """
         Set background color of specified table cells to indicate pass/fail
 
@@ -622,7 +619,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             output = ret['output']
             if type(output) == str:
                 output = json.loads(output)
-            print('output', output)
+            logger.debug(f'output {output}')
             for i in range(*row):
                 for j in self.dut_selected:
                     x = output[i - row[0]][j]
@@ -650,7 +647,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 
     def taskdone(self, message):
-        print('taskdone start !')
+        logger.debug('taskdone start !')
         self.taskdone_first = True
         self.table_view.setSelectionMode(QAbstractItemView.NoSelection)
         msg, t0, t1 = itemgetter('msg', 't0', 't1')(json.loads(message))
@@ -681,16 +678,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             dut_num = self.task.dut_num
 
-            print('\n\n')
-            print(d)
-            print(d.columns)
-            print(d.columns[-dut_num])
+            logger.debug('\n\n')
+            logger.debug(d)
+            logger.debug(d.columns)
+            logger.debug(d.columns[-dut_num])
 
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
                 res = 'Pass' if all_pass(results_) else 'Fail'
                 fail_list = get_fail_list(d[d.columns[-dut_num+dut_i]])
-                print('fail_list', fail_list)
+                logger.debug(f'fail_list {fail_list}')
                 self.table_view.setItem(r, self.col_dut_start + dut_i, QTableWidgetItem(res))
                 self.table_view.item(r, self.col_dut_start + dut_i).setBackground(self.color_check(res))
                 all_res.append(res)
@@ -727,16 +724,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.after()
 
     def show_barcode_dialog(self):
-        print('show_barcode_dialog start')
+        logger.debug('show_barcode_dialog start')
         status_all = self.get_checkboxes_status()
         num = len(list(filter(lambda x: x == True, status_all)))
         self.barcode_dialog.set_total_barcode(num)
         if num > 0:
             self.barcode_dialog.show()
-        print('show_barcode_dialog end')
+        logger.debug('show_barcode_dialog end')
 
     def btn_clicked(self):
-        print('btn_clicked')
+        logger.debug('btn_clicked')
         self.barcodes = []
         for dut_i, port in self._comports_dut.items():
             if port:
@@ -747,7 +744,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             return
 
         self.dut_selected = self.get_dut_selected()
-        print('dut_selected', self.dut_selected)
+        logger.debug(f'dut_selected {self.dut_selected}')
         for i in range(self.task.len() + 1):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
@@ -762,26 +759,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.task.start()
 
     def closeEvent(self, event):
-        print('closeEvent')
+        logger.debug('closeEvent')
         for power in self.task.instruments['gw_powersupply']:
             if power.is_open:
                 power.off()
         event.accept()  # let the window close
 
     def chk_box_fx_state_changed(self, status, idx):
-        print('status', status, 'idx', idx)
         self.settings.set(f'fixture_{idx}', status == Qt.Checked)
-        print(f'chk_box_fx{idx}_state_changed',
-            getattr(self.settings ,f'is_fx{idx}_checked'))
-
-    def chk_box_fx1_state_changed(self, status):
-        self.settings.set("fixture_1", status == Qt.Checked)
-        print('chk_box_fx1_state_changed', self.settings.is_fx1_checked)
-
-    def chk_box_fx2_state_changed(self, status):
-        self.settings.set("fixture_2", status == Qt.Checked)
-        print('chk_box_fx2_state_changed', self.settings.is_fx2_checked)
-
+        getattr(self.settings ,f'is_fx{idx}_checked')
 
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if (not is_eng_mode_on):
@@ -818,7 +804,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
 
     def on_barcode_entered(self, barcode):
-        print(barcode)
         self.barcodes.append(barcode)
 
     def on_barcode_dialog_closed(self):
@@ -826,15 +811,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         When the barcode(s) are ready, start testing
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
-        #  self.dut_selected = [i for i, x in enumerate(self.get_checkboxes_status()) if x]
-        #  print('dut_selected', self.dut_selected)
         header = self.task.header_ext()
         for j, dut_i in enumerate(self.dut_selected):
             header[-self.task.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
             port = self._comports_dut[dut_i]
             self.port_barcodes[port] = self.barcodes[j]
-        print('header', header)
-        print('port_barcodes', self.port_barcodes)
         self.table_view.setHorizontalHeaderLabels(header)
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
@@ -877,13 +858,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 def parse_for_register(task, actions_or_prepares):
     items = task.base['behaviors'][actions_or_prepares]
     for e in items:
-        print('e', e)
         item_name = actions_or_prepares[:-1] # sigular not plural
         item, args = e[item_name], e['args']
-
-        print('item', item)
-        print('args', args)
-
         item = eval(item)
         args_parsed = []
         if args:
