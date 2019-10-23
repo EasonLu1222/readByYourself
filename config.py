@@ -26,4 +26,4 @@ station_json = {
     'Download': 'v12_download',
 }
 
-CAP_TOUCH_FW = 'msp430Upgrade_V05'
+CAP_TOUCH_FW = 'msp430Upgrade_V06'
