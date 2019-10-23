@@ -27,26 +27,25 @@ from utils import s_
 def enter_prompt_simu():
     def dummy(sec):
         time.sleep(sec)
-    print('enter factory image prompt start')
+    logger.debug('enter factory image prompt start')
     t0 = time.time()
     t = threading.Thread(target=dummy, args=(1.5, ))
     t.start()
     t.join()
     t1 = time.time()
-    print('enter factory image prompt end')
-    print('time elapsed entering prompt: %f' % (t1 - t0))
+    logger.debug('enter factory image prompt end')
+    logger.debug('time elapsed entering prompt: %f' % (t1 - t0))
     return True
 
 
 def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
-    print('enter factory image prompt start')
+    logger.debug('enter factory image prompt start')
     t0 = time.time()
     port_ser_thread = {}
     comports = window.comports
-    print('enter_prompt: comports - ', comports)
+    logger.debug(f'enter_prompt: comports -  {comports}')
     for i in window.dut_selected:
         port = comports()[i]
-        print('i', i, 'port', port)
         ser = get_serial(port, 115200, ser_timeout)
         t = threading.Thread(target=enter_factory_image_prompt, args=(ser, waitwordidx))
         port_ser_thread[port] = [ser, t]
@@ -54,8 +53,8 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     for port, (ser, th) in port_ser_thread.items():
         th.join()
     t1 = time.time()
-    print('enter factory image prompt end')
-    print('time elapsed entering prompt: %f' % (t1 - t0))
+    logger.debug('enter factory image prompt end')
+    logger.debug('time elapsed entering prompt: %f' % (t1 - t0))
     for port, (ser, th) in port_ser_thread.items():
         ser.close()
     return True
@@ -64,19 +63,17 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
 def check_json_integrity(filename):
     path1 = resource_path(f'jsonfile/{filename}.json')
     path2 = os.path.join(os.path.abspath(os.path.curdir), 'jsonfile', f'{filename}.json')
-    print('path1', path1)
-    print('path2', path2)
+    logger.debug(f'path1 {path1}')
+    logger.debug(f'path2 {path2}')
 
     def check_each_json(path):
         try:
             j = json.loads(open(path, 'r').read())
         except json.JSONDecodeError as ex:
-            print('==ERROR==', ex)
+            logger.error(f'==ERROR== {ex}')
             return False
 
         for dev, v in j['devices'].items():
-            print('dev', dev)
-            print('v', v)
             num, sn = v['num'], v['sn']
             if type(sn) != list:
                 return False
@@ -92,8 +89,6 @@ def check_json_integrity(filename):
             # do not check integrity before pyinstaller deployment
             return True # json file integrity is good
         else:
-            print('j1', j1['devices'])
-            print('j2', j2['devices'])
             return True if j1==j2 else False
     else:
         return False
@@ -131,13 +126,11 @@ class ProcessListener(QThread):
         self.processes = processes
 
     def run(self):
-        print('\n\n\nProcessListener run start!')
         outputs = {}
         for pid, proc in self.processes.items():
             output, _ = proc.communicate()
             output = output.decode('utf8')
             outputs[pid] = float(output)
-        print('\n\n\nProcessListener run done!')
         self.process_results.emit(outputs)
 
     def stop(self):
@@ -258,9 +251,9 @@ class Task(QThread):
         self.action_args = list()
         self.df = self.load()
         self.instruments = generate_instruments(self.devices, INSTRUMENT_MAP)
-        print('Task.instruments')
+        logger.debug('Task.instruments')
         for k,v in self.instruments.items():
-            print(f'{k} ---> {v}')
+            logger.debug(f'{k} ---> {v}')
 
     @property
     def serial_instruments(self):
@@ -384,13 +377,13 @@ class Task(QThread):
 
     def rungroup(self, groupname):
         eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
-        print(f'[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
+        logger.debug(f'[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
         limits_group = [self.limits(groupname, i) for i in range(item_len)]
         limits = {}
         for e in zip(*args):
             xx = {i: j for i, j in zip(e, limits_group)}
             limits.update(xx)
-        print('limits', limits)
+        logger.debug(f'limits {limits}')
         args = {'args': args, 'limits': limits}
 
         coms = {}
@@ -413,7 +406,7 @@ class Task(QThread):
         port = self.window.comports()[dut_idx]
         each, script, args = self.unpack_each(row_idx)
         msg = f'[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(dynamic_info)}][{s_(args)}]'
-        print(msg)
+        logger.debug(msg)
         arguments = [python_path(), '-m', script,
                      '-p', port,
                      '-i', str(dut_idx),
@@ -434,7 +427,7 @@ class Task(QThread):
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
         msg = f'[rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
-        print(msg)
+        logger.debug(msg)
         self.printterm_msg.emit(msg)
         selected_duts = ','.join([str(s) for s in self.window.dut_selected])    # E.g. '0,1'
 
@@ -442,7 +435,7 @@ class Task(QThread):
 
         outputs, _ = proc.communicate()
         if not outputs:
-            print('outputs is None!!!!')
+            logger.warning('outputs is None!!!!')
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
         msg2 = '[task %s][outputs: %s]' % (index, outputs)  # E.g. outputs = ['Passed', 'Failed']
@@ -457,7 +450,7 @@ class Task(QThread):
             self.task_result.emit(result)
 
     def register_action(self, actions):
-        print('register_action')
+        logger.debug('register_action')
         for e in actions:
             action, args = e['action'], e['args']
             self.action_args.append([action, args])
@@ -486,7 +479,7 @@ class Task(QThread):
                 port = self.window.comports()[dut_idx]
                 procs[port] = proc
 
-        print('procs', procs)
+        logger.debug(f'procs {procs}')
         for j, (port, proc) in enumerate(procs.items()):
             output, _ = proc.communicate()
             output = output.decode('utf8')
@@ -518,7 +511,6 @@ class Task(QThread):
         proc = self.rungroup(group)
         output, _ = proc.communicate()
         output = output.decode('utf8')
-        print('OUTPUT', output)
         msg2 = '[task %s][output: %s]' % ([row, row + len(items)], output)
         self.printterm_msg.emit(msg2)
         result = json.dumps({
@@ -532,7 +524,7 @@ class Task(QThread):
         get_col = lambda arr, col: map(lambda x: x[col], arr)
         if len(self.window.dut_selected) == 1:
             output = [[e] for e in get_col(output, self.window.dut_selected[0])]
-        print('OUTPUT', output)
+        logger.debug(f'OUTPUT {output}')
         self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
 
@@ -587,8 +579,8 @@ class Task(QThread):
         threads = {}
         for dut_idx in self.window.dut_selected:
             port = self.window.comports()[dut_idx]
-            print('dut_idx: ', dut_idx)
-            print('port: ', port)
+            logger.debug(f'dut_idx:  {dut_idx}')
+            logger.debug(f'port:  {port}')
             threads[dut_idx] = th = threading.Thread(target=run_iqfactrun_console,
                                                 args=(self, dut_idx, port, group,))
             th.start()
@@ -601,9 +593,9 @@ class Task(QThread):
         t0 = time_()
 
         for action, args in self.action_args:
-            print('run action', action, args)
+            logger.debug(f'run action {action} {args}')
             if not action(*args):
-                print('return !!!!!')
+                logger.debug('return !!!!!')
                 self.window.show_animation_dialog.emit(False)
                 self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
                 return
@@ -617,7 +609,6 @@ class Task(QThread):
             is_auto, task_type = next_item['auto'], next_item['tasktype']
             if task_type != 11:
                 self.task_each.emit([row, len(items)])
-            print()
             getattr(self, f'run_task{task_type}')(group, items)
             QThread.msleep(500)
 
