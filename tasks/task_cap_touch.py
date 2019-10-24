@@ -124,7 +124,6 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
         logger.info('TouchPolling thread terminated!')
-        self.all_color('#FFFFFF')
         time.sleep(0.5)     # Wait for serial communication finish before closing serial connection
         try:
             logger.info(f"Closing serial port ({self.ser})")
@@ -190,7 +189,7 @@ if __name__ == "__main__":
     portnames = args.portnames.split(',')
     dut_idx_list = [int(idx) for idx in args.dutselected.split(',')]
     # dut_idx_list = [0, 1]
-    # portnames = ['/dev/cu.usbserial-11111111', '/dev/cu.usbserial-22222222']
+    # portnames = ['/dev/cu.usbserial-A50285BI', '/dev/cu.usbserial-22222222']
 
     app = QApplication(sys.argv)
 
