@@ -37,6 +37,13 @@ class Ui_LoadingDialog(object):
         _translate = QtCore.QCoreApplication.translate
         LoadingDialog.setWindowTitle(_translate("LoadingDialog", "Dialog"))
         self.label_2.setText(_translate("LoadingDialog", "Booting..."))
+        self.label_2.setStyleSheet('''
+            QLabel {
+                font-size: 24px;
+                font-weight: bold;
+                font-family: Gill Sans;
+            }
+        ''')
         self.label.setText(_translate("LoadingDialog", "TextLabel"))
 
 

@@ -31,6 +31,19 @@
  "test_items":
     [
         {
+            "group": "LS",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "LS",
+            "script": "task_runeach",
+            "args": ["ls_test"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "Load LED driver",
             "hidden": false,
             "tasktype": 1,

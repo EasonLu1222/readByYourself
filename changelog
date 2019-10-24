@@ -1,3 +1,9 @@
+[2019.10.25 - 01:00]
+beautify all
+
+1. beautify using stylesheet
+	- modify MyWindow.set_appearance()
+
 [2019.10.24 - 21:00]
 beautify pushbutton
 
