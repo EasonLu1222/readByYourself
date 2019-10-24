@@ -1,6 +1,6 @@
 {"header": 
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
- "version": "11.0",
+ "version": "13.0",
  "devices": {
     "dut": {
         "name": null,
@@ -18,8 +18,13 @@
         "sn": ["00000001"]
     }
  },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4],
+     "columns_width": [1, 1, 1, 1, 1, 300, 300, 90, 90, 90, 90, 300]
+ },
  "behaviors": {
      "barcode-scan": false,
+     "firsts": [],
      "actions": [
          {
             "action": "disable_power_check",
@@ -50,6 +55,3 @@
         }
     ]
 }
-
-
-

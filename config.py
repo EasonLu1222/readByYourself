@@ -10,20 +10,20 @@ VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
 station_json = {
-    'SIMULATION': 'v12_simu',
+    'SIMULATION': 'v13_simu',
 
     # --- SMT ---
-    'MainBoard': 'v12_mb',                  # pyinstaller exe  tested on clean windows
-    'LED': 'v12_led',                       # pyinstaller exe  tested on clean windows
-    'CapTouch': 'v12_cap_touch',            # pyinstaller exe  tested on clean windows
+    'MainBoard': 'v13_mb',                  # pyinstaller exe  tested on clean windows
+    'LED': 'v13_led',                       # pyinstaller exe  tested on clean windows
+    'CapTouch': 'v13_cap_touch',            # pyinstaller exe  tested on clean windows
 
     # --- FATP ---
-    'SA': 'v12_sa',                         # pyinstaller exe  tested on clean windows
-    'RF': 'v12_rf',
-    'WPC': 'v12_wpc',                       # pyinstaller exe  tested on clean windows
-    'PowerSensor': 'v12_power_sensor',      # pyinstaller exe  tested on clean windows
-    'Audio': 'v12_audio',
-    'Download': 'v12_download',
+    'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
+    'RF': 'v13_rf',
+    'WPC': 'v13_wpc',                       # pyinstaller exe  tested on clean windows
+    'PowerSensor': 'v13_power_sensor',      # pyinstaller exe  tested on clean windows
+    'Audio': 'v13_audio',
+    'Download': 'v13_download',
 }
 
 CAP_TOUCH_FW = 'msp430Upgrade_V06'

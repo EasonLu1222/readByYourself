@@ -8,7 +8,7 @@ from datetime import datetime
 from operator import itemgetter
 
 from PyQt5 import QtCore
-from PyQt5.QtGui import QFont, QColor, QPixmap
+from PyQt5.QtGui import QFont, QColor, QPixmap, QPainter, QPainterPath
 from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
@@ -112,6 +112,27 @@ class MySettings():
         self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
 
 
+class Label(QLabel):
+    def __init__(self, *args, antialiasing=True, **kwargs):
+        super(Label, self).__init__(*args, **kwargs)
+        self.Antialiasing = antialiasing
+        #  self.setMaximumSize(220, 130)
+        self.setMinimumSize(200, 100)
+        self.radius = 100
+        self.target = QPixmap(self.size())  # 大小和控件一样
+        self.target.fill(Qt.transparent)  # 填充背景为透明
+        p = QPixmap(resource_path("./images/fit_logo.png")).scaled(  # 加载图片并缩放和控件一样大
+            170, 1, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+        painter = QPainter(self.target)
+        if self.Antialiasing:
+            # 抗锯齿
+            painter.setRenderHint(QPainter.Antialiasing, True)
+            painter.setRenderHint(QPainter.HighQualityAntialiasing, True)
+            painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
+        painter.drawPixmap(0, 0, p)
+        self.setPixmap(self.target)
+
+
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
     msg_dialog_signal = QSignal(str)
@@ -123,15 +144,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.simulation = False
 
-        logo_img = QPixmap(resource_path("./images/fit_logo.png"))
-        self.logo.setPixmap(logo_img.scaled(self.logo.width(), self.logo.height(), Qt.KeepAspectRatio))
-
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self)
         self.barcodes = []
         self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
 
         self.set_task(task)
+        self.set_appearance()
         self.settings = MySettings(dut_num=self.task.dut_num)
         self.make_checkboxes()
 
@@ -314,13 +333,44 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task_results = []
         self.table_view.set_data(self.task.mylist, self.task.header_ext())
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
-        widths = [1] * 3 + [100] * 2 + [150, 250] + [90] * 4 + [280] * task.dut_num
+
+    def set_appearance(self):
+        logo_img = QPixmap(resource_path("./images/fit_logo.png"))
+        self.logo = Label(self.container, antialiasing=True)
+        self.logo.setText("")
+        self.logo.setObjectName("logo")
+        self.horizontalLayout_2.addWidget(self.logo)
+
+        widths = self.task.appearance['columns_width']
+        for col in self.task.appearance['columns_hidden']:
+            self.table_view.setColumnHidden(col, True)
         for idx, w in zip(range(len(widths)), widths):
             self.table_view.setColumnWidth(idx, w)
-        for col in [0, 1, 2, 3, 4]:
-            self.table_view.setColumnHidden(col, True)
+        self.table_view.horizontalHeader().setStyleSheet(
+            '''
+                QHeaderView {
+                    font-size: 12pt;
+                    font-weight: bold;
+                    font-family: Gill Sans;
+                }
+                QHeaderView::section {
+                    font-size: 16pt;
+                    Background-color:#eef7fd;
+                    border-radius:6px;
+                    border-bottom: 1px solid black;
+                    border-right: 1px solid black;
+                }
+            '''
+        )
+        font = QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(16)
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
         self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
+        for i in range(self.table_view.rowCount()-1):
+            for j in range(self.table_view.columnCount()):
+                self.table_view.item(i, j).setFont(font)
+        self.table_view.item(self.table_view.rowCount()-1, 0).setFont(font)
 
     def poweron(self, power):
         logger.debug('poweron start')
@@ -894,7 +944,6 @@ if __name__ == "__main__":
         STATION = 'Download'
 
     '''
-    #  STATION = 'Download'
 
     # temporary approach, for convenient development
     STATION = json.loads(open('jsonfile/station.json', 'r').\

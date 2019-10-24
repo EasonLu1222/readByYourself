@@ -344,6 +344,10 @@ class Task(QThread):
     def behaviors(self):
         return self.base['behaviors']
 
+    @property
+    def appearance(self):
+        return self.base['appearance']
+
     def header_dut(self, dut_names=None):
         if dut_names:
             return dut_names

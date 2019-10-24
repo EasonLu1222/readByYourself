@@ -121,8 +121,8 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
 
 
 def generate_jsonfile():
-    source_json = 'v12_rf_base'
-    target_json = os.path.join('jsonfile', 'v12_rf.json')
+    source_json = 'v13_rf_base'
+    target_json = os.path.join('jsonfile', 'v13_rf.json')
     from core import Task
     each = lambda item: {
         "group": "RF",

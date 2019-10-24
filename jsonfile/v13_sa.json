@@ -1,21 +1,29 @@
-{"header": 
+{"header":
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
- "version": "11.0",
+ "version": "13.0",
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 2,
-        "sn": ["12341111A", "12342222A"]
+        "num": 1,
+        "sn": ["A43QHNAMA"]
     }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4],
+     "columns_width": [1, 1, 1, 1, 1, 200, 400, 90, 90, 90, 90, 280]
  },
  "behaviors": {
      "barcode-scan": false,
+     "firsts": [],
      "actions": [
          {
             "action": "disable_power_check",
             "args": ["win"]
          }
-
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win.comports", "task.serial_ok"]
+         }
      ],
      "prepares": [],
      "afters": []
@@ -23,13 +31,26 @@
  "test_items":
     [
         {
-            "group": "Cap Touch FW Download",
+            "group": "Read ProductID",
             "hidden": false,
             "tasktype": 1,
             "item": "",
             "script": "task_runeach",
-            "args": ["msp430_download"],
-            "auto": true,
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "LED Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "",
+            "script": "task_led",
+            "args": null,
+            "auto": false,
             "min": null,
             "expect": null,
             "max": null,
@@ -78,7 +99,7 @@
             "group": "Mic Test3",
             "hidden": false,
             "tasktype": 4,
-            "item": "pull the recorded tone to computer",
+            "item": "pull the record tone to computer",
             "script": "task_mic",
             "args": ["pull_recorded_sound"],
             "auto": true,
@@ -100,7 +121,45 @@
             "max": null,
             "unit": null
         }
+        ,{
+            "group": "Write Wifi Mac",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write mac_wifi",
+            "script": "task_runeach",
+            "args": ["write_mac_wifi"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool"
+        }
+        ,{
+            "group": "Write BT Mac",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write mac_bt",
+            "script": "task_runeach",
+            "args": ["write_mac_bt"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool"
+        }
+        ,{
+            "group": "Write Country Code",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write country_code",
+            "script": "task_runeach",
+            "args": ["write_country_code"],
+            "auto": true,
+
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool"
+        }
     ]
 }
-
-

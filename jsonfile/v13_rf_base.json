@@ -1,0 +1,50 @@
+{"header": 
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "version": "13.0",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 3,
+        "sn": ["AI069IAVA", "00000000A", "ABCD1234A"]
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10],
+     "columns_width": [1, 1, 1, 1, 1, 80, 520, 1, 1, 1, 1, 230, 230, 230]
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [
+     ],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         }
+     ],
+     "prepares": [
+         {
+             "prepare": "prepare_for_testflow_files",
+             "args": ["win"]
+         }
+     ],
+     "afters": [
+     ]
+ },
+ "test_items":  
+     [
+        {
+            "group": "RF",
+            "hidden": false,
+            "tasktype": 11,
+            "item": "CONNECT_IQ_TESTER",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+     ]
+}

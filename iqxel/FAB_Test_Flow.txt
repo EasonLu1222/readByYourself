@@ -333,8 +333,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -481,8 +480,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -629,8 +627,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
@@ -777,8 +774,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -925,8 +921,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -1073,8 +1068,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
@@ -1221,8 +1215,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -1369,8 +1362,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -1517,8 +1509,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -1665,8 +1656,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -1813,8 +1803,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -1961,8 +1950,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -2109,8 +2097,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -2257,8 +2244,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -2405,8 +2391,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -2553,8 +2538,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -2701,8 +2685,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -2849,8 +2832,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
@@ -2997,8 +2979,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -3145,8 +3126,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -3293,8 +3273,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
@@ -3441,8 +3420,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -3589,8 +3567,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -3737,8 +3714,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
@@ -3885,8 +3861,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
@@ -4033,8 +4008,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
@@ -4181,8 +4155,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -4329,8 +4302,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -4477,8 +4449,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -4625,8 +4596,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -4773,8 +4743,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -4921,8 +4890,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -5069,8 +5037,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
@@ -5217,8 +5184,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
@@ -5365,8 +5331,7 @@ WIFI_11AC:
 		<SPECTRUM_RAW_DATA_X [ArrayDouble]  = <,>
 		<SPECTRUM_RAW_DATA_Y [ArrayDouble]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_MULTI_VERIFICATION ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
@@ -5553,8 +5518,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5594,8 +5558,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5635,8 +5598,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5676,8 +5638,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5717,8 +5678,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5758,8 +5718,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5799,8 +5758,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5840,8 +5798,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5881,8 +5838,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5922,8 +5878,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -5963,8 +5918,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6004,8 +5958,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6045,8 +5998,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6086,8 +6038,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6127,8 +6078,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6168,8 +6118,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6209,8 +6158,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6250,8 +6198,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6291,8 +6238,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6332,8 +6278,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6373,8 +6318,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6414,8 +6358,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6455,8 +6398,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6496,8 +6438,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6537,8 +6478,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6578,8 +6518,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6619,8 +6558,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6660,8 +6598,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6701,8 +6638,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6742,8 +6678,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6783,8 +6718,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6824,8 +6758,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6865,8 +6798,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6906,8 +6838,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6947,8 +6878,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -6988,8 +6918,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7029,8 +6958,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7070,8 +6998,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7111,8 +7038,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7152,8 +7078,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7193,8 +7118,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7234,8 +7158,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7275,8 +7198,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7316,8 +7238,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7357,8 +7278,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7398,8 +7318,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7439,8 +7358,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7480,8 +7398,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7521,8 +7438,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2412 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7562,8 +7478,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7603,8 +7518,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2437 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7644,8 +7558,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7685,8 +7598,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 2472 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7726,8 +7638,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7767,8 +7678,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7808,8 +7718,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7849,8 +7758,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7890,8 +7798,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7931,8 +7838,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -7972,8 +7878,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8013,8 +7918,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8054,8 +7958,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8095,8 +7998,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8136,8 +8038,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8177,8 +8078,7 @@ WIFI_11AC:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
 		<WAVEFORM_NAME [String]  = <,>
-	RX_VERIFY_PER ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_VERIFY_PER
 		#Input Parameters:
 		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5805 
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
@@ -8411,8 +8311,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_BDR
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2441 
@@ -8466,8 +8365,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_BDR
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2480 
@@ -8521,8 +8419,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_EDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2402 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -8572,8 +8469,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_EDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2441 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -8623,8 +8519,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_EDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2480 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -8674,8 +8569,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_LE
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2402 
@@ -8729,8 +8623,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_LE
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2444 
@@ -8784,8 +8677,7 @@ BT:
 		<POWER_PEAK_DBM [Double]  = <,>
 		<TARGET_POWER_DBM [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	TX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	TX_LE
 		#Input Parameters:
 		>ANALYZE_POWER_ONLY [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2480 
@@ -8857,8 +8749,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_BDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2441 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -8876,8 +8767,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_BDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_BDR
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2480 
 		>PACKET_LENGTH [Integer]  = 0 
@@ -8895,8 +8785,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_EDR
 		#Input Parameters:
 		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2402 
@@ -8917,8 +8806,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_EDR
 		#Input Parameters:
 		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2441 
@@ -8939,8 +8827,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_EDR ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_EDR
 		#Input Parameters:
 		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
 		>FREQ_MHZ [Integer]  = 2480 
@@ -8961,8 +8848,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_BITS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_LE
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2402 
 		>CABLE_LOSS_DB [Double]  = 0.00 
@@ -8979,8 +8865,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_PACKETS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_LE
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2441 
 		>CABLE_LOSS_DB [Double]  = 0.00 
@@ -8997,8 +8882,7 @@ BT:
 		<RX_POWER_LEVEL [Double]  = <,>
 		<TOTAL_PACKETS [Double]  = <,>
 		<ERROR_MESSAGE [String]  = <,>
-	RX_LE ALWAYS_SKIP
-		#:run_mode = ALWAYS_SKIP
+	RX_LE
 		#Input Parameters:
 		>FREQ_MHZ [Integer]  = 2480 
 		>CABLE_LOSS_DB [Double]  = 0.00 

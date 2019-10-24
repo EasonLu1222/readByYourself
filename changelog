@@ -1,3 +1,16 @@
+[2019.10.24 - 18:30]
+Jsonfile v13
+
+1. Jsonfile version 13
+	- add appearance attribute to control table appearance for each station
+	- add 10 jsonfiles
+	- delete all v11 jsonfiles
+	- add MyWindow.set_appearance()
+
+2. anti-aliasing FIT logo
+	- add class Label
+
+
 [2019.9.26 - 23:55]
 Generate jsonfile based on testflow file
 
@@ -36,7 +49,7 @@ Jsonfile v12 & winpty trick to recieve iqfact output
 	  which 3 dummy com ports are com11, com87, com5. Three testflow
 	  files at iqxel/ are based on these com ports. For test, please
 	  copy these files into workdir of IQfactRun_Console. That should
-	  be bin1/ bin2/ bin3/ 
+	  be bin1/ bin2/ bin3/
 
 
 
