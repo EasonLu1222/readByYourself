@@ -17,7 +17,7 @@ num_key_list = [
 
 
 class LedColorDialog(QDialog, Ui_LedColorDialog):
-    def __init__(self, parent=None, ser_list=[], dut_num=1):
+    def __init__(self, parent=None, ser_list=[], dut_idx_list=[]):
         super().__init__(parent)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -25,9 +25,9 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setWindowModality(Qt.ApplicationModal)
 
-        self.result_dialog = LedResultMarkerDialog(dut_num=dut_num)
+        self.result_dialog = LedResultMarkerDialog(dut_idx_list=dut_idx_list)
         self.ser_list = ser_list
-        self.dut_num = dut_num  # Number of devices to test
+        self.dut_idx_list = dut_idx_list    # E.g. [0, 1]
         self.color_block_list = []
         self.color_list = [  # Colors to test
             Qt.red,
@@ -37,7 +37,7 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
         ]
         self.color_idx = -1
 
-        for i in range(dut_num):
+        for i in range(len(self.ser_list)):
             self.add_color_block()
 
         self.next_color()
@@ -91,7 +91,7 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
 
 
 class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
-    def __init__(self, parent=None, dut_num=1):
+    def __init__(self, parent=None, dut_idx_list=[]):
         super().__init__(parent)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -101,19 +101,21 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
 
         self.color_pass = QColor("#8BC34A")  # Green
         self.color_fail = QColor("#FF5722")  # Red
-        self.dut_num = dut_num  # Number of devices to test
+        self.color_disabled = QColor('#E0E0E0')  #Grey
+        self.dut_idx_list = dut_idx_list  # Number of devices to test
         self.result_block_list = []
+        self.valid_keys = [num_key_list[i] for i in dut_idx_list]
         self.pass_list = []  # Stores a list of True/False to represent pass/fail of each DUT
         self.result_str = ''   # Json dump of pass/fail list. e.g. "['Pass', 'Fail']"
 
-        for i in range(dut_num):
+        for i in range(2):
             self.add_result_block(i)
 
         self.set_color()
 
     def keyPressEvent(self, event):
         # If number key is pressed
-        if event.key() in num_key_list[:self.dut_num]:
+        if event.key() in self.valid_keys:
             idx = num_key_list.index(event.key())
             self.toggle_pass_fail(self.result_block_list[idx])
         # If return key is pressed
@@ -128,9 +130,9 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
     def closeEvent(self, event):
         pass_fail_str_list = []
         for b in self.pass_list:
-            if b:
+            if b is True:
                 pass_fail_str_list.append('Passed')
-            else:
+            elif b is False:
                 pass_fail_str_list.append('Failed')
         self.result_str = json.dumps(pass_fail_str_list)
         sys.stdout.write(self.result_str)
@@ -141,17 +143,24 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         font.setPointSize(36)
         lb = QLabel()
         lb.setFont(font)
-        lb.setText(str(dut_idx))
+        lb.setText(str(dut_idx+1))
+        lb.setAlignment(Qt.AlignCenter)
         self.result_block_list.append(lb)
         self.horizontalLayout.addWidget(lb)
-        self.pass_list.append(True)
+        if dut_idx in self.dut_idx_list:
+            self.pass_list.append(True)
+        else:
+            self.pass_list.append(None)
 
     def set_color(self):
         """
         Set the color of all result blocks
         """
-        for lb in self.result_block_list:
-            lb.setStyleSheet(f"background-color:{self.color_pass.name()}")
+        for dut_idx, lb in enumerate(self.result_block_list):
+            if dut_idx not in self.dut_idx_list:
+                lb.setStyleSheet(f"background-color:{self.color_disabled.name()}; color:#BDBDBD")
+            else:
+                lb.setStyleSheet(f"background-color:{self.color_pass.name()}")
 
     def toggle_pass_fail(self, result_block):
         """
@@ -172,8 +181,10 @@ if __name__ == "__main__":
     parser.add_argument('-pp', '--portnames', help='serial com port names', type=str)
     parser.add_argument('-ds', '--dutselected', help='selected duts', type=str)
     args = parser.parse_args()
+    dut_idx_list = [int(idx) for idx in args.dutselected.split(',')]
     com_list = args.portnames.split(',') if args.portnames else []
-    # com_list = ['/dev/cu.usbserial-00000000']
+    # dut_idx_list = [0, 1]
+    # com_list = ['/dev/cu.usbserial-A50285BI', '/dev/cu.usbserial-22222222']
 
     app = QApplication(sys.argv)
 
@@ -188,6 +199,6 @@ if __name__ == "__main__":
     for com in com_list:
         s = get_serial(com, 115200, 0)
         serial_list.append(s)
-    d = LedColorDialog(ser_list=serial_list, dut_num=len(com_list))
+    d = LedColorDialog(ser_list=serial_list, dut_idx_list=dut_idx_list)
     d.showMaximized()
     sys.exit(app.exec_())
