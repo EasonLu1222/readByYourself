@@ -8,7 +8,7 @@ from json import JSONDecodeError
 from subprocess import Popen, PIPE
 
 from PyQt5.QtGui import QKeySequence, QCursor
-from PyQt5.QtCore import QThread, pyqtSignal as QSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal as QSignal, Qt, QSettings, QTranslator
 from PyQt5.QtWidgets import QDialog, QApplication, QShortcut
 from serial.serialutil import SerialException
 
@@ -16,6 +16,7 @@ from mylogger import logger
 from serials import get_serial, issue_command
 from ui.cap_touch_dialog import Ui_CapTouchDialog
 from utils import get_env, resource_path, run, set_property
+from config import LANG_LIST
 
 
 class TouchPolling(QThread):
@@ -192,6 +193,14 @@ if __name__ == "__main__":
     # portnames = ['/dev/cu.usbserial-11111111', '/dev/cu.usbserial-22222222']
 
     app = QApplication(sys.argv)
+
+    settings = QSettings('FAB', 'SAP109')
+    settings.lang_index = settings.value('lang_index', 0, int)
+    translator = QTranslator()
+    translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))
+    app.removeTranslator(translator)
+    app.installTranslator(translator)
+
     d = CapTouchDialog(portnames=portnames, dut_idx_list=dut_idx_list)
     d.showMaximized()
     sys.exit(app.exec_())

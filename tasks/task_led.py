@@ -2,12 +2,14 @@ import sys
 import json
 import argparse
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTranslator, QSettings
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel
 from ui.led_color_dialog import Ui_LedColorDialog
 from ui.led_result_marker_dialog import Ui_LedResultMarkerDialog
 from serials import issue_command, get_serial
+from utils import resource_path
+from config import LANG_LIST
 
 num_key_list = [
     Qt.Key_1, Qt.Key_2, Qt.Key_3, Qt.Key_4, Qt.Key_5, Qt.Key_6, Qt.Key_7, Qt.Key_8, Qt.Key_9
@@ -174,6 +176,13 @@ if __name__ == "__main__":
     # com_list = ['/dev/cu.usbserial-00000000']
 
     app = QApplication(sys.argv)
+
+    settings = QSettings('FAB', 'SAP109')
+    settings.lang_index = settings.value('lang_index', 0, int)
+    translator = QTranslator()
+    translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))
+    app.removeTranslator(translator)
+    app.installTranslator(translator)
 
     serial_list = []
     for com in com_list:

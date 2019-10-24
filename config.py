@@ -26,4 +26,11 @@ station_json = {
     'Download': 'v12_download',
 }
 
+LANG_LIST = [
+    'en_US',
+    'zh_TW',
+    'zh_CN',
+    'vi'
+]
+
 CAP_TOUCH_FW = 'msp430Upgrade_V06'

@@ -24,7 +24,7 @@ from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path
 from ui.main import Ui_MainWindow
-from config import station_json
+from config import station_json, LANG_LIST
 
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
@@ -86,12 +86,8 @@ class SerialListener(BaseSerialListener,
 
 
 class MySettings():
-    lang_list = [
-        'en_US',
-        'zh_TW',
-        'zh_CN',
-        'vi'
-    ]
+    lang_list = LANG_LIST
+
     def __init__(self, dut_num):
         self.settings = QSettings('FAB', 'SAP109')
         self.dut_num = dut_num
