@@ -30,6 +30,7 @@ added_files = [
     ('wav/tmp/*', 'wav/tmp'),
     ('translate/*', 'translate'),
     ('instrument/*', 'instrument'),
+    ('firmware/*', 'firmware'),
     ('site-packages/serial/*.py', 'serial'),
     ('site-packages/serial/tools/*.py', 'serial/tools'),
     ('site-packages/PyQt5/*.py', 'PyQt5'),

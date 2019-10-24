@@ -11,57 +11,57 @@
 <context>
     <name>CapTouchDialog</name>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="234"/>
+        <location filename="../ui/cap_touch_dialog.py" line="237"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="235"/>
+        <location filename="../ui/cap_touch_dialog.py" line="238"/>
         <source>DUT2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="247"/>
+        <location filename="../ui/cap_touch_dialog.py" line="250"/>
         <source>Mute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="256"/>
+        <location filename="../ui/cap_touch_dialog.py" line="259"/>
         <source>touchBtn</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="249"/>
+        <location filename="../ui/cap_touch_dialog.py" line="252"/>
         <source>V+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="251"/>
+        <location filename="../ui/cap_touch_dialog.py" line="254"/>
         <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="253"/>
+        <location filename="../ui/cap_touch_dialog.py" line="256"/>
         <source>V-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="255"/>
+        <location filename="../ui/cap_touch_dialog.py" line="258"/>
         <source>BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="246"/>
+        <location filename="../ui/cap_touch_dialog.py" line="249"/>
         <source>DUT1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="257"/>
+        <location filename="../ui/cap_touch_dialog.py" line="260"/>
         <source>PASS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/cap_touch_dialog.py" line="258"/>
+        <location filename="../ui/cap_touch_dialog.py" line="261"/>
         <source>FAIL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -138,7 +138,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="872"/>
+        <location filename="../app.py" line="849"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
@@ -148,12 +148,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="873"/>
+        <location filename="../app.py" line="850"/>
         <source>At least one of the fixture should be checked</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.py" line="871"/>
+        <location filename="../app.py" line="848"/>
         <source>DUT</source>
         <translation type="unfinished"></translation>
     </message>

@@ -8,7 +8,7 @@ from json import JSONDecodeError
 from subprocess import Popen, PIPE
 
 from PyQt5.QtGui import QKeySequence, QCursor
-from PyQt5.QtCore import QThread, pyqtSignal as QSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal as QSignal, Qt, QSettings, QTranslator
 from PyQt5.QtWidgets import QDialog, QApplication, QShortcut
 from serial.serialutil import SerialException
 
@@ -16,6 +16,7 @@ from mylogger import logger
 from serials import get_serial, issue_command
 from ui.cap_touch_dialog import Ui_CapTouchDialog
 from utils import get_env, resource_path, run, set_property
+from config import LANG_LIST
 
 
 class TouchPolling(QThread):
@@ -123,12 +124,14 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
         logger.info('TouchPolling thread terminated!')
-        self.all_color('#FFFFFF')
-        time.sleep(0.1)     # Wait for serial communication finish before closing serial connection
+        time.sleep(0.5)     # Wait for serial communication finish before closing serial connection
         try:
+            logger.info(f"Closing serial port ({self.ser})")
             self.ser.close()
-        except Exception:
-            logger.error("Close serial port failed")
+            logger.info(f"Serial port closed successfully ({self.ser})")
+        except Exception as e:
+            logger.error(f"Failed to close serial port ({self.ser})")
+            logger.error(f"{e}")
 
     def on_touch(self, touched_key_code):
         # When cap touch button is touched, set the corresponding label's background color to yellow
@@ -144,6 +147,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         self.handle_click()
 
     def handle_click(self):
+        self.clear_test()
         if self.next():
             self.start_test()
         else:
@@ -185,9 +189,17 @@ if __name__ == "__main__":
     portnames = args.portnames.split(',')
     dut_idx_list = [int(idx) for idx in args.dutselected.split(',')]
     # dut_idx_list = [0, 1]
-    # portnames = ['/dev/cu.usbserial-11111111', '/dev/cu.usbserial-22222222']
+    # portnames = ['/dev/cu.usbserial-A50285BI', '/dev/cu.usbserial-22222222']
 
     app = QApplication(sys.argv)
+
+    settings = QSettings('FAB', 'SAP109')
+    settings.lang_index = settings.value('lang_index', 0, int)
+    translator = QTranslator()
+    translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))
+    app.removeTranslator(translator)
+    app.installTranslator(translator)
+
     d = CapTouchDialog(portnames=portnames, dut_idx_list=dut_idx_list)
     d.showMaximized()
     sys.exit(app.exec_())
