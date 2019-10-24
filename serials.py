@@ -100,7 +100,8 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
-            if line and printline: print(line)
+            # TODO: Change "logger.debug" to "print" after all stations are stable
+            if line and printline: logger.debug(line)
         except UnicodeDecodeError as ex: # ignore to proceed
             logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
             continue
