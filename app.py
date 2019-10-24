@@ -368,6 +368,36 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.item(i, j).setFont(font)
         self.table_view.item(self.table_view.rowCount()-1, 0).setFont(font)
 
+        self.pushButton.setStyleSheet(
+            '''
+                QPushButton {
+                    font-size:30px;
+                    font-weight: bold;
+                    background-color: #f4f6f6;
+                    border: 1px solid #35495e;
+                    border-radius: 12px;
+                    border-style: outset;
+                }
+                QPushButton:hover {
+                    background-color: #d5d8dc;
+                    border-width: 1px;
+                    border-style: outset;
+                }
+                QPushButton:pressed {
+                    background-color: grey;
+                    border-width: 1px;
+                    border-style: inset;
+                    color: white;
+                }
+                QPushButton:disabled {
+                    background-color: grey;
+                    border-width: 1px;
+                    border-style: inset;
+                    color: #abb2b9;
+                }
+            '''
+        )
+
     def poweron(self, power):
         logger.debug('poweron start')
         if not power.is_open:
