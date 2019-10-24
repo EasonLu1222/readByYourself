@@ -124,11 +124,14 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
             self.touchPollingThread.kill = True
         logger.info('TouchPolling thread terminated!')
         self.all_color('#FFFFFF')
-        time.sleep(0.1)     # Wait for serial communication finish before closing serial connection
+        time.sleep(0.5)     # Wait for serial communication finish before closing serial connection
         try:
+            logger.info(f"Closing serial port ({self.ser})")
             self.ser.close()
-        except Exception:
-            logger.error("Close serial port failed")
+            logger.info(f"Serial port closed successfully ({self.ser})")
+        except Exception as e:
+            logger.error(f"Failed to close serial port ({self.ser})")
+            logger.error(f"{e}")
 
     def on_touch(self, touched_key_code):
         # When cap touch button is touched, set the corresponding label's background color to yellow
@@ -144,6 +147,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         self.handle_click()
 
     def handle_click(self):
+        self.clear_test()
         if self.next():
             self.start_test()
         else:
