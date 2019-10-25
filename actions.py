@@ -10,7 +10,8 @@ def serial_ignore_xff(window, ser_timeout=0.2):
     for i in window.dut_selected:
         port = comports()[i]
         with get_serial(port, 115200, ser_timeout) as ser:
-            issue_command(ser, 'ls')
+            # simulate press enter & ignore all the garbage
+            issue_command(ser, '', False)
     return True
 
 
