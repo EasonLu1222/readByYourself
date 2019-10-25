@@ -87,7 +87,7 @@ class LedColorDialog(QDialog, Ui_LedColorDialog):
             for i in range(1, 5):
                 for j, k in enumerate(['R', 'G', 'B']):
                     cmd = f'echo {rgb[j]} > /sys/class/leds/LED{i}_{k}/brightness'
-                    issue_command(ser, cmd)
+                    issue_command(ser, cmd, False)
 
 
 class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):

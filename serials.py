@@ -103,7 +103,7 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
             # TODO: Change "logger.debug" to "print" after all stations are stable
             if line and printline: logger.debug(line)
         except UnicodeDecodeError as ex: # ignore to proceed
-            logger.debug(f'catch UnicodeDecodeError. ignore it: {ex}')
+            logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
             continue
 
         se.serial_msg.emit([portname, line.strip()])
@@ -188,15 +188,15 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
 
 
 def issue_command(serial, cmd, fetch=True):
-    logger.info('issue_command: write')
     serial.write(f'{cmd}\n'.encode('utf-8'))
     logger.info(f'issue_command: {cmd}')
+    lines = serial.readlines()
     if fetch:
-        lines = serial.readlines()
         lines_encoded = []
         for e in lines:
             try:
                 logger.info(f'line: {e}')
+                logger.handlers[0].flush()
                 line = e.decode('utf-8')
             except UnicodeDecodeError as ex: # ignore to proceed
                 logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')

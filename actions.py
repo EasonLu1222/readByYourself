@@ -1,8 +1,17 @@
 import os
 import re
 from subprocess import Popen, PIPE
-from serials import is_serial_free
+from serials import is_serial_free, get_serial, issue_command
 from utils import resource_path, get_env, python_path, run
+
+
+def serial_ignore_xff(window, ser_timeout=0.2):
+    comports = window.comports
+    for i in window.dut_selected:
+        port = comports()[i]
+        with get_serial(port, 115200, ser_timeout) as ser:
+            issue_command(ser, 'ls')
+    return True
 
 
 def disable_power_check(win):

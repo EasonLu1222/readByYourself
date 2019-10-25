@@ -35,7 +35,7 @@ from iqxel import prepare_for_testflow_files
 
 # for actions
 from actions import (disable_power_check, set_power_simu, dummy_com,
-                     is_serial_ok, set_power, is_adb_ok)
+                     is_serial_ok, set_power, is_adb_ok, serial_ignore_xff)
 from mylogger import logger
 
 

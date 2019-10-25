@@ -1,3 +1,17 @@
+[2019.10.25 - 18:40]
+improve serial error handling
+
+1. handle \xff issue
+	- serial readlines() will have \xff issue when first plugging 
+	  in the uart connector
+	- add actions.serial_ignore_xff() to handle this situation
+	- for station without booting, must add this action
+		- modify v13_cap_touch.json
+		- modify v13_led.json
+
+2. modify issue_command
+	- for fetch=False case, force readlines()
+
 [2019.10.25 - 01:00]
 beautify all
 
