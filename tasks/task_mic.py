@@ -9,7 +9,7 @@ from playsound import playsound
 from subprocess import Popen, PIPE
 
 from mylogger import logger
-from utils import resource_path, get_env
+from utils import resource_path, get_env, run
 
 wav_dir = './wav'
 
@@ -20,9 +20,7 @@ def play_tone():
 
 def pull_recorded_sound():
     cmd = "adb devices -l"
-    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-    output, _ = proc.communicate()
-    decoded_output = output.decode('utf-8').strip()
+    decoded_output = run(cmd, strip=True)
     lines = decoded_output.split('\n')[1:]
     for line in lines:
         # Sample output of "adb devices -l"
@@ -35,8 +33,7 @@ def pull_recorded_sound():
             test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result_{transport_id}")
 
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
-            proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-            proc.communicate()
+            run(cmd)
 
             top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
             test_result = judge_fft_result(top_n_freq_and_amp)
@@ -58,26 +55,30 @@ def analyze_recorded_sound(wav_file_path):
     Returns({int:int,...}):
         A dict that maps frequency to its amplitude
     """
+    rtn = []
     sample_rate, data = wavfile.read(wav_file_path)  # Load the wav data
     channel_data = data.T[1] if len(data.T) == 2 else data.T  # Detect number of channels. data.T is the transposed data
-    normalized_channel_data = [ele / 2 ** 16. for ele in channel_data]  # This is signed 16-bit track, b is now normalized on [-1,1)
-    fft_data = fft(normalized_channel_data)  # Calculate fourier transform (complex numbers list)
-    half_fft_data_len = int(len(fft_data) / 2)  # We only need half of the FFT list (real signal symmetry)
-    data_len = len(data)
-    total_seconds = data_len / sample_rate
+    for channel_data in data.T:
+        normalized_channel_data = [ele / 2 ** 16. for ele in channel_data]  # This is signed 16-bit track, b is now normalized on [-1,1)
+        fft_data = fft(normalized_channel_data)  # Calculate fourier transform (complex numbers list)
+        half_fft_data_len = int(len(fft_data) / 2)  # We only need half of the FFT list (real signal symmetry)
+        data_len = len(data)
+        total_seconds = data_len / sample_rate
 
-    abs_fft = abs(fft_data[:(half_fft_data_len - 1)])
-    peaks, _ = find_peaks(abs_fft, height=10, width=11, distance=200)
-    peak_amplitudes = [int(abs_fft[p]) for p in peaks]
-    peak_freqs = [ceil(p / total_seconds) for p in peaks]
+        abs_fft = abs(fft_data[:(half_fft_data_len - 1)])
+        peaks, _ = find_peaks(abs_fft, height=10, width=11, distance=200)
+        peak_amplitudes = [int(abs_fft[p]) for p in peaks]
+        peak_freqs = [ceil(p / total_seconds) for p in peaks]
 
-    logger.info(f'deleting {wav_file_path}')
+        rtn.append(dict(zip(peak_freqs, peak_amplitudes)))
+
+    logger.info(f'[MicTest] Deleting {wav_file_path}')
     os.remove(wav_file_path)
 
-    return dict(zip(peak_freqs, peak_amplitudes))
+    return rtn
 
 
-def judge_fft_result(freq_and_amp_dict):
+def judge_fft_result(freq_and_amp_dict_list):
     """
     Args:
         freq_and_amp_dict({int: int,...}): A list of frequency and amplitude tuples
@@ -85,18 +86,19 @@ def judge_fft_result(freq_and_amp_dict):
     Returns(str):
         'Passed' or 'Failed'
     """
-    freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
-    logger.info(f'Frequency to amplitude dict: {freq_and_amp_dict}')
-    amp_threshold = [1] * len(freq_list)    # TODO: Have to test on multiple DUTs to adjust the criteria
-    freq_amp_threshold_dict = dict(zip(freq_list, amp_threshold))
     rtn = 'Passed'
+    freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
+    for freq_and_amp_dict in freq_and_amp_dict_list:
+        logger.info(f'Frequency to amplitude dict: {freq_and_amp_dict}')
+        amp_threshold = [1] * len(freq_list)    # TODO: Have to test on multiple DUTs to adjust the criteria
+        freq_amp_threshold_dict = dict(zip(freq_list, amp_threshold))
 
-    for freq in freq_amp_threshold_dict:
-        amp_threshold = freq_amp_threshold_dict[freq]
-        if (freq not in freq_and_amp_dict or
-                amp_threshold > freq_and_amp_dict[freq]):
-            rtn = 'Failed'
-            break
+        for freq in freq_amp_threshold_dict:
+            amp_threshold = freq_amp_threshold_dict[freq]
+            if (freq not in freq_and_amp_dict or
+                    amp_threshold > freq_and_amp_dict[freq]):
+                rtn = 'Failed'
+                break
 
     return rtn
 
@@ -113,9 +115,9 @@ def push_result_to_device(transport_id, test_result_path):
 
     file_path = "/usr/share/"
     cmd = f"adb -t {transport_id} push {test_result_path} {file_path}"
-    proc = Popen(cmd.split(" "), stdout=PIPE, env=get_env(), cwd=resource_path('.'))
-    output, _ = proc.communicate()
+    run(cmd)
 
+    logger.info(f"[MicTest] Removing {test_result_path}")
     os.remove(test_result_path)
 
 
