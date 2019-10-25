@@ -5,7 +5,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 def getlogger():
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     log_dir = 'logs'
     if not os.path.isdir(log_dir):
@@ -20,8 +20,8 @@ def getlogger():
     # create formatter
     formatter = logging.Formatter(
         fmt='[%(asctime)s]'
-        '[%(levelname)s]'
-        '[%(module)s#%(lineno)d]'
+        '[%(levelname)8s]'
+        '[%(module)16s#%(lineno)4d]'
         '%(message)s',
         datefmt='%m-%d %H:%M:%S'
     )

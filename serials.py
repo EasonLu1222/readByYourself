@@ -19,7 +19,7 @@ type_ = lambda ex: f'<{type(ex).__name__}>'
 
 
 def get_serial(port_name, baudrate, timeout):
-    logger.info(f'===get_serial=== {port_name}')
+    logger.info(f'    ===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
                         baudrate=baudrate,
                         bytesize=serial.EIGHTBITS,
@@ -35,7 +35,7 @@ def is_serial_free(port_name):
     try:
         get_serial(port_name, 115200, 1)
     except serial.serialutil.SerialException as ex:
-        logger.error(f'Port {port_name} is not free: {ex}')
+        logger.error(f'    Port {port_name} is not free: {ex}')
         return False
     return True
 
@@ -52,9 +52,9 @@ def get_device(comport):
     except KeyError as ex:
         msg = (f'\n\n{type_(ex)}, {ex}'
                f'not defined in device.json.\n')
-        logger.warning(msg)
+        logger.warning(    msg)
     except Exception as ex:
-        logger.error(f'{type_(ex)}, {ex}')
+        logger.error(f'    {type_(ex)}, {ex}')
     finally:
         if not device: device = ""
     return device
@@ -92,10 +92,10 @@ se = SerialEmit()
 
 
 def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
-    logger.info(f'\n\nwait_for_prompt: {prompt}\n\n')
+    logger.info(f'    wait_for_prompt: {prompt}')
     portname = serial.name
-    logger.info(f'portname: {portname}')
-    logger.info(f'is_open: {serial.isOpen()}')
+    logger.info(f'    portname: {portname}')
+    logger.info(f'    is_open: {serial.isOpen()}')
     while True:
         line = ''
         try:
@@ -103,13 +103,13 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
             # TODO: Change "logger.debug" to "print" after all stations are stable
             if line and printline: logger.debug(line)
         except UnicodeDecodeError as ex: # ignore to proceed
-            logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
+            logger.error(f'    catch UnicodeDecodeError. ignore it: {ex}')
             continue
 
         se.serial_msg.emit([portname, line.strip()])
         #  if line.startswith(prompt):
         if prompt in line:
-            logger.info('get %s' % prompt)
+            logger.info('    get %s' % prompt)
             break
 
 
@@ -189,19 +189,18 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
 
 def issue_command(serial, cmd, fetch=True):
     serial.write(f'{cmd}\n'.encode('utf-8'))
-    logger.info(f'issue_command: {cmd}')
+    logger.info(f'    issue_command: {cmd}')
     lines = serial.readlines()
     if fetch:
         lines_encoded = []
         for e in lines:
             try:
-                logger.info(f'line: {e}')
-                logger.handlers[0].flush()
+                logger.info(f'    line: {e}')
                 line = e.decode('utf-8')
             except UnicodeDecodeError as ex: # ignore to proceed
-                logger.error(f'catch UnicodeDecodeError. ignore it: {ex}')
+                logger.error(f'    catch UnicodeDecodeError. ignore it: {ex}')
             except Exception as ex:
-                logger.error(f'{type_(ex)}:{ex}')
+                logger.error(f'    {type_(ex)}:{ex}')
             else:
                 #  logger.info(f'{line.rstrip()}')
                 lines_encoded.append(line)
@@ -279,13 +278,11 @@ class BaseSerialListener(QThread):
                 self.if_all_ready.emit(False)
 
     def stop(self):
-        logger.info('BaseSerialListener stop start')
         # wait 1s for list_ports to finish, is it enough or too long in order
         # not to occupy com port for subsequent test scripts
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
-        logger.info('BaseSerialListener stop end')
 
 
 if __name__ == "__main__":

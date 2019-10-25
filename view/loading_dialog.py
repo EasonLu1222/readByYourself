@@ -8,7 +8,6 @@ from utils import resource_path
 class LoadingDialog(QDialog, Ui_LoadingDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        print('LoadingDialog init')
         self.setupUi(self)
 
         self.setWindowFlags(Qt.FramelessWindowHint)

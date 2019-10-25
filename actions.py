@@ -4,6 +4,8 @@ from subprocess import Popen, PIPE
 from serials import is_serial_free, get_serial, issue_command
 from utils import resource_path, get_env, python_path, run
 
+from mylogger import logger
+
 
 def serial_ignore_xff(window, ser_timeout=0.2):
     comports = window.comports
@@ -21,15 +23,12 @@ def disable_power_check(win):
 
 
 def is_serial_ok(comports, signal_from):
-    print('is_serial_ok start')
-    print('comports', comports)
-    print('signal_from', signal_from)
     if not all(is_serial_free(p) for p in comports()):
-        print('not all serial port are free!')
+        logger.debug('    not all serial port are free!')
         signal_from.emit(False)
         return False
     else:
-        print('all serial port are free!')
+        logger.debug('    all serial port are free!')
         signal_from.emit(True)
         return True
 

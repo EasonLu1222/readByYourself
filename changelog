@@ -1,3 +1,17 @@
+[2019.10.26 - 01:10]
+Make logger more readable
+
+1. set logger default level to debug
+
+2. add alignment for each logging item
+
+3. add indent for differnt modules
+	- app.py: 0 indent
+	- core.py: 2 indent
+	- else: 4 indent (To Be Added)
+
+4. remove some logs
+
 [2019.10.25 - 23:50]
 Serial error handling with description
 

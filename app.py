@@ -551,21 +551,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         logger.debug('visa_instrument_ready start')
         if ready:
             self.visa_ready = True
-            logger.debug('\nVISA READY\n')
+            logger.debug('VISA READY')
         else:
             self.visa_ready = False
             self.pushButton.setEnabled(False)
-            logger.debug('\nVISA NOT READY\n')
+            logger.debug('VISA NOT READY')
 
         if self.serial_ready and self.visa_ready:
-            logger.debug('\n===READY===')
+            logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.prepare()
 
     def instrument_ready(self, ready):
         logger.debug('instrument_ready start')
         if ready:
-            logger.debug('\nSERIAL READY\n!')
+            logger.debug('SERIAL READY!')
             self.serial_ready = True
             self.clean_power()
 
@@ -577,14 +577,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     pickle.dump(instruments_to_dump, f)
         else:
             self.serial_ready = False
-            logger.debug('\nSERIAL NOT READY\n!')
+            logger.debug('SERIAL NOT READY!')
 
         if self.serial_ready and self.visa_ready:
-            logger.debug('\n===READY===')
+            logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.prepare()
         else:
-            logger.debug('\n===NOT READY===')
+            logger.debug('===NOT READY===')
             self.pushButton.setEnabled(False)
 
     def comports(self):
@@ -740,10 +740,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             dut_num = self.task.dut_num
 
-            logger.debug('\n\n')
-            logger.debug(d)
-            logger.debug(d.columns)
-            logger.debug(d.columns[-dut_num])
+            print(d)
+            print(d.columns)
+            print(d.columns[-dut_num])
 
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
@@ -795,7 +794,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         logger.debug('show_barcode_dialog end')
 
     def btn_clicked(self):
-        logger.debug('btn_clicked')
+        logger.debug('\n');logger.debug('btn_clicked')
         self.barcodes = []
         for dut_i, port in self._comports_dut.items():
             if port:

@@ -12,7 +12,6 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        print('BarcodeDialog init')
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
@@ -49,7 +48,6 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
 
     def show_start_test_dialog(self):
         infoBox = QMessageBox()  ##Message Box that doesn't run
-        print("Im here")
         infoBox.setIcon(QMessageBox.Information)
         infoBox.setText("将待测物放回治具后，按回车键开始测试")
         infoBox.exec_()

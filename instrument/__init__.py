@@ -543,7 +543,6 @@ def open_all(update_ser=False, if_open_com=False, if_poweron=False):
 
 
 def generate_instruments(task_devices, instrument_map):
-    print('\n\ngenerate_instruments ->', task_devices)
     instruments = defaultdict(list)
     for dev, dev_info in task_devices.items():
         name, num = dev_info['name'], dev_info['num']

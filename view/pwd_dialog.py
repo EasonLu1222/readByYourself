@@ -7,7 +7,6 @@ class PwdDialog(QDialog, Ui_PwdDialog):
     dialog_close = pyqtSignal(bool)
     def __init__(self, parent=None):
         super().__init__(parent)
-        print('PwdDialog init')
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
