@@ -1,3 +1,14 @@
+[2019.10.26 - 14:05]
+Error handling for serial issues
+
+1. is_serial_ok: print out every failed com port
+	- modify actions.is_serial_ok()
+
+2. modify core.Task.run()
+	- add QThread.msleep(1000) before running actions
+	- add self.window.ser_listener.start() if actions failed
+
+
 [2019.10.26 - 09:20]
 Make logger more readable
 

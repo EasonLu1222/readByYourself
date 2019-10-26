@@ -23,14 +23,18 @@ def disable_power_check(win):
 
 
 def is_serial_ok(comports, signal_from):
-    if not all(is_serial_free(p) for p in comports()):
-        logger.debug('    not all serial port are free!')
+    ports_not_free = []
+    for p in comports():
+        if not is_serial_free(p):
+            logger.debug(f'    serial port {p} are not free!')
+            ports_not_free.append(p)
+    if len(ports_not_free)>0:
         signal_from.emit(False)
         return False
     else:
         logger.debug('    all serial port are free!')
         signal_from.emit(True)
-        return True
+    return True
 
 
 def is_adb_ok(dut_selected, signal_from):

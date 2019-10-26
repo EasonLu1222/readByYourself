@@ -594,8 +594,9 @@ class Task(QThread):
     def run(self):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
-        t0 = time_()
 
+        QThread.msleep(1000)
+        t0 = time_()
         for action, args in self.action_args:
             aname = action.__name__
             logger.debug(f'  run action {aname}')
@@ -603,6 +604,7 @@ class Task(QThread):
                 logger.debug(f'  {aname} is False --> return')
                 self.window.show_animation_dialog.emit(False)
                 self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
+                self.window.ser_listener.start()
                 return
 
         QThread.msleep(500)

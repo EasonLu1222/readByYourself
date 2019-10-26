@@ -7,6 +7,7 @@ import serial
 from serial.tools.list_ports import comports
 import pandas as pd
 from PyQt5.QtCore import pyqtSignal as QSignal, QObject, QThread
+from serial import SerialException
 from threading import Thread
 import argparse
 from queue import Queue
@@ -33,11 +34,11 @@ def get_serial(port_name, baudrate, timeout):
 
 def is_serial_free(port_name):
     try:
-        get_serial(port_name, 115200, 1)
-    except serial.serialutil.SerialException as ex:
-        logger.error(f'    Port {port_name} is not free: {ex}')
+        serial.Serial(port_name, 115200, timeout=0.2)
+    except SerialException as ex:
         return False
-    return True
+    else:
+        return True
 
 
 def get_device(comport):
@@ -283,6 +284,7 @@ class BaseSerialListener(QThread):
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
+        logger.debug('    BaseSerialListener stopped')
 
 
 if __name__ == "__main__":
