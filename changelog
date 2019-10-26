@@ -1,3 +1,11 @@
+[2019.10.26 - 14:30]
+Make logger more readable
+
+1. files modified 
+	- instrument.__init__
+	- iqxel.__init__
+	- soundcheck
+
 [2019.10.26 - 14:05]
 Error handling for serial issues
 

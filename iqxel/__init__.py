@@ -77,7 +77,7 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
         matched3 = re.search(pattern3, line)
         if matched:
             if not processing_item:
-                logger.debug('pattern1 found [case1]')
+                logger.debug('    pattern1 found [case1]')
                 processing_item = True
                 task.task_each.emit([index, 1])
                 index += 1
@@ -102,13 +102,13 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
                 items_lines = []
 
                 if matched2:
-                    logger.debug('pattern2 found')
+                    logger.debug('    pattern2 found')
                     # change pattern
                     if item_idx < len(items):
                         pattern1 = '[\d]{1,4}\.%s' % items[item_idx]
                         logger.debug(f'    change pattern1!!!!! {pattern1}')
                     if re.search(pattern1, line):
-                        logger.debug('pattern1 found [case2]')
+                        logger.debug('    pattern1 found [case2]')
                         processing_item = True
                         task.task_each.emit([index, 1])
                         index += 1
@@ -116,10 +116,10 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
                 elif matched3:
                     pattern1 = 'DO NOT FIND ANY PATTERN'
                     logger.debug(f'    change pattern1!!!!! {pattern1}')
-                    logger.debug('pattern3 found')
+                    logger.debug('    pattern3 found')
             else:
                 items_lines.append(line)
-    logger.debug('run_iqfactrun_console end')
+    logger.debug('    run_iqfactrun_console end')
 
 
 def generate_jsonfile():

@@ -219,7 +219,7 @@ def cmd_volts(channels):
     cmds = cmds[:idx2 + 1] + into2 + cmds[idx2 + 1:]
     cmds[cmds.index('ROUT:COUN 1')] = f'ROUT:COUN {len(channels)}'
     for e in cmds:
-        logger.info(e)
+        logger.info(f'  {e}')
     return cmds
 
 
@@ -244,8 +244,8 @@ def get_ordered_comports_by_gw_idn(comports, sn_numbers):
 
 
 def update_serial(instruments, inst_type, comports):
-    logger.info('update_serial start')
-    logger.info(f'inst_type: {inst_type}')
+    logger.info('    update_serial start')
+    logger.info(f'    inst_type: {inst_type}')
     inst = instruments[inst_type]
     for i, e in enumerate(inst):
         e.com = None
@@ -254,16 +254,14 @@ def update_serial(instruments, inst_type, comports):
         sn = [e.sn for e in inst]
         comports = get_ordered_comports_by_gw_idn(comports, sn)
 
-    logger.info(instruments)
-
     for i, com in enumerate(comports):
         inst[i].com = com
 
     for name, items in instruments.items():
-        logger.info('  name: %s', name)
+        logger.info('    name: %s', name)
         for i, e in enumerate(items):
             logger.info('    e: %s, com=%s', e, e.com)
-    logger.info('update_serial end\n')
+    logger.info('    update_serial end')
 
 
 class Instrument():
@@ -308,7 +306,7 @@ class VisaInstrument(Instrument):
     def run_cmd(self, items, fetch=False):
         try:
             for cmd in items:
-                logger.info(f'cmd: {cmd}')
+                logger.info(f'    cmd: {cmd}')
                 if '?' in cmd:
                     result = self.dev.query(cmd)
                 else:
@@ -318,8 +316,8 @@ class VisaInstrument(Instrument):
             if fetch:
                 return result
         except Exception as ex:
-            logger.error("run_cmd failed!")
-            logger.error(f'{type_(ex)}, {ex}')
+            logger.error("    run_cmd failed!")
+            logger.error(f'    {type_(ex)}, {ex}')
 
     def read_idn(self):
         idn = self.run_cmd(['*IDN?'], True)
@@ -376,14 +374,14 @@ class SerialInstrument(Instrument):
         return self.ser.isOpen() if self.ser else False
 
     def open_com(self, baud=115200, timeout=2):
-        logger.info('in SerialInstrument: open_com start')
+        logger.info('    in SerialInstrument: open_com start')
         success = False
         if self.com:
-            logger.info('  get_serial start')
+            logger.info('    get_serial start')
             self.ser = get_serial(self.com, baudrate=baud, timeout=timeout)
-            logger.info('  get_serial end')
+            logger.info('    get_serial end')
             success = True
-        logger.info('in SerialInstrument: open_com end\n')
+        logger.info('    in SerialInstrument: open_com end\n')
         return success
 
     def close_com(self):
@@ -400,8 +398,8 @@ class SerialInstrument(Instrument):
                 result = self.ser.readline().decode('utf8')
                 return result
         except Exception as e:
-            logger.debug("run_cmd failed!")
-            logger.error(f'{type_(ex)}, {ex}')
+            logger.debug("    run_cmd failed!")
+            logger.error(f'    {type_(ex)}, {ex}')
 
     def gw_read_idn(self):
         idn = self.run_cmd(['*IDN?'], True) # ignore first since it's empty (just MacOS)
@@ -416,19 +414,19 @@ class PowerSupply(SerialInstrument):
     MeasureTime = 10
 
     def init(self):
-        logger.info(f'power_{self.index}({self}) init!')
+        logger.info(f'    power_{self.index}({self}) init!')
         self.run_cmd(cmd(POWER_INIT))
 
     def start(self):
-        logger.info(f'power_{self.index}({self}) start!')
+        logger.info(f'    power_{self.index}({self}) start!')
         self.run_cmd(cmd(POWER_START))
 
     def on(self):
-        logger.info(f'power_{self.index}({self}) on!')
+        logger.info(f'    power_{self.index}({self}) on!')
         self.run_cmd(cmd(POWERON))
 
     def off(self):
-        logger.info(f'power_{self.index}({self}) off!')
+        logger.info(f'    power_{self.index}({self}) off!')
         self.run_cmd(cmd(POWEROFF))
 
     def measure_voltage(self):
@@ -483,8 +481,8 @@ class Eloader(SerialInstrument):
             line = self.run_cmd(['MEASure:CURRent:DC?'], True)
             current = float(line)
         except ValueError as ex:
-            logger.error(ex)
-            logger.error(line)
+            logger.error(f'    {ex}')
+            logger.error(f'    {line}')
             return None
         #  line = self.run_cmd(['MEASure:CURRent:DC?'], True)
         #  current = float(line)
@@ -507,7 +505,7 @@ class DMM(SerialInstrument):
 
     def measure_volts(self, channels):
         result = self.run_cmd(cmd_volts(channels), True)
-        logger.info(f'result: {result}')
+        logger.info(f'    result: {result}')
         values = [float(e) for e in result.split(',')]
         return values
 
@@ -518,8 +516,8 @@ class DMM(SerialInstrument):
 
     def measure_freqs_all(self):
         result = self.run_cmd(cmd(MEASURE_FREQ), True)
-        logger.info(f'measure_freqs_all result: {result}')
-        logger.info(f'type: {type(result)}')
+        logger.info(f'    measure_freqs_all result: {result}')
+        logger.info(f'    type: {type(result)}')
         values = [float(e) for e in result.split(',')]
         return values
 

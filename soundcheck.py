@@ -101,7 +101,7 @@ class BSndChk(object):
 
 
 def soundcheck_init(module, sqz_path=None):
-    logger.info('soundcheck_init start')
+    logger.info('    soundcheck_init start')
     b = BSndChk()
     cases = ['all pass', 'all failed', 'one failed']
     case = cases[2]
@@ -113,12 +113,12 @@ def soundcheck_init(module, sqz_path=None):
                                 f"test_{case.replace(' ', '_')}.sqc")
         b.Open_Sequence(sqz_path)
         setattr(module, 'snd_chk', b)
-        logger.info(f'module: {module}')
+        logger.info(f'    module: {module}')
         time.sleep(1)
     except Exception as ex:
-        logger.error(ex)
+        logger.error(f'    {ex}')
         return False
-    logger.info('soundcheck_init end')
+    logger.info('    soundcheck_init end')
     return True
 
 
