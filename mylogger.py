@@ -20,8 +20,9 @@ def getlogger():
     # create formatter
     formatter = logging.Formatter(
         fmt='[%(asctime)s]'
-        '[%(levelname)8s]'
-        '[%(module)16s#%(lineno)4d]'
+        '[%(levelname)5s]'
+        '[%(module)12s]'
+        '[#%(lineno)4d]'
         '%(message)s',
         datefmt='%m-%d %H:%M:%S'
     )
