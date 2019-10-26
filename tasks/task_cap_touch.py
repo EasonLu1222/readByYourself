@@ -118,10 +118,6 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         elif dut_num == 1:
             set_property(self.bc2, "active", True)
 
-    def all_color(self, btn_labels, color_code):
-        for btn_label in btn_labels:
-            btn_label.setStyleSheet(f'background-color: {color_code}')
-
     def clear_test(self):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
