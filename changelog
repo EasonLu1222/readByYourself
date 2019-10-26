@@ -1,3 +1,9 @@
+[2019.10.27 - 00:45]
+Show duts & devices at top and colored when detected
+
+1. modify app.MyWindow.render_port_plot
+
+
 [2019.10.26 - 23:50]
 Change from waitcursor to arrowcursor when starting a new app
 

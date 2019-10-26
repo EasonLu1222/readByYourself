@@ -231,6 +231,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.after_args = list()
         self.showMaximized()
         app.setOverrideCursor(Qt.ArrowCursor)
+        self.render_port_plot()
 
     def set_hbox_visible(self, is_visible):
         for i in range(self.hboxPorts.count()):
@@ -484,11 +485,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clearlayout(e)
             e.addWidget(QLabel(f'#{i}'))
 
+        lb_text = 'DUT'
         for i, port in self._comports_dut.items():
+            lb_port = QLabel(lb_text)
+            lb_port.setStyleSheet(style_('grey'))
+            self.dut_layout[i].addWidget(lb_port)
             if port:
-                lb_port = QLabel(port)
+                lb_port.setText(f'{lb_text}|{port}')
                 lb_port.setStyleSheet(style_('#369'))
-                self.dut_layout[i].addWidget(lb_port)
 
         colors_inst = {
             'gw_powersupply': '#712',
@@ -500,23 +504,26 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for name, items in self.task.instruments.items():
             each_instruments = self.task.instruments[name]
             for i, e in enumerate(each_instruments):
+                lb_text = f'{e.__class__.__name__}'
+                lb_port = QLabel(lb_text)
+                lb_port.setStyleSheet(style_('grey'))
+                self.dut_layout[i].addWidget(lb_port)
 
                 if e.interface=='serial':
                     logger.info(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
                     if e.com in comports_map[name]:
-                        lb_port = QLabel(e.com)
+                        #  lb_port = QLabel(e.com)
+                        lb_port = QLabel(f'{lb_text}|{e.com}')
                         lb_port.setStyleSheet(style_(colors_inst[name]))
-                        self.dut_layout[i].addWidget(lb_port)
+                        #  self.dut_layout[i].addWidget(lb_port)
 
                 elif e.interface=='visa':
                     logger.info(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
                     if comports_map[name]:
-                        lb_port = QLabel(e.com)
+                        #  lb_port = QLabel(e.com)
+                        lb_port = QLabel(f'{lb_text}|{e.com}')
                         lb_port.setStyleSheet(style_(colors_inst[name]))
-                        self.dut_layout[i].addWidget(lb_port)
-
-                #  lb_port.setStyleSheet(style_(colors_inst[name]))
-                #  self.dut_layout[i].addWidget(lb_port)
+                        #  self.dut_layout[i].addWidget(lb_port)
 
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()

@@ -408,6 +408,9 @@ class SerialInstrument(Instrument):
         sn = idn.split(',')[2]
         return sn
 
+    def __repr__(self):
+        return f'<{self.__class__.__name__}({self.index}, {self.sn})>'
+
 
 class PowerSupply(SerialInstrument):
     NAME = 'gw_powersupply'
