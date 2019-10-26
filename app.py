@@ -230,6 +230,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.prepare_args = list()
         self.after_args = list()
         self.showMaximized()
+        app.setOverrideCursor(Qt.ArrowCursor)
 
     def set_hbox_visible(self, is_visible):
         for i in range(self.hboxPorts.count()):
