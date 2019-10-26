@@ -108,7 +108,7 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
 
         se.serial_msg.emit([portname, line.strip()])
         if prompt in line:
-            logger.info('{PADDING}get %s' % prompt)
+            logger.info(f'{PADDING}get %s' % prompt)
             break
 
 
@@ -226,7 +226,7 @@ class BaseSerialListener(QThread):
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
-        logger.debug('{PADDING}BaseSerialListener stopped')
+        logger.debug(f'{PADDING}BaseSerialListener stopped')
 
 
 if __name__ == "__main__":

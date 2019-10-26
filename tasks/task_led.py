@@ -11,6 +11,7 @@ from serials import issue_command, get_serial
 from utils import resource_path
 from config import LANG_LIST
 
+PADDING = ' ' * 8
 num_key_list = [
     Qt.Key_1, Qt.Key_2, Qt.Key_3, Qt.Key_4, Qt.Key_5, Qt.Key_6, Qt.Key_7, Qt.Key_8, Qt.Key_9
 ]

@@ -7,11 +7,11 @@ from scipy.io import wavfile
 from scipy.signal import find_peaks
 from playsound import playsound
 from subprocess import Popen, PIPE
-
 from mylogger import logger
 from utils import resource_path, get_env, run
 
 wav_dir = './wav'
+PADDING = ' ' * 8
 
 
 def play_tone():
@@ -72,7 +72,7 @@ def analyze_recorded_sound(wav_file_path):
 
         rtn.append(dict(zip(peak_freqs, peak_amplitudes)))
 
-    logger.info(f'[MicTest] Deleting {wav_file_path}')
+    logger.info(f'{PADDING}[MicTest] Deleting {wav_file_path}')
     os.remove(wav_file_path)
 
     return rtn
@@ -89,7 +89,7 @@ def judge_fft_result(freq_and_amp_dict_list):
     rtn = 'Passed'
     freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
     for freq_and_amp_dict in freq_and_amp_dict_list:
-        logger.info(f'Frequency to amplitude dict: {freq_and_amp_dict}')
+        logger.info(f'{PADDING}Frequency to amplitude dict: {freq_and_amp_dict}')
         amp_threshold = [1] * len(freq_list)    # TODO: Have to test on multiple DUTs to adjust the criteria
         freq_amp_threshold_dict = dict(zip(freq_list, amp_threshold))
 
@@ -117,7 +117,7 @@ def push_result_to_device(transport_id, test_result_path):
     cmd = f"adb -t {transport_id} push {test_result_path} {file_path}"
     run(cmd)
 
-    logger.info(f"[MicTest] Removing {test_result_path}")
+    logger.info(f'{PADDING}[MicTest] Removing {test_result_path}')
     os.remove(test_result_path)
 
 

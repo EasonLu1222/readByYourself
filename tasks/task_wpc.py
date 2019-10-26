@@ -3,12 +3,13 @@ import json
 import time
 import argparse
 from instrument import PowerSupply, Eloader
-
 from mylogger import logger
+
+PADDING = ' ' * 8
 
 
 if __name__ == "__main__":
-    logger.info('task_wpc start...')
+    logger.info(f'{PADDING}task_wpc start...')
     parser = argparse.ArgumentParser()
     parser.add_argument('channels_limits', help='channel', type=str)
     parser.add_argument('-p', '--ports',
@@ -16,15 +17,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     unpacked = json.loads(args.channels_limits)
-    logger.info(f'unpacked: {unpacked}')
+    logger.info(f'{PADDING}unpacked: {unpacked}')
     channel_group = unpacked['args']
 
     limits = unpacked['limits']['null']
 
     ports = json.loads(args.ports)
-    logger.info(ports)
+    logger.info(f'{PADDING}{ports}')
 
-    logger.info(f'limits: {limits}')
+    logger.info(f'{PADDING}limits: {limits}')
 
     p = PowerSupply(1, ports['gw_powersupply'][0])
     e = Eloader(1, ports['gw_eloader'][0])
@@ -35,8 +36,8 @@ if __name__ == "__main__":
     p.start()
     e.start()
 
-    logger.info(f'power idn: {p.gw_read_idn()}')
-    logger.info(f'eloader idn: {e.gw_read_idn()}')
+    logger.info(f'{PADDING}power idn: {p.gw_read_idn()}')
+    logger.info(f'{PADDING}eloader idn: {e.gw_read_idn()}')
 
     i_in_list = []
 
@@ -46,7 +47,7 @@ if __name__ == "__main__":
             return i_in - i_in_list[-1] < i_in_tol
         return False
 
-    logger.info('measure loop start')
+    logger.info(f'{PADDING}measure loop start')
     while True:
         time.sleep(0.2)
         i_out = e.measure_current()
@@ -57,8 +58,8 @@ if __name__ == "__main__":
         v_out = e.measure_voltage()
         i_in_list.append(i_in)
         if is_stable(i_in, i_in_list): break
-    logger.info('measure loop end')
-    logger.info(i_in_list)
+    logger.info(f'{PADDING}measure loop end')
+    logger.info(f'{PADDING}{i_in_list}')
 
     p.off()
     e.stop()
@@ -67,13 +68,12 @@ if __name__ == "__main__":
     p_out = v_out * i_out
     efficiency = p_out / p_in
 
-    logger.info('\n\n')
-    logger.info(f'v_in {v_in}')
-    logger.info(f'i_in {i_in}')
-    logger.info(f'v_out {v_out}')
-    logger.info(f'i_out {i_out}')
-    logger.info(f'p_in {p_in}')
-    logger.info(f'p_out {p_out}')
+    logger.info(f'{PADDING}v_in {v_in}')
+    logger.info(f'{PADDING}i_in {i_in}')
+    logger.info(f'{PADDING}v_out {v_out}')
+    logger.info(f'{PADDING}i_out {i_out}')
+    logger.info(f'{PADDING}p_in {p_in}')
+    logger.info(f'{PADDING}p_out {p_out}')
 
     ifpass = efficiency > limits[0]
     result = [[f'Pass({efficiency})' if ifpass else f'Fail({efficiency})']]

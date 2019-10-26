@@ -2,19 +2,20 @@ import sys
 import json
 import argparse
 import pickle
-
 from mylogger import logger
 from utils import resource_path
 
+PADDING = ' ' * 8
+
 
 if __name__ == "__main__":
-    logger.info('poweron start...')
+    logger.info(f'{PADDING}poweron start...')
     parser = argparse.ArgumentParser()
     parser.add_argument('power_index', help='power_index', type=int)
     args = parser.parse_args()
     power_index = args.power_index
 
-    logger.info(f'power_index: {power_index}')
+    logger.info(f'{PADDING}power_index: {power_index}')
 
     with open(resource_path('instruments'), 'rb') as f:
         #  _, power1, power2 = pickle.load(f)
@@ -22,12 +23,12 @@ if __name__ == "__main__":
 
     power = [power1, power2][power_index - 1]
     if not power.is_open:
-        logger.info(f'open power{power_index}!')
+        logger.info(f'{PADDING}open power{power_index}!')
         power.open_com()
         power.on()
         power.measure_current()
 
     result = power.max_current
 
-    logger.info(f'result: {result}')
+    logger.info(f'{PADDING}result: {result}')
     sys.stdout.write(str(result))

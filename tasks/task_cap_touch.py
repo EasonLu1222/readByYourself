@@ -18,6 +18,8 @@ from ui.cap_touch_dialog import Ui_CapTouchDialog
 from utils import get_env, resource_path, run, set_property
 from config import LANG_LIST
 
+PADDING = ' ' * 8
+
 
 class TouchPolling(QThread):
     '''
@@ -38,7 +40,7 @@ class TouchPolling(QThread):
             try:
                 lines = issue_command(self.ser, cmd)
             except (AttributeError, OSError, TypeError, JSONDecodeError, SerialException):
-                logger.info('TouchPolling thread terminated!')
+                logger.info(f'{PADDING}TouchPolling thread terminated!')
                 self.kill = True
                 break
             if len(lines) > 1:
@@ -106,7 +108,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         self.touchPollingThread = TouchPolling(self.ser, self.key_codes)
         self.touchPollingThread.touchSignal.connect(self.on_touch)
         self.touchPollingThread.start()
-        logger.info('cap touch start_test')
+        logger.info(f'{PADDING}cap touch start_test')
 
     def set_focus(self, dut_num=0):
         set_property(self.bc1, "active", False)
@@ -123,15 +125,15 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
     def clear_test(self):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
-        logger.info('TouchPolling thread terminated!')
+        logger.info(f'{PADDING}TouchPolling thread terminated!')
         time.sleep(0.5)     # Wait for serial communication finish before closing serial connection
         try:
-            logger.info(f"Closing serial port ({self.ser})")
+            logger.info(f'{PADDING}Closing serial port ({self.ser})')
             self.ser.close()
             logger.info(f"Serial port closed successfully ({self.ser})")
         except Exception as e:
-            logger.error(f"Failed to close serial port ({self.ser})")
-            logger.error(f"{e}")
+            logger.error(f'{PADDING}Failed to close serial port ({self.ser})')
+            logger.error(f'{PADDING}{e}')
 
     def on_touch(self, touched_key_code):
         # When cap touch button is touched, set the corresponding label's background color to yellow
@@ -169,7 +171,7 @@ def check_fw():
             match = re.search('ls:', outputs)
             if match:
                 # Push the firmware from app to fixture's mainboard
-                logger.info("Cap touch fw doesn't exist, downloading from app to fixture")
+                logger.info(f'{PADDING}Cap touch fw doesn't exist, downloading from app to fixture')
                 fw_file_path = resource_path(f"./firmware/{config.CAP_TOUCH_FW}")
                 cmd = f"adb -t {transport_id} push {fw_file_path} /usr/share"
                 run(cmd)
@@ -178,7 +180,7 @@ def check_fw():
                 cmd = f"adb -t {transport_id} shell chmod 777 /usr/share/{config.CAP_TOUCH_FW}"
                 run(cmd)
             else:
-                logger.info("Cap touch fw exists in fixture")
+                logger.info(f'{PADDING}Cap touch fw exists in fixture')
 
 
 if __name__ == "__main__":
