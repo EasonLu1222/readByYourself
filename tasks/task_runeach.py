@@ -17,7 +17,7 @@ from mylogger import logger
 SERIAL_TIMEOUT = 0.8
 
 
-PADDING = '    '
+PADDING = ' '*8
 
 
 def enter_burn_mode(portname, dut_idx):
