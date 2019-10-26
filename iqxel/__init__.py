@@ -4,10 +4,9 @@ import json
 import shutil
 from subprocess import Popen, PIPE
 from utils import s_, resource_path
-
 from mylogger import logger
 
-
+PADDING = ' ' * 4
 SOURCE_TF = 'FAB_Test_Flow.txt'
 iqfact_v18_workdir = 'C:/LitePoint/IQfact_plus/IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng18_Lock'
 iqfact_v19_workdir = 'C:/LitePoint/IQfact_plus/IQfact+_BRCM_43xx_COM_Golden_3.3.2.Eng19_Lock'
@@ -28,9 +27,9 @@ def iqxel_ver():
 
 
 def run_iqfactrun_console(task, dut_idx, port, groupname):
-    logger.debug('    run_iqfactrun_console start')
+    logger.debug(f'{PADDING}run_iqfactrun_console start')
     eachgroup, script, index, item_len, tasktype, args = task.unpack_group(groupname)
-    logger.debug(f'    [run_iqfactrun_console][{s_(eachgroup)}][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
+    logger.debug(f'{PADDING}[run_iqfactrun_console][{s_(eachgroup)}][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
     workdir = f'C:/LitePoint/IQfact_plus/{iqxel_workdir()}/bin{dut_idx+1}/'
 
     iqxel_dir = os.path.join(os.path.abspath(os.path.curdir), 'iqxel')
@@ -39,13 +38,13 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
     exe = 'IQfactRun_Console.exe'
     #  exe_winpty = os.path.join(iqxel_dir, 'winpty.exe')
     exe_winpty = resource_path('iqxel/winpty.exe')
-    logger.debug('    exe_winpty', exe_winpty)
+    logger.debug(f'{PADDING}exe_winpty', exe_winpty)
     def run():
         # clean log
         try:
             shutil.rmtree(f'{workdir}LOG')
         except OSError as e:
-            logger.error(f'    {e}')
+            logger.error(f'{PADDING}{e}')
         else:
             os.mkdir(f'{workdir}LOG')
 
@@ -71,13 +70,13 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
     pattern3 = '--------------------------------------------------------------------'
     items_lines = []
     for line in run():
-        logger.debug(f'    {line}')
+        logger.debug(f'{PADDING}{line}')
         matched = re.search(pattern1, line)
         matched2 = re.search(pattern2, line)
         matched3 = re.search(pattern3, line)
         if matched:
             if not processing_item:
-                logger.debug('    pattern1 found [case1]')
+                logger.debug(f'{PADDING}pattern1 found [case1]')
                 processing_item = True
                 task.task_each.emit([index, 1])
                 index += 1
@@ -102,24 +101,24 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
                 items_lines = []
 
                 if matched2:
-                    logger.debug('    pattern2 found')
+                    logger.debug(f'{PADDING}pattern2 found')
                     # change pattern
                     if item_idx < len(items):
                         pattern1 = '[\d]{1,4}\.%s' % items[item_idx]
-                        logger.debug(f'    change pattern1!!!!! {pattern1}')
+                        logger.debug(f'{PADDING}change pattern1!!!!! {pattern1}')
                     if re.search(pattern1, line):
-                        logger.debug('    pattern1 found [case2]')
+                        logger.debug(f'{PADDING}pattern1 found [case2]')
                         processing_item = True
                         task.task_each.emit([index, 1])
                         index += 1
                         item_idx += 1
                 elif matched3:
                     pattern1 = 'DO NOT FIND ANY PATTERN'
-                    logger.debug(f'    change pattern1!!!!! {pattern1}')
-                    logger.debug('    pattern3 found')
+                    logger.debug(f'{PADDING}change pattern1!!!!! {pattern1}')
+                    logger.debug(f'{PADDING}pattern3 found')
             else:
                 items_lines.append(line)
-    logger.debug('    run_iqfactrun_console end')
+    logger.debug(f'{PADDING}run_iqfactrun_console end')
 
 
 def generate_jsonfile():
@@ -144,7 +143,7 @@ def generate_jsonfile():
     #  source_tf = resource_path(os.path.join('iqxel', SOURCE_TF))
     source_tf = os.path.join('iqxel', SOURCE_TF)
 
-    logger.debug(f'    source_tf {source_tf}')
+    logger.debug(f'{PADDING}source_tf {source_tf}')
 
     wifi, bt = parse_testflow(source_tf)
     j['test_items'] = [each(item) for item in wifi + bt]

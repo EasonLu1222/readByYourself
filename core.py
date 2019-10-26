@@ -24,7 +24,7 @@ from iqxel import run_iqfactrun_console
 from utils import s_
 
 
-PADDING = '  '
+PADDING = ' ' * 2
 
 
 def enter_prompt_simu():

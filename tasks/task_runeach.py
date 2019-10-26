@@ -11,13 +11,10 @@ import config
 from subprocess import Popen, PIPE
 from serials import issue_command, get_serial, enter_factory_image_prompt
 from utils import resource_path
-
 from mylogger import logger
 
 SERIAL_TIMEOUT = 0.8
-
-
-PADDING = ' '*8
+PADDING = ' ' * 8
 
 
 def enter_burn_mode(portname, dut_idx):

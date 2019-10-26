@@ -11,13 +11,11 @@ from serial import SerialException
 from threading import Thread
 import argparse
 from queue import Queue
-
 from config import DEVICES
 from mylogger import logger
 
-
 type_ = lambda ex: f'<{type(ex).__name__}>'
-PADDING = '    '
+PADDING = ' ' * 4
 
 
 def get_serial(port_name, baudrate, timeout):
