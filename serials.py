@@ -17,10 +17,11 @@ from mylogger import logger
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
+PADDING = '    '
 
 
 def get_serial(port_name, baudrate, timeout):
-    logger.info(f'    ===get_serial=== {port_name}')
+    logger.info(f'{PADDING}===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
                         baudrate=baudrate,
                         bytesize=serial.EIGHTBITS,
@@ -55,7 +56,7 @@ def get_device(comport):
                f'not defined in device.json.\n')
         logger.warning(    msg)
     except Exception as ex:
-        logger.error(f'    {type_(ex)}, {ex}')
+        logger.error(f'{PADDING}{type_(ex)}, {ex}')
     finally:
         if not device: device = ""
     return device
@@ -93,81 +94,24 @@ se = SerialEmit()
 
 
 def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
-    logger.info(f'    wait_for_prompt: {prompt}')
+    logger.info(f'{PADDING}wait_for_prompt: {prompt}')
     portname = serial.name
-    logger.info(f'    portname: {portname}')
-    logger.info(f'    is_open: {serial.isOpen()}')
+    logger.info(f'{PADDING}portname: {portname}')
+    logger.info(f'{PADDING}is_open: {serial.isOpen()}')
     while True:
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
             # TODO: Change "logger.debug" to "print" after all stations are stable
-            if line and printline: logger.debug(line)
+            if line and printline: logger.debug(f'{PADDING}{line}')
         except UnicodeDecodeError as ex: # ignore to proceed
-            logger.error(f'    catch UnicodeDecodeError. ignore it: {ex}')
+            logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
             continue
 
         se.serial_msg.emit([portname, line.strip()])
-        #  if line.startswith(prompt):
         if prompt in line:
-            logger.info('    get %s' % prompt)
+            logger.info('{PADDING}get %s' % prompt)
             break
-
-
-class WaitPromptThread(Thread):
-    def __init__(self, serial, prompt, q=None):
-        super(WaitPromptThread, self).__init__()
-        self.ser = serial
-        self.prompt = prompt
-        self.q = q
-        self.kill = False
-
-    def run(self):
-        logger.info(f'\n\nwait_for_prompt: {self.prompt}\n\n')
-        portname = self.ser.name
-        logger.info(f'portname: {portname}')
-        logger.info(f'is_open: {self.ser.isOpen()}')
-        while not self.kill:
-            line = ''
-            try:
-                x1 = self.ser.readline()
-                x2 = x1.decode('utf-8')
-                line = x2.rstrip('\n')
-                if line: logger.info(line)
-            except UnicodeDecodeError as ex: # ignore to proceed
-                logger.debug(f'x1: {x1}')
-                continue
-
-            if line.startswith(self.prompt):
-                logger.info('get %s' % self.prompt)
-                if self.q:
-                    self.q.put(portname)
-                self.ser.close()
-                break
-        logger.info('end of WaitPromptThread')
-
-
-#  def check_which_port_when_poweron(ports, prompt='U-Boot', qsignal=True):
-def check_which_port_when_poweron(ports, prompt='Starting kernel', qsignal=True):
-    logger.info('check_which_port_when_poweron start')
-    serial_ports = [get_serial(port, 115200, 0.2) for port in ports]
-    q = Queue()
-    threads = {}
-    for port in serial_ports:
-        t = WaitPromptThread(port, prompt, q)
-        threads[port.name] = t
-        t.start()
-    port = q.get()
-    for p in ports:
-        threads[p].kill = True
-    logger.info('port %s', port)
-    if qsignal: se.detect_notice.emit(port)
-
-    logger.info('close each serial start')
-    for sp in serial_ports:
-        sp.close()
-    logger.info('close each serial end')
-    logger.info('check_which_port_when_poweron end')
 
 
 def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printline=True):
@@ -190,18 +134,18 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
 
 def issue_command(serial, cmd, fetch=True):
     serial.write(f'{cmd}\n'.encode('utf-8'))
-    logger.info(f'    issue_command: {cmd}')
+    logger.info(f'{PADDING}issue_command: {cmd}')
     lines = serial.readlines()
     if fetch:
         lines_encoded = []
         for e in lines:
             try:
-                logger.info(f'    line: {e}')
+                logger.info(f'{PADDING}line: {e}')
                 line = e.decode('utf-8')
             except UnicodeDecodeError as ex: # ignore to proceed
-                logger.error(f'    catch UnicodeDecodeError. ignore it: {ex}')
+                logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
             except Exception as ex:
-                logger.error(f'    {type_(ex)}:{ex}')
+                logger.error(f'{PADDING}{type_(ex)}:{ex}')
             else:
                 #  logger.info(f'{line.rstrip()}')
                 lines_encoded.append(line)
@@ -284,7 +228,7 @@ class BaseSerialListener(QThread):
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
-        logger.debug('    BaseSerialListener stopped')
+        logger.debug('{PADDING}BaseSerialListener stopped')
 
 
 if __name__ == "__main__":
@@ -292,6 +236,4 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--ports', help='serial com port names', type=str)
     args = parser.parse_args()
     ports = args.ports.split(',')
-
-    print('ports', ports)
     check_which_port_when_poweron(ports)

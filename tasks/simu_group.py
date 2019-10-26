@@ -8,8 +8,11 @@ from instrument import DMM
 from mylogger import logger
 
 
+PADDING = '    '
+
+
 if __name__ == "__main__":
-    logger.info('simulation group1 start...')
+    logger.info(f'{PADDING}simulation group1 start...')
     parser = argparse.ArgumentParser()
     parser.add_argument('channels', help='channels', type=str)
     parser.add_argument('-pm', '--port_dmm', help='serial com port dmm', type=str)
@@ -17,10 +20,10 @@ if __name__ == "__main__":
 
     channel_group = json.loads(args.channels)
     port_dmm = args.port_dmm
-    logger.info('simulation group1 start. [channel_group: %s]' % channel_group)
+    logger.info(f'{PADDING}simulation group1 start. [channel_group: %s]' % channel_group)
     time.sleep(random.randint(1,4))
 
-    logger.info('simulation group1 end...')
+    logger.info(f'{PADDING}simulation group1 end...')
 
     results = []
     rnd = lambda: random.choice(['Pass']*9+['Fail'])

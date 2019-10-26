@@ -17,41 +17,44 @@ from mylogger import logger
 SERIAL_TIMEOUT = 0.8
 
 
+PADDING = '    '
+
+
 def enter_burn_mode(portname, dut_idx):
-    logger.debug(f'    portname: {portname}, dut_idx: {dut_idx}')
+    logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'update')
-        logger.debug(f'    {lines}')
+        logger.debug(f'{PADDING}{lines}')
         result = f'Pass'
     return result
 
 
 def read_pid(portname, dut_idx):
-    logger.debug(f'  portname: {portname}, dut_idx: {dut_idx}')
+    logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo usid > /sys/class/unifykeys/name',
         ]
         for cmd in cmds:
-            logger.debug(f'  cmd: {cmd}')
+            logger.debug(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
-        logger.debug(f'    {lines}')
+        logger.debug(f'{PADDING}{lines}')
         response = lines[-1]
-        logger.debug(f'    response: {response}')
+        logger.debug(f'{PADDING}response: {response}')
         if response == '/ # ':
             result = 'Fail(no pid found)'
         else:
             pid = response[:4]
-            logger.debug(f'    pid: {pid}')
+            logger.debug(f'{PADDING}pid: {pid}')
             result = f'Pass({pid})'
     return result
 
 
 def write_usid(dynamic_info):
     sid = dynamic_info
-    logger.info('    write usid')
+    logger.info(f'{PADDING}write usid')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -59,7 +62,7 @@ def write_usid(dynamic_info):
             f'echo {sid} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -70,7 +73,7 @@ def write_usid(dynamic_info):
 
 def write_mac_wifi(dynamic_info):
     mac_wifi_addr = dynamic_info
-    logger.info('    write mac_wifi')
+    logger.info(f'{PADDING}write mac_wifi')
     with get_serial(portname, 115200, timeout=3) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -78,7 +81,7 @@ def write_mac_wifi(dynamic_info):
             f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -89,7 +92,7 @@ def write_mac_wifi(dynamic_info):
 
 def write_mac_bt(dynamic_info):
     mac_bt_addr = dynamic_info
-    logger.info('    write mac_bt')
+    logger.info(f'{PADDING}mac_bt')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -97,7 +100,7 @@ def write_mac_bt(dynamic_info):
             f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -108,7 +111,7 @@ def write_mac_bt(dynamic_info):
 
 def write_country_code(dynamic_info):
     ccode = dynamic_info
-    logger.info('    write country_code')
+    logger.info(f'{PADDING}write country_code')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -116,7 +119,7 @@ def write_country_code(dynamic_info):
             f'echo {ccode} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -127,7 +130,7 @@ def write_country_code(dynamic_info):
 
 def write_mac_wifi(dynamic_info):
     mac_wifi_addr = dynamic_info
-    logger.info('    write mac_wifi')
+    logger.info(f'{PADDING}write mac_wifi')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -135,7 +138,7 @@ def write_mac_wifi(dynamic_info):
             f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -146,7 +149,7 @@ def write_mac_wifi(dynamic_info):
 
 def write_mac_bt(dynamic_info):
     mac_bt_addr = dynamic_info
-    logger.info('    write mac_bt')
+    logger.info(f'{PADDING}write mac_bt')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -154,7 +157,7 @@ def write_mac_bt(dynamic_info):
             f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -165,7 +168,7 @@ def write_mac_bt(dynamic_info):
 
 def write_country_code(dynamic_info):
     ccode = dynamic_info
-    logger.info('    write country_code')
+    logger.info(f'{PADDING}write country_code')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
@@ -173,7 +176,7 @@ def write_country_code(dynamic_info):
             f'echo {ccode} > /sys/class/unifykeys/write',
         ]
         for cmd in cmds:
-            logger.info(f'    cmd: {cmd}')
+            logger.info(f'{PADDING}cmd: {cmd}')
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
@@ -190,7 +193,7 @@ def record_sound(portname):
         # Start recording
         cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d {wav_duration+1} {wav_file_path}'
 
-        logger.info(f"    [MicTest]Recording sound and save to {wav_file_path}")
+        logger.info(f'{PADDING}[MicTest]Recording sound and save to {wav_file_path}')
         lines = issue_command(ser, cmd)
         # TODO: Check if WAV file exists
         time.sleep(wav_duration + 2)
@@ -202,20 +205,19 @@ def get_mic_test_result(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         test_result_path = '/usr/share/mic_test_result*'
         wav_file_path = '/usr/share/recorded_sound.wav'
-        logger.info(
-            f"    [MicTest] Fetching mic test result from {test_result_path}")
+        logger.info(f'{PADDING}[MicTest] Fetching mic test result from {test_result_path}')
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
         result = f'Passed' if any(re.match('Passed', e)
                                   for e in lines) else 'Failed'
 
         # Delete test result
-        logger.info(f"    [MicTest] Deleting {test_result_path}")
+        logger.info(f'{PADDING}[MicTest] Deleting {test_result_path}')
         cmd = f'rm {test_result_path}'
         lines = issue_command(ser, cmd)
 
         # Remove previously recorded file
-        logger.info(f"    [MicTest] Deleting {wav_file_path}")
+        logger.info(f'{PADDING}[MicTest] Deleting {wav_file_path}')
         cmd = f'rm {wav_file_path}'
         lines = issue_command(ser, cmd)
 
@@ -241,17 +243,17 @@ def unload_led_driver(portname):
 
 
 def speaker_play_1kz(portname):
-    logger.info('    play_1khz start')
+    logger.info(f'{PADDING}play_1khz start')
     wav_file = '/usr/share/2ch_1khz-16b-120s.wav'
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, f'aplay {wav_file}', fetch=True)
         for e in lines:
-            logger.info(f'    {e}')
+            logger.info(f'{PADDING}{e}')
         return None
 
 
 def speaker_close_1kz(portname):
-    logger.info('    play_1khz end')
+    logger.info(f'{PADDING}play_1khz end')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, '\x03', fetch=False)
         return None
@@ -262,7 +264,7 @@ def check_wifi_if(portname):
         lines = issue_command(ser, 'ifconfig -a')
         result = 'Passed' if any(re.match('wlan[\d]+', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    check_wifi_if: {result}')
+        logger.info(f'{PADDING}check_wifi_if: {result}')
         return result
 
 
@@ -273,7 +275,7 @@ def check_bt(portname):
         result = 'Passed' if any(re.search('UP RUNNING', e)
                                  for e in lines) else 'Failed'
         lines = issue_command(ser, 'hciconfig hci0 down')
-        logger.info(f'    has BT: {result}')
+        logger.info(f'{PADDING}has BT: {result}')
         return result
 
 
@@ -282,7 +284,7 @@ def check_cpu_cores(portname):
         lines = issue_command(ser, 'cat /proc/cpuinfo |grep processor|wc -l')
         result = 'Passed' if any(re.match('4\r\n', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    Check CPU Cores: {result}')
+        logger.info(f'{PADDING}Check CPU Cores: {result}')
         return result
 
 
@@ -292,7 +294,7 @@ def check_cpu_freq(portname):
             ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
         result = 'Passed' if any(re.match('[\d]+', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    Check CPU Freq: {result}')
+        logger.info(f'{PADDING}Check CPU Freq: {result}')
         return result
 
 
@@ -301,7 +303,7 @@ def check_ddr_size(portname):
         lines = issue_command(ser, 'grep MemTotal /proc/meminfo')
         result = 'Passed' if any(
             re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else 'Failed'
-        logger.info(f'    DDR Size: {result}')
+        logger.info(f'{PADDING}DDR Size: {result}')
         return result
 
 
@@ -311,7 +313,7 @@ def check_i2c_tas5766(portname):
                               'cat /sys/class/i2c-adapter/i2c-0/0-004e/name')
         result = 'Passed' if any(re.match('tas5766m', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    has tas5766m: {result}')
+        logger.info(f'{PADDING}has tas5766m: {result}')
         return result
 
 
@@ -321,7 +323,7 @@ def check_i2c_msp430(portname):
                               'cat /sys/class/i2c-adapter/i2c-1/1-001f/name')
         result = 'Passed' if any(re.match('msp430', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    has msp430: {result}')
+        logger.info(f'{PADDING}has msp430: {result}')
         return result
 
 
@@ -331,7 +333,7 @@ def check_i2c_lp5018(portname):
                               'cat /sys/class/i2c-adapter/i2c-1/1-0028/name')
         result = 'Passed' if any(re.match('lp5018', e)
                                  for e in lines) else 'Failed'
-        logger.info(f'    has lp5018: {result}')
+        logger.info(f'{PADDING}has lp5018: {result}')
         return result
 
 
@@ -341,7 +343,7 @@ def hciup(portname):
         lines = issue_command(ser, 'hciconfig')
         result = 'Pass' if any(re.search('UP RUNNING', e)
                                for e in lines) else 'Fail'
-        logger.info(f'    hciup succeed: {result}')
+        logger.info(f'{PADDING}hciup succeed: {result}')
         return result
 
 
@@ -352,20 +354,20 @@ def check_max_current(dut_idx):
             content = f.read()
             return False if content else True
 
-    logger.info(f'    check_max_current start')
+    logger.info(f'{PADDING}check_max_current start')
     power_results_path = resource_path('power_results')
     while True:
         if os.path.isfile(power_results_path):
-            logger.info('    has power_results')
+            logger.info(f'{PADDING}has power_results')
             if not is_file_empty(power_results_path):
                 with open(power_results_path, 'r') as f:
                     x = json.load(f)
                     break
         else:
-            logger.info('    no power_results')
+            logger.info(f'{PADDING}no power_results')
     result = x[str(dut_idx + 1)]
-    logger.info(f'    result: {result}')
-    logger.info(f'    check_max_current end')
+    logger.info(f'{PADDING}result: {result}')
+    logger.info(f'{PADDING}check_max_current end')
     result = f'Pass({result})'
     return result
 
@@ -376,7 +378,7 @@ def check_something(portname):
 
 
 def open_spdif(portname):
-    logger.info(f'    portname: {portname}')
+    logger.info(f'{PADDING}portname: {portname}')
     result = 'Pass'
     return result
 
@@ -388,7 +390,7 @@ def msp430_download(portname):
         result = 'Passed' if any(
             re.search('Firmware updated without issue', e)
             for e in lines) else 'Failed'
-        logger.info(f'    msp430 fw download: {result}')
+        logger.info(f'{PADDING}msp430 fw download: {result}')
     return result
 
 
@@ -397,7 +399,7 @@ def tx_power_11n_2442mhz_ch1(portname):
         lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-1')
         result = 'Passed' if any(
             re.search('wl pkteng_start', e) for e in lines) else 'Failed'
-        logger.info(f'    TX_POWER_11n_2442MHZ: {result}')
+        logger.info(f'{PADDING}TX_POWER_11n_2442MHZ: {result}')
     return result
 
 
@@ -406,7 +408,7 @@ def tx_power_11n_2442mhz_ch2(portname):
         lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-2')
         result = 'Passed' if any(
             re.search('wl pkteng_start', e) for e in lines) else 'Failed'
-        logger.info(f'    TX_POWER_11n_2442MHZ: {result}')
+        logger.info(f'{PADDING}TX_POWER_11n_2442MHZ: {result}')
     return result
 
 
@@ -415,7 +417,7 @@ def tx_power_11ac_5500mhz_ch1(portname):
         lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-1')
         result = 'Passed' if any(
             re.search('wl pkteng_start', e) for e in lines) else 'Failed'
-        logger.info(f'    TX_POWER_11ac_5500MHZ: {result}')
+        logger.info(f'{PADDING}TX_POWER_11ac_5500MHZ: {result}')
     return result
 
 
@@ -424,7 +426,7 @@ def tx_power_11ac_5500mhz_ch2(portname):
         lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-2')
         result = 'Passed' if any(
             re.search('wl pkteng_start', e) for e in lines) else 'Failed'
-        logger.info(f'    TX_POWER_11ac_5500MHZ: {result}')
+        logger.info(f'{PADDING}TX_POWER_11ac_5500MHZ: {result}')
     return result
 
 
@@ -432,7 +434,7 @@ if __name__ == "__main__":
 
     thismodule = sys.modules[__name__]
 
-    logger.info('    task_runeach start...')
+    logger.info(f'{PADDING}task_runeach start...')
     parser = argparse.ArgumentParser()
     parser.add_argument('-p',
                         '--portname',
@@ -447,20 +449,20 @@ if __name__ == "__main__":
     ]
     funcname = args.funcname
 
-    logger.info(f'    portname: {portname}')
-    logger.info(f'    dut_idx: {dut_idx}')
-    logger.info(f'    dynamic_info: {dynamic_info}')
-    logger.info(f'    args: {args}')
-    logger.info(f'    funcname: {funcname}')
+    logger.info(f'{PADDING}portname: {portname}')
+    logger.info(f'{PADDING}dut_idx: {dut_idx}')
+    logger.info(f'{PADDING}dynamic_info: {dynamic_info}')
+    logger.info(f'{PADDING}args: {args}')
+    logger.info(f'{PADDING}funcname: {funcname}')
 
     func = getattr(thismodule, funcname)
     func_args = [
         getattr(thismodule, arg) for arg in inspect.getfullargspec(func).args
     ]
-    logger.info(f'    func_args: {func_args}')
+    logger.info(f'{PADDING}func_args: {func_args}')
 
     result = func(*func_args)
     if result:
         sys.stdout.write(result)
 
-    logger.info('    task_runeach end...')
+    logger.info(f'{PADDING}task_runeach end...')

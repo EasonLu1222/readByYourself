@@ -24,26 +24,29 @@ from iqxel import run_iqfactrun_console
 from utils import s_
 
 
+PADDING = '  '
+
+
 def enter_prompt_simu():
     def dummy(sec):
         time.sleep(sec)
-    logger.debug('  enter factory image prompt start')
+    logger.debug(f'{PADDING}enter factory image prompt start')
     t0 = time.time()
     t = threading.Thread(target=dummy, args=(1.5, ))
     t.start()
     t.join()
     t1 = time.time()
-    logger.debug('  enter factory image prompt end')
-    logger.debug('  time elapsed entering prompt: %f' % (t1 - t0))
+    logger.debug(f'{PADDING}enter factory image prompt end')
+    logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
     return True
 
 
 def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
-    logger.debug('  enter factory image prompt start')
+    logger.debug(f'{PADDING}enter factory image prompt start')
     t0 = time.time()
     port_ser_thread = {}
     comports = window.comports
-    logger.debug(f'  enter_prompt: comports -  {comports}')
+    logger.debug(f'{PADDING}enter_prompt: comports -  {comports}')
     for i in window.dut_selected:
         port = comports()[i]
         ser = get_serial(port, 115200, ser_timeout)
@@ -53,8 +56,8 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     for port, (ser, th) in port_ser_thread.items():
         th.join()
     t1 = time.time()
-    logger.debug('  enter factory image prompt end')
-    logger.debug('  time elapsed entering prompt: %f' % (t1 - t0))
+    logger.debug(f'{PADDING}enter factory image prompt end')
+    logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
     for port, (ser, th) in port_ser_thread.items():
         ser.close()
     return True
@@ -63,14 +66,14 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
 def check_json_integrity(filename):
     path1 = resource_path(f'jsonfile/{filename}.json')
     path2 = os.path.join(os.path.abspath(os.path.curdir), 'jsonfile', f'{filename}.json')
-    logger.debug(f'  path1 {path1}')
-    logger.debug(f'  path2 {path2}')
+    logger.debug(f'{PADDING}path1 {path1}')
+    logger.debug(f'{PADDING}path2 {path2}')
 
     def check_each_json(path):
         try:
             j = json.loads(open(path, 'r').read())
         except json.JSONDecodeError as ex:
-            logger.error(f'  ==ERROR== {ex}')
+            logger.error(f'{PADDING}==ERROR== {ex}')
             return False
 
         for dev, v in j['devices'].items():
@@ -203,13 +206,13 @@ class BaseVisaListener(QThread):
                 self.if_all_ready.emit(False)
 
     def stop(self):
-        logger.info('  BaseVisaListener stop start')
+        logger.info(f'{PADDING}BaseVisaListener stop start')
         # wait 1s for list_ports to finish, is it enough or too long in order
         # not to occupy com port for subsequent test scripts
         if self.is_reading:
             QThread.msleep(1000)
         self.terminate()
-        logger.info('  BaseVisaListener stop end')
+        logger.info(f'{PADDING}BaseVisaListener stop end')
 
 
 class Task(QThread):
@@ -238,7 +241,7 @@ class Task(QThread):
         self.json_root = json_root
         self.json_name = json_name
         self.jsonfile = f'{json_root}/{json_name}.json'
-        logger.info(f'  {self.jsonfile}')
+        logger.info(f'{PADDING}{self.jsonfile}')
         #  if not check_json_integrity(self.json_name):
             #  if QMessageBox.warning(None, 'Warning',
                    #  'You can not change jsonfile content besides the serial numbers',
@@ -251,9 +254,9 @@ class Task(QThread):
         self.action_args = list()
         self.df = self.load()
         self.instruments = generate_instruments(self.devices, INSTRUMENT_MAP)
-        logger.debug('  Task.instruments')
+        logger.debug(f'{PADDING}Task.instruments')
         for k,v in self.instruments.items():
-            logger.debug(f'  {k} ---> {v}')
+            logger.debug(f'{PADDING}{k} ---> {v}')
 
     @property
     def serial_instruments(self):
@@ -381,13 +384,13 @@ class Task(QThread):
 
     def rungroup(self, groupname):
         eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
-        logger.debug(f'  [rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
+        logger.debug(f'{PADDING}[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
         limits_group = [self.limits(groupname, i) for i in range(item_len)]
         limits = {}
         for e in zip(*args):
             xx = {i: j for i, j in zip(e, limits_group)}
             limits.update(xx)
-        logger.debug(f'  limits {limits}')
+        logger.debug(f'{PADDING}limits {limits}')
         args = {'args': args, 'limits': limits}
 
         coms = {}
@@ -409,7 +412,7 @@ class Task(QThread):
     def runeach(self, row_idx, dut_idx, dynamic_info):
         port = self.window.comports()[dut_idx]
         each, script, args = self.unpack_each(row_idx)
-        msg = f'  [runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(dynamic_info)}][{s_(args)}]'
+        msg = f'{PADDING}[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(dynamic_info)}][{s_(args)}]'
         logger.debug(msg)
         arguments = [python_path(), '-m', script,
                      '-p', port,
@@ -430,7 +433,7 @@ class Task(QThread):
         line = self.df.values[index]
         script = 'tasks.%s' % line[0]
         args = [str(e) for e in line[1]] if line[1] else []
-        msg = f'  [rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
+        msg = f'{PADDING}[rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
         logger.debug(msg)
         self.printterm_msg.emit(msg)
         selected_duts = ','.join([str(s) for s in self.window.dut_selected])    # E.g. '0,1'
@@ -439,7 +442,7 @@ class Task(QThread):
 
         outputs, _ = proc.communicate()
         if not outputs:
-            logger.warning('  outputs is None!!!!')
+            logger.warning(f'{PADDING}outputs is None!!!!')
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
         msg2 = '[task %s][outputs: %s]' % (index, outputs)  # E.g. outputs = ['Passed', 'Failed']
@@ -454,7 +457,7 @@ class Task(QThread):
             self.task_result.emit(result)
 
     def register_action(self, actions):
-        logger.debug('  register_action')
+        logger.debug(f'{PADDING}register_action')
         for e in actions:
             action, args = e['action'], e['args']
             self.action_args.append([action, args])
@@ -483,7 +486,7 @@ class Task(QThread):
                 port = self.window.comports()[dut_idx]
                 procs[port] = proc
 
-        logger.debug(f'  procs {procs}')
+        logger.debug(f'{PADDING}procs {procs}')
         for j, (port, proc) in enumerate(procs.items()):
             output, _ = proc.communicate()
             output = output.decode('utf8')
@@ -528,7 +531,7 @@ class Task(QThread):
         get_col = lambda arr, col: map(lambda x: x[col], arr)
         if len(self.window.dut_selected) == 1:
             output = [[e] for e in get_col(output, self.window.dut_selected[0])]
-        logger.debug(f'  OUTPUT {output}')
+        logger.debug(f'{PADDING}OUTPUT {output}')
         self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
 
@@ -583,8 +586,8 @@ class Task(QThread):
         threads = {}
         for dut_idx in self.window.dut_selected:
             port = self.window.comports()[dut_idx]
-            logger.debug(f'  dut_idx:  {dut_idx}')
-            logger.debug(f'  port:  {port}')
+            logger.debug(f'{PADDING}dut_idx:  {dut_idx}')
+            logger.debug(f'{PADDING}port:  {port}')
             threads[dut_idx] = th = threading.Thread(target=run_iqfactrun_console,
                                                 args=(self, dut_idx, port, group,))
             th.start()
@@ -599,9 +602,9 @@ class Task(QThread):
         t0 = time_()
         for action, args in self.action_args:
             aname = action.__name__
-            logger.debug(f'  run action {aname}')
+            logger.debug(f'{PADDING}run action {aname}')
             if not action(*args):
-                logger.debug(f'  {aname} is False --> return')
+                logger.debug(f'{PADDING}{aname} is False --> return')
                 self.window.show_animation_dialog.emit(False)
                 self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
                 self.window.ser_listener.start()
