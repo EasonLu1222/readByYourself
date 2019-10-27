@@ -1,0 +1,43 @@
+QCheckBox {font: 18pt Trebuchet MS}
+QComboBox {font: 18pt Trebuchet MS}
+
+QTableView {font: 16pt Segoe UI}
+
+QHeaderView::section {
+    font-size: 16pt;
+    font-weight: bold;
+    font-family: Gill Sans;
+    Background-color:#eef7fd;
+    border-radius:6px;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
+QPushButton {
+    font-size:30px;
+    font-weight: bold;
+    background-color: #f4f6f6;
+    border: 1px solid #35495e;
+    border-radius: 12px;
+    border-style: outset;
+}
+
+QPushButton:hover {
+    background-color: #d5d8dc;
+    border-width: 1px;
+    border-style: outset;
+}
+
+QPushButton:pressed {
+    background-color: grey;
+    border-width: 1px;
+    border-style: inset;
+    color: white;
+}
+
+QPushButton:disabled {
+    background-color: grey;
+    border-width: 1px;
+    border-style: inset;
+    color: #abb2b9;
+}

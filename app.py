@@ -22,7 +22,7 @@ from core import (Task, ProcessListener, BaseVisaListener,
                   enter_prompt, enter_prompt_simu)
 from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
-from utils import resource_path
+from utils import resource_path, QssTools
 from ui.main import Ui_MainWindow
 from config import station_json, LANG_LIST
 
@@ -328,63 +328,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
 
     def set_appearance(self):
-        self.setStyleSheet('''
-            QCheckBox {font: 18pt Trebuchet MS}
-            QComboBox {font: 18pt Trebuchet MS}
-        ''')
         logo_img = QPixmap(resource_path("./images/fit_logo.png"))
         self.logo = Label(self.container, antialiasing=True)
         self.logo.setText("")
         self.logo.setObjectName("logo")
         self.horizontalLayout_2.addWidget(self.logo)
-
         widths = self.task.appearance['columns_width']
         for col in self.task.appearance['columns_hidden']:
             self.table_view.setColumnHidden(col, True)
         for idx, w in zip(range(len(widths)), widths):
             self.table_view.setColumnWidth(idx, w)
-
         self.table_view.setStyleSheet('font: 16pt Segoe UI')
-        self.table_view.horizontalHeader().setStyleSheet('''
-            QHeaderView::section {
-                font-size: 16pt;
-                font-weight: bold;
-                font-family: Gill Sans;
-                Background-color:#eef7fd;
-                border-radius:6px;
-                border-bottom: 1px solid black;
-                border-right: 1px solid black;
-            }
-        ''')
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
         self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
-        self.pushButton.setStyleSheet('''
-            QPushButton {
-                font-size:30px;
-                font-weight: bold;
-                background-color: #f4f6f6;
-                border: 1px solid #35495e;
-                border-radius: 12px;
-                border-style: outset;
-            }
-            QPushButton:hover {
-                background-color: #d5d8dc;
-                border-width: 1px;
-                border-style: outset;
-            }
-            QPushButton:pressed {
-                background-color: grey;
-                border-width: 1px;
-                border-style: inset;
-                color: white;
-            }
-            QPushButton:disabled {
-                background-color: grey;
-                border-width: 1px;
-                border-style: inset;
-                color: #abb2b9;
-            }
-        ''')
+        for obj in [self, self.pushButton, self.table_view.horizontalHeader()]:
+            QssTools.set_qss_to_obj('./ui/qss/style1.qss', obj)
 
     def poweron(self, power):
         logger.debug('poweron start')

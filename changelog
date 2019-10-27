@@ -1,3 +1,12 @@
+[2019.10.27 - 21:50]
+Move qss string from set_appearance() into a separate qss file
+
+1. qss loading
+	- add utils.QssTools class to simplify qss file loading
+	- move all qss settings into ui/qss/style1.qss
+	- in MyWindow.set_appearance(), use QssTools.set_qss_to_obj
+	  to loading qss file
+
 [2019.10.27 - 00:45]
 Show duts & devices at top and colored when detected
 
