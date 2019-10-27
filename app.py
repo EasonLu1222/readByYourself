@@ -214,16 +214,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.port_autodecting = False
         #  self.statusBar().hide()
 
-        lb1 = QLabel(f'Program version: {getattr(thismodule, "version")}')
-        lb2 = QLabel(f'Station version: {self.task.base["version"]}')
-        lb1.setObjectName('lb1')
-        lb2.setObjectName('lb2')
-        for lb in [lb1, lb2]:
-            self.statusbar.addWidget(lb, 1)
-            lb.setAlignment(QtCore.Qt.AlignCenter)
-            lb.setStyleSheet("QLabel#%s {background-color: #444; color: white;"
-                             "font-weight: bold}" % lb.objectName())
-
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.msg_dialog_signal.connect(self.show_message_dialog)
         self.first_args = list()
@@ -341,8 +331,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setStyleSheet('font: 16pt Segoe UI')
         self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
         self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
-        for obj in [self, self.pushButton, self.table_view.horizontalHeader()]:
-            QssTools.set_qss_to_obj('./ui/qss/style1.qss', obj)
+        for obj in [self, self.table_view.horizontalHeader()]:
+            QssTools.set_qss_to_obj(obj)
+        lb1 = QLabel(f'Program version: {getattr(thismodule, "version")}')
+        lb2 = QLabel(f'Station version: {self.task.base["version"]}')
+        lb1.setObjectName('lb1')
+        lb2.setObjectName('lb2')
+        for lb in [lb1, lb2]:
+            self.statusbar.addWidget(lb, 1)
+            lb.setAlignment(QtCore.Qt.AlignCenter)
+            lb.setStyleSheet("QLabel#%s {background-color: #444; color: white;"
+                             "font-weight: bold}" % lb.objectName())
 
     def poweron(self, power):
         logger.debug('poweron start')
@@ -421,17 +420,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.render_port_plot()
 
     def render_port_plot(self):
-        style_ = lambda color: """
-                QLabel {
-                    padding: 6px;
-                    background: %s;
-                    color: white;
-                    border: 0;
-                    border-radius: 3px;
-                    outline: 0px;
-                    font-family: Courier;
-                    font-size: 16px;
-                }""" % (color, )
         comports_map = {
             'gw_powersupply': self._comports_pwr,
             'gw_dmm': self._comports_dmm,
@@ -446,42 +434,37 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         lb_text = 'DUT'
         for i, port in self._comports_dut.items():
             lb_port = QLabel(lb_text)
-            lb_port.setStyleSheet(style_('grey'))
+            lb_port.setProperty('state', 'default')
+            QssTools.set_qss_to_obj(lb_port)
+
             self.dut_layout[i].addWidget(lb_port)
             if port:
                 lb_port.setText(f'{lb_text}|{port}')
-                lb_port.setStyleSheet(style_('#369'))
-
-        colors_inst = {
-            'gw_powersupply': '#712',
-            'gw_dmm': '#4a3',
-            'gw_eloader': '#a31',
-            'ks_powersensor': '#1a3',
-        }
+                lb_port.setProperty('state', 'dut_detected')
+                QssTools.set_qss_to_obj(lb_port)
 
         for name, items in self.task.instruments.items():
             each_instruments = self.task.instruments[name]
             for i, e in enumerate(each_instruments):
                 lb_text = f'{e.__class__.__name__}'
                 lb_port = QLabel(lb_text)
-                lb_port.setStyleSheet(style_('grey'))
+                lb_port.setProperty('state', 'default')
+                QssTools.set_qss_to_obj(lb_port)
                 self.dut_layout[i].addWidget(lb_port)
 
                 if e.interface=='serial':
                     logger.info(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
                     if e.com in comports_map[name]:
-                        #  lb_port = QLabel(e.com)
                         lb_port = QLabel(f'{lb_text}|{e.com}')
-                        lb_port.setStyleSheet(style_(colors_inst[name]))
-                        #  self.dut_layout[i].addWidget(lb_port)
+                        lb_port.setProperty('state', f'{name}_detected')
+                        QssTools.set_qss_to_obj(lb_port)
 
                 elif e.interface=='visa':
                     logger.info(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
                     if comports_map[name]:
-                        #  lb_port = QLabel(e.com)
                         lb_port = QLabel(f'{lb_text}|{e.com}')
-                        lb_port.setStyleSheet(style_(colors_inst[name]))
-                        #  self.dut_layout[i].addWidget(lb_port)
+                        lb_port.setProperty('state', f'{name}_detected')
+                        QssTools.set_qss_to_obj(lb_port)
 
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()

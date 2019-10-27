@@ -1,3 +1,9 @@
+[2019.10.28 - 00:10]
+Move more qss string from app.py
+
+1. comment out self.pushButton.setStyleSheet("padding:10px") from ui/main.py
+
+
 [2019.10.27 - 21:50]
 Move qss string from set_appearance() into a separate qss file
 

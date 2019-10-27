@@ -93,7 +93,7 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.pushButton.setFont(font)
         self.pushButton.setAutoFillBackground(False)
-        self.pushButton.setStyleSheet("padding:10px")
+        #  self.pushButton.setStyleSheet("padding:10px")
         self.pushButton.setObjectName("pushButton")
         self.verticalLayout.addWidget(self.pushButton)
         self.horizontalLayout_4.addLayout(self.verticalLayout)
