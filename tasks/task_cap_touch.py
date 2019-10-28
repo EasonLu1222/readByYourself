@@ -152,6 +152,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
             sys.stdout.write(json.dumps(self.test_results))
             self.close()
 
+
 def check_fw():
     # TODO: Make sure all adb devices are listed
     cmd = "adb devices -l"
@@ -167,7 +168,7 @@ def check_fw():
             match = re.search('ls:', outputs)
             if match:
                 # Push the firmware from app to fixture's mainboard
-                logger.info(f'{PADDING}Cap touch fw doesn't exist, downloading from app to fixture')
+                logger.info(f'{PADDING}Cap touch fw does not exist, downloading from app to fixture')
                 fw_file_path = resource_path(f"./firmware/{config.CAP_TOUCH_FW}")
                 cmd = f"adb -t {transport_id} push {fw_file_path} /usr/share"
                 run(cmd)
