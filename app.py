@@ -219,10 +219,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.msg_dialog_signal.connect(self.show_message_dialog)
-        self.showMaximized()
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
         self.actions = {}
+        self.showMaximized()
 
     def prepare_done(self):
         print('prepare_done')
