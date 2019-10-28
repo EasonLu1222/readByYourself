@@ -5,63 +5,69 @@ QLabel[state=default] {
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
+    font-family: Trebuchet MS;
     font-size: 16px;
 }
 
 QLabel[state=dut_detected] {
     padding: 6px;
-    background: #369;
     color: white;
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
+    font-weight: bold;
     font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #369, stop: 1 #8588B2);
 }
 
 QLabel[state=gw_powersupply_detected] {
     padding: 6px;
-    background: #712;
     color: white;
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
     font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #712, stop: 1 #8588B2);
 }
 
 QLabel[state=gw_dmm_detected] {
     padding: 6px;
-    background: #4a3;
     color: white;
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
     font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #4a3, stop: 1 #8588B2);
 }
 
 QLabel[state=gw_eloader_detected] {
     padding: 6px;
-    background: #a31;
     color: white;
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
     font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #a31, stop: 1 #8588B2);
 }
 
 QLabel[state=ks_powersensor_detected] {
     padding: 6px;
-    background: #1a3;
     color: white;
     border: 0;
     border-radius: 3px;
     outline: 0px;
-    font-family: Courier;
     font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #1a3, stop: 1 #8588B2);
 }
 
 QCheckBox {font: 18pt Trebuchet MS}
