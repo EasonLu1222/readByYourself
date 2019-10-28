@@ -17,6 +17,16 @@ SERIAL_TIMEOUT = 0.8
 PADDING = ' ' * 8
 
 
+def ls_test(portname):
+    with get_serial(portname, 115200, timeout=1) as ser:
+        ser.reset_output_buffer()
+        cmd = f'ls'
+        lines = issue_command(ser, cmd)
+        for e in lines:
+            logger.info(e)
+        return 'Pass'
+
+
 def enter_burn_mode(portname, dut_idx):
     logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:

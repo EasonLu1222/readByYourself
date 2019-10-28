@@ -457,14 +457,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 if e.interface=='serial':
                     logger.info(f'(SERIAL!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}] [{e.com}]')
                     if e.com in comports_map[name]:
-                        lb_port = QLabel(f'{lb_text}|{e.com}')
+                        lb_port.setText(f'{lb_text}|{e.com}')
                         lb_port.setProperty('state', f'{name}_detected')
                         QssTools.set_qss_to_obj(lb_port)
 
                 elif e.interface=='visa':
                     logger.info(f'(VISA!!!!)[inst: {e.NAME}] [{e}] [index: {e.index}] [{i}]')
                     if comports_map[name]:
-                        lb_port = QLabel(f'{lb_text}|{e.com}')
+                        lb_port.setText(f'{lb_text}|{e.com}')
                         lb_port.setProperty('state', f'{name}_detected')
                         QssTools.set_qss_to_obj(lb_port)
 
@@ -506,7 +506,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
-            logger.debug('action_signal emit', 'prepare')
+            logger.debug(f'action_signal emit prepare')
             self.action_signal.emit('prepare')
 
         else:

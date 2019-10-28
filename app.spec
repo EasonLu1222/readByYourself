@@ -42,6 +42,7 @@ added_files = [
     ('python-3.7.3-embed-amd64/*', '.'),
     ('iqxel/*.dll', 'iqxel'),
     ('iqxel/*.exe', 'iqxel'),
+    ('ui/qss/*.qss', 'ui/qss'),
 ]
 
 a = Analysis(['app.py'],

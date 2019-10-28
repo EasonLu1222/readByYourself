@@ -275,7 +275,8 @@ class Instrument():
             return 'unknown'
 
 
-visa_addr = 'USB0::0x2A8D::0x2D18::MY57420015::0::INSTR'
+#  visa_addr = 'USB0::0x2A8D::0x2D18::MY57420015::0::INSTR'
+#  visa_addr = 'USB0::0x2A8D::0x2D18::MY59190011::0::INSTR'  --> U2040XA
 class VisaInstrument(Instrument):
     dll_32 = 'C:/Windows/System32/visa32.dll'
     dll_64 = 'C:/Windows/System32/visa64.dll'

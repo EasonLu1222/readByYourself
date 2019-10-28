@@ -5,12 +5,12 @@
     "dut": {
         "name": "ftdi",
         "num": 1,
-        "sn": ["A43QHNAMA"]
+        "sn": ["22222222A"]
     },
     "pws": {
         "name": "ks_powersensor",
         "num": 1,
-        "sn": ["MY57420015"]
+        "sn": ["MY59190011"]
     }
  },
  "appearance": {
@@ -45,7 +45,7 @@
             "unit": null
         }
         ,{
-            "group": "Tx 11n 2442MHz ch1",
+            "group": "Tx 11n 2442MHz ch1 [0]",
             "hidden": false,
             "tasktype": 1,
             "item": "Set TX to 11n 2442MHZ CH1",
@@ -58,7 +58,7 @@
             "unit": null
         }
         ,{
-            "group": "Tx 11n 2442MHz ch1",
+            "group": "Tx 11n 2442MHz ch1 [1]",
             "hidden": false,
             "tasktype": 2,
             "item": "measure 11n 2442MHZ TX power CH1",
@@ -71,7 +71,7 @@
             "unit": "dBm"
         }
         ,{
-            "group": "TX Power 11ac 5500MHZ CH1",
+            "group": "TX Power 11ac 5500MHZ CH1 [0]",
             "group": "Tx 11ac 5500MHz ch1",
             "hidden": false,
             "tasktype": 1,
@@ -85,7 +85,7 @@
             "unit": null
         }
         ,{
-            "group": "Tx 11ac 5500MHz ch1",
+            "group": "Tx 11ac 5500MHz ch1 [1]",
             "hidden": false,
             "tasktype": 2,
             "item": "measure 11ac 5500MHZ TX power CH1",
@@ -98,7 +98,7 @@
             "unit": "dBm"
         }
         ,{
-            "group": "Tx 11n 2442MHz ch2",
+            "group": "Tx 11n 2442MHz ch2 [0]",
             "hidden": false,
             "tasktype": 1,
             "item": "Set TX to 11n 2442MHZ CH2",
@@ -111,7 +111,7 @@
             "unit": null
         }
         ,{
-            "group": "Tx 11n 2442MHz ch2",
+            "group": "Tx 11n 2442MHz ch2 [1]",
             "hidden": false,
             "tasktype": 2,
             "item": "measure 11n 2442MHZ TX power CH2",
@@ -123,9 +123,9 @@
             "max": null,
             "unit": "dBm"
         }
-        
+
         ,{
-            "group": "Tx 11ac 5500MHz ch2",
+            "group": "Tx 11ac 5500MHz ch2 [0]",
             "hidden": false,
             "tasktype": 1,
             "item": "Set TX to 11ac 5500MHZ CH2",
@@ -138,7 +138,7 @@
             "unit": null
         }
         ,{
-            "group": "Tx 11ac 5500MHz ch2",
+            "group": "Tx 11ac 5500MHz ch2 [1]",
             "hidden": false,
             "tasktype": 2,
             "item": "measure 11ac 5500MHZ TX power CH2",
@@ -152,4 +152,3 @@
         }
     ]
 }
-

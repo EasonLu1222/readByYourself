@@ -84,5 +84,6 @@ def set_property(widget, attr, val):
 class QssTools(object):
     @classmethod
     def set_qss_to_obj(cls, obj, file_path='./ui/qss/style1.qss'):
-        with open(file_path, 'r') as f:
+        #  with open(file_path, 'r') as f:
+        with open(resource_path(file_path)) as f:
             obj.setStyleSheet(f.read())

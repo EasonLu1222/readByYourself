@@ -5,6 +5,6 @@
     "2184:0051": ["gw_powersupply", "serial"],
     "2184:001A": ["gw_dmm","serial"],
     "2184:000D": ["gw_eloader","serial"],
-    "2A8D:2D18": ["ks_powersensor", "visa"]
+    "2A8D:1C01": ["ks_powersensor", "visa"]
 }
 

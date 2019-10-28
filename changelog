@@ -1,3 +1,17 @@
+[2019.10.28 - 21:45]
+Product line readiness
+
+1. fix instrument render bug
+
+2. qss loading bug fixed when pyinstaller packageing
+
+3. modification for powersensor station
+	- device.json: vid update for U2040XA 
+	- modify jsonfile/v13_power_sensor.json
+
+4. others
+	- recover task_runeach.ls_test() 
+
 [2019.10.28 - 11:10]
 Unify actions creation & register
 
