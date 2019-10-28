@@ -19,7 +19,7 @@ from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
 from core import (Task, ProcessListener, BaseVisaListener,
-                  enter_prompt, enter_prompt_simu)
+                  enter_prompt, enter_prompt_simu, Action)
 from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path, QssTools
@@ -132,6 +132,7 @@ class Label(QLabel):
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
     msg_dialog_signal = QSignal(str)
+    action_signal = QSignal(str)
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -155,7 +156,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.toggle_engineering_mode(self.settings.is_eng_mode_on)
 
-        self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
+        if 'dut' in self.task.serial_devices:
+            self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
+        else:
+            self._comports_dut = {}
         self._comports_pwr = []
         self._comports_dmm = []
         self._comports_eld = []
@@ -212,16 +216,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_hidden_row()
         self.taskdone_first = False
         self.port_autodecting = False
-        #  self.statusBar().hide()
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.msg_dialog_signal.connect(self.show_message_dialog)
-        self.first_args = list()
-        self.prepare_args = list()
-        self.after_args = list()
         self.showMaximized()
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
+        self.actions = {}
+
+    def prepare_done(self):
+        print('prepare_done')
 
     def set_hbox_visible(self, is_visible):
         for i in range(self.hboxPorts.count()):
@@ -230,23 +234,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.hboxPorts.itemAt(i).widget().hide()
 
-    def register_prepare(self, prepares):
-        logger.debug('register_prepares')
-        for e in prepares:
-            prepare, args = e['prepare'], e['args']
-            self.prepare_args.append([prepare, args])
+    def register_action(self, action, to_connect=True):
+        logger.debug(f'register_action {action.name}')
+        self.actions[action.name] = action
+        if to_connect:
+            self.action_signal.connect(self.action_start)
+            self.actions[action.name].action_done.connect(getattr(win, f'{action.name}_done'))
 
-    def register_first(self, firsts):
-        logger.debug('register_firsts')
-        for e in firsts:
-            first, args = e['first'], e['args']
-            self.first_args.append([first, args])
+    def action_start(self, action_name):
+        logger.debug('action_start')
+        self.actions[action_name].start()
 
-    def register_after(self, afters):
-        logger.debug('register_afters')
-        for e in afters:
-            after, args = e['after'], e['args']
-            self.after_args.append([after, args])
+    def action_trigger(self, action_name):
+        logger.debug('action_trigger')
+        Action.trigger(self.actions[action_name].action_args)
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -420,6 +421,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.render_port_plot()
 
     def render_port_plot(self):
+        logger.debug(f'render_port_plot')
         comports_map = {
             'gw_powersupply': self._comports_pwr,
             'gw_dmm': self._comports_dmm,
@@ -469,33 +471,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for i in range(self.task.dut_num):
             self.dut_layout[i].addStretch()
 
-    def first(self):
-        logger.debug('first start')
-        for action, args in self.first_args:
-            logger.debug(f'run first {action} {args}')
-            if not action(*args):
-                logger.debug('first action {action} {args} returned False')
-                return
-        logger.debug('first end')
-
-    def prepare(self):
-        logger.debug('prepare start')
-        for action, args in self.prepare_args:
-            logger.debug(f'run prepare {action} {args}')
-            if not action(*args):
-                logger.debug('prepare action {action} {args} returned False')
-                return
-        logger.debug('prepare end')
-
-    def after(self):
-        logger.debug('after start')
-        for action, args in self.after_args:
-            logger.debug(f'run after {action} {args}')
-            if not action(*args):
-                logger.debug('after action {action} {args} returned False')
-                return
-        logger.debug('after end')
-
     def visa_instrument_ready(self, ready):
         logger.debug('visa_instrument_ready start')
         if ready:
@@ -509,7 +484,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
-            self.prepare()
+            #  self.prepare()
 
     def instrument_ready(self, ready):
         logger.debug('instrument_ready start')
@@ -531,7 +506,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
-            self.prepare()
+            logger.debug('action_signal emit', 'prepare')
+            self.action_signal.emit('prepare')
+
         else:
             logger.debug('===NOT READY===')
             self.pushButton.setEnabled(False)
@@ -731,7 +708,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if os.path.isfile('power_results'):
                 os.remove('power_results')
-        self.after()
+        self.action_trigger('after')
 
     def show_barcode_dialog(self):
         logger.debug('show_barcode_dialog start')
@@ -918,16 +895,19 @@ if __name__ == "__main__":
     win = MyWindow(app, task)
 
     firsts = parse_for_register(task, 'firsts')
-    win.register_first(firsts)
+    action_first = Action('first', firsts)
+    win.register_action(action_first, to_connect=False)
 
     prepares = parse_for_register(task, 'prepares')
-    win.register_prepare(prepares)
+    action_prepare = Action('prepare', prepares)
+    win.register_action(action_prepare)
 
     actions = parse_for_register(task, 'actions')
     task.register_action(actions)
 
     afters = parse_for_register(task, 'afters')
-    win.register_after(afters)
+    action_after = Action('after', afters)
+    win.register_action(action_after, to_connect=False)
 
-    win.first()
+    win.action_trigger('first')
     app.exec_()

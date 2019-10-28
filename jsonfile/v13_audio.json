@@ -3,9 +3,9 @@
  "version": "13.0",
  "devices": {
     "dut": {
-        "name": null,
+        "name": "prolific",
         "num": 1,
-        "sn": []
+        "sn": ["6"]
     }
  },
  "appearance": {

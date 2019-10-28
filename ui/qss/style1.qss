@@ -83,7 +83,7 @@ QPushButton#pushButton {
     font-family: Courier New;
     background-color: #f4f6f6;
     border: 1px solid #35495e;
-    border-radius: 12px;
+    border-radius: 16px;
     border-style: outset;
 }
 

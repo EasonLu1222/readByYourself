@@ -215,6 +215,44 @@ class BaseVisaListener(QThread):
         logger.info(f'{PADDING}BaseVisaListener stop end')
 
 
+class Action(QThread):
+    action_done = QSignal()
+
+    def __init__(self, action_name, actions):
+        super(Action, self).__init__()
+        #  self.prepare_args = list()
+        #  set(self, f{action_name}_args, list())
+        self.action_args = list()
+        self.name = action_name
+        self.update_action(actions)
+
+    def update_action(self, actions):
+        logger.debug(f'{PADDING}update_action')
+        for e in actions:
+            action, args = e[f'{self.name}'], e['args']
+            self.action_args.append([action, args])
+
+    @classmethod
+    def trigger(cls, action_args):
+        for action, args in action_args:
+            aname = action.__name__
+            logger.debug(f'{PADDING}run action {aname}')
+            if not action(*args):
+                logger.debug(f'{PADDING}{aname} is False --> return')
+                return
+        logger.debug(f'{PADDING}Action run end')
+
+    def run(self):
+        for action, args in self.action_args:
+            aname = action.__name__
+            logger.debug(f'{PADDING}run action {aname}')
+            if not action(*args):
+                logger.debug(f'{PADDING}{aname} is False --> return')
+                return
+        self.action_done.emit()
+        logger.debug('Action run end')
+
+
 class Task(QThread):
     '''
     there's three types of tasks

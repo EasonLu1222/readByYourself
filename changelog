@@ -1,3 +1,11 @@
+[2019.10.28 - 11:10]
+Unify actions creation & register
+
+1. new class core.Action
+	- MyWindow.register_action() to handle actions register
+
+2. do not render if dut name is null
+
 [2019.10.28 - 00:10]
 Move more qss string from app.py
 
