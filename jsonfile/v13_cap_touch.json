@@ -55,7 +55,7 @@
             "group": "Cap Touch FW Download",
             "hidden": false,
             "tasktype": 1,
-            "item": "",
+            "item": "download firmware from fixture to DUT",
             "script": "task_runeach",
             "args": ["msp430_download"],
             "auto": true,
@@ -63,12 +63,12 @@
             "expect": null,
             "max": null,
             "unit": null
-        }
-        ,{
+        },
+        {
             "group": "Cap Touch Test",
             "hidden": false,
             "tasktype": 3,
-            "item": "",
+            "item": "check cap touch functionality",
             "script": "task_cap_touch",
             "args": null,
             "auto": false,
