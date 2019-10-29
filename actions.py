@@ -1,14 +1,38 @@
 import os
 import re
+import time
+import threading
 from subprocess import Popen, PIPE
 from serials import is_serial_free, get_serial, issue_command
 from utils import resource_path, get_env, python_path, run
-
 from mylogger import logger
+
+PADDING = ' ' * 4
 
 
 def window_click_run(win):
     win.btn_clicked()
+
+
+def enter_prompt_simu():
+    def dummy(sec):
+        time.sleep(sec)
+
+    logger.debug(f'{PADDING}enter factory image prompt start')
+    t0 = time.time()
+    t = threading.Thread(target=dummy, args=(1.5, ))
+    t.start()
+    t.join()
+    t1 = time.time()
+    logger.debug(f'{PADDING}enter factory image prompt end')
+    logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
+    return True
+
+
+def dummy_com_first(win, *coms):
+    win._comports_dut = dict(zip(range(len(coms)), coms))
+    win.instrument_ready(True)
+    win.render_port_plot()
 
 
 def serial_ignore_xff(window, ser_timeout=0.2):

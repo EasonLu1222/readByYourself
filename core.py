@@ -23,30 +23,17 @@ from serials import enter_factory_image_prompt, get_serial
 from iqxel import run_iqfactrun_console
 from utils import s_
 
-from actions import (disable_power_check, set_power_simu, dummy_com, window_click_run,
-                     is_serial_ok, set_power, is_adb_ok, serial_ignore_xff)
+from actions import (
+    disable_power_check, set_power_simu, dummy_com, 
+    window_click_run, is_serial_ok, set_power, is_adb_ok, 
+    serial_ignore_xff, dummy_com_first, enter_prompt_simu,
+)
 
 # for prepares
 from iqxel import prepare_for_testflow_files
 from soundcheck import soundcheck_init
 
 PADDING = ' ' * 2
-
-
-def enter_prompt_simu():
-
-    def dummy(sec):
-        time.sleep(sec)
-
-    logger.debug(f'{PADDING}enter factory image prompt start')
-    t0 = time.time()
-    t = threading.Thread(target=dummy, args=(1.5, ))
-    t.start()
-    t.join()
-    t1 = time.time()
-    logger.debug(f'{PADDING}enter factory image prompt end')
-    logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
-    return True
 
 
 def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
@@ -224,12 +211,6 @@ class BaseVisaListener(QThread):
             QThread.msleep(1000)
         self.terminate()
         logger.info(f'{PADDING}BaseVisaListener stop end')
-
-
-def dummy_com_first(win, *coms):
-    win._comports_dut = dict(zip(range(len(coms)), coms))
-    win.instrument_ready(True)
-    win.render_port_plot()
 
 
 class Actions(QThread):

@@ -1,3 +1,6 @@
+[2019.10.29 - 15:25]
+Move codes from core.py into actions.py
+
 [2019.10.29 - 15:00]
 Actions codes refactoring: firsts/prepares/actions/afters
 
