@@ -16,6 +16,7 @@ station_json = {
     'MainBoard': 'v13_mb',                  # pyinstaller exe  tested on clean windows
     'LED': 'v13_led',                       # pyinstaller exe  tested on clean windows
     'CapTouch': 'v13_cap_touch',            # pyinstaller exe  tested on clean windows
+    'CapTouchMic': 'v13_cap_touch_mic',
 
     # --- FATP ---
     'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
