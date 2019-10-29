@@ -67,9 +67,9 @@ if __name__ == "__main__":
 
         if processing_item and line=='':
             if any(e for e in items_lines if 'Failed' in e):
-                print(f'item {current_idx} {items[current_idx-1]} FAILED!!!')
+                print(f'item {current_idx} {items[current_idx-1]} FAIL!!!')
             else:
-                print(f'item {current_idx} {items[current_idx-1]} PASSED !!!')
+                print(f'item {current_idx} {items[current_idx-1]} PASS !!!')
 
             if current_idx == len(items):
                 print('break')

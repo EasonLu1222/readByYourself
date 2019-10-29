@@ -132,9 +132,9 @@ class LedResultMarkerDialog(QDialog, Ui_LedResultMarkerDialog):
         pass_fail_str_list = []
         for b in self.pass_list:
             if b is True:
-                pass_fail_str_list.append('Passed')
+                pass_fail_str_list.append('Pass')
             elif b is False:
-                pass_fail_str_list.append('Failed')
+                pass_fail_str_list.append('Fail')
         self.result_str = json.dumps(pass_fail_str_list)
         sys.stdout.write(self.result_str)
 

@@ -84,9 +84,9 @@ def judge_fft_result(freq_and_amp_dict_list):
         freq_and_amp_dict({int: int,...}): A list of frequency and amplitude tuples
 
     Returns(str):
-        'Passed' or 'Failed'
+        'Pass' or 'Fail'
     """
-    rtn = 'Passed'
+    rtn = 'Pass'
     freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
     for freq_and_amp_dict in freq_and_amp_dict_list:
         logger.info(f'{PADDING}Frequency to amplitude dict: {freq_and_amp_dict}')
@@ -97,7 +97,7 @@ def judge_fft_result(freq_and_amp_dict_list):
             amp_threshold = freq_amp_threshold_dict[freq]
             if (freq not in freq_and_amp_dict or
                     amp_threshold > freq_and_amp_dict[freq]):
-                rtn = 'Failed'
+                rtn = 'Fail'
                 break
 
     return rtn

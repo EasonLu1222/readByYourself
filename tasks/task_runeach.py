@@ -73,8 +73,8 @@ def write_usid(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.search(sid, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.search(sid, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -92,8 +92,8 @@ def write_mac_wifi(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(mac_wifi_addr, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(mac_wifi_addr, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -111,8 +111,8 @@ def write_mac_bt(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(mac_bt_addr, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(mac_bt_addr, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -130,8 +130,8 @@ def write_country_code(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(ccode, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(ccode, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -149,8 +149,8 @@ def write_mac_wifi(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(mac_wifi_addr, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(mac_wifi_addr, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -168,8 +168,8 @@ def write_mac_bt(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(mac_bt_addr, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(mac_bt_addr, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -187,8 +187,8 @@ def write_country_code(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match(ccode, e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match(ccode, e)
+                                  for e in lines) else 'Fail'
         return result
 
 
@@ -204,7 +204,7 @@ def record_sound(portname):
         lines = issue_command(ser, cmd)
         # TODO: Check if WAV file exists
         time.sleep(wav_duration + 2)
-        return 'Passed'
+        return 'Pass'
 
 
 def get_mic_test_result(portname):
@@ -215,8 +215,8 @@ def get_mic_test_result(portname):
         logger.info(f'{PADDING}[MicTest] Fetching mic test result from {test_result_path}')
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.match('Passed', e)
-                                  for e in lines) else 'Failed'
+        result = f'Pass' if any(re.match('Pass', e)
+                                  for e in lines) else 'Fail'
 
         # Delete test result
         logger.info(f'{PADDING}[MicTest] Deleting {test_result_path}')
@@ -235,8 +235,8 @@ def load_led_driver(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmd = f'insmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
-        result = f'Passed' if any(re.search('probe', e) for e in lines) or any(
-            re.search('File exists', e) for e in lines) else 'Failed'
+        result = f'Pass' if any(re.search('probe', e) for e in lines) or any(
+            re.search('File exists', e) for e in lines) else 'Fail'
         return result
 
 
@@ -244,8 +244,8 @@ def unload_led_driver(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
-        result = f'Failed' if any(re.search('leds_lp50xx', e)
-                                  for e in lines) else 'Passed'
+        result = f'Fail' if any(re.search('leds_lp50xx', e)
+                                  for e in lines) else 'Pass'
         return result
 
 
@@ -269,8 +269,8 @@ def speaker_close_1kz(portname):
 def check_wifi_if(portname):
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, 'ifconfig -a')
-        result = 'Passed' if any(re.match('wlan[\d]+', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('wlan[\d]+', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}check_wifi_if: {result}')
         return result
 
@@ -279,8 +279,8 @@ def check_bt(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'hciconfig hci0 up')
         lines = issue_command(ser, 'hciconfig')
-        result = 'Passed' if any(re.search('UP RUNNING', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.search('UP RUNNING', e)
+                                 for e in lines) else 'Fail'
         lines = issue_command(ser, 'hciconfig hci0 down')
         logger.info(f'{PADDING}has BT: {result}')
         return result
@@ -289,8 +289,8 @@ def check_bt(portname):
 def check_cpu_cores(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'cat /proc/cpuinfo |grep processor|wc -l')
-        result = 'Passed' if any(re.match('4\r\n', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('4\r\n', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}Check CPU Cores: {result}')
         return result
 
@@ -299,8 +299,8 @@ def check_cpu_freq(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(
             ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
-        result = 'Passed' if any(re.match('[\d]+', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('[\d]+', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}Check CPU Freq: {result}')
         return result
 
@@ -308,8 +308,8 @@ def check_cpu_freq(portname):
 def check_ddr_size(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'grep MemTotal /proc/meminfo')
-        result = 'Passed' if any(
-            re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else 'Failed'
+        result = 'Pass' if any(
+            re.match('MemTotal:[\s]+[\d]+ kB', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}DDR Size: {result}')
         return result
 
@@ -318,8 +318,8 @@ def check_i2c_tas5766(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-0/0-004e/name')
-        result = 'Passed' if any(re.match('tas5766m', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('tas5766m', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}has tas5766m: {result}')
         return result
 
@@ -328,8 +328,8 @@ def check_i2c_msp430(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-1/1-001f/name')
-        result = 'Passed' if any(re.match('msp430', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('msp430', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}has msp430: {result}')
         return result
 
@@ -338,8 +338,8 @@ def check_i2c_lp5018(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-1/1-0028/name')
-        result = 'Passed' if any(re.match('lp5018', e)
-                                 for e in lines) else 'Failed'
+        result = 'Pass' if any(re.match('lp5018', e)
+                                 for e in lines) else 'Fail'
         logger.info(f'{PADDING}has lp5018: {result}')
         return result
 
@@ -394,9 +394,9 @@ def msp430_download(portname):
     time.sleep(5)
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, f'/usr/share/{config.CAP_TOUCH_FW}')
-        result = 'Passed' if any(
+        result = 'Pass' if any(
             re.search('Firmware updated without issue', e)
-            for e in lines) else 'Failed'
+            for e in lines) else 'Fail'
         logger.info(f'{PADDING}msp430 fw download: {result}')
     return result
 
@@ -404,8 +404,8 @@ def msp430_download(portname):
 def tx_power_11n_2442mhz_ch1(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-1')
-        result = 'Passed' if any(
-            re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        result = 'Pass' if any(
+            re.search('wl pkteng_start', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}TX_POWER_11n_2442MHZ: {result}')
     return result
 
@@ -413,8 +413,8 @@ def tx_power_11n_2442mhz_ch1(portname):
 def tx_power_11n_2442mhz_ch2(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, 'WifiTest4U2xxxx  11n2442-2')
-        result = 'Passed' if any(
-            re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        result = 'Pass' if any(
+            re.search('wl pkteng_start', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}TX_POWER_11n_2442MHZ: {result}')
     return result
 
@@ -422,8 +422,8 @@ def tx_power_11n_2442mhz_ch2(portname):
 def tx_power_11ac_5500mhz_ch1(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-1')
-        result = 'Passed' if any(
-            re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        result = 'Pass' if any(
+            re.search('wl pkteng_start', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}TX_POWER_11ac_5500MHZ: {result}')
     return result
 
@@ -431,8 +431,8 @@ def tx_power_11ac_5500mhz_ch1(portname):
 def tx_power_11ac_5500mhz_ch2(portname):
     with get_serial(portname, 115200, timeout=2) as ser:
         lines = issue_command(ser, 'WifiTest4U2xxxx  11ac5500-2')
-        result = 'Passed' if any(
-            re.search('wl pkteng_start', e) for e in lines) else 'Failed'
+        result = 'Pass' if any(
+            re.search('wl pkteng_start', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}TX_POWER_11ac_5500MHZ: {result}')
     return result
 

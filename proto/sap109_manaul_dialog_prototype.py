@@ -83,7 +83,7 @@ class MyDialog(QtWidgets.QDialog):
         button_layout = QtWidgets.QHBoxLayout()
         button_layout.addStretch()
 
-        pass_button = QtWidgets.QPushButton('Passed')
+        pass_button = QtWidgets.QPushButton('Pass')
         pass_button.setObjectName('pass_button')
         pass_button.clicked.connect(self.button_clicked)
         button_layout.addWidget(pass_button)

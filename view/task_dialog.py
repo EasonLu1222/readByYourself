@@ -80,11 +80,11 @@ class MyDialog(QtWidgets.QDialog):
         button_layout = QtWidgets.QHBoxLayout()
         button_layout.addStretch()
 
-        pass_button = QtWidgets.QPushButton('Passed')
+        pass_button = QtWidgets.QPushButton('Pass')
         pass_button.setObjectName('pass_button')
         pass_button.clicked.connect(self.button_clicked)
         button_layout.addWidget(pass_button)
-        fail_button = QtWidgets.QPushButton('Failed')
+        fail_button = QtWidgets.QPushButton('Fail')
         fail_button.setObjectName('fail_button')
         fail_button.clicked.connect(self.button_clicked)
         button_layout.addWidget(fail_button)
@@ -108,9 +108,9 @@ class MyDialog(QtWidgets.QDialog):
     def button_clicked(self):
         btn = self.sender()
         if btn.objectName() == 'pass_button':
-            self.passes[self.idx] = 'Passed'
+            self.passes[self.idx] = 'Pass'
         elif btn.objectName() == 'fail_button':
-            self.passes[self.idx] = 'Failed'
+            self.passes[self.idx] = 'Fail'
 
         if self.idx < self.number-1:
             page = self.pages[self.idx]

@@ -565,9 +565,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 index(int or [int, int]): Row or row range
                 idx(int): The (idx)th DUT
                 port(str): The port name, used to inference idx
-                output(str): 'Passed' or 'Failed'
+                output(str): 'Pass' or 'Fail'
 
-                e.g. {'index': 0, 'idx': 0, 'port':'COM1', 'output': 'Passed'}
+                e.g. {'index': 0, 'idx': 0, 'port':'COM1', 'output': 'Pass'}
         """
         ret = json.loads(result)
         row = ret['index']

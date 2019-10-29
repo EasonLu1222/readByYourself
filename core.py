@@ -570,7 +570,7 @@ class Task(QThread):
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
         msg2 = '[task %s][outputs: %s]' % (
-            index, outputs)  # E.g. outputs = ['Passed', 'Failed']
+            index, outputs)  # E.g. outputs = ['Pass', 'Fail']
         self.printterm_msg.emit(msg2)
 
         port_list = ports.split(',')
@@ -695,9 +695,9 @@ class Task(QThread):
         r1, r2 = row, row + 1
         c1 = len(self.header()) + self.window.dut_selected[0]
         c2 = c1 + len(self.window.dut_selected)
-        self.df.iloc[r1:r2, c1:c2] = "Passed"
+        self.df.iloc[r1:r2, c1:c2] = "Pass"
 
-        result = json.dumps({'index': row, 'output': "Passed"})
+        result = json.dumps({'index': row, 'output': "Pass"})
         self.task_result.emit(result)
 
     def run_task9(self, group, items):

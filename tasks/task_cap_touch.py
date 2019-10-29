@@ -137,11 +137,11 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         btn_label.setStyleSheet('background-color: #FDD835')
 
     def pass_clicked(self):
-        self.test_results.append("Passed")
+        self.test_results.append("Pass")
         self.handle_click()
 
     def fail_clicked(self):
-        self.test_results.append("Failed")
+        self.test_results.append("Fail")
         self.handle_click()
 
     def handle_click(self):
