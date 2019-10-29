@@ -7,6 +7,10 @@ from utils import resource_path, get_env, python_path, run
 from mylogger import logger
 
 
+def window_click_run(win):
+    win.btn_clicked()
+
+
 def serial_ignore_xff(window, ser_timeout=0.2):
     comports = window.comports
     for i in window.dut_selected:
@@ -22,9 +26,10 @@ def disable_power_check(win):
     return True
 
 
-def is_serial_ok(comports, signal_from):
+def is_serial_ok(win, task):
+    signal_from = task.serial_ok
     ports_not_free = []
-    for p in comports():
+    for p in win.comports():
         if not is_serial_free(p):
             logger.debug(f'    serial port {p} are not free!')
             ports_not_free.append(p)
@@ -37,7 +42,9 @@ def is_serial_ok(comports, signal_from):
     return True
 
 
-def is_adb_ok(dut_selected, signal_from):
+def is_adb_ok(win, task):
+    dut_selected = win.get_dut_selected
+    signal_from = task.adb_ok
     print('is_adb_ok start')
     cmd = "adb start-server"
     output = run(cmd)
@@ -63,7 +70,9 @@ def is_adb_ok(dut_selected, signal_from):
     return rtn
 
 
-def set_power(power_process, proc_listener):
+def set_power(win):
+    power_process = win.power_process
+    proc_listener = win.proc_listener
     script = 'tasks.poweron'
     for idx in range(1, 3):
         args = [str(idx)]

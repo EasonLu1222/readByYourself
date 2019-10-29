@@ -1,3 +1,13 @@
+[2019.10.29 - 15:00]
+Actions codes refactoring: firsts/prepares/actions/afters
+
+1. Actions & Action classes
+	- move actions related codes from app.py into core.py
+
+2. jsonfile modified
+	- v13_cap_touch, v13_download, v13_led, v13_mb, v13_sa, v13_wpc
+
+
 [2019.10.28 - 22:20]
 Beautify top port rendor: linear gradient background
 

@@ -112,6 +112,7 @@ def soundcheck_init(module, sqz_path=None):
                                 f'test_20181030_{case}',
                                 f"test_{case.replace(' ', '_')}.sqc")
         b.Open_Sequence(sqz_path)
+        if module=='thismodule': module = sys.modules['__main__']
         setattr(module, 'snd_chk', b)
         logger.info(f'    module: {module}')
         time.sleep(1)

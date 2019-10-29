@@ -19,7 +19,8 @@ from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
 from core import (Task, ProcessListener, BaseVisaListener,
-                  enter_prompt, enter_prompt_simu, Action)
+                  enter_prompt, enter_prompt_simu, Actions,
+                 )
 from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path, QssTools
@@ -29,24 +30,8 @@ from config import station_json, LANG_LIST
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
 
-# for prepares
-from soundcheck import soundcheck_init
-from iqxel import prepare_for_testflow_files
-
-# for actions
-from actions import (disable_power_check, set_power_simu, dummy_com,
-                     is_serial_ok, set_power, is_adb_ok, serial_ignore_xff)
 from mylogger import logger
 
-
-def dummy_com_first(win, *coms):
-    win._comports_dut = dict(zip(range(len(coms)), coms))
-    win.instrument_ready(True)
-    win.render_port_plot()
-
-
-def window_click_run(win):
-    win.btn_clicked()
 
 
 class UsbPowerSensor(): comports_pws = QSignal(list)
@@ -132,7 +117,7 @@ class Label(QLabel):
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
     msg_dialog_signal = QSignal(str)
-    action_signal = QSignal(str)
+    #  action_signal = QSignal(str)
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -221,11 +206,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.msg_dialog_signal.connect(self.show_message_dialog)
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
-        self.actions = {}
+        #  self.actions = {}
         self.showMaximized()
 
-    def prepare_done(self):
-        print('prepare_done')
+    #  def prepare_done(self):
+        #  print('prepare_done')
 
     def set_hbox_visible(self, is_visible):
         for i in range(self.hboxPorts.count()):
@@ -233,21 +218,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.hboxPorts.itemAt(i).widget().show()
             else:
                 self.hboxPorts.itemAt(i).widget().hide()
-
-    def register_action(self, action, to_connect=True):
-        logger.debug(f'register_action {action.name}')
-        self.actions[action.name] = action
-        if to_connect:
-            self.action_signal.connect(self.action_start)
-            self.actions[action.name].action_done.connect(getattr(win, f'{action.name}_done'))
-
-    def action_start(self, action_name):
-        logger.debug('action_start')
-        self.actions[action_name].start()
-
-    def action_trigger(self, action_name):
-        logger.debug('action_trigger')
-        Action.trigger(self.actions[action_name].action_args)
 
     def make_checkboxes(self):
         self.checkboxes = []
@@ -507,7 +477,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             logger.debug(f'action_signal emit prepare')
-            self.action_signal.emit('prepare')
+            self.actions.action_signal.emit('prepare')
 
         else:
             logger.debug('===NOT READY===')
@@ -633,7 +603,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
                 self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
 
-
     def taskdone(self, message):
         logger.debug('taskdone start !')
         self.taskdone_first = True
@@ -708,7 +677,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if os.path.isfile('power_results'):
                 os.remove('power_results')
-        self.action_trigger('after')
+        self.actions.action_trigger('after')
 
     def show_barcode_dialog(self):
         logger.debug('show_barcode_dialog start')
@@ -842,24 +811,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             "MainWindow", "At least one of the fixture should be checked")
 
 
-def parse_for_register(task, actions_or_prepares):
-    items = task.base['behaviors'][actions_or_prepares]
-    for e in items:
-        item_name = actions_or_prepares[:-1] # sigular not plural
-        item, args = e[item_name], e['args']
-        item = eval(item)
-        args_parsed = []
-        if args:
-            for a in args:
-                try:
-                    args_parsed.append(eval(a))
-                except Exception as ex:
-                    args_parsed.append(a)
-        e[item_name] = item
-        e['args'] = args_parsed
-    return items
-
-
 if __name__ == "__main__":
     version = "0.1.0"
     thismodule = sys.modules[__name__]
@@ -893,21 +844,8 @@ if __name__ == "__main__":
     if not task.base: sys.exit()
 
     win = MyWindow(app, task)
+    actions = Actions(task)
+    win.actions = actions
+    actions.action_trigger('first')
 
-    firsts = parse_for_register(task, 'firsts')
-    action_first = Action('first', firsts)
-    win.register_action(action_first, to_connect=False)
-
-    prepares = parse_for_register(task, 'prepares')
-    action_prepare = Action('prepare', prepares)
-    win.register_action(action_prepare)
-
-    actions = parse_for_register(task, 'actions')
-    task.register_action(actions)
-
-    afters = parse_for_register(task, 'afters')
-    action_after = Action('after', afters)
-    win.register_action(action_after, to_connect=False)
-
-    win.action_trigger('first')
     app.exec_()

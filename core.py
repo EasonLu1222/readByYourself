@@ -17,19 +17,27 @@ from PyQt5.QtWidgets import QMessageBox
 from utils import resource_path, get_env, python_path
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
-from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES,
-                    SERIAL_DEVICE_NAME, VISA_DEVICE_NAME)
+from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
+                    VISA_DEVICE_NAME)
 from serials import enter_factory_image_prompt, get_serial
 from iqxel import run_iqfactrun_console
 from utils import s_
 
+from actions import (disable_power_check, set_power_simu, dummy_com, window_click_run,
+                     is_serial_ok, set_power, is_adb_ok, serial_ignore_xff)
+
+# for prepares
+from iqxel import prepare_for_testflow_files
+from soundcheck import soundcheck_init
 
 PADDING = ' ' * 2
 
 
 def enter_prompt_simu():
+
     def dummy(sec):
         time.sleep(sec)
+
     logger.debug(f'{PADDING}enter factory image prompt start')
     t0 = time.time()
     t = threading.Thread(target=dummy, args=(1.5, ))
@@ -50,7 +58,8 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     for i in window.dut_selected:
         port = comports()[i]
         ser = get_serial(port, 115200, ser_timeout)
-        t = threading.Thread(target=enter_factory_image_prompt, args=(ser, waitwordidx))
+        t = threading.Thread(target=enter_factory_image_prompt,
+                             args=(ser, waitwordidx))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
@@ -65,7 +74,8 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
 
 def check_json_integrity(filename):
     path1 = resource_path(f'jsonfile/{filename}.json')
-    path2 = os.path.join(os.path.abspath(os.path.curdir), 'jsonfile', f'{filename}.json')
+    path2 = os.path.join(os.path.abspath(os.path.curdir), 'jsonfile',
+                         f'{filename}.json')
     logger.debug(f'{PADDING}path1 {path1}')
     logger.debug(f'{PADDING}path2 {path2}')
 
@@ -90,9 +100,9 @@ def check_json_integrity(filename):
     if j1 and j2:
         if path1 == path2:
             # do not check integrity before pyinstaller deployment
-            return True # json file integrity is good
+            return True  # json file integrity is good
         else:
-            return True if j1==j2 else False
+            return True if j1 == j2 else False
     else:
         return False
 
@@ -143,19 +153,20 @@ class ProcessListener(QThread):
 class BaseVisaListener(QThread):
     update_msec = 500
     if_all_ready = QSignal(bool)
+
     def __init__(self, *args, **kwargs):
         super(BaseVisaListener, self).__init__(*args, **kwargs)
         self.is_reading = False
         self.is_instrument_ready = False
 
     def filter_devices(self, devices, name, field='comport'):
-        filtered = [e[field] for e in [e for e in devices if e['name']==name]]
+        filtered = [e[field] for e in [e for e in devices if e['name'] == name]]
         return filtered
 
     def get_update_ports_map(self):
         devices = get_visa_devices()
         ports_map = {}
-        for k,v in self.devices.items():
+        for k, v in self.devices.items():
             ports = self.filter_devices(devices, v['name'])
             ports_map[k] = ports
         return ports_map
@@ -174,13 +185,13 @@ class BaseVisaListener(QThread):
         return False
 
     def port_full(self, excludes=None):
-        for k,v in self.devices.items():
+        for k, v in self.devices.items():
             if not v['name']:
                 continue
 
             if excludes:
                 for e in excludes:
-                    if k==e: continue
+                    if k == e: continue
             if len(getattr(self, f'ports_{k}')) < v['num']:
                 return False
         return True
@@ -215,13 +226,84 @@ class BaseVisaListener(QThread):
         logger.info(f'{PADDING}BaseVisaListener stop end')
 
 
+def dummy_com_first(win, *coms):
+    win._comports_dut = dict(zip(range(len(coms)), coms))
+    win.instrument_ready(True)
+    win.render_port_plot()
+
+
+class Actions(QThread):
+    action_signal = QSignal(str)
+
+    def __init__(self, task):
+        super(Actions, self).__init__()
+        self.task = task
+        firsts, prepares, actions, afters = self.parse_action_all()
+        self.actions = {}
+
+        first = Action('first', firsts)
+        prepare = Action('prepare', prepares)
+        action = Action('action', actions)
+        after = Action('after', afters)
+
+        self.register_action(first, to_connect=False)
+        self.register_action(prepare, to_connect=True)
+        self.task.register_action(actions)
+        #  self.register_action(action, to_connect=False)
+        self.register_action(after, to_connect=False)
+
+    def parse_action_all(self):
+        actions_all = [
+            self.parse_for_register(e)
+            for e in ['firsts', 'prepares', 'actions', 'afters']
+        ]
+        return actions_all
+
+    def parse_for_register(self, actions_or_prepares):
+        items = self.task.base['behaviors'][actions_or_prepares]
+        for e in items:
+            item_name = actions_or_prepares[:-1]  # sigular not plural
+            item, args = e[item_name], e['args']
+            item = eval(item)
+            args_parsed = []
+            if args:
+                for a in args:
+                    if a=='win': a = 'self.task.window'
+                    if a=='task': a = 'self.task'
+                    if a=='thismodule': a = sys.modules['__main__']
+                    try:
+                        args_parsed.append(eval(a))
+                    except Exception as ex:
+                        args_parsed.append(a)
+            e[item_name] = item
+            e['args'] = args_parsed
+        return items
+
+    def register_action(self, action, to_connect=True):
+        logger.debug(f'register_action {action.name}')
+        self.actions[action.name] = action
+        if to_connect:
+            self.action_signal.connect(self.action_start)
+            self.actions[action.name].action_done.connect(
+                getattr(self, f'{action.name}_done'))
+
+    def prepare_done(self):
+        print('prepare_done')
+
+    def action_start(self, action_name):
+        logger.debug('action_start')
+        self.actions[action_name].start()
+
+    def action_trigger(self, action_name):
+        logger.debug('action_trigger')
+        Action.trigger(self.actions[action_name].action_args)
+
+
 class Action(QThread):
     action_done = QSignal()
 
     def __init__(self, action_name, actions):
         super(Action, self).__init__()
-        #  self.prepare_args = list()
-        #  set(self, f{action_name}_args, list())
         self.action_args = list()
         self.name = action_name
         self.update_action(actions)
@@ -234,6 +316,7 @@ class Action(QThread):
 
     @classmethod
     def trigger(cls, action_args):
+        logger.debug('trigger')
         for action, args in action_args:
             aname = action.__name__
             logger.debug(f'{PADDING}run action {aname}')
@@ -243,12 +326,7 @@ class Action(QThread):
         logger.debug(f'{PADDING}Action run end')
 
     def run(self):
-        for action, args in self.action_args:
-            aname = action.__name__
-            logger.debug(f'{PADDING}run action {aname}')
-            if not action(*args):
-                logger.debug(f'{PADDING}{aname} is False --> return')
-                return
+        Action.trigger(self.action_args)
         self.action_done.emit()
         logger.debug('Action run end')
 
@@ -281,11 +359,11 @@ class Task(QThread):
         self.jsonfile = f'{json_root}/{json_name}.json'
         logger.info(f'{PADDING}{self.jsonfile}')
         #  if not check_json_integrity(self.json_name):
-            #  if QMessageBox.warning(None, 'Warning',
-                   #  'You can not change jsonfile content besides the serial numbers',
-                   #  QMessageBox.Yes):
-                #  self.base = None
-                #  return
+        #  if QMessageBox.warning(None, 'Warning',
+        #  'You can not change jsonfile content besides the serial numbers',
+        #  QMessageBox.Yes):
+        #  self.base = None
+        #  return
 
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
@@ -293,21 +371,27 @@ class Task(QThread):
         self.df = self.load()
         self.instruments = generate_instruments(self.devices, INSTRUMENT_MAP)
         logger.debug(f'{PADDING}Task.instruments')
-        for k,v in self.instruments.items():
+        for k, v in self.instruments.items():
             logger.debug(f'{PADDING}{k} ---> {v}')
 
     @property
     def serial_instruments(self):
-        name_int = dict(DEVICES.values()) # {intrument_name: interface}
-        filtered = {k:v for k,v in self.instruments.items() if name_int[k]=='serial'}
+        name_int = dict(DEVICES.values())  # {intrument_name: interface}
+        filtered = {
+            k: v
+            for k, v in self.instruments.items() if name_int[k] == 'serial'
+        }
         serial_inst = defaultdict(list)
         serial_inst.update(filtered)
         return serial_inst
 
     @property
     def visa_instruments(self):
-        name_int = dict(DEVICES.values()) # {intrument_name: interface}
-        filtered = {k:v for k,v in self.instruments.items() if name_int[k]=='visa'}
+        name_int = dict(DEVICES.values())  # {intrument_name: interface}
+        filtered = {
+            k: v
+            for k, v in self.instruments.items() if name_int[k] == 'visa'
+        }
         visa_inst = defaultdict(list)
         visa_inst.update(filtered)
         return visa_inst
@@ -372,13 +456,19 @@ class Task(QThread):
     @property
     def serial_devices(self):
         devices = self.base['devices']
-        serial_devices = {k:v for k,v in devices.items() if v['name'] in SERIAL_DEVICE_NAME}
+        serial_devices = {
+            k: v
+            for k, v in devices.items() if v['name'] in SERIAL_DEVICE_NAME
+        }
         return serial_devices
 
     @property
     def visa_devices(self):
         devices = self.base['devices']
-        visa_devices = {k:v for k,v in devices.items() if v['name'] in VISA_DEVICE_NAME}
+        visa_devices = {
+            k: v
+            for k, v in devices.items() if v['name'] in VISA_DEVICE_NAME
+        }
         return visa_devices
 
     @property
@@ -417,12 +507,15 @@ class Task(QThread):
         each = self.each(index)
         line = self.df.values[index]
         script = 'tasks.%s' % each['script']
-        args = [str(e) for e in each['args']]if each['args'] else []
+        args = [str(e) for e in each['args']] if each['args'] else []
         return each, script, args
 
     def rungroup(self, groupname):
-        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(groupname)
-        logger.debug(f'{PADDING}[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]')
+        eachgroup, script, index, item_len, tasktype, args = self.unpack_group(
+            groupname)
+        logger.debug(
+            f'{PADDING}[rungroup][{s_(script)}][{s_(index)}][{s_(item_len)}][{s_(args)}]'
+        )
         limits_group = [self.limits(groupname, i) for i in range(item_len)]
         limits = {}
         for e in zip(*args):
@@ -432,18 +525,22 @@ class Task(QThread):
         args = {'args': args, 'limits': limits}
 
         coms = {}
-        for k,v in self.instruments.items():
+        for k, v in self.instruments.items():
             interface = dict(DEVICES.values())[k]
             if interface == 'serial':
                 com_to_extract = 'com'
             elif interface == 'visa':
                 com_to_extract = 'visa_addr'
-            if len(v) > 0 :
+            if len(v) > 0:
                 coms.update({k: [getattr(e, com_to_extract) for e in v]})
 
         coms = json.dumps(coms)
 
-        proc = Popen([python_path(), '-m', script, '-p', coms] + [json.dumps(args)], stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        proc = Popen([python_path(), '-m', script, '-p', coms] +
+                     [json.dumps(args)],
+                     stdout=PIPE,
+                     env=get_env(),
+                     cwd=resource_path('.'))
 
         return proc
 
@@ -452,12 +549,15 @@ class Task(QThread):
         each, script, args = self.unpack_each(row_idx)
         msg = f'{PADDING}[runeach][{s_(script)}][{s_(row_idx)}][{s_(dut_idx)}][{s_(port)}][{s_(dynamic_info)}][{s_(args)}]'
         logger.debug(msg)
-        arguments = [python_path(), '-m', script,
-                     '-p', port,
-                     '-i', str(dut_idx),
-                     '-s', dynamic_info]
+        arguments = [
+            python_path(), '-m', script, '-p', port, '-i',
+            str(dut_idx), '-s', dynamic_info
+        ]
         if args: arguments.append(args)
-        proc = Popen(arguments, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        proc = Popen(arguments,
+                     stdout=PIPE,
+                     env=get_env(),
+                     cwd=resource_path('.'))
         self.printterm_msg.emit(msg)
         return proc
 
@@ -474,21 +574,32 @@ class Task(QThread):
         msg = f'{PADDING}[rungroup][{s_(script)}][{s_(index)}][{s_(ports)}][{s_(args)}]'
         logger.debug(msg)
         self.printterm_msg.emit(msg)
-        selected_duts = ','.join([str(s) for s in self.window.dut_selected])    # E.g. '0,1'
+        selected_duts = ','.join([str(s) for s in self.window.dut_selected
+                                  ])  # E.g. '0,1'
 
-        proc = Popen([python_path(), '-m', script, '-pp', ports, '-ds', selected_duts] + args, stdout=PIPE, env=get_env())
+        proc = Popen(
+            [python_path(), '-m', script, '-pp', ports, '-ds', selected_duts] +
+            args,
+            stdout=PIPE,
+            env=get_env())
 
         outputs, _ = proc.communicate()
         if not outputs:
             logger.warning(f'{PADDING}outputs is None!!!!')
         outputs = outputs.decode('utf8')
         outputs = json.loads(outputs)
-        msg2 = '[task %s][outputs: %s]' % (index, outputs)  # E.g. outputs = ['Passed', 'Failed']
+        msg2 = '[task %s][outputs: %s]' % (
+            index, outputs)  # E.g. outputs = ['Passed', 'Failed']
         self.printterm_msg.emit(msg2)
 
         port_list = ports.split(',')
         for idx, output in enumerate(outputs):
-            result = json.dumps({'index': index, 'port': port_list[idx], 'idx': idx, 'output': output})
+            result = json.dumps({
+                'index': index,
+                'port': port_list[idx],
+                'idx': idx,
+                'output': output
+            })
             self.df.iat[index,
                         len(self.header()) +
                         self.window.dut_selected[idx]] = output
@@ -499,6 +610,14 @@ class Task(QThread):
         for e in actions:
             action, args = e['action'], e['args']
             self.action_args.append([action, args])
+
+    #  def register_action(self, action, to_connect=True):
+        #  logger.debug(f'register_action {action.name}')
+        #  self.actions[action.name] = action
+        #  if to_connect:
+            #  self.action_signal.connect(self.action_start)
+            #  self.actions[action.name].action_done.connect(
+                #  getattr(win, f'{action.name}_done'))
 
     def run_task1(self, group, items):
         row_idx, next_item = items[0]['index'], items[0]
@@ -542,7 +661,7 @@ class Task(QThread):
             if not any(self.window.port_barcodes.values()):
                 script = next_item['script']
                 func = next_item['args'][0]
-                to_read_pid = (script=='task_runeach' and func=='read_pid')
+                to_read_pid = (script == 'task_runeach' and func == 'read_pid')
                 if output.startswith('Pass') and to_read_pid:
                     pid = output[5:-1]
                     header = self.header_ext()
@@ -592,15 +711,12 @@ class Task(QThread):
         func = getattr(mod, func_list[0])
         t = threading.Thread(target=func)
         t.start()
-        r1, r2 = row, row+1
+        r1, r2 = row, row + 1
         c1 = len(self.header()) + self.window.dut_selected[0]
         c2 = c1 + len(self.window.dut_selected)
         self.df.iloc[r1:r2, c1:c2] = "Passed"
 
-        result = json.dumps({
-            'index': row,
-            'output': "Passed"
-        })
+        result = json.dumps({'index': row, 'output': "Passed"})
         self.task_result.emit(result)
 
     def run_task9(self, group, items):
@@ -626,8 +742,14 @@ class Task(QThread):
             port = self.window.comports()[dut_idx]
             logger.debug(f'{PADDING}dut_idx:  {dut_idx}')
             logger.debug(f'{PADDING}port:  {port}')
-            threads[dut_idx] = th = threading.Thread(target=run_iqfactrun_console,
-                                                args=(self, dut_idx, port, group,))
+            threads[dut_idx] = th = threading.Thread(
+                target=run_iqfactrun_console,
+                args=(
+                    self,
+                    dut_idx,
+                    port,
+                    group,
+                ))
             th.start()
         for dut_idx, th in threads.items():
             th.join()

@@ -28,11 +28,11 @@
      "actions": [
          {
             "action": "is_serial_ok",
-            "args": ["win.comports", "task.serial_ok"]
+            "args": ["win", "task"]
          }
          ,{
             "action": "set_power",
-            "args": ["win.power_process", "win.proc_listener"]
+            "args": ["win"]
          }
          ,{
             "action": "enter_prompt",
