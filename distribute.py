@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-from shutil import copyfile, make_archive
+from shutil import copyfile, make_archive, rmtree
 from distutils.dir_util import copy_tree
 from utils import run
 
@@ -55,6 +55,7 @@ class Distribute:
                 json.dump(sta_obj, outfile)
 
             make_archive(target_dir, "zip", target_dir)
+            rmtree(target_dir)
 
 
 if __name__ == '__main__':
