@@ -35,3 +35,6 @@ LANG_LIST = [
 ]
 
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
+
+STATION = json.loads(open('jsonfile/station.json', 'r').\
+                     read())['STATION']

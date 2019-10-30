@@ -1,6 +1,6 @@
 import time
 import json
-import visa
+#  import visa
 from collections import defaultdict
 
 from mylogger import logger
@@ -14,7 +14,7 @@ PADDING = ' ' * 4
 
 
 def get_visa_devices():
-    #  import visa
+    import visa
     dll_32 = 'C:/Windows/System32/visa32.dll'
     rm = visa.ResourceManager(dll_32)
     resource_names = rm.list_resources()
@@ -289,7 +289,7 @@ class VisaInstrument(Instrument):
         self.visa_addr = '::'.join([
             f'USB{index-1}', vid, pid, sn, 'INSTR'])
         self.delay_sec = delay_sec
-        #  import visa
+        import visa
         self.rm = visa.ResourceManager(self.dll_32)
 
     def open(self):

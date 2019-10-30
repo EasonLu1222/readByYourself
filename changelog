@@ -1,3 +1,11 @@
+[2019.10.30 - 23:55]
+Some station avaiable at Mac environment
+
+1. include only necessary modules when needed
+
+2. worked stations at mac
+	- LED, CatTouch, MainBoard, SA, WPC, Download
+
 [2019.10.29 - 15:25]
 Move codes from core.py into actions.py
 

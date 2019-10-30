@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayo
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
                              QWidget, QCheckBox, QMessageBox)
 
+
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
@@ -25,7 +26,7 @@ from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path, QssTools
 from ui.main import Ui_MainWindow
-from config import station_json, LANG_LIST
+from config import station_json, LANG_LIST, STATION
 
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
@@ -832,11 +833,6 @@ if __name__ == "__main__":
         STATION = 'Download'
 
     '''
-
-    # temporary approach, for convenient development
-    STATION = json.loads(open('jsonfile/station.json', 'r').\
-                         read())['STATION']
-
     app = QApplication(sys.argv)
 
     if STATION == 'RF': generate_jsonfile()

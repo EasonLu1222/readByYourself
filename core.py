@@ -18,7 +18,7 @@ from utils import resource_path, get_env, python_path
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
-                    VISA_DEVICE_NAME)
+                    VISA_DEVICE_NAME, STATION)
 from serials import enter_factory_image_prompt, get_serial
 from iqxel import run_iqfactrun_console
 from utils import s_
@@ -31,7 +31,9 @@ from actions import (
 
 # for prepares
 from iqxel import prepare_for_testflow_files
-from soundcheck import soundcheck_init
+
+if STATION == 'Audio':
+    from soundcheck import soundcheck_init
 
 PADDING = ' ' * 2
 
