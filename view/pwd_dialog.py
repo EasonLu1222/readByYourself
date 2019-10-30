@@ -33,3 +33,8 @@ class PwdDialog(QDialog, Ui_PwdDialog):
         self.dialog_close.emit(False)
         self.close()
 
+    def keyPressEvent(self, event):
+        if event.key() is Qt.Key_Escape:
+            pass
+
+
