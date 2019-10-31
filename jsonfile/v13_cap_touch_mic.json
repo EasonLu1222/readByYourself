@@ -22,7 +22,11 @@
          },
          {
             "action": "is_serial_ok",
-            "args": ["win.comports", "task.serial_ok"]
+            "args": ["win", "task"]
+         },
+         {
+            "action": "is_adb_ok",
+            "args": ["win", "task"]
          },
          {
             "action": "serial_ignore_xff",
