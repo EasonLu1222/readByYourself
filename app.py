@@ -690,7 +690,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         logger.debug('show_barcode_dialog end')
 
     def btn_clicked(self):
-        logger.debug('\n');logger.debug('btn_clicked')
+        logger.debug('\n')
         self.barcodes = []
         for dut_i, port in self._comports_dut.items():
             if port:

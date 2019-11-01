@@ -383,7 +383,7 @@ class SerialInstrument(Instrument):
             self.ser = get_serial(self.com, baudrate=baud, timeout=timeout)
             logger.info(f'{PADDING}get_serial end')
             success = True
-        logger.info(f'{PADDING}in SerialInstrument: open_com end\n')
+        logger.info(f'{PADDING}in SerialInstrument: open_com end')
         return success
 
     def close_com(self):
