@@ -19,11 +19,12 @@ station_json = {
     'CapTouchMic': 'v13_cap_touch_mic',
 
     # --- FATP ---
-    'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
     'RF': 'v13_rf',
+    'Audio': 'v13_audio',
+    'Leak': 'v13_leak',
     'WPC': 'v13_wpc',                       # pyinstaller exe  tested on clean windows
     'PowerSensor': 'v13_power_sensor',      # pyinstaller exe  tested on clean windows
-    'Audio': 'v13_audio',
+    'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
     'Download': 'v13_download',
 }
 

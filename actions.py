@@ -3,6 +3,7 @@ import re
 import time
 import threading
 from subprocess import Popen, PIPE
+from PyQt5.QtCore import QThread
 from serials import is_serial_free, get_serial, issue_command
 from utils import resource_path, get_env, python_path, run
 from mylogger import logger
@@ -11,6 +12,11 @@ PADDING = ' ' * 4
 
 
 def window_click_run(win):
+    win.btn_clicked()
+
+
+def wait_and_window_click_run(win, wait_sec=3):
+    QThread.sleep(wait_sec)
     win.btn_clicked()
 
 

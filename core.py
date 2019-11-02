@@ -27,6 +27,7 @@ from actions import (
     disable_power_check, set_power_simu, dummy_com,
     window_click_run, is_serial_ok, set_power, is_adb_ok,
     serial_ignore_xff, dummy_com_first, enter_prompt_simu,
+    wait_and_window_click_run,
 )
 
 # for prepares
@@ -233,7 +234,7 @@ class Actions(QThread):
         self.register_action(prepare, to_connect=True)
         self.task.register_action(actions)
         #  self.register_action(action, to_connect=False)
-        self.register_action(after, to_connect=False)
+        self.register_action(after, to_connect=True)
 
     def parse_action_all(self):
         actions_all = [
@@ -272,6 +273,9 @@ class Actions(QThread):
 
     def prepare_done(self):
         print('prepare_done')
+
+    def after_done(self):
+        print('after_done')
 
     def action_start(self, action_name):
         logger.debug('action_start')
@@ -742,7 +746,7 @@ class Task(QThread):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
 
-        QThread.msleep(1000)
+        #  QThread.msleep(1000)
         t0 = time_()
         for action, args in self.action_args:
             aname = action.__name__
@@ -754,7 +758,7 @@ class Task(QThread):
                 self.window.ser_listener.start()
                 return
 
-        QThread.msleep(500)
+        #  QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
         c1 = len(self.header())
         self.df.iloc[:, c1:c1 + self.dut_num] = ""

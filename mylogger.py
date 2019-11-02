@@ -52,7 +52,7 @@ def lookup_class(module, funcname, lineno):
 class MyLogFormatter(logging.Formatter):
     def format(self, record):
         record.className = lookup_class(
-                record.module, record.funcName, record.lineno
+            record.module, record.funcName, record.lineno
         )
         if record.className:
             location = '%s.%s.%s' % (record.module, record.className, record.funcName)
@@ -60,7 +60,7 @@ class MyLogFormatter(logging.Formatter):
         else:
             location = '%s.%s' % (record.module, record.funcName)
 
-        msg = '%s %5s %5s %30s:%-4s %s' % (self.formatTime(record, '%m/%d %H:%M:%S'), record.levelname,
+        msg = '%s %5s %5s %35s:%-4s %s' % (self.formatTime(record, '%m/%d %H:%M:%S'), record.levelname,
                                           record.process, location, record.lineno, record.msg)
         record.msg = msg
         return super(MyLogFormatter, self).format(record)

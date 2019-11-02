@@ -593,7 +593,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 j = self.comports().index(port)
             elif 'idx' in ret:
                 j = ret['idx']
-
             self.table_view.setItem(row, self.col_dut_start + j, QTableWidgetItem(output))
             self.table_view.item(row, self.col_dut_start + j).setBackground(self.color_check(output))
 
@@ -678,7 +677,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if os.path.isfile('power_results'):
                 os.remove('power_results')
-        self.actions.action_trigger('after')
+        #  self.actions.action_trigger('after')
+        self.actions.action_signal.emit('after')
 
     def show_barcode_dialog(self):
         logger.debug('show_barcode_dialog start')
