@@ -24,8 +24,8 @@ from iqxel import run_iqfactrun_console
 from utils import s_
 
 from actions import (
-    disable_power_check, set_power_simu, dummy_com, 
-    window_click_run, is_serial_ok, set_power, is_adb_ok, 
+    disable_power_check, set_power_simu, dummy_com,
+    window_click_run, is_serial_ok, set_power, is_adb_ok,
     serial_ignore_xff, dummy_com_first, enter_prompt_simu,
 )
 
@@ -263,7 +263,7 @@ class Actions(QThread):
         return items
 
     def register_action(self, action, to_connect=True):
-        logger.debug(f'register_action {action.name}')
+        logger.debug(f'{PADDING}{action.name}')
         self.actions[action.name] = action
         if to_connect:
             self.action_signal.connect(self.action_start)
@@ -292,9 +292,10 @@ class Action(QThread):
         self.update_action(actions)
 
     def update_action(self, actions):
-        logger.debug(f'{PADDING}update_action')
+        logger.debug(f'{PADDING}{self.name}')
         for e in actions:
             action, args = e[f'{self.name}'], e['args']
+            logger.debug(f'{PADDING}> {action.__name__}')
             self.action_args.append([action, args])
 
     @classmethod
@@ -589,9 +590,9 @@ class Task(QThread):
             self.task_result.emit(result)
 
     def register_action(self, actions):
-        logger.debug(f'{PADDING}register_action')
         for e in actions:
             action, args = e['action'], e['args']
+            logger.debug(f'{PADDING} {action}')
             self.action_args.append([action, args])
 
     #  def register_action(self, action, to_connect=True):
