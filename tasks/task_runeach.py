@@ -6,10 +6,15 @@ import json
 import time
 import random
 import argparse
+import threading
 import inspect
 import config
+
+from PyQt5.QtWidgets import (QApplication, QMainWindow)
+
 from subprocess import Popen, PIPE
-from serials import issue_command, get_serial, enter_factory_image_prompt
+from serials import issue_command, get_serial, wait_for_prompt
+#  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
 
@@ -437,11 +442,11 @@ def tx_power_11ac_5500mhz_ch2(portname):
     return result
 
 
-def wait_for_leak_result(portname):
-    logger.debug('wait_for_leak_result')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        result = 'Pass!'
-    logger.debug('wait_for_leak_result end')
+def read_leak_result(portname):
+    logger.debug('read_leak_result')
+    with open('leak_result', 'r') as f:
+        result = f.readline()
+    logger.debug(result)
     return result
 
 

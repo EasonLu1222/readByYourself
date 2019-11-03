@@ -13,7 +13,7 @@ from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox, QMessageBox)
+                             QWidget, QCheckBox, QMessageBox, QPushButton)
 
 
 from view.pwd_dialog import PwdDialog
@@ -32,7 +32,6 @@ from config import station_json, LANG_LIST, STATION
 from iqxel import generate_jsonfile
 
 from mylogger import logger
-
 
 
 class UsbPowerSensor(): comports_pws = QSignal(list)
@@ -98,7 +97,6 @@ class Label(QLabel):
     def __init__(self, *args, antialiasing=True, **kwargs):
         super(Label, self).__init__(*args, **kwargs)
         self.Antialiasing = antialiasing
-        #  self.setMaximumSize(220, 130)
         self.setMinimumSize(200, 100)
         self.radius = 100
         self.target = QPixmap(self.size())  # 大小和控件一样
@@ -118,7 +116,6 @@ class Label(QLabel):
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
     msg_dialog_signal = QSignal(str)
-    #  action_signal = QSignal(str)
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -207,11 +204,25 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.msg_dialog_signal.connect(self.show_message_dialog)
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
-        #  self.actions = {}
         self.showMaximized()
+        self.loading_dialog = LoadingDialog(self)
+        self.set_togglebutton()
 
-    #  def prepare_done(self):
-        #  print('prepare_done')
+    def set_togglebutton(self):
+        self.pushButton2 = QPushButton(self.container)
+        self.pushButton2.setText('enable fetch')
+        self.pushButton2.setObjectName("pushButton2")
+        self.verticalLayout.addWidget(self.pushButton2)
+        self.pushButton2.setCheckable(True)
+        self.pushButton2.toggled.connect(self.btn2_toggled)
+        self.pushButton2.setVisible(False)
+
+    def btn2_toggled(self, state):
+        if state:
+            self.pushButton2.setText('fetching...')
+            self.btn_clicked()
+        else:
+            self.pushButton2.setText('enable fetch')
 
     def set_hbox_visible(self, is_visible):
         for i in range(self.hboxPorts.count()):
@@ -455,7 +466,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
-            #  self.prepare()
+            self.actions.action_signal.emit('prepare')
 
     def instrument_ready(self, ready):
         logger.debug('instrument_ready start')
@@ -465,7 +476,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clean_power()
 
             # order: power1,power2, dmm1
-            #  instruments_to_dump = sum(self.task.instruments.values(), [])
             if self.task.serial_instruments:
                 instruments_to_dump = sum(self.task.serial_instruments.values(), [])
                 with open(resource_path('instruments'), 'wb') as f:
@@ -477,7 +487,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.serial_ready and self.visa_ready:
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
-            logger.debug(f'action_signal emit prepare')
             self.actions.action_signal.emit('prepare')
 
         else:
@@ -677,7 +686,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             if os.path.isfile('power_results'):
                 os.remove('power_results')
-        #  self.actions.action_trigger('after')
         self.actions.action_signal.emit('after')
 
     def show_barcode_dialog(self):
@@ -707,7 +715,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
         self.set_window_color('default')
-
         if self.task.behaviors['barcode-scan']:
             self.show_barcode_dialog()
         else:
@@ -779,8 +786,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.start()
 
     def toggle_loading_dialog(self, is_on=False):
-        if not hasattr(self, 'loading_dialog'):
-            self.loading_dialog = LoadingDialog(self)
         if is_on:
             self.loading_dialog.show()
         else:

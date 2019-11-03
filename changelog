@@ -1,3 +1,14 @@
+[2019.11.3 - 23:25]
+Leak station testing flow worked
+
+1. use toggle button to switch btw enable-fetch & fetching...
+	- once toggled on, it will listen to uart output
+	- tested with com0com --> ok
+	- real leaker output still needed to be parsed
+
+2. add wait_for_leak_result() & set_appearance() in actions.py
+	- modify v13_leak.json
+
 [2019.11.2 - 10:10]
 New station: preliminary framework for leak test
 

@@ -3,8 +3,8 @@ import re
 import time
 import threading
 from subprocess import Popen, PIPE
-from PyQt5.QtCore import QThread
-from serials import is_serial_free, get_serial, issue_command
+from PyQt5.QtCore import QThread, Qt
+from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
 from utils import resource_path, get_env, python_path, run
 from mylogger import logger
 
@@ -15,9 +15,45 @@ def window_click_run(win):
     win.btn_clicked()
 
 
-def wait_and_window_click_run(win, wait_sec=3):
+def wait_and_window_click_run(win, wait_sec=10):
     QThread.sleep(wait_sec)
-    win.btn_clicked()
+    win.pushButton.clicked.emit()
+
+
+def set_appearance(win):
+    win.pushButton2.setVisible(True)
+    win.pushButton.setVisible(False)
+
+
+# for leak test
+def wait_for_leak_result(win):
+    win.show_animation_dialog.emit(True)
+    win.loading_dialog.label_2.setText('wait for result')
+    port = win.comports()[0]
+    logger.debug('wait_for_leak_result')
+    logger.debug(f'{PADDING}wait_for_leak_result start')
+
+    prompt = 'fab'
+    while win.pushButton2.isChecked():
+        portname = win.comports()[0]
+        #  logger.debug(portname)
+        with get_serial(portname, 115200, timeout=0.2) as ser:
+            line = ''
+            try:
+                line = ser.readline().decode('utf-8').rstrip('\n')
+                if line: logger.debug(f'{PADDING}{line}')
+            except UnicodeDecodeError as ex: # ignore to proceed
+                logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
+                continue
+
+            if prompt in line:
+                logger.info(f'{PADDING}get %s' % prompt)
+                leak_result = 'Pass(1.3Pa)'
+                leak_result = 'Fail(3.7Pa)'
+                with open('leak_result', 'w') as f:
+                    f.write(leak_result)
+                return True
+    return False
 
 
 def enter_prompt_simu():
@@ -39,6 +75,7 @@ def dummy_com_first(win, *coms):
     win._comports_dut = dict(zip(range(len(coms)), coms))
     win.instrument_ready(True)
     win.render_port_plot()
+    return True
 
 
 def serial_ignore_xff(window, ser_timeout=0.2):

@@ -14,10 +14,23 @@
  },
  "behaviors": {
      "barcode-scan": false,
-     "firsts": [],
+     "firsts": [
+         {
+             "first": "dummy_com_first",
+             "args": ["win", "COM55"]
+         },
+         {
+             "first": "set_appearance",
+             "args": ["win"]
+         }
+     ],
      "actions": [
          {
             "action": "disable_power_check",
+            "args": ["win"]
+         },
+         {
+            "action": "wait_for_leak_result",
             "args": ["win"]
          }
      ],
@@ -37,7 +50,7 @@
             "tasktype": 1,
             "item": "",
             "script": "task_runeach",
-            "args": ["wait_for_leak_result"],
+            "args": ["read_leak_result"],
             "auto": true,
             "min": null,
             "expect": null,

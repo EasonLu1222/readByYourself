@@ -27,7 +27,7 @@ from actions import (
     disable_power_check, set_power_simu, dummy_com,
     window_click_run, is_serial_ok, set_power, is_adb_ok,
     serial_ignore_xff, dummy_com_first, enter_prompt_simu,
-    wait_and_window_click_run,
+    wait_and_window_click_run, wait_for_leak_result, set_appearance,
 )
 
 # for prepares
@@ -754,7 +754,8 @@ class Task(QThread):
             if not action(*args):
                 logger.debug(f'{PADDING}{aname} is False --> return')
                 self.window.show_animation_dialog.emit(False)
-                self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
+                if STATION != 'Leak':
+                    self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
                 self.window.ser_listener.start()
                 return
 

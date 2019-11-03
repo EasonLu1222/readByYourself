@@ -19,7 +19,7 @@ PADDING = ' ' * 4
 
 
 def get_serial(port_name, baudrate, timeout):
-    logger.info(f'{PADDING}===get_serial=== {port_name}')
+    #  logger.info(f'{PADDING}===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
                         baudrate=baudrate,
                         bytesize=serial.EIGHTBITS,
