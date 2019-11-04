@@ -10,7 +10,7 @@
     "pwr": {
         "name": "gw_powersupply",
         "num": 2,
-        "sn": ["GET140969", "GET140974"]
+        "sn": ["GES151079", "GES151078"]
     },
     "dmm": {
         "name": "gw_dmm",
