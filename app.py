@@ -818,7 +818,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    version = "0.1.0"
+    version = "0.2.1"
     thismodule = sys.modules[__name__]
 
     ''' === choose one of following station ===
