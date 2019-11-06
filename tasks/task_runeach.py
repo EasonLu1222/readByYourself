@@ -263,7 +263,7 @@ def decrease_playback_volume(portname):
 
 def speaker_play_1kz(portname):
     logger.info(f'{PADDING}play_1khz start')
-    wav_file = '/usr/share/2ch_1khz-16b-120s.wav'
+    wav_file = '/usr/share/2ch_1khz-16b-120s_30percent.wav'
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, f'aplay {wav_file}', fetch=True)
         for e in lines:
