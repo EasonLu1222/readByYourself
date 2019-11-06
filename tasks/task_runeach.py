@@ -213,7 +213,7 @@ def record_sound(portname):
 
 
 def get_mic_test_result(portname):
-    time.sleep(5)
+    time.sleep(6)
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         test_result_path = '/usr/share/mic_test_result*'
         wav_file_path = '/usr/share/recorded_sound.wav'
