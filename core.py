@@ -278,11 +278,11 @@ class Actions(QThread):
         print('after_done')
 
     def action_start(self, action_name):
-        logger.debug('action_start')
+        logger.debug(f'{PADDING}action_start {action_name}')
         self.actions[action_name].start()
 
     def action_trigger(self, action_name):
-        logger.debug('action_trigger')
+        logger.debug(f'{PADDING}action_trigger')
         Action.trigger(self.actions[action_name].action_args)
 
 
@@ -304,7 +304,7 @@ class Action(QThread):
 
     @classmethod
     def trigger(cls, action_args):
-        logger.debug('trigger')
+        logger.debug(f'{PADDING}trigger')
         for action, args in action_args:
             aname = action.__name__
             logger.debug(f'{PADDING}run action {aname}')
@@ -316,7 +316,7 @@ class Action(QThread):
     def run(self):
         Action.trigger(self.action_args)
         self.action_done.emit()
-        logger.debug('Action run end')
+        logger.debug(f'{PADDING}Action run end')
 
 
 class Task(QThread):

@@ -1,3 +1,9 @@
+[2019.11.6 - 23:30]
+Notorius is_serial_ok bug fixed (to be tested)
+
+1. use QSignal to handle the stopping of BaseSerialListener
+
+
 [2019.11.3 - 23:25]
 Leak station testing flow worked
 

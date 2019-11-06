@@ -172,7 +172,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.ser_listener.comports_dmm.connect(self.dmm_update)
         self.ser_listener.comports_eld.connect(self.eld_update)
         self.ser_listener.if_all_ready.connect(self.instrument_ready)
+        self.ser_listener.if_actions_ready.connect(self.actions_ready)
         self.ser_listener.start()
+
         self.serial_ready = False
 
         if self.task.visa_devices:
@@ -720,7 +722,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.pushButton.setEnabled(False)
             self.ser_listener.stop()
-            self.task.start()
+            #  self.task.start()
+
+    def actions_ready(self):
+        print('actions_ready')
+        self.task.start()
 
     def closeEvent(self, event):
         logger.debug('closeEvent')
