@@ -15,7 +15,7 @@ def window_click_run(win):
     win.btn_clicked()
 
 
-def wait_and_window_click_run(win, wait_sec=10):
+def wait_and_window_click_run(win, wait_sec=5):
     QThread.sleep(wait_sec)
     win.pushButton.clicked.emit()
 
@@ -29,15 +29,17 @@ def set_appearance(win):
 def wait_for_leak_result(win):
     win.show_animation_dialog.emit(True)
     win.loading_dialog.label_2.setText('wait for result')
-    port = win.comports()[0]
+    #port = win.comports()[0]
+    win._comports_dut = {0: 'com1'}
     logger.debug('wait_for_leak_result')
     logger.debug(f'{PADDING}wait_for_leak_result start')
 
-    prompt = 'fab'
+    prompt = '):'
+    prompt_ok='(OK)'
     while win.pushButton2.isChecked():
         portname = win.comports()[0]
         #  logger.debug(portname)
-        with get_serial(portname, 115200, timeout=0.2) as ser:
+        with get_serial(portname, 9600, timeout=0.2) as ser:
             line = ''
             try:
                 line = ser.readline().decode('utf-8').rstrip('\n')
@@ -48,11 +50,19 @@ def wait_for_leak_result(win):
 
             if prompt in line:
                 logger.info(f'{PADDING}get %s' % prompt)
-                leak_result = 'Pass(1.3Pa)'
-                leak_result = 'Fail(3.7Pa)'
-                with open('leak_result', 'w') as f:
-                    f.write(leak_result)
+                index=line.find('):')
+                if prompt_ok in line:
+                    leak_result = f'Pass({line[index+2:-2]})'
+                    with open('leak_result', 'w') as f:
+                     f.write(leak_result)
+                else:
+                    leak_result = f'Fail({line[index+2:-2]})'
+                    with open('leak_result', 'w') as f:
+                     f.write(leak_result)
+
                 return True
+
+
     return False
 
 

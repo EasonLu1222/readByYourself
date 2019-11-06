@@ -213,7 +213,7 @@ def record_sound(portname):
 
 
 def get_mic_test_result(portname):
-    time.sleep(1)
+    time.sleep(6)
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         test_result_path = '/usr/share/mic_test_result*'
         wav_file_path = '/usr/share/recorded_sound.wav'
@@ -253,17 +253,19 @@ def unload_led_driver(portname):
                                   for e in lines) else 'Pass'
         return result
 
+
 def decrease_playback_volume(portname):
     logger.info(f'{PADDING}decrease_playback_volume start')
     with get_serial(portname, 115200, timeout=1) as ser:
-        issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
+        lines = issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
         for e in lines:
             logger.info(f'{PADDING}{e}')
         return None
 
+
 def speaker_play_1kz(portname):
     logger.info(f'{PADDING}play_1khz start')
-    wav_file = '/usr/share/2ch_1khz-16b-120s.wav'
+    wav_file = '/usr/share/2ch_1khz-16b-120s_30percent.wav'
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, f'aplay {wav_file}', fetch=True)
         for e in lines:
