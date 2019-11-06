@@ -3,9 +3,9 @@
  "version": "13.0",
  "devices": {
     "dut": {
-        "name": "prolific",
+        "name": null,
         "num": 1,
-        "sn": ["6"]
+        "sn": []
     }
  },
  "appearance": {
@@ -15,10 +15,6 @@
  "behaviors": {
      "barcode-scan": false,
      "firsts": [
-         {
-             "first": "dummy_com_first",
-             "args": ["win", "COM55"]
-         },
          {
              "first": "set_appearance",
              "args": ["win"]
