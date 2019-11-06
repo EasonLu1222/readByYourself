@@ -253,13 +253,15 @@ def unload_led_driver(portname):
                                   for e in lines) else 'Pass'
         return result
 
+
 def decrease_playback_volume(portname):
     logger.info(f'{PADDING}decrease_playback_volume start')
     with get_serial(portname, 115200, timeout=1) as ser:
-        issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
+        lines = issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
         for e in lines:
             logger.info(f'{PADDING}{e}')
         return None
+
 
 def speaker_play_1kz(portname):
     logger.info(f'{PADDING}play_1khz start')
