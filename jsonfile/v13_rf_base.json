@@ -4,8 +4,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 3,
-        "sn": ["AI069IAVA", "00000000A", "ABCD1234A"]
+        "num": 2,
+        "sn": ["AQ000RXSA", "AQ000TATA"]
     }
  },
  "appearance": {
@@ -20,6 +20,14 @@
          {
             "action": "disable_power_check",
             "args": ["win"]
+         },
+         {
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         },
+         {
+            "action": "enter_prompt",
+            "args": ["win", 0.2, 7]
          }
      ],
      "prepares": [
