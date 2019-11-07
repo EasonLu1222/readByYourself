@@ -1,3 +1,8 @@
+[2019.11.7 - 23:10]
+Change WPC station's actions
+
+1. staion PowerSensor: actions changed to enter_prompt2
+
 [2019.11.7 - 23:00]
 Modified wait_for_prompt
 
