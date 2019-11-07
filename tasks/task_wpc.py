@@ -61,7 +61,7 @@ if __name__ == "__main__":
     logger.info(f'{PADDING}measure loop end')
     logger.info(f'{PADDING}{i_in_list}')
 
-    p.off()
+    #p.off()
     e.stop()
 
     p_in = v_in * i_in

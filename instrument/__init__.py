@@ -399,13 +399,15 @@ class SerialInstrument(Instrument):
             if fetch:
                 result = self.ser.readline().decode('utf8')
                 return result
-        except Exception as e:
+        except Exception as ex:
             logger.debug(f'{PADDING}run_cmd failed!')
-            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            logger.error(f'{PADDING}{type_(ex)} -- {ex}')
 
     def gw_read_idn(self):
         idn = self.run_cmd(['*IDN?'], True) # ignore first since it's empty (just MacOS)
+        logger.debug(f'idn {idn}')
         idn = self.run_cmd(['*IDN?'], True)
+        logger.debug(f'idn {idn}')
         sn = idn.split(',')[2]
         return sn
 
@@ -468,9 +470,11 @@ class Eloader(SerialInstrument):
     MeasureTime = 10
 
     def init(self):
+        logger.info(f'{PADDING}eloader_{self.index}({self}) init!')
         self.run_cmd(cmd(ELOADER_INIT), False)
 
     def start(self):
+        logger.info(f'{PADDING}eloader_{self.index}({self}) start!')
         self.run_cmd(cmd(ELOADER_START), False)
 
     def stop(self):
