@@ -48,7 +48,7 @@
             "script": "task_wpc",
             "args": [null],
             "auto": true,
-            "min": 0.55,
+            "min": 0.6,
             "expect": null,
             "max": null,
             "unit": null
