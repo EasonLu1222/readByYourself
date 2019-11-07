@@ -140,63 +140,6 @@ def write_country_code(dynamic_info):
         return result
 
 
-def write_mac_wifi(dynamic_info):
-    mac_wifi_addr = dynamic_info
-    logger.info(f'{PADDING}write mac_wifi')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_wifi > /sys/class/unifykeys/name',
-            f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_wifi_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
-def write_mac_bt(dynamic_info):
-    mac_bt_addr = dynamic_info
-    logger.info(f'{PADDING}write mac_bt')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_bt > /sys/class/unifykeys/name',
-            f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_bt_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
-def write_country_code(dynamic_info):
-    ccode = dynamic_info
-    logger.info(f'{PADDING}write country_code')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac > /sys/class/unifykeys/name',
-            f'echo {ccode} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(ccode, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
 def record_sound(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         wav_file_path = '/usr/share/recorded_sound.wav'
