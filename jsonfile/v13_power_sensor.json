@@ -5,7 +5,7 @@
     "dut": {
         "name": "ftdi",
         "num": 1,
-        "sn": ["22222222A"]
+        "sn": ["AQ0010ZIA"]
     },
     "pws": {
         "name": "ks_powersensor",
@@ -24,6 +24,10 @@
          {
             "action": "disable_power_check",
             "args": ["win"]
+         },
+         {
+           "action": "enter_prompt",
+           "args": ["win", 0.2, 7]
          }
      ],
      "prepares": [],
