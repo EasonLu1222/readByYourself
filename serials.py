@@ -116,6 +116,37 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
             break
 
 
+def wait_for_prompt2(serial, thread_timeout=25, printline=True):
+    portname = serial.name
+    logger.info(f'{PADDING}portname: {portname}')
+    lines_empty = 0
+    while True:
+        line = ''
+        try:
+            line = serial.readline().decode('utf-8').rstrip('\n')
+            if line=='': 
+                lines_empty += 1
+            else:
+                lines_empty = 0
+            if lines_empty > 5:
+                serial.write(os.linesep.encode('ascii'))
+
+                lines = issue_command(serial, 'echo 123')
+                if lines:
+                    if any(e.strip()=="123" for e in lines):
+                        logger.info('prompt entered')
+                        break
+                    else:
+                        continue
+
+            if line and printline: logger.debug(f'{PADDING}{line}')
+        except UnicodeDecodeError as ex: # ignore to proceed
+            logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
+            continue
+
+        se.serial_msg.emit([portname, line.strip()])
+
+
 def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printline=True):
     waitwords = [
         'U-Boot',
@@ -207,7 +238,7 @@ class BaseSerialListener(QThread):
 
     def run(self):
         while True:
-            if self.ready_to_stop: 
+            if self.ready_to_stop:
                 logger.debug('ready_to_stop is True!')
                 self.ready_to_stop = False
                 self.if_actions_ready.emit(True)

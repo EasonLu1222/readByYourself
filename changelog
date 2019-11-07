@@ -1,3 +1,15 @@
+[2019.11.7 - 23:00]
+Modified wait_for_prompt
+
+1. add serials.wait_for_prompt2()
+	- work for both two cases
+		- in the prompt already
+		- if not powered, wait for powered and prompt appeared
+
+2. modify two stations
+	- SA: actions changed to enter_prompt2
+	- RF: actions changed to enter_prompt2
+
 [2019.11.6 - 23:30]
 Notorius is_serial_ok bug fixed (to be tested)
 

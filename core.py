@@ -19,7 +19,7 @@ from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
                     VISA_DEVICE_NAME, STATION)
-from serials import enter_factory_image_prompt, get_serial
+from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from utils import s_
 
@@ -57,6 +57,29 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     t1 = time.time()
     logger.debug(f'{PADDING}enter factory image prompt end')
     logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
+    for port, (ser, th) in port_ser_thread.items():
+        ser.close()
+    return True
+
+
+def enter_prompt2(window, ser_timeout=0.2):
+    logger.debug(f'{PADDING}start')
+    t0 = time.time()
+    port_ser_thread = {}
+    comports = window.comports
+    logger.debug(f'{PADDING}enter_prompt: comports -  {comports}')
+    for i in window.dut_selected:
+        port = comports()[i]
+        ser = get_serial(port, 115200, ser_timeout)
+        t = threading.Thread(target=wait_for_prompt2,
+                             args=(ser,))
+        port_ser_thread[port] = [ser, t]
+        t.start()
+    for port, (ser, th) in port_ser_thread.items():
+        th.join()
+    t1 = time.time()
+    logger.debug(f'{PADDING}end')
+    logger.debug(f'{PADDING}time elapsed: %f' % (t1 - t0))
     for port, (ser, th) in port_ser_thread.items():
         ser.close()
     return True

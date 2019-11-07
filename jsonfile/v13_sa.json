@@ -4,8 +4,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 1,
-        "sn": ["A43QHNAMA"]
+        "num": 2,
+        "sn": ["AQ000TY7A", "22222222A"]
     }
  },
  "appearance": {
@@ -23,6 +23,10 @@
          ,{
             "action": "is_serial_ok",
             "args": ["win", "task"]
+         }
+         ,{
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
          }
      ],
      "prepares": [],
@@ -42,124 +46,6 @@
             "expect": null,
             "max": null,
             "unit": null
-        }
-        ,{
-            "group": "LED Test",
-            "hidden": false,
-            "tasktype": 3,
-            "item": "",
-            "script": "task_led",
-            "args": null,
-            "auto": false,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "Cap Touch Test",
-            "hidden": false,
-            "tasktype": 3,
-            "item": "",
-            "script": "task_cap_touch",
-            "args": null,
-            "auto": false,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        },
-        {
-            "group": "Mic Test",
-            "hidden": false,
-            "tasktype": 4,
-            "item": "play sweep tone from computer",
-            "script": "task_mic",
-            "args": ["play_tone"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "Mic Test2",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "record tone from mics",
-            "script": "task_runeach",
-            "args": ["record_sound"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "Mic Test3",
-            "hidden": false,
-            "tasktype": 4,
-            "item": "pull the record tone to computer",
-            "script": "task_mic",
-            "args": ["pull_recorded_sound"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "Mic Test4",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "get FFT result",
-            "script": "task_runeach",
-            "args": ["get_mic_test_result"],
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null
-        }
-        ,{
-            "group": "Write Wifi Mac",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "write mac_wifi",
-            "script": "task_runeach",
-            "args": ["write_mac_wifi"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool"
-        }
-        ,{
-            "group": "Write BT Mac",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "write mac_bt",
-            "script": "task_runeach",
-            "args": ["write_mac_bt"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool"
-        }
-        ,{
-            "group": "Write Country Code",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "write country_code",
-            "script": "task_runeach",
-            "args": ["write_country_code"],
-            "auto": true,
-
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool"
         }
     ]
 }
