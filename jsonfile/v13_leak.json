@@ -6,49 +6,49 @@
         "name": null,
         "num": 1,
         "sn": []
-    },
-    "pwr": {
-        "name": "gw_powersupply",
-        "num": 1,
-        "sn": ["GES150976"]
-    },
-    "eld": {
-        "name": "gw_eloader",
-        "num": 1,
-        "sn": ["GEQ130786"]
     }
  },
  "appearance": {
-     "columns_hidden": [0, 1, 2, 3, 4],
+     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10],
      "columns_width": [1, 1, 1, 1, 1, 300, 300, 90, 90, 90, 90, 300]
  },
  "behaviors": {
      "barcode-scan": false,
-     "firsts": [],
+     "firsts": [
+         {
+             "first": "set_appearance",
+             "args": ["win"]
+         }
+     ],
      "actions": [
          {
             "action": "disable_power_check",
             "args": ["win"]
-         }
-         ,{
-            "action": "is_serial_ok",
-            "args": ["win", "task"]
+         },
+         {
+            "action": "wait_for_leak_result",
+            "args": ["win"]
          }
      ],
      "prepares": [],
-     "afters": []
+     "afters": [
+         {
+             "after": "wait_and_window_click_run",
+             "args": ["win"]
+         }
+     ]
  },
  "test_items":
     [
         {
-            "group": "WPC",
+            "group": "Leak",
             "hidden": false,
-            "tasktype": 2,
-            "item": "efficiency",
-            "script": "task_wpc",
-            "args": [null],
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_leak_result"],
             "auto": true,
-            "min": 0.6,
+            "min": null,
             "expect": null,
             "max": null,
             "unit": null

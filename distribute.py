@@ -1,3 +1,4 @@
+import re
 import os
 import json
 from datetime import datetime
@@ -23,6 +24,27 @@ class Distribute:
             }
         ]
 
+    def gen_version_num(self):
+        """
+        Use the result of 'git describe' as version number
+        Insert the version number to app.py
+        """
+        # Get version number from git
+        ver = run("git describe")
+        ver = ver.strip()
+
+        # Read app.py
+        with open("./app.py", "r", encoding="utf-8") as f:
+            contents = f.read()
+
+        # Replace insert the version number to app.py
+        # new_content = contents.replace('version = ""', f'version = "{ver}"')
+        new_content = re.sub("version = \".*\"", f'version = "{ver}"', contents)
+
+        # Write app.py
+        with open("./app.py", "w", encoding="utf-8") as f:
+            f.write(new_content)
+
     def gen_installer(self):
         """
         Run pyinstaller to generate installer file.
@@ -30,8 +52,7 @@ class Distribute:
             dist/app.exe
             dist/jsonfile
         """
-        cmd = "pyinstaller --onefile app.spec"
-        output = run(cmd)
+        output = run("pyinstaller --onefile app.spec")
         print(output)
 
     def make_zip(self):
@@ -57,8 +78,24 @@ class Distribute:
             make_archive(target_dir, "zip", target_dir)
             rmtree(target_dir)
 
+    def cleanup(self):
+        """
+        Undo the change in app.py
+        Returns:
+
+        """
+        with open("./app.py", "r", encoding="utf-8") as f:
+            contents = f.read()
+
+        new_content = re.sub("version = \".*\"", 'version = ""', contents)
+
+        with open("./app.py", "w", encoding="utf-8") as f:
+            f.write(new_content)
+
 
 if __name__ == '__main__':
     d = Distribute()
+    d.gen_version_num()
     d.gen_installer()
     d.make_zip()
+    d.cleanup()

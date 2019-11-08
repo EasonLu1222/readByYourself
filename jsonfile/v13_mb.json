@@ -10,7 +10,7 @@
     "pwr": {
         "name": "gw_powersupply",
         "num": 2,
-        "sn": ["GET140969", "GET140974"]
+        "sn": ["GES151079", "GES151078"]
     },
     "dmm": {
         "name": "gw_dmm",
@@ -269,6 +269,19 @@
             "group": "SpeakerSetup1",
             "hidden": true,
             "tasktype": 1,
+            "item": "decrese playback volume",
+            "script": "task_runeach",
+            "args": ["decrease_playback_volume"],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": null
+        }
+        ,{
+            "group": "SpeakerSetup2",
+            "hidden": true,
+            "tasktype": 1,
             "item": "play 1KHz frequency for 2 DUTs",
             "script": "task_runeach",
             "args": ["speaker_play_1kz"],
@@ -305,7 +318,7 @@
             "unit": "Hz"
         }
         ,{
-            "group": "SpeakerSetup2",
+            "group": "SpeakerSetup3",
             "hidden": true,
             "tasktype": 1,
             "item": "close 1KHz frequency for 2 DUTs",

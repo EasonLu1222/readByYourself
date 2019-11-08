@@ -6,10 +6,15 @@ import json
 import time
 import random
 import argparse
+import threading
 import inspect
 import config
+
+from PyQt5.QtWidgets import (QApplication, QMainWindow)
+
 from subprocess import Popen, PIPE
-from serials import issue_command, get_serial, enter_factory_image_prompt
+from serials import issue_command, get_serial, wait_for_prompt
+#  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
 
@@ -135,63 +140,6 @@ def write_country_code(dynamic_info):
         return result
 
 
-def write_mac_wifi(dynamic_info):
-    mac_wifi_addr = dynamic_info
-    logger.info(f'{PADDING}write mac_wifi')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_wifi > /sys/class/unifykeys/name',
-            f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_wifi_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
-def write_mac_bt(dynamic_info):
-    mac_bt_addr = dynamic_info
-    logger.info(f'{PADDING}write mac_bt')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_bt > /sys/class/unifykeys/name',
-            f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_bt_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
-def write_country_code(dynamic_info):
-    ccode = dynamic_info
-    logger.info(f'{PADDING}write country_code')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac > /sys/class/unifykeys/name',
-            f'echo {ccode} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(ccode, e)
-                                  for e in lines) else 'Fail'
-        return result
-
-
 def record_sound(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         wav_file_path = '/usr/share/recorded_sound.wav'
@@ -208,7 +156,7 @@ def record_sound(portname):
 
 
 def get_mic_test_result(portname):
-    time.sleep(1)
+    time.sleep(6)
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         test_result_path = '/usr/share/mic_test_result*'
         wav_file_path = '/usr/share/recorded_sound.wav'
@@ -249,9 +197,18 @@ def unload_led_driver(portname):
         return result
 
 
+def decrease_playback_volume(portname):
+    logger.info(f'{PADDING}decrease_playback_volume start')
+    with get_serial(portname, 115200, timeout=1) as ser:
+        lines = issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
+        for e in lines:
+            logger.info(f'{PADDING}{e}')
+        return None
+
+
 def speaker_play_1kz(portname):
     logger.info(f'{PADDING}play_1khz start')
-    wav_file = '/usr/share/2ch_1khz-16b-120s.wav'
+    wav_file = '/usr/share/2ch_1khz-16b-120s_30percent.wav'
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, f'aplay {wav_file}', fetch=True)
         for e in lines:
@@ -434,6 +391,14 @@ def tx_power_11ac_5500mhz_ch2(portname):
         result = 'Pass' if any(
             re.search('wl pkteng_start', e) for e in lines) else 'Fail'
         logger.info(f'{PADDING}TX_POWER_11ac_5500MHZ: {result}')
+    return result
+
+
+def read_leak_result(portname):
+    logger.debug('read_leak_result')
+    with open('leak_result', 'r') as f:
+        result = f.readline()
+    logger.debug(result)
     return result
 
 

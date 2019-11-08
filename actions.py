@@ -3,7 +3,8 @@ import re
 import time
 import threading
 from subprocess import Popen, PIPE
-from serials import is_serial_free, get_serial, issue_command
+from PyQt5.QtCore import QThread, Qt
+from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
 from utils import resource_path, get_env, python_path, run
 from mylogger import logger
 
@@ -12,6 +13,57 @@ PADDING = ' ' * 4
 
 def window_click_run(win):
     win.btn_clicked()
+
+
+def wait_and_window_click_run(win, wait_sec=5):
+    QThread.sleep(wait_sec)
+    win.pushButton.clicked.emit()
+
+
+def set_appearance(win):
+    win.pushButton2.setVisible(True)
+    win.pushButton.setVisible(False)
+
+
+# for leak test
+def wait_for_leak_result(win):
+    win.show_animation_dialog.emit(True)
+    win.loading_dialog.label_2.setText('wait for result')
+    #port = win.comports()[0]
+    win._comports_dut = {0: 'com1'}
+    logger.debug('wait_for_leak_result')
+    logger.debug(f'{PADDING}wait_for_leak_result start')
+
+    prompt = '):'
+    prompt_ok='(OK)'
+    while win.pushButton2.isChecked():
+        portname = win.comports()[0]
+        #  logger.debug(portname)
+        with get_serial(portname, 9600, timeout=0.2) as ser:
+            line = ''
+            try:
+                line = ser.readline().decode('utf-8').rstrip('\n')
+                if line: logger.debug(f'{PADDING}{line}')
+            except UnicodeDecodeError as ex: # ignore to proceed
+                logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
+                continue
+
+            if prompt in line:
+                logger.info(f'{PADDING}get %s' % prompt)
+                index=line.find('):')
+                if prompt_ok in line:
+                    leak_result = f'Pass({line[index+2:-2]})'
+                    with open('leak_result', 'w') as f:
+                     f.write(leak_result)
+                else:
+                    leak_result = f'Fail({line[index+2:-2]})'
+                    with open('leak_result', 'w') as f:
+                     f.write(leak_result)
+
+                return True
+
+
+    return False
 
 
 def enter_prompt_simu():
@@ -33,6 +85,7 @@ def dummy_com_first(win, *coms):
     win._comports_dut = dict(zip(range(len(coms)), coms))
     win.instrument_ready(True)
     win.render_port_plot()
+    return True
 
 
 def serial_ignore_xff(window, ser_timeout=0.2):

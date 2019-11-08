@@ -22,6 +22,8 @@ def pull_recorded_sound():
     cmd = "adb devices -l"
     decoded_output = run(cmd, strip=True)
     lines = decoded_output.split('\n')[1:]
+    tid_list = []   # Adb transport id list
+    trp_list = []   # Test result path list
     for line in lines:
         # Sample output of "adb devices -l"
         # 0123456789ABCDEF       device usb:336855040X product:occam model:Nexus_4 device:mako transport_id:9
@@ -29,8 +31,10 @@ def pull_recorded_sound():
         match = re.search(r"transport_id:(\d+)", line)   # extract "9" from the above example
         if match:
             transport_id = match.groups()[0]
+            tid_list.append(transport_id)
             wav_file_path = resource_path(f"{wav_dir}/tmp/{transport_id}.wav")
             test_result_path = resource_path(f"{wav_dir}/tmp/mic_test_result_{transport_id}")
+            trp_list.append(test_result_path)
 
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             run(cmd)
@@ -42,7 +46,8 @@ def pull_recorded_sound():
             with open(test_result_path, "w+", encoding='utf8') as out_file:
                 subprocess.call(cmd.split(' '), shell=True, stdout=out_file)
 
-            push_result_to_device(transport_id, test_result_path)
+    for i,tid in enumerate(tid_list):
+        push_result_to_device(tid, trp_list[i])
 
 
 def analyze_recorded_sound(wav_file_path):
@@ -87,19 +92,37 @@ def judge_fft_result(freq_and_amp_dict_list):
         'Pass' or 'Fail'
     """
     rtn = 'Pass'
-    freq_list = [100, 300, 500, 700, 1000, 3000, 6000, 10000, 13000, 16000, 19000, 20000]
+    freq_amp_threshold_dict = {
+        # '100': 1,
+        # '300': 1,
+        500: 20,
+        # '700': 1,
+        1000: 30,
+        # '3000': 1,
+        # '6000': 1,
+        10000: 40,
+        # '13000': 1,
+        # '16000': 1,
+        19000: 130,
+        # '20000': 1,
+    }
     for freq_and_amp_dict in freq_and_amp_dict_list:
         logger.info(f'{PADDING}Frequency to amplitude dict: {freq_and_amp_dict}')
-        amp_threshold = [1] * len(freq_list)    # TODO: Have to test on multiple DUTs to adjust the criteria
-        freq_amp_threshold_dict = dict(zip(freq_list, amp_threshold))
-
         for freq in freq_amp_threshold_dict:
             amp_threshold = freq_amp_threshold_dict[freq]
-            if (freq not in freq_and_amp_dict or
-                    amp_threshold > freq_and_amp_dict[freq]):
-                rtn = 'Fail'
-                break
 
+            amp = -1
+            if freq in freq_and_amp_dict:
+                amp = freq_and_amp_dict[freq]
+            elif (freq+1) in freq_and_amp_dict:
+                amp = freq_and_amp_dict[freq+1]
+
+            if amp_threshold > amp:
+                rtn = 'Fail'
+                logger.warning(f'{PADDING}Freq {freq} test fail, expect >{amp_threshold}, got {amp}')
+                break
+        if rtn == 'Fail':
+            break
     return rtn
 
 
@@ -125,4 +148,3 @@ if __name__ == '__main__':
     # with daemon.DaemonContext(working_directory=os.getcwd()):
     # play_tone()
     pull_recorded_sound()
-

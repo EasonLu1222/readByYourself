@@ -19,7 +19,7 @@ PADDING = ' ' * 4
 
 
 def get_serial(port_name, baudrate, timeout):
-    logger.info(f'{PADDING}===get_serial=== {port_name}')
+    #  logger.info(f'{PADDING}===get_serial=== {port_name}')
     ser = serial.Serial(port=port_name,
                         baudrate=baudrate,
                         bytesize=serial.EIGHTBITS,
@@ -35,6 +35,10 @@ def is_serial_free(port_name):
     try:
         serial.Serial(port_name, 115200, timeout=0.2)
     except SerialException as ex:
+        logger.debug(f'{PADDING}{type_(ex)}, {ex}')
+        return False
+    except Exception as ex:
+        logger.debug(f'{PADDING}{type_(ex)}, {ex}')
         return False
     else:
         return True
@@ -50,9 +54,9 @@ def get_device(comport):
         vid_pid = group[8:]
         device, _ = DEVICES[vid_pid]
     except KeyError as ex:
-        msg = (f'\n\n{type_(ex)}, {ex}'
+        msg = (f'{PADDING}{type_(ex)}, {ex}'
                f'not defined in device.json.\n')
-        logger.warning(    msg)
+        logger.warning(msg)
     except Exception as ex:
         logger.error(f'{PADDING}{type_(ex)}, {ex}')
     finally:
@@ -112,6 +116,37 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
             break
 
 
+def wait_for_prompt2(serial, thread_timeout=25, printline=True):
+    portname = serial.name
+    logger.info(f'{PADDING}portname: {portname}')
+    lines_empty = 0
+    while True:
+        line = ''
+        try:
+            line = serial.readline().decode('utf-8').rstrip('\n')
+            if line=='': 
+                lines_empty += 1
+            else:
+                lines_empty = 0
+            if lines_empty > 5:
+                serial.write(os.linesep.encode('ascii'))
+
+                lines = issue_command(serial, 'echo 123')
+                if lines:
+                    if any(e.strip()=="123" for e in lines):
+                        logger.info('prompt entered')
+                        break
+                    else:
+                        continue
+
+            if line and printline: logger.debug(f'{PADDING}{line}')
+        except UnicodeDecodeError as ex: # ignore to proceed
+            logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
+            continue
+
+        se.serial_msg.emit([portname, line.strip()])
+
+
 def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printline=True):
     waitwords = [
         'U-Boot',
@@ -155,9 +190,10 @@ def issue_command(serial, cmd, fetch=True):
 class BaseSerialListener(QThread):
     update_msec = 500
     if_all_ready = QSignal(bool)
+    if_actions_ready = QSignal(bool)
     def __init__(self, *args, **kwargs):
         super(BaseSerialListener, self).__init__(*args, **kwargs)
-        self.is_reading = False
+        self.ready_to_stop = False
         self.is_instrument_ready = False
 
     def get_update_ports_map(self):
@@ -202,8 +238,12 @@ class BaseSerialListener(QThread):
 
     def run(self):
         while True:
+            if self.ready_to_stop:
+                logger.debug('ready_to_stop is True!')
+                self.ready_to_stop = False
+                self.if_actions_ready.emit(True)
+                break
             QThread.msleep(BaseSerialListener.update_msec)
-            self.is_reading = True
             ports_map = self.get_update_ports_map()
             for k in self.devices.keys():
                 ports = ports_map[k]
@@ -211,7 +251,6 @@ class BaseSerialListener(QThread):
                 self_comports = getattr(self, f'comports_{k}')
                 if self.update(self_ports, ports):
                     self_comports.emit(self_ports)
-            self.is_reading = False
 
             if not self.is_instrument_ready and self.port_full():
                 self.is_instrument_ready = True
@@ -221,12 +260,7 @@ class BaseSerialListener(QThread):
                 self.if_all_ready.emit(False)
 
     def stop(self):
-        # wait 1s for list_ports to finish, is it enough or too long in order
-        # not to occupy com port for subsequent test scripts
-        if self.is_reading:
-            QThread.msleep(1000)
-        self.terminate()
-        logger.debug(f'{PADDING}BaseSerialListener stopped')
+        self.ready_to_stop = True
 
 
 if __name__ == "__main__":

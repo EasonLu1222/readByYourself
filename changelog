@@ -1,3 +1,56 @@
+[2019.11.7 - 23:10]
+Change WPC station's actions
+
+1. staion PowerSensor: actions changed to enter_prompt2
+
+[2019.11.7 - 23:00]
+Modified wait_for_prompt
+
+1. add serials.wait_for_prompt2()
+	- work for both two cases
+		- in the prompt already
+		- if not powered, wait for powered and prompt appeared
+
+2. modify two stations
+	- SA: actions changed to enter_prompt2
+	- RF: actions changed to enter_prompt2
+
+[2019.11.6 - 23:30]
+Notorius is_serial_ok bug fixed (to be tested)
+
+1. use QSignal to handle the stopping of BaseSerialListener
+
+
+[2019.11.3 - 23:25]
+Leak station testing flow worked
+
+1. use toggle button to switch btw enable-fetch & fetching...
+	- once toggled on, it will listen to uart output
+	- tested with com0com --> ok
+	- real leaker output still needed to be parsed
+
+2. add wait_for_leak_result() & set_appearance() in actions.py
+	- modify v13_leak.json
+
+[2019.11.2 - 10:10]
+New station: preliminary framework for leak test
+
+1. remove QThread.msleep(1000) & QThread.msleep(500) from Task.run()
+   may be needed in the future. need more test.
+ 
+
+[2019.11.2 - 08:10]
+Make logger more readable
+
+1. format:
+	- date, level, module, pid, module.className.funcName:lineno, message
+
+[2019.11.2 - 00:55]
+Make logger more readable
+
+1. Add customized Formatter
+
+
 [2019.10.30 - 23:55]
 Some station avaiable at Mac environment
 

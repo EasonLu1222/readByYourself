@@ -19,14 +19,15 @@ from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
                     VISA_DEVICE_NAME, STATION)
-from serials import enter_factory_image_prompt, get_serial
+from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from utils import s_
 
 from actions import (
-    disable_power_check, set_power_simu, dummy_com, 
-    window_click_run, is_serial_ok, set_power, is_adb_ok, 
+    disable_power_check, set_power_simu, dummy_com,
+    window_click_run, is_serial_ok, set_power, is_adb_ok,
     serial_ignore_xff, dummy_com_first, enter_prompt_simu,
+    wait_and_window_click_run, wait_for_leak_result, set_appearance,
 )
 
 # for prepares
@@ -56,6 +57,29 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     t1 = time.time()
     logger.debug(f'{PADDING}enter factory image prompt end')
     logger.debug(f'{PADDING}time elapsed entering prompt: %f' % (t1 - t0))
+    for port, (ser, th) in port_ser_thread.items():
+        ser.close()
+    return True
+
+
+def enter_prompt2(window, ser_timeout=0.2):
+    logger.debug(f'{PADDING}start')
+    t0 = time.time()
+    port_ser_thread = {}
+    comports = window.comports
+    logger.debug(f'{PADDING}enter_prompt: comports -  {comports}')
+    for i in window.dut_selected:
+        port = comports()[i]
+        ser = get_serial(port, 115200, ser_timeout)
+        t = threading.Thread(target=wait_for_prompt2,
+                             args=(ser,))
+        port_ser_thread[port] = [ser, t]
+        t.start()
+    for port, (ser, th) in port_ser_thread.items():
+        th.join()
+    t1 = time.time()
+    logger.debug(f'{PADDING}end')
+    logger.debug(f'{PADDING}time elapsed: %f' % (t1 - t0))
     for port, (ser, th) in port_ser_thread.items():
         ser.close()
     return True
@@ -233,7 +257,7 @@ class Actions(QThread):
         self.register_action(prepare, to_connect=True)
         self.task.register_action(actions)
         #  self.register_action(action, to_connect=False)
-        self.register_action(after, to_connect=False)
+        self.register_action(after, to_connect=True)
 
     def parse_action_all(self):
         actions_all = [
@@ -263,7 +287,7 @@ class Actions(QThread):
         return items
 
     def register_action(self, action, to_connect=True):
-        logger.debug(f'register_action {action.name}')
+        logger.debug(f'{PADDING}{action.name}')
         self.actions[action.name] = action
         if to_connect:
             self.action_signal.connect(self.action_start)
@@ -273,12 +297,15 @@ class Actions(QThread):
     def prepare_done(self):
         print('prepare_done')
 
+    def after_done(self):
+        print('after_done')
+
     def action_start(self, action_name):
-        logger.debug('action_start')
+        logger.debug(f'{PADDING}action_start {action_name}')
         self.actions[action_name].start()
 
     def action_trigger(self, action_name):
-        logger.debug('action_trigger')
+        logger.debug(f'{PADDING}action_trigger')
         Action.trigger(self.actions[action_name].action_args)
 
 
@@ -292,14 +319,15 @@ class Action(QThread):
         self.update_action(actions)
 
     def update_action(self, actions):
-        logger.debug(f'{PADDING}update_action')
+        logger.debug(f'{PADDING}{self.name}')
         for e in actions:
             action, args = e[f'{self.name}'], e['args']
+            logger.debug(f'{PADDING}> {action.__name__}')
             self.action_args.append([action, args])
 
     @classmethod
     def trigger(cls, action_args):
-        logger.debug('trigger')
+        logger.debug(f'{PADDING}trigger')
         for action, args in action_args:
             aname = action.__name__
             logger.debug(f'{PADDING}run action {aname}')
@@ -311,7 +339,7 @@ class Action(QThread):
     def run(self):
         Action.trigger(self.action_args)
         self.action_done.emit()
-        logger.debug('Action run end')
+        logger.debug(f'{PADDING}Action run end')
 
 
 class Task(QThread):
@@ -589,9 +617,9 @@ class Task(QThread):
             self.task_result.emit(result)
 
     def register_action(self, actions):
-        logger.debug(f'{PADDING}register_action')
         for e in actions:
             action, args = e['action'], e['args']
+            logger.debug(f'{PADDING} {action}')
             self.action_args.append([action, args])
 
     #  def register_action(self, action, to_connect=True):
@@ -741,7 +769,7 @@ class Task(QThread):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
         self.window.show_animation_dialog.emit(True)
 
-        QThread.msleep(1000)
+        #  QThread.msleep(1000)
         t0 = time_()
         for action, args in self.action_args:
             aname = action.__name__
@@ -749,11 +777,12 @@ class Task(QThread):
             if not action(*args):
                 logger.debug(f'{PADDING}{aname} is False --> return')
                 self.window.show_animation_dialog.emit(False)
-                self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
+                if STATION != 'Leak':
+                    self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
                 self.window.ser_listener.start()
                 return
 
-        QThread.msleep(500)
+        #  QThread.msleep(500)
         self.window.show_animation_dialog.emit(False)
         c1 = len(self.header())
         self.df.iloc[:, c1:c1 + self.dut_num] = ""

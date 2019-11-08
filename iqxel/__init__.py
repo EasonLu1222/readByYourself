@@ -286,8 +286,8 @@ def prepare_for_testflow_files(win):
     match_s2 = r"\t\t>IQTESTER_MODULE_01 \[String]  = 192.168.100.254:A"
     match_s3 = r"\t\t>VSA_PORT \[Integer]  = \d"
     match_s4 = r"\t\t>VSG_PORT \[Integer]  = \d"
-    match_s5 = r"\t\t>CONNECTION_STRING \[String]  = com"
-    match_s6 = r"\t\t>CONNECTION_NAME \[String]  = com"
+    match_s5 = r"\t\t>CONNECTION_STRING \[String]  = COM"
+    match_s6 = r"\t\t>CONNECTION_NAME \[String]  = COM"
     source_tf = os.path.join('iqxel', SOURCE_TF)
     appid = 4
 
