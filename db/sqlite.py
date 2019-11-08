@@ -67,8 +67,8 @@ def write_addr(addr, sn):
 
 
 def fetch_addr():
-    mac_wifi = None
-    mac_bt = None
+    mac_wifi = ""
+    mac_bt = ""
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     print("Opened database successfully")
@@ -81,7 +81,7 @@ def fetch_addr():
     except TypeError as e:
         print("Error: no WiFi or BT address available")
     conn.close()
-    return (mac_wifi, mac_bt)
+    return f"{mac_wifi},{mac_bt}"
 
 
 def is_addr_used(addr):
@@ -102,4 +102,3 @@ def first_run():
     create_table()
     mac_list = gen_mac_list(start_mac, total_mac)
     import_addr(mac_list)
-

@@ -55,7 +55,11 @@ def read_pid(portname, dut_idx):
             issue_command(ser, cmd, False)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
         logger.debug(f'{PADDING}{lines}')
-        response = lines[-1]
+        try:
+            response = lines[-1]
+        except IndexError as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return 'Fail'
         logger.debug(f'{PADDING}response: {response}')
         if response == '/ # ':
             result = 'Fail(no pid found)'
@@ -87,7 +91,11 @@ def write_usid(dynamic_info):
 
 def write_wifi_bt_mac(dynamic_info):
     pid = None
-    mac_wifi_addr, mac_bt_addr = dynamic_info
+    mac_list = dynamic_info.split(",")
+    mac_wifi_addr = mac_list[0]
+    mac_bt_addr = mac_list[1]
+    if mac_wifi_addr == "" or mac_bt_addr == "":
+        return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
     logger.info(f'{PADDING}write mac_wifi and mac_bt')
     with get_serial(portname, 115200, timeout=3) as ser:
         # Read product ID
@@ -100,7 +108,12 @@ def write_wifi_bt_mac(dynamic_info):
             issue_command(ser, cmd, False)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
         logger.debug(f'{PADDING}{lines}')
-        response = lines[-1]
+        try:
+            response = lines[-1]
+        except IndexError as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return 'Fail(no respond when querying product ID)'
+
         logger.debug(f'{PADDING}response: {response}')
         if response == '/ # ':
             return "Fail(product ID not found)"
@@ -108,6 +121,7 @@ def write_wifi_bt_mac(dynamic_info):
             pid = response[:4]
             logger.debug(f'{PADDING}pid: {pid}')
 
+        # Write wifi_mac
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo mac_wifi > /sys/class/unifykeys/name',
@@ -122,6 +136,7 @@ def write_wifi_bt_mac(dynamic_info):
         if not is_wifi_mac_written:
             return "Fail(failed to write wifi_mac to DUT)"
 
+        # Write bt_mac
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo mac_bt > /sys/class/unifykeys/name',
@@ -136,6 +151,7 @@ def write_wifi_bt_mac(dynamic_info):
         if not is_bt_mac_written:
             return "Fail(failed to write bt_mac to DUT)"
 
+        # Mark the mac_wifi and mac_bt have been used by pid
         try:
             write_addr(mac_wifi_addr, pid)
         except Exception as ex:
