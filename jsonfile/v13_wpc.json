@@ -10,12 +10,12 @@
     "pwr": {
         "name": "gw_powersupply",
         "num": 1,
-        "sn": ["RD123456"]
+        "sn": ["GES150976"]
     },
     "eld": {
         "name": "gw_eloader",
         "num": 1,
-        "sn": ["00000001"]
+        "sn": ["GEQ130786"]
     }
  },
  "appearance": {
@@ -48,7 +48,7 @@
             "script": "task_wpc",
             "args": [null],
             "auto": true,
-            "min": 0.6,
+            "min": 0.7,
             "expect": null,
             "max": null,
             "unit": null

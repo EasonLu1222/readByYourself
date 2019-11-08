@@ -627,7 +627,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     if not power.is_open:
                         power.open_com()
                     if power.ser:
-                        power.off()
+                        if STATION != 'WPC':
+                            power.off()
                         power.close_com()
             r = self.task.len()
             all_pass = lambda results: all(e.startswith('Pass') for e in results)

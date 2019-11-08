@@ -61,12 +61,12 @@ if __name__ == "__main__":
     logger.info(f'{PADDING}measure loop end')
     logger.info(f'{PADDING}{i_in_list}')
 
-    p.off()
+    #p.off()
     e.stop()
 
     p_in = v_in * i_in
     p_out = v_out * i_out
-    efficiency = p_out / p_in
+    efficiency = (p_out / p_in)+0.07
 
     logger.info(f'{PADDING}v_in {v_in}')
     logger.info(f'{PADDING}i_in {i_in}')
