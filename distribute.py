@@ -1,28 +1,63 @@
 import re
 import os
+import sys
 import json
 from datetime import datetime
 from shutil import copyfile, make_archive, rmtree
 from distutils.dir_util import copy_tree
 from utils import run
+import argparse
 
 
 class Distribute:
-    def __init__(self):
-        self.STATION = [
+    def __init__(self, stations=None):
+        STATIONS = [
             {
-                "file_prefix": "第2站_主板",
-                "station": "MainBoard"
+                "station": "MainBoard",
+                "file_prefix": "第02站_主板",
             },
             {
-                "file_prefix": "第3站_觸控板",
-                "station": "CapTouch"
+                "station": "CapTouch",
+                "file_prefix": "第03站_觸控板",
             },
             {
-                "file_prefix": "第4站_燈板",
-                "station": "LED"
-            }
+                "station": "LED",
+                "file_prefix": "第04站_燈板",
+            },
+            {
+                "station": "RF",
+                "file_prefix": "第05站_BtWiFi",
+            },
+            {
+                "station": "Audio",
+                "file_prefix": "第06站_Audio",
+            },
+            {
+                "station": "Leak",
+                "file_prefix": "第07站_Leak",
+            },
+            {
+                "station": "WPC",
+                "file_prefix": "第08站_WPC",
+            },
+            {
+                "station": "PowerSensor",
+                "file_prefix": "第09站_Antenna",
+            },
+            {
+                "station": "SA",
+                "file_prefix": "第10站_SA",
+            },
+            {
+                "station": "Download",
+                "file_prefix": "第12站_Download",
+            },
         ]
+        if stations:
+            self.STATION = [e for e in STATIONS if e['station'] in stations]
+        else:
+            self.STATION = STATIONS
+        print(self.STATION)
 
     def gen_version_num(self):
         """
@@ -65,10 +100,14 @@ class Distribute:
         """
         ts = datetime.now().strftime("%Y%m%d_%H%M")
         for sta in self.STATION:
+            print('sta', sta)
             target_dir = f"dist/{sta['file_prefix']}_{ts}"
             os.mkdir(target_dir)
             copyfile("dist/app.exe", f"{target_dir}/app_{ts}.exe")
             copy_tree("dist/jsonfile", f"{target_dir}/jsonfile")
+
+            if sta['station']=='RF':
+                copy_tree("dist/iqxel", f"{target_dir}/iqxel")
 
             sta_obj = {"STATION": sta["station"]}
             station_json_path = f"dist/{sta['file_prefix']}_{ts}/jsonfile/station.json"
@@ -94,7 +133,14 @@ class Distribute:
 
 
 if __name__ == '__main__':
-    d = Distribute()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('stations', help='station names', type=str, nargs='*',
+                        metavar='c')
+    args = parser.parse_args()
+    stations = args.stations
+
+    d = Distribute(stations)
     d.gen_version_num()
     d.gen_installer()
     d.make_zip()
