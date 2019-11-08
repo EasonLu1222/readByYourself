@@ -9,6 +9,7 @@ from utils import run
 
 class Distribute:
     def __init__(self):
+        self.ts = datetime.now().strftime("%Y%m%d_%H%M")
         self.STATION = [
             {
                 "file_prefix": "第2站_主板",
@@ -39,7 +40,7 @@ class Distribute:
 
         # Replace insert the version number to app.py
         # new_content = contents.replace('version = ""', f'version = "{ver}"')
-        new_content = re.sub("version = \".*\"", f'version = "{ver}"', contents)
+        new_content = re.sub("version = \".*\"", f'version = "{ver}_{self.ts}"', contents)
 
         # Write app.py
         with open("./app.py", "w", encoding="utf-8") as f:
@@ -63,15 +64,15 @@ class Distribute:
         4. Modify station.json in each folder
         5. Zip those folders
         """
-        ts = datetime.now().strftime("%Y%m%d_%H%M")
+
         for sta in self.STATION:
-            target_dir = f"dist/{sta['file_prefix']}_{ts}"
+            target_dir = f"dist/{sta['file_prefix']}_{self.ts}"
             os.mkdir(target_dir)
-            copyfile("dist/app.exe", f"{target_dir}/app_{ts}.exe")
+            copyfile("dist/app.exe", f"{target_dir}/app_{self.ts}.exe")
             copy_tree("dist/jsonfile", f"{target_dir}/jsonfile")
 
             sta_obj = {"STATION": sta["station"]}
-            station_json_path = f"dist/{sta['file_prefix']}_{ts}/jsonfile/station.json"
+            station_json_path = f"dist/{sta['file_prefix']}_{self.ts}/jsonfile/station.json"
             with open(station_json_path, "w") as outfile:
                 json.dump(sta_obj, outfile)
 
