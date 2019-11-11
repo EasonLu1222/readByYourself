@@ -5,6 +5,7 @@ from mylogger import logger
 
 
 DB_PATH = 'C:\\db\\address.db'
+PADDING = ' ' * 4
 
 
 def create_table():
