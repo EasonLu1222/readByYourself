@@ -96,7 +96,7 @@ def write_wifi_bt_mac(dynamic_info):
     mac_bt_addr = mac_list[1]
     if mac_wifi_addr == "" or mac_bt_addr == "":
         return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
-    logger.info(f'{PADDING}write mac_wifi and mac_bt')
+    logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
     with get_serial(portname, 115200, timeout=3) as ser:
         # Read product ID
         cmds = [
