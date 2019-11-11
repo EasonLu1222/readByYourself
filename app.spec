@@ -19,6 +19,7 @@ exec_before = exec_statement('''
 ''')
 
 added_files = [
+    ('db/*.py', 'db'),
     ('tasks/*', 'tasks'),
     ('view/*', 'view'),
     ('ui/*.py', 'ui'),
