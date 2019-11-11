@@ -61,12 +61,16 @@ def read_pid(portname, dut_idx):
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
             return 'Fail'
         logger.debug(f'{PADDING}response: {response}')
-        if response == '/ # ':
+
+        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+        matches = re.search(regex, response)
+        if not matches:
             result = 'Fail(no pid found)'
         else:
-            pid = response[:28]
+            pid = matches.group()
             logger.debug(f'{PADDING}pid: {pid}')
             result = f'Pass({pid})'
+
     return result
 
 
