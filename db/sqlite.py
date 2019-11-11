@@ -64,7 +64,7 @@ def write_addr(addr, sn):
 
     c.execute(f'UPDATE ADDRESS set SN = "{sn}" where ADDRESS_WIFI="{addr}"')
     conn.commit()
-    logger.debug(f"{PADDING}Total number of rows updated :", conn.total_changes)
+    logger.debug(f"{PADDING}Total number of rows updated : {conn.total_changes}")
     conn.close()
 
 
