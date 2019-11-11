@@ -118,7 +118,7 @@ def write_wifi_bt_mac(dynamic_info):
         if response == '/ # ':
             return "Fail(product ID not found)"
         else:
-            pid = response[:4]
+            pid = response[:28]
             logger.debug(f'{PADDING}pid: {pid}')
 
         # Write wifi_mac
