@@ -5,7 +5,7 @@
     "dut": {
         "name": "ftdi",
         "num": 2,
-        "sn": ["AQ000TY7A", "22222222A"]
+        "sn": ["AC009ZLNA", "AQ0011SBA"]
     }
  },
  "appearance": {
@@ -74,25 +74,12 @@
             "unit": null
         }
         ,{
-            "group": "Write Wifi Mac",
+            "group": "Write Wifi and BT Mac",
             "hidden": false,
             "tasktype": 1,
             "item": "write mac_wifi",
             "script": "task_runeach",
-            "args": ["write_mac_wifi"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool"
-        }
-        ,{
-            "group": "Write BT Mac",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "write mac_bt",
-            "script": "task_runeach",
-            "args": ["write_mac_bt"],
+            "args": ["write_wifi_bt_mac"],
             "auto": true,
             "min": null,
             "expect": "True",

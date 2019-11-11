@@ -14,14 +14,14 @@ import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
 
-from utils import resource_path, get_env, python_path
+from utils import resource_path, get_env, python_path, s_
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
                     VISA_DEVICE_NAME, STATION)
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
-from utils import s_
+from db.sqlite import fetch_addr
 
 from actions import (
     disable_power_check, set_power_simu, dummy_com,
@@ -642,11 +642,9 @@ class Task(QThread):
         else:
             func = next_item['args'][0]
             dynamic_info = ''
-            if (func == 'write_mac_wifi'):
-                dynamic_info = 'fa:23:34:89:45:22'
-            if (func == 'write_mac_bt'):
-                dynamic_info = 'fa:8f:ca:52:f3:38'
-            if (func == 'write_country_code'):
+            if func == 'write_wifi_bt_mac':
+                dynamic_info = fetch_addr()
+            if func == 'write_country_code':
                 dynamic_info = 'CN01'
 
             for dut_idx in self.window.dut_selected:

@@ -17,9 +17,11 @@ from serials import issue_command, get_serial, wait_for_prompt
 #  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
+from db.sqlite import write_addr
 
 SERIAL_TIMEOUT = 0.8
 PADDING = ' ' * 8
+type_ = lambda ex: f'<{type(ex).__name__}>'
 
 
 def ls_test(portname):
@@ -53,12 +55,16 @@ def read_pid(portname, dut_idx):
             issue_command(ser, cmd, False)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
         logger.debug(f'{PADDING}{lines}')
-        response = lines[-1]
+        try:
+            response = lines[-1]
+        except IndexError as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return 'Fail'
         logger.debug(f'{PADDING}response: {response}')
         if response == '/ # ':
             result = 'Fail(no pid found)'
         else:
-            pid = response[:4]
+            pid = response[:28]
             logger.debug(f'{PADDING}pid: {pid}')
             result = f'Pass({pid})'
     return result
@@ -83,10 +89,39 @@ def write_usid(dynamic_info):
         return result
 
 
-def write_mac_wifi(dynamic_info):
-    mac_wifi_addr = dynamic_info
-    logger.info(f'{PADDING}write mac_wifi')
+def write_wifi_bt_mac(dynamic_info):
+    pid = None
+    mac_list = dynamic_info.split(",")
+    mac_wifi_addr = mac_list[0]
+    mac_bt_addr = mac_list[1]
+    if mac_wifi_addr == "" or mac_bt_addr == "":
+        return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
+    logger.info(f'{PADDING}write mac_wifi and mac_bt')
     with get_serial(portname, 115200, timeout=3) as ser:
+        # Read product ID
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo usid > /sys/class/unifykeys/name',
+        ]
+        for cmd in cmds:
+            logger.debug(f'{PADDING}cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+        logger.debug(f'{PADDING}{lines}')
+        try:
+            response = lines[-1]
+        except IndexError as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return 'Fail(no respond when querying product ID)'
+
+        logger.debug(f'{PADDING}response: {response}')
+        if response == '/ # ':
+            return "Fail(product ID not found)"
+        else:
+            pid = response[:28]
+            logger.debug(f'{PADDING}pid: {pid}')
+
+        # Write wifi_mac
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo mac_wifi > /sys/class/unifykeys/name',
@@ -97,15 +132,11 @@ def write_mac_wifi(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_wifi_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
+        is_wifi_mac_written = any(re.match(mac_wifi_addr, e) for e in lines)
+        if not is_wifi_mac_written:
+            return "Fail(failed to write wifi_mac to DUT)"
 
-
-def write_mac_bt(dynamic_info):
-    mac_bt_addr = dynamic_info
-    logger.info(f'{PADDING}mac_bt')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        # Write bt_mac
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo mac_bt > /sys/class/unifykeys/name',
@@ -116,9 +147,18 @@ def write_mac_bt(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(mac_bt_addr, e)
-                                  for e in lines) else 'Fail'
-        return result
+        is_bt_mac_written = any(re.match(mac_bt_addr, e) for e in lines)
+        if not is_bt_mac_written:
+            return "Fail(failed to write bt_mac to DUT)"
+
+        # Mark the mac_wifi and mac_bt have been used by pid
+        try:
+            write_addr(mac_wifi_addr, pid)
+        except Exception as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return "Fail(failed to write product ID to DB)"
+
+        return 'Pass'
 
 
 def write_country_code(dynamic_info):
