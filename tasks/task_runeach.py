@@ -64,7 +64,7 @@ def read_pid(portname, dut_idx):
         if response == '/ # ':
             result = 'Fail(no pid found)'
         else:
-            pid = response[:4]
+            pid = response[:28]
             logger.debug(f'{PADDING}pid: {pid}')
             result = f'Pass({pid})'
     return result
