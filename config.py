@@ -25,6 +25,7 @@ station_json = {
     'WPC': 'v13_wpc',                       # pyinstaller exe  tested on clean windows
     'PowerSensor': 'v13_power_sensor',      # pyinstaller exe  tested on clean windows
     'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
+    'Acoustic': 'v13_acoustic',
     'Download': 'v13_download',
 }
 

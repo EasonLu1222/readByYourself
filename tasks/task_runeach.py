@@ -34,6 +34,17 @@ def ls_test(portname):
         return 'Pass'
 
 
+def arecord_aplay_path(portname):
+    with get_serial(portname, 115200, timeout=1) as ser:
+        cmd = f'arecord -Dhw:0,4 -c 2 -r 48000 -f S24_LE | aplay -Dhw:0,2 -r 48000 -f S24_LE'
+        lines = issue_command(ser, cmd)
+        expected = 'asoc-aml-card auge_sound: tdm playback enable'
+        result = f'Pass' if any(re.search(expected, e) for e in lines) else 'Fail'
+        #  for e in lines:
+            #  logger.info(e)
+        return result
+
+
 def enter_burn_mode(portname, dut_idx):
     logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
