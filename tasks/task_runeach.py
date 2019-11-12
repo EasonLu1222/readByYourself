@@ -116,13 +116,15 @@ def write_wifi_bt_mac(dynamic_info):
             response = lines[-1]
         except IndexError as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
-            return 'Fail(no respond when querying product ID)'
+            return "Fail(no respond when querying product ID)"
 
         logger.debug(f'{PADDING}response: {response}')
-        if response == '/ # ':
-            return "Fail(product ID not found)"
+        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+        matches = re.search(regex, response)
+        if not matches:
+            return "Fail(no pid found)"
         else:
-            pid = response[:28]
+            pid = matches.group()
             logger.debug(f'{PADDING}pid: {pid}')
 
         # Write wifi_mac
