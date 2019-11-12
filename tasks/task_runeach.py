@@ -40,9 +40,13 @@ def arecord_aplay_path(portname):
         lines = issue_command(ser, cmd)
         expected = 'asoc-aml-card auge_sound: tdm playback enable'
         result = f'Pass' if any(re.search(expected, e) for e in lines) else 'Fail'
-        #  for e in lines:
-            #  logger.info(e)
         return result
+
+
+def exit_aplay_path(portname):
+    with get_serial(portname, 115200, timeout=1) as ser:
+        lines = issue_command(ser, '\x03', fetch=False)
+        return 'Pass'
 
 
 def enter_burn_mode(portname, dut_idx):
