@@ -4,8 +4,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 2,
-        "sn": ["AQ000RXSA", "AQ000TATA"]
+        "num": 3,
+        "sn": ["AQ0011S7A", "AQ000RXSA", "AQ000TATA"]
     }
  },
  "appearance": {
