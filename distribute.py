@@ -18,7 +18,7 @@ class Distribute:
                 "file_prefix": "第02站_主板",
             },
             {
-                "station": "CapTouch",
+                "station": "CapTouchMic",
                 "file_prefix": "第03站_觸控板",
             },
             {
@@ -48,6 +48,10 @@ class Distribute:
             {
                 "station": "SA",
                 "file_prefix": "第10站_SA",
+            },
+            {
+                "station": "Acoustic",
+                "file_prefix": "第11站_Acoustic",
             },
             {
                 "station": "Download",
