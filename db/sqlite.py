@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sqlite3
-from sqlite3 import IntegrityError
+from sqlite3 import IntegrityError, OperationalError
 from mylogger import logger
 
 DB_PATH = 'C:\\db\\address.db'
@@ -77,18 +77,25 @@ def write_addr(addr, sn):
 def fetch_addr():
     mac_wifi = ""
     mac_bt = ""
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    logger.info(f"{PADDING}Opened database successfully")
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        logger.info(f"{PADDING}Opened database successfully")
 
-    cursor = c.execute("SELECT ADDRESS_WIFI, ADDRESS_BT from ADDRESS where SN is null")
-    result = cursor.fetchone()
+        cursor = c.execute("SELECT ADDRESS_WIFI, ADDRESS_BT from ADDRESS where SN is null")
+        result = cursor.fetchone()
+    except OperationalError as ex:
+        logger.error(f"{PADDING}Error: {ex}")
+
     try:
         mac_wifi, mac_bt = result
         logger.info(f"{PADDING}Operation  successfully")
-    except TypeError as e:
+    except (TypeError, UnboundLocalError) as ex:
         logger.error(f"{PADDING}Error: no WiFi or BT address available")
-    conn.close()
+    try:
+        conn.close()
+    except UnboundLocalError as ex:
+        logger.error(f"{PADDING}Error: failed to close connection")
     return f"{mac_wifi},{mac_bt}"
 
 
