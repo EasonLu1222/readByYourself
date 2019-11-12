@@ -88,11 +88,11 @@ def fetch_addr():
         mac_wifi, mac_bt = result
         logger.info(f"{PADDING}Operation  successfully")
     except (TypeError, UnboundLocalError) as ex:
-        logger.error(f"{PADDING}Error: no WiFi or BT address available")
+        logger.error(f"{PADDING}Error: no WiFi or BT address available, {ex}")
     try:
         conn.close()
     except UnboundLocalError as ex:
-        logger.error(f"{PADDING}Error: failed to close connection")
+        logger.error(f"{PADDING}Error: failed to close connection, {ex}")
     return f"{mac_wifi},{mac_bt}"
 
 
@@ -103,6 +103,18 @@ def is_addr_used(addr):
     cursor = c.execute(f"SELECT SN from ADDRESS where ADDRESS_WIFI={addr}")
     logger.info(f"{PADDING}Operation done successfully")
     conn.close()
+
+
+def is_pid_used(pid):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    logger.info(f"{PADDING}Opened database successfully")
+    cursor = c.execute(f"SELECT COUNT(*) from ADDRESS where SN='{pid}'")
+    count = cursor.fetchone()
+    logger.info(f"{PADDING}Operation done successfully")
+    conn.close()
+
+    return count[0] > 0
 
 
 def first_run():
