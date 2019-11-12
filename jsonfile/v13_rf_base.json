@@ -42,6 +42,19 @@
  "test_items":
      [
         {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
