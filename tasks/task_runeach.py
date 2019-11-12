@@ -17,7 +17,7 @@ from serials import issue_command, get_serial, wait_for_prompt
 #  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
-from db.sqlite import write_addr
+from db.sqlite import write_addr, is_pid_used
 
 SERIAL_TIMEOUT = 0.8
 PADDING = ' ' * 8
@@ -127,14 +127,20 @@ def write_wifi_bt_mac(dynamic_info):
             response = lines[-1]
         except IndexError as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
-            return 'Fail(no respond when querying product ID)'
+            return "Fail(no respond when querying product ID)"
 
         logger.debug(f'{PADDING}response: {response}')
-        if response == '/ # ':
-            return "Fail(product ID not found)"
+        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+        matches = re.search(regex, response)
+        if not matches:
+            return "Fail(no pid found)"
         else:
-            pid = response[:28]
+            pid = matches.group()
             logger.debug(f'{PADDING}pid: {pid}')
+
+        # Check if pid is in db
+        if is_pid_used(pid):
+            return "Pass(pid exists in db)"
 
         # Write wifi_mac
         cmds = [
