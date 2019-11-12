@@ -1,8 +1,8 @@
 #!/usr/bin/python
-
 import sqlite3
 from sqlite3 import IntegrityError, OperationalError
 from mylogger import logger
+
 
 DB_PATH = 'C:\\db\\address.db'
 PADDING = ' ' * 8
@@ -49,7 +49,6 @@ def import_addr(addr_list):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     logger.info(f"{PADDING}Opened database successfully")
-
     for i in range(0, len(addr_list)):
         if (i % 2) == 0:
             try:
@@ -57,7 +56,6 @@ def import_addr(addr_list):
                     VALUES ("{addr_list[i]}", "{addr_list[i + 1]}", null )')
             except IntegrityError as e:
                 logger.error(f"{PADDING}Error inserting ({addr_list[i]}, {addr_list[i + 1]}), {e}")
-
     conn.commit()
     logger.info(f"{PADDING}Records created successfully")
     conn.close()
@@ -67,7 +65,6 @@ def write_addr(addr, sn):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     logger.info(f"{PADDING}Opened database successfully")
-
     c.execute(f'UPDATE ADDRESS set SN = "{sn}" where ADDRESS_WIFI="{addr}"')
     conn.commit()
     logger.info(f"{PADDING}Total number of rows updated : {conn.total_changes}")
@@ -103,9 +100,7 @@ def is_addr_used(addr):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     logger.info(f"{PADDING}Opened database successfully")
-
     cursor = c.execute(f"SELECT SN from ADDRESS where ADDRESS_WIFI={addr}")
-
     logger.info(f"{PADDING}Operation done successfully")
     conn.close()
 

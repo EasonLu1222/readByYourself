@@ -124,7 +124,7 @@ def wait_for_prompt2(serial, thread_timeout=25, printline=True):
         line = ''
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
-            if line=='': 
+            if line=='':
                 lines_empty += 1
             else:
                 lines_empty = 0
@@ -261,6 +261,9 @@ class BaseSerialListener(QThread):
 
     def stop(self):
         self.ready_to_stop = True
+
+    def to_stop(self):
+        self.terminate()
 
 
 if __name__ == "__main__":

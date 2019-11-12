@@ -469,6 +469,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.actions.action_signal.emit('prepare')
+            if STATION == 'CapTouchMic':
+                logger.debug('ser_listener.to_stop')
+                self.ser_listener.to_stop()
 
     def instrument_ready(self, ready):
         logger.debug('instrument_ready start')
@@ -490,6 +493,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.actions.action_signal.emit('prepare')
+            if STATION == 'CapTouchMic':
+                logger.debug('ser_listener.to_stop')
+                self.ser_listener.to_stop()
 
         else:
             logger.debug('===NOT READY===')
@@ -621,7 +627,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         msg, t0, t1 = itemgetter('msg', 't0', 't1')(json.loads(message))
         if msg.startswith('tasks done') and self.power_recieved:
             self.pushButton.setEnabled(True)
-            self.ser_listener.start()
+
+            if STATION != "CapTouchMic":
+                self.ser_listener.start()
             if not self.simulation:
                 for power in self.task.instruments['gw_powersupply']:
                     if not power.is_open:
@@ -722,8 +730,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.show_barcode_dialog()
         else:
             self.pushButton.setEnabled(False)
-            self.ser_listener.stop()
-            #  self.task.start()
+            if STATION != 'CapTouchMic':
+                self.ser_listener.stop()
+            else:
+                self.task.start()
 
     def actions_ready(self):
         print('actions_ready')
