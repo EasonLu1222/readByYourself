@@ -9,8 +9,8 @@
     }
  },
  "appearance": {
-     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10],
-     "columns_width": [1, 1, 1, 1, 1, 330, 330, 90, 90, 90, 90, 330, 330]
+     "columns_hidden": [0, 1, 2, 3, 4, 7,8,9,10],
+     "columns_width": [1, 1, 1, 1, 1, 300, 330, 1, 1, 1, 1, 220, 220]
  },
  "behaviors": {
      "barcode-scan": false,
