@@ -48,7 +48,7 @@
             "unit": null
         },
         {
-            "group": "Audio Path",
+            "group": "Audio Path[1]",
             "hidden": false,
             "tasktype": 1,
             "item": "exit existed path",
@@ -61,7 +61,7 @@
             "unit": "Bool"
         },
         {
-            "group": "Audio Path",
+            "group": "Audio Path[2]",
             "hidden": false,
             "tasktype": 1,
             "item": "trigger audio path",
