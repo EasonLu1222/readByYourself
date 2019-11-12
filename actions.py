@@ -98,6 +98,15 @@ def serial_ignore_xff(window, ser_timeout=0.2):
     return True
 
 
+def press_ctrl_c(window, ser_timeout=0.2):
+    comports = window.comports
+    for i in window.dut_selected:
+        port = comports()[i]
+        with get_serial(port, 115200, ser_timeout) as ser:
+            lines = issue_command(ser, '\x03', fetch=False)
+    return True
+
+
 def disable_power_check(win):
     win.power_recieved = True
     return True

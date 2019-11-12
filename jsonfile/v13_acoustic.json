@@ -25,6 +25,14 @@
             "args": ["win", "task"]
          }
          ,{
+            "action": "press_ctrl_c",
+            "args": ["win"]
+         }
+         ,{
+            "action": "serial_ignore_xff",
+            "args": ["win"]
+         }
+         ,{
             "action": "enter_prompt2",
             "args": ["win", 0.2]
          }
