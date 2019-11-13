@@ -21,6 +21,7 @@ station_json = {
     # --- FATP ---
     'RF': 'v13_rf',
     'Audio': 'v13_audio',
+    'AudioPath': 'v13_audio_path',
     'Leak': 'v13_leak',
     'WPC': 'v13_wpc',                       # pyinstaller exe  tested on clean windows
     'PowerSensor': 'v13_power_sensor',      # pyinstaller exe  tested on clean windows

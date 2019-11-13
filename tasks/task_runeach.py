@@ -43,6 +43,15 @@ def arecord_aplay_path(portname):
         return result
 
 
+def arecord_aplay_path_audio(portname):
+    with get_serial(portname, 115200, timeout=1) as ser:
+        cmd = f'arecord -Dhw:0,4 -c 2 -r 48000 -f S16_LE | aplay -Dhw:0,2 -r 48000 -f S16_LE'
+        lines = issue_command(ser, cmd)
+        expected = 'asoc-aml-card auge_sound: tdm playback enable'
+        result = f'Pass' if any(re.search(expected, e) for e in lines) else 'Fail'
+        return result
+
+
 def exit_aplay_path(portname):
     with get_serial(portname, 115200, timeout=1) as ser:
         lines = issue_command(ser, '\x03', fetch=False)
