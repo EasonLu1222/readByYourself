@@ -30,8 +30,8 @@ class Distribute:
                 "file_prefix": "第05站_BtWiFi",
             },
             {
-                "station": "Audio",
-                "file_prefix": "第06站_Audio",
+                "station": "AudioPath",
+                "file_prefix": "第06站_AudioPath",
             },
             {
                 "station": "Leak",
