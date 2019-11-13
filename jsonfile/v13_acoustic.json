@@ -25,14 +25,6 @@
             "args": ["win", "task"]
          }
          ,{
-            "action": "press_ctrl_c",
-            "args": ["win"]
-         }
-         ,{
-            "action": "serial_ignore_xff",
-            "args": ["win"]
-         }
-         ,{
             "action": "enter_prompt2",
             "args": ["win", 0.2]
          }
@@ -56,20 +48,7 @@
             "unit": null
         },
         {
-            "group": "Audio Path[1]",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "exit existed path",
-            "script": "task_runeach",
-            "args": ["exit_aplay_path"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool"
-        },
-        {
-            "group": "Audio Path[2]",
+            "group": "Audio Path",
             "hidden": false,
             "tasktype": 1,
             "item": "trigger audio path",
@@ -83,4 +62,3 @@
         }
     ]
 }
-
