@@ -98,6 +98,21 @@ def read_pid(portname, dut_idx):
     return result
 
 
+def read_pid_dummy(portname, dut_idx):
+    xxx = ['000-111-222-3333-4444-555555'
+           'aaa-bbb-ccc-dddd-eeee-ffffff',
+           'aa1-bbb-ccc-dddd-eeee-ffffff',
+           'aa2-bbb-ccc-dddd-eeee-ffffff',
+           'aa3-bbb-ccc-dddd-eeee-ffffff',
+           'aa4-bbb-ccc-dddd-eeee-ffffff',
+           'aa5-bbb-ccc-dddd-eeee-ffffff',
+           None]
+    import random
+    result = random.choice(xxx)
+    result = f'Pass({result})' if result else 'Fail(no pid found)'
+    return result
+
+
 def write_usid(dynamic_info):
     sid = dynamic_info
     logger.info(f'{PADDING}write usid')

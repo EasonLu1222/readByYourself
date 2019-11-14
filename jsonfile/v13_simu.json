@@ -50,6 +50,19 @@
  "test_items":
     [
         {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid_dummy"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "Power Rail",
             "hidden": false,
             "tasktype": 2,
