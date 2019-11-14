@@ -725,6 +725,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j in range(self.task.dut_num):
                 self.table_view.setItem(i, self.col_dut_start + j,
                                         QTableWidgetItem(""))
+
+        header = self.task.header_ext()
+        for dut_i in range(self.task.dut_num):
+            header[-self.task.dut_num + dut_i] = f'#{dut_i+1}'
+        self.table_view.setHorizontalHeaderLabels(header)
+
         self.set_window_color('default')
         if self.task.behaviors['barcode-scan']:
             self.show_barcode_dialog()

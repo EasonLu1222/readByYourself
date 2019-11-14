@@ -1,3 +1,10 @@
+[2019.11.14 - 11:10]
+Fix no pid in logs issue
+
+1. no pid in logs bugs fixed
+
+2. clear header to #1, #2, ... once run button clicked
+
 [2019.11.12 - 16:00]
 Modify acoustic station: add one item exit_aplay_path
 

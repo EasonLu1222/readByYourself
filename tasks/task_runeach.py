@@ -99,7 +99,7 @@ def read_pid(portname, dut_idx):
 
 
 def read_pid_dummy(portname, dut_idx):
-    xxx = ['000-111-222-3333-4444-555555'
+    xxx = ['000-111-222-3333-4444-555555',
            'aaa-bbb-ccc-dddd-eeee-ffffff',
            'aa1-bbb-ccc-dddd-eeee-ffffff',
            'aa2-bbb-ccc-dddd-eeee-ffffff',
@@ -110,6 +110,7 @@ def read_pid_dummy(portname, dut_idx):
     import random
     result = random.choice(xxx)
     result = f'Pass({result})' if result else 'Fail(no pid found)'
+    logger.debug(f'read_pid_dummy: {result}')
     return result
 
 

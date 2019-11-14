@@ -654,8 +654,10 @@ class Task(QThread):
                 procs[port] = proc
 
         logger.debug(f'{PADDING}procs {procs}')
+        header = self.header_ext()
         for j, (port, proc) in enumerate(procs.items()):
             output, _ = proc.communicate()
+            logger.critical(output)
             output = output.decode('utf8')
             msg2 = '[task %s][output: %s]' % (row_idx, output)
             self.printterm_msg.emit(msg2)
@@ -671,13 +673,19 @@ class Task(QThread):
             if not any(self.window.port_barcodes.values()):
                 script = next_item['script']
                 func = next_item['args'][0]
-                to_read_pid = (script == 'task_runeach' and func == 'read_pid')
-                if output.startswith('Pass') and to_read_pid:
-                    pid = output[5:-1]
-                    header = self.header_ext()
-                    dut_i = self.window.dut_selected[j]
-                    header[-self.dut_num + dut_i] = f'#{dut_i+1} - {pid}'
+                to_read_pid = (script == 'task_runeach' and func.startswith('read_pid'))
+
+                if to_read_pid:
+                    if output.startswith('Pass'):
+                        pid = output[5:-1]
+                        dut_i = self.window.dut_selected[j]
+                        header[-self.dut_num + dut_i] = f'#{dut_i+1} - {pid}'
+                    elif output.startswith('Fail'):
+                        pid = '0'
+
                     self.window.table_view.setHorizontalHeaderLabels(header)
+                    self.window.barcodes.append(pid)
+
             self.task_result.emit(result)
 
     def run_task2(self, group, items):
