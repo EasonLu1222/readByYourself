@@ -1,16 +1,25 @@
 import re
 import sys
 
+from enum import Enum
 from PyQt5.QtWidgets import QDialog, QApplication, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.barcode_dialog import Ui_BarcodeDialog
+
+
+class BarcodeRe(Enum):
+    """
+    Define the regular expression for different types of barcode
+    """
+    PRODUCT = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+    WPC = r"\d{3}"  # TODO: Replace this with real WPC barcode regular expression
 
 
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
     barcode_entered = pyqtSignal(str)  # str:barcode
     barcode_dialog_closed = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, station=None):
         super().__init__(parent)
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
@@ -18,16 +27,21 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         self.setWindowModality(Qt.ApplicationModal)
         self.barcodeLineEdit.returnPressed.connect(self.on_input_done)
         self.barcodeLineEdit.setFocus()
+        self.total_barcode = -1
+        if station == 'WPC':
+            self.regex = BarcodeRe.WPC.value
+        else:
+            self.regex = BarcodeRe.PRODUCT.value
 
     def set_total_barcode(self, num):
         self.total_barcode = num
 
     def on_input_done(self):
         barcode = self.barcodeLineEdit.text()
-        if (self.is_valid(barcode)):
+        if self.is_valid(barcode):
             self.barcode_entered.emit(barcode)
             self.total_barcode = self.total_barcode - 1
-            if (self.total_barcode <= 0):
+            if self.total_barcode <= 0:
                 self.close()
             else:
                 self.barcodeLineEdit.clear()
@@ -38,19 +52,11 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         """
         Verify if the input is a valid barcode
         """
-        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-        matches = re.match(regex, barcode)
+        matches = re.match(self.regex, barcode)
 
         return matches is not None
 
     def closeEvent(self, evnt):
-        self.show_start_test_dialog()
-
-    def show_start_test_dialog(self):
-        infoBox = QMessageBox()  ##Message Box that doesn't run
-        infoBox.setIcon(QMessageBox.Information)
-        infoBox.setText("将待测物放回治具后，按回车键开始测试")
-        infoBox.exec_()
         self.barcode_dialog_closed.emit()
 
 

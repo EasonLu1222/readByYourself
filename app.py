@@ -125,7 +125,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.simulation = False
 
         self.pwd_dialog = PwdDialog(self)
-        self.barcode_dialog = BarcodeDialog(self)
+        self.barcode_dialog = BarcodeDialog(self, STATION)
         self.barcodes = []
         self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
 
@@ -798,11 +798,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         When the barcode(s) are ready, start testing
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
+
+        if STATION == "WPC":
+            pass
+        else:
+            infoBox = QMessageBox()  ##Message Box that doesn't run
+            infoBox.setIcon(QMessageBox.Information)
+            infoBox.setText("将待测物放回治具后，按回车键开始测试")
+            infoBox.exec_()
+
         header = self.task.header_ext()
         for j, dut_i in enumerate(self.dut_selected):
             header[-self.task.dut_num + dut_i] = f'#{dut_i+1} - {self.barcodes[j]}'
-            port = self._comports_dut[dut_i]
-            self.port_barcodes[port] = self.barcodes[j]
+            if self._comports_dut:
+                port = self._comports_dut[dut_i]
+                self.port_barcodes[port] = self.barcodes[j]
         self.table_view.setHorizontalHeaderLabels(header)
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
