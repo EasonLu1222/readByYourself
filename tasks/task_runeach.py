@@ -141,15 +141,15 @@ def write_wifi_bt_mac(dynamic_info):
     if mac_wifi_addr == "" or mac_bt_addr == "":
         return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
     logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
-    with get_serial(portname, 115200, timeout=3) as ser:
+    with get_serial(portname, 115200, timeout=1) as ser:
         # Read product ID
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo usid > /sys/class/unifykeys/name',
-        ]
-        for cmd in cmds:
-            logger.debug(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
+        cmd = ";".join([
+            'echo 1 > /sys/class/unifykeys/attach',
+            'echo usid > /sys/class/unifykeys/name',
+            'cat /sys/class/unifykeys/read'
+        ])
+        logger.debug(f'{PADDING}cmd: {cmd}')
+        issue_command(ser, cmd)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
         logger.debug(f'{PADDING}{lines}')
         try:
@@ -172,30 +172,25 @@ def write_wifi_bt_mac(dynamic_info):
             return "Pass(pid exists in db)"
 
         # Write wifi_mac
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_wifi > /sys/class/unifykeys/name',
+        cmd = ";".join([
+            'echo mac_wifi > /sys/class/unifykeys/name',
             f'echo {mac_wifi_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
+            "cat /sys/class/unifykeys/read"
+        ])
+        logger.info(f'{PADDING}cmd: {cmd}')
+        issue_command(ser, cmd)
         lines = issue_command(ser, cmd)
         is_wifi_mac_written = any(re.match(mac_wifi_addr, e) for e in lines)
         if not is_wifi_mac_written:
             return "Fail(failed to write wifi_mac to DUT)"
 
         # Write bt_mac
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo mac_bt > /sys/class/unifykeys/name',
+        cmd = ";".join([
+            'echo mac_bt > /sys/class/unifykeys/name',
             f'echo {mac_bt_addr} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
+            "cat /sys/class/unifykeys/read"
+        ])
+        logger.info(f'{PADDING}cmd: {cmd}')
         lines = issue_command(ser, cmd)
         is_bt_mac_written = any(re.match(mac_bt_addr, e) for e in lines)
         if not is_bt_mac_written:
