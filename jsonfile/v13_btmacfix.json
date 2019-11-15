@@ -25,12 +25,8 @@
             "args": ["win", "task"]
          }
          ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 0]
-         }
-         ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 9]
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
          }
      ],
      "prepares": [],
@@ -39,12 +35,12 @@
  "test_items":
     [
         {
-            "group": "Download",
+            "group": "BT MAC Hotfix",
             "hidden": false,
             "tasktype": 1,
-            "item": "enter burn mode",
+            "item": "fix mac_bt",
             "script": "task_runeach",
-            "args": ["enter_burn_mode"],
+            "args": ["fix_mac_bt"],
             "auto": true,
             "min": null,
             "expect": null,
