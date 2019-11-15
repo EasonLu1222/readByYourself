@@ -57,6 +57,10 @@ class Distribute:
                 "station": "Download",
                 "file_prefix": "第12站_Download",
             },
+            {
+                "station": "BTMacFix",
+                "file_prefix": "第xx站_BTMacFixDownload",
+            },
         ]
         if stations:
             self.STATION = [e for e in STATIONS if e['station'] in stations]
