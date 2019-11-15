@@ -211,6 +211,50 @@ def write_wifi_bt_mac(dynamic_info):
         return 'Pass'
 
 
+# TODO: This function should be removed when all DUTs with incorrect mac_bt are fixed at SA station
+def fix_mac_bt(portname):
+    """
+    fix mac_bt
+    "aa:bb:cc:dd:ee:ff" => "aabbccddeeff"
+    """
+    logger.debug(f'{PADDING}portname: {portname}')
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmds = [
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_bt > /sys/class/unifykeys/name',
+        ]
+        for cmd in cmds:
+            logger.debug(f'{PADDING}cmd: {cmd}')
+            issue_command(ser, cmd, False)
+        lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+        logger.debug(f'{PADDING}{lines}')
+        try:
+            response = lines[-1]
+        except IndexError as ex:
+            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            return 'Fail(fail to read old mac_bt)'
+        logger.debug(f'{PADDING}response: {response}')
+
+        regex = r"\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2}"
+        matches = re.search(regex, response)
+        old_mac = ""
+        if not matches:
+            return 'Fail(no old mac_bt found)'
+        else:
+            old_mac = matches.group()
+            logger.debug(f'{PADDING}old_mac: {old_mac}')
+
+        mac_bt = old_mac.replace(":", "")
+        cmd = f'echo {mac_bt} > /sys/class/unifykeys/write'
+        issue_command(ser, cmd, False)
+        cmd = "cat /sys/class/unifykeys/read"
+        lines = issue_command(ser, cmd)
+        result = f'Pass' if any(re.search(mac_bt, e)
+                                for e in lines) else 'Fail(fail to replace old mac_bt with the correct one)'
+
+    return result
+
+
 def write_country_code(dynamic_info):
     ccode = dynamic_info
     logger.info(f'{PADDING}write country_code')
