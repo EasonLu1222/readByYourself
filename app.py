@@ -791,6 +791,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
 
     def on_barcode_entered(self, barcode):
+        logger.info(f"Received barcode: {barcode}")
         self.barcodes.append(barcode)
 
     def on_barcode_dialog_closed(self):
@@ -802,7 +803,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if STATION == "WPC":
             pass
         else:
-            infoBox = QMessageBox()  ##Message Box that doesn't run
+            infoBox = QMessageBox()  #Message Box that doesn't run
             infoBox.setIcon(QMessageBox.Information)
             infoBox.setText("将待测物放回治具后，按回车键开始测试")
             infoBox.exec_()
