@@ -15,51 +15,51 @@ class Distribute:
         STATIONS = [
             {
                 "station": "MainBoard",
-                "file_prefix": "第02站_主板",
+                "file_prefix": "Station02_MainBoard",
             },
             {
                 "station": "CapTouchMic",
-                "file_prefix": "第03站_觸控板",
+                "file_prefix": "Station03_SwBoard",
             },
             {
                 "station": "LED",
-                "file_prefix": "第04站_燈板",
+                "file_prefix": "Station04_LedBoard",
             },
             {
                 "station": "RF",
-                "file_prefix": "第05站_BtWiFi",
+                "file_prefix": "Station05_BtWiFi",
             },
             {
                 "station": "AudioPath",
-                "file_prefix": "第06站_AudioPath",
+                "file_prefix": "Station06_AudioPath",
             },
             {
                 "station": "Leak",
-                "file_prefix": "第07站_Leak",
+                "file_prefix": "Station07_Leak",
             },
             {
                 "station": "WPC",
-                "file_prefix": "第08站_WPC",
+                "file_prefix": "Station08_WPC",
             },
             {
                 "station": "PowerSensor",
-                "file_prefix": "第09站_Antenna",
+                "file_prefix": "Station09_Antenna",
             },
             {
                 "station": "SA",
-                "file_prefix": "第10站_SA",
+                "file_prefix": "Station10_SA",
             },
             {
                 "station": "Acoustic",
-                "file_prefix": "第11站_Acoustic",
+                "file_prefix": "Station11_Acoustic",
             },
             {
                 "station": "Download",
-                "file_prefix": "第12站_Download",
+                "file_prefix": "Station12_Download",
             },
             {
                 "station": "BTMacFix",
-                "file_prefix": "第xx站_BTMacFixDownload",
+                "file_prefix": "StationXX_BTMacFixDownload",
             },
         ]
         if stations:
