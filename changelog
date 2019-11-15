@@ -1,3 +1,13 @@
+[2019.11.15 - 14:30]
+Add read_pid at RF station
+
+1. autogenerate v13_rf_only.json instead of v13_rf.json
+
+2. manually add read_pid test item into v13_rf.json
+
+3. update FAB_Test_Flow file : total 45 items
+
+
 [2019.11.14 - 11:10]
 Fix no pid in logs issue
 

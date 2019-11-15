@@ -123,7 +123,7 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
 
 def generate_jsonfile():
     source_json = 'v13_rf_base'
-    target_json = os.path.join('jsonfile', 'v13_rf.json')
+    target_json = os.path.join('jsonfile', 'v13_rf_only.json')
     from core import Task
     each = lambda item: {
         "group": "RF",
@@ -353,3 +353,7 @@ def prepare_for_testflow_files(win):
                     print(line, end='')
                 f2.write(line)
         print('-----------------------------------------------------------')
+
+
+if __name__ == "__main__":
+    generate_jsonfile()
