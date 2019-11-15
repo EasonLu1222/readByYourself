@@ -206,6 +206,16 @@ def write_wifi_bt_mac(dynamic_info):
         return 'Pass'
 
 
+def reboot_and_enter_dl_mode(portname):
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        issue_command(ser, 'reboot', fetch=False)
+        logger.info('enter uboot mode')
+        enter_factory_image_prompt(ser, waitwordidx=0, press_enter=True, printline=False)
+        logger.info('enter download mode')
+        enter_factory_image_prompt(ser, waitwordidx=9, press_enter=True, printline=False)
+    return 'Pass'
+
+
 # TODO: This function should be removed when all DUTs with incorrect mac_bt are fixed at SA station
 def fix_mac_bt(portname):
     """
