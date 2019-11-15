@@ -23,7 +23,7 @@
      "columns_width": [1, 1, 1, 1, 1, 200, 200, 90, 90, 90, 90, 200]
  },
  "behaviors": {
-     "barcode-scan": false,
+     "barcode-scan": true,
      "firsts": [],
      "actions": [
          {
