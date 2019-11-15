@@ -13,7 +13,7 @@ import config
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 
 from subprocess import Popen, PIPE
-from serials import issue_command, get_serial, wait_for_prompt
+from serials import issue_command, get_serial, wait_for_prompt, enter_factory_image_prompt
 #  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger

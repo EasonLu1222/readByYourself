@@ -116,7 +116,7 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
             break
 
 
-def wait_for_prompt2(serial, thread_timeout=25, printline=True):
+def wait_for_prompt2(serial, empty_wait=5, printline=True):
     portname = serial.name
     logger.info(f'{PADDING}portname: {portname}')
     lines_empty = 0
@@ -128,7 +128,7 @@ def wait_for_prompt2(serial, thread_timeout=25, printline=True):
                 lines_empty += 1
             else:
                 lines_empty = 0
-            if lines_empty > 5:
+            if lines_empty > empty_wait:
                 serial.write(os.linesep.encode('ascii'))
 
                 lines = issue_command(serial, 'echo 123')

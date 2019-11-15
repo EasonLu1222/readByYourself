@@ -63,7 +63,7 @@ def enter_prompt(window, ser_timeout=0.2, waitwordidx=8):
     return True
 
 
-def enter_prompt2(window, ser_timeout=0.2):
+def enter_prompt2(window, ser_timeout=0.2, empty_wait=5):
     logger.debug(f'{PADDING}start')
     t0 = time.time()
     port_ser_thread = {}
@@ -73,7 +73,7 @@ def enter_prompt2(window, ser_timeout=0.2):
         port = comports()[i]
         ser = get_serial(port, 115200, ser_timeout)
         t = threading.Thread(target=wait_for_prompt2,
-                             args=(ser,))
+                             args=(ser, empty_wait))
         port_ser_thread[port] = [ser, t]
         t.start()
     for port, (ser, th) in port_ser_thread.items():
