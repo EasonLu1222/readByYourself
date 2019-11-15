@@ -48,12 +48,25 @@
             "unit": null
         },
         {
-            "group": "Download",
+            "group": "Download[1]",
             "hidden": false,
             "tasktype": 1,
-            "item": "final image download",
+            "item": "reboot",
             "script": "task_runeach",
             "args": ["reboot_and_enter_dl_mode"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Download[2]",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "enter burn mode",
+            "script": "task_runeach",
+            "args": ["enter_burn_mode"],
             "auto": true,
             "min": null,
             "expect": null,
