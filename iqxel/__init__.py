@@ -38,7 +38,7 @@ def run_iqfactrun_console(task, dut_idx, port, groupname):
     exe = 'IQfactRun_Console.exe'
     #  exe_winpty = os.path.join(iqxel_dir, 'winpty.exe')
     exe_winpty = resource_path('iqxel/winpty.exe')
-    logger.debug(f'{PADDING}exe_winpty', exe_winpty)
+    logger.debug(f'{PADDING}exe_winpty {exe_winpty}')
     def run():
         # clean log
         try:
