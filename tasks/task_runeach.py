@@ -137,7 +137,7 @@ def write_wifi_bt_mac(dynamic_info):
     pid = None
     mac_list = dynamic_info.split(",")
     mac_wifi_addr = mac_list[0]
-    mac_bt_addr = mac_list[1]
+    mac_bt_addr = mac_list[1].replace(":", "")
     if mac_wifi_addr == "" or mac_bt_addr == "":
         return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
     logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')

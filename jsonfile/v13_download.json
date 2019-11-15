@@ -49,6 +49,19 @@
  "test_items":
     [
         {
+            "group": "BT MAC Hotfix",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "fix mac_bt",
+            "script": "task_runeach",
+            "args": ["fix_mac_bt"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
             "group": "Download",
             "hidden": false,
             "tasktype": 1,
