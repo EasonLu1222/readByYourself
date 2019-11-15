@@ -12,7 +12,8 @@ class BarcodeRe(Enum):
     Define the regular expression for different types of barcode
     """
     PRODUCT = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-    WPC = r"^\w{4}\d{3,4}[A-Z]\d{5}"
+    #WPC = r"^\w{4}\d{3,4}[A-Z]\d{5}"
+    WPC = r"\w*"
 
 
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
