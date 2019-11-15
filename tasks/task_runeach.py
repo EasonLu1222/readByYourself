@@ -234,7 +234,15 @@ def fix_mac_bt(portname):
         matches = re.search(regex, response)
         old_mac = ""
         if not matches:
-            return 'Fail(no old mac_bt found)'
+            logger.debug(f'{PADDING}No old mac_bt found')
+            regex = r"\w{6}#"
+            matches = re.search(regex, response)
+            if not matches:
+                logger.debug(f'{PADDING}No mac_bt found')
+                return 'Fail(no mac_bt found)'
+            else:
+                logger.debug(f'{PADDING}mac_bt already good')
+                return 'Pass(mac_bt already good)'
         else:
             old_mac = matches.group()
             logger.debug(f'{PADDING}old_mac: {old_mac}')
