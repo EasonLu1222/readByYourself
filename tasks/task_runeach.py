@@ -178,7 +178,6 @@ def write_wifi_bt_mac(dynamic_info):
             "cat /sys/class/unifykeys/read"
         ])
         logger.info(f'{PADDING}cmd: {cmd}')
-        issue_command(ser, cmd)
         lines = issue_command(ser, cmd)
         is_wifi_mac_written = any(re.match(mac_wifi_addr, e) for e in lines)
         if not is_wifi_mac_written:
