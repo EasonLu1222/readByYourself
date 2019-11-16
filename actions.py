@@ -3,9 +3,10 @@ import re
 import time
 import threading
 from subprocess import Popen, PIPE
-from PyQt5.QtCore import QThread, Qt
+from PyQt5.QtCore import QThread, Qt, QSize
+from PyQt5.QtWidgets import QHBoxLayout
 from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
-from utils import resource_path, get_env, python_path, run
+from utils import resource_path, get_env, python_path, run, move_mainwindow_centered
 from mylogger import logger
 
 PADDING = ' ' * 4
@@ -23,6 +24,24 @@ def wait_and_window_click_run(win, wait_sec=5):
 def set_appearance(win):
     win.pushButton2.setVisible(True)
     win.pushButton.setVisible(False)
+
+
+def set_acoustic_appearance(win):
+    #  flags = win.windowFlags()
+    #  flags &= ~Qt.FramelessWindowHint & ~Qt.WindowMaximizeButtonHint
+    flags = Qt.WindowCloseButtonHint 
+    win.setWindowFlags(flags)
+    win.container.setVisible(False)
+    win.horizontalLayout_3.addWidget(win.pushButton)
+    win.horizontalLayout_3.setContentsMargins(10, 1, 10, 1)
+    win.pushButton.setParent(win.centralwidget)
+    win.setWindowState(Qt.WindowNoState)
+    win.show()
+    win.setWindowTitle('SAP109 Acoustic Enable')
+    #  win.resize(1000, 50)
+    #  win.setFixedSize(1000, 50)
+    win.setFixedHeight(50)
+    move_mainwindow_centered(win.app, win)
 
 
 # for leak test

@@ -14,7 +14,12 @@
  },
  "behaviors": {
      "barcode-scan": false,
-     "firsts": [],
+     "firsts": [
+         {
+             "first": "set_acoustic_appearance",
+             "args": ["win"]
+         }
+     ],
      "actions": [
          {
             "action": "disable_power_check",

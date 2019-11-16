@@ -119,6 +119,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
+        self.app = app
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -227,11 +228,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton2.setText('enable fetch')
 
     def set_hbox_visible(self, is_visible):
-        for i in range(self.hboxPorts.count()):
+        self.set_layout_visible(self.hboxPorts, is_visible)
+
+    def set_layout_visible(self, layout, is_visible):
+        for i in range(layout.count()):
+            each_widget = layout.itemAt(i).widget()
+            print(each_widget)
             if is_visible:
-                self.hboxPorts.itemAt(i).widget().show()
+                each_widget.show()
             else:
-                self.hboxPorts.itemAt(i).widget().hide()
+                if each_widget:
+                    each_widget.hide()
 
     def make_checkboxes(self):
         self.checkboxes = []
