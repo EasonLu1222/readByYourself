@@ -33,14 +33,14 @@ def set_acoustic_appearance(win):
     win.setWindowFlags(flags)
     win.container.setVisible(False)
     win.horizontalLayout_3.addWidget(win.pushButton)
-    win.horizontalLayout_3.setContentsMargins(10, 1, 10, 1)
+    win.horizontalLayout_3.setContentsMargins(10, 10, 10, 10)
     win.pushButton.setParent(win.centralwidget)
     win.setWindowState(Qt.WindowNoState)
     win.show()
     win.setWindowTitle('SAP109 Acoustic Enable')
     #  win.resize(1000, 50)
     #  win.setFixedSize(1000, 50)
-    win.setFixedHeight(50)
+    win.setFixedHeight(80)
     move_mainwindow_centered(win.app, win)
 
 
