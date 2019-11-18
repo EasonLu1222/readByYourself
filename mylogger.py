@@ -3,6 +3,7 @@ import time
 import logging
 import pyclbr
 import bisect
+from copy import copy
 from logging.handlers import TimedRotatingFileHandler
 
 
@@ -51,6 +52,7 @@ def lookup_class(module, funcname, lineno):
 
 class MyLogFormatter(logging.Formatter):
     def format(self, record):
+        record = copy(record)
         record.className = lookup_class(
             record.module, record.funcName, record.lineno
         )
