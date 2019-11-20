@@ -900,8 +900,4 @@ if __name__ == "__main__":
     win.actions = actions
     actions.action_trigger('first')
 
-
-    _path = os.environ['PATH']
-    logger.debug(f'_path {_path}')
-
     app.exec_()
