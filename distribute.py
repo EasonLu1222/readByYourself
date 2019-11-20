@@ -30,8 +30,8 @@ class Distribute:
                 "file_prefix": "Station05_BtWiFi",
             },
             {
-                "station": "AudioPath",
-                "file_prefix": "Station06_AudioPath",
+                "station": "AudioListen",
+                "file_prefix": "Station06_AudioListen",
             },
             {
                 "station": "Leak",
