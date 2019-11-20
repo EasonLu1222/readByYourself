@@ -821,7 +821,6 @@ class Task(QThread):
         })
         self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
-        #logger.debug(f'RESULT {event_handler.result}')
 
     def run_task11(self, group, items):
         threads = {}

@@ -61,7 +61,7 @@
             "unit": "Bool"
         },
         {
-            "group": "SoundChecK",
+            "group": "SoundCheck",
             "hidden": false,
             "tasktype": 10,
             "item": "frequency response [L]",
@@ -74,7 +74,7 @@
             "unit": null
         }
         ,{
-            "group": "SoundChecK",
+            "group": "SoundCheck",
             "hidden": false,
             "tasktype": 10,
             "item": "THD [L]",
@@ -87,7 +87,7 @@
             "unit": null
         },
         {
-            "group": "SoundChecK",
+            "group": "SoundCheck",
             "hidden": false,
             "tasktype": 10,
             "item": "frequency response [R]",
@@ -100,7 +100,7 @@
             "unit": null
         }
         ,{
-            "group": "SoundChecK",
+            "group": "SoundCheck",
             "hidden": false,
             "tasktype": 10,
             "item": "THD [R]",
