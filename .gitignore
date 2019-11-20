@@ -1,6 +1,7 @@
 power_results
 leak_result
 logs/
+tmp/
 klippel_dev/
 Log/
 Result_LP/

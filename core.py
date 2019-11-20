@@ -13,6 +13,8 @@ from collections import defaultdict
 import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 from utils import resource_path, get_env, python_path, s_
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
@@ -341,6 +343,33 @@ class Action(QThread):
         Action.trigger(self.action_args)
         self.action_done.emit()
         logger.debug(f'{PADDING}Action run end')
+
+
+class MyHandler(FileSystemEventHandler):
+    def __init__(self, ob, file_to_monitor):
+        self.file = self._path(file_to_monitor)
+        self.lines = self.readlines(self.file)
+        #  print('lines', len(self.lines))
+        self.to_stop = False
+
+    def readlines(self, file):
+        with open(file) as f:
+            return f.readlines()
+
+    def _path(self, path):
+        return path.replace('\\', '/')
+
+    def on_modified(self, event):
+        if self._path(event.src_path) == self.file:
+            #  print("The file is modified")
+            lines = [e.strip() for e in self.readlines(self.file)]
+            if len(lines) > len(self.lines):
+                diff = lines[len(self.lines):]
+                #  for e in diff:
+                    #  print(e)
+                self.to_stop = True
+                #  print('to_stop')
+            self.lines = lines
 
 
 class Task(QThread):
@@ -753,6 +782,24 @@ class Task(QThread):
         })
         self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
+
+    def run_task10(self, group, items):
+        row, next_item = items[0]['index'], items[0]
+        obj_name, method_name = next_item['args']
+
+        observer = Observer()
+        path = 'C:\SoundCheckData'
+        filename = 'log.txt'
+        filepath = os.path.join(path, filename)
+        print('filepath', filepath)
+        event_handler = MyHandler(observer, filepath)
+        observer.schedule(event_handler, path=path)
+        observer.start()
+        try:
+            while not event_handler.to_stop:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
 
     def run_task11(self, group, items):
         threads = {}
