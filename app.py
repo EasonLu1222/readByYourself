@@ -739,6 +739,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.barcode_dialog.set_total_barcode(num)
         if num > 0:
             self.barcode_dialog.show()
+            self.barcode_dialog.barcodeLineEdit.clear()
         logger.debug('show_barcode_dialog end')
 
     def btn_clicked(self):
@@ -833,7 +834,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
 
-        if STATION == "WPC":
+        if STATION in ["WPC", 'AcousticListen']:
             pass
         else:
             infoBox = QMessageBox()  #Message Box that doesn't run
