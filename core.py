@@ -351,6 +351,7 @@ class MyHandler(FileSystemEventHandler):
         self.lines = self.readlines(self.file)
         #  print('lines', len(self.lines))
         self.to_stop = False
+        self.result = None
 
     def readlines(self, file):
         with open(file) as f:
@@ -360,15 +361,20 @@ class MyHandler(FileSystemEventHandler):
         return path.replace('\\', '/')
 
     def on_modified(self, event):
+        results = []
         if self._path(event.src_path) == self.file:
             #  print("The file is modified")
             lines = [e.strip() for e in self.readlines(self.file)]
             if len(lines) > len(self.lines):
                 diff = lines[len(self.lines):]
-                #  for e in diff:
-                    #  print(e)
+                print('\n\n\n')
+                for e in diff:
+                    _, name, _, _, result, _, _ = e.strip().split('\t')
+                    print('name', name, 'result', result)
+                    results.append(result)
+                print('\n\n\n')
+                self.result = results
                 self.to_stop = True
-                #  print('to_stop')
             self.lines = lines
 
 
@@ -392,6 +398,7 @@ class Task(QThread):
     message = QSignal(str)
     printterm_msg = QSignal(str)
     show_task_dialog = QSignal(list)
+    trigger_snk = QSignal(str)
 
     def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
@@ -785,11 +792,12 @@ class Task(QThread):
 
     def run_task10(self, group, items):
         row, next_item = items[0]['index'], items[0]
-        obj_name, method_name = next_item['args']
+
+        self.trigger_snk.emit('run_sqc')
 
         observer = Observer()
-        path = 'C:\SoundCheckData'
-        filename = 'log.txt'
+        path = 'F:\SAP 109 DATA'
+        filename = 'SAP109 Results 11-20-2019.txt'
         filepath = os.path.join(path, filename)
         print('filepath', filepath)
         event_handler = MyHandler(observer, filepath)
@@ -801,6 +809,20 @@ class Task(QThread):
         except KeyboardInterrupt:
             observer.stop()
 
+        output = [e.capitalize() for e in event_handler.result]
+        r1, r2 = row, row + len(items)
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+        if len(self.window.dut_selected) == 1:
+            output = [[e] for e in output]
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': output
+        })
+        self.df.iloc[r1:r2, c1:c2] = output
+        self.task_result.emit(result)
+        #logger.debug(f'RESULT {event_handler.result}')
+
     def run_task11(self, group, items):
         threads = {}
         for dut_idx in self.window.dut_selected:
@@ -809,12 +831,8 @@ class Task(QThread):
             logger.debug(f'{PADDING}port:  {port}')
             threads[dut_idx] = th = threading.Thread(
                 target=run_iqfactrun_console,
-                args=(
-                    self,
-                    dut_idx,
-                    port,
-                    group,
-                ))
+                args=(self, dut_idx, port, group,)
+            )
             th.start()
         for dut_idx, th in threads.items():
             th.join()

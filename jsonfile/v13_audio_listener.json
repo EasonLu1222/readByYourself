@@ -3,9 +3,9 @@
  "version": "13.0",
  "devices": {
     "dut": {
-        "name": "prolific",
+        "name": "ftdi",
         "num": 1,
-        "sn": ["6"]
+        "sn": ["AK08QPMXA"]
     }
  },
  "appearance": {
@@ -20,6 +20,14 @@
             "action": "disable_power_check",
             "args": ["win"]
          }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         }
+         ,{
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
+         }
      ],
      "prepares": [],
      "afters": []
@@ -27,12 +35,38 @@
  "test_items":
     [
         {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Audio Path",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "trigger audio path",
+            "script": "task_runeach",
+            "args": ["arecord_aplay_path_audio"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool"
+        },
+        {
             "group": "SoundChecK",
             "hidden": false,
             "tasktype": 10,
-            "item": "frequency response",
+            "item": "frequency response [L]",
             "script": null,
-            "args": ["snd_chk", "Run_Sequence"],
+            "args": null,
             "auto": true,
             "min": null,
             "expect": null,
@@ -43,7 +77,33 @@
             "group": "SoundChecK",
             "hidden": false,
             "tasktype": 10,
-            "item": "THD",
+            "item": "THD [L]",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "SoundChecK",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "frequency response [R]",
+            "script": null,
+            "args": [],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "SoundChecK",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "THD [R]",
             "script": null,
             "args": [],
             "auto": true,
@@ -54,8 +114,3 @@
         }
     ]
 }
-
-
-
-
-

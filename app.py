@@ -532,6 +532,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
         self.task.adb_ok.connect(self.adb_ok)
+        self.task.trigger_snk.connect(self.snk_hnd)
+
+    def snk_hnd(self, message):
+        import pyautogui as pag
+        wins = pag.getWindowsWithTitle('soundcheck')
+        win = [e for e in wins if '-' in e.title][0]
+        my = pag.getActiveWindow()
+        win.activate()
+        pag.hotkey('f2')
+        my.activate()
 
     def serial_ok(self, ok):
         if ok:
