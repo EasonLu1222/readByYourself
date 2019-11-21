@@ -366,10 +366,18 @@ class MyHandler(FileSystemEventHandler):
             if len(lines) > len(self.lines):
                 diff = lines[len(self.lines):]
                 print('\n\n\n')
-                for e in diff:
-                    _, name, _, _, result, _, _ = e.strip().split('\t')
-                    print('name', name, 'result', result)
-                    results.append(result)
+                if STATION == 'AudioListen':
+                    for e in diff:
+                        _, name, _, _, result, _, _ = e.strip().split('\t')
+                        print('name', name, 'result', result)
+                        results.append(result)
+                elif STATION == 'AcousticListen':
+                    if len(diff) == 1:
+                        from parse_klippel import parse
+                        df = parse(self.file)
+                        results = df.values[-1].tolist()
+                        results = [{1:'Pass', 0:'Fail'}[e] for e in results]
+                        print(results)
                 print('\n\n\n')
                 self.result = results
                 self.to_stop = True
@@ -397,6 +405,7 @@ class Task(QThread):
     printterm_msg = QSignal(str)
     show_task_dialog = QSignal(list)
     trigger_snk = QSignal(str)
+    trigger_klippel = QSignal(str)
 
     def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
@@ -839,16 +848,31 @@ class Task(QThread):
 
     def run_task20(self, group, items):
         from datetime import datetime
+        import glob
+        now = datetime.now()
         row, next_item = items[0]['index'], items[0]
 
-        self.trigger_snk.emit('run_sqc')
+        asn = self.window.barcodes[0] #ASN
+        print('asn', asn)
+        self.trigger_klippel.emit(asn)
 
         observer = Observer()
-        path = 'F:\SAP 109 DATA'
-        now = datetime.now().strftime('%m-%d-%Y')
-        filename = f'SAP109 Results {now}.txt'
-        filepath = os.path.join(path, filename)
+
+        projname = 'SAP109 - v1.2 - DVT1 - 191114'
+        workdir = f'D:\QC_Log_Files\{projname}'
+        year = now.strftime('%Y')   #2019
+        week = int(now.strftime('%W')) + 1   #47
+        x1 = now.strftime('%Y%m%d') #20191121
+        x2 = now.strftime('%Y-%m-%d') #20191121
+        path = f'{workdir}\{year}\CW{week}\{x1}'
+
+        #filename = 'Summary SAP109 - v1.2 - DVT1 - 191114 2019-11-21 07-47-27-5 UTC+0700'
+        #filename = 'Summary {projname} {x2} 09-01-29-3 UTC+0700'
+
+        files = glob.glob(f'{path}\\*.log')
+        filepath = max(files)
         print('filepath', filepath)
+
         event_handler = MyHandler(observer, filepath)
         observer.schedule(event_handler, path=path)
         observer.start()

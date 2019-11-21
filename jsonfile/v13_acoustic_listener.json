@@ -13,7 +13,7 @@
      "columns_width": [1, 1, 1, 1, 1, 180, 330, 90, 90, 90, 90, 400]
  },
  "behaviors": {
-     "barcode-scan": false,
+     "barcode-scan": true,
      "firsts": [],
      "actions": [
          {
@@ -63,7 +63,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "00 10-20Hz Woofer L RBZ",
             "script": null,
             "args": null,
@@ -76,7 +76,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "00 10-20Hz Woofer R RBZ",
             "script": null,
             "args": null,
@@ -89,7 +89,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer L FR",
             "script": null,
             "args": null,
@@ -102,7 +102,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer L AL",
             "script": null,
             "args": null,
@@ -115,7 +115,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer L RBZ",
             "script": null,
             "args": null,
@@ -128,7 +128,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer R FR",
             "script": null,
             "args": null,
@@ -141,7 +141,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer R AL",
             "script": null,
             "args": null,
@@ -154,7 +154,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "02 20-800Hz Woofer R RBZ",
             "script": null,
             "args": null,
@@ -167,7 +167,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "04 200-20kHz FR FR",
             "script": null,
             "args": null,
@@ -180,7 +180,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "04 200-20kHz FR AL",
             "script": null,
             "args": null,
@@ -193,7 +193,7 @@
         ,{
             "group": "Klippel",
             "hidden": false,
-            "tasktype": 11,
+            "tasktype": 20,
             "item": "04 200-20kHz FR RBZ",
             "script": null,
             "args": null,

@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 import re
 import pickle
 import pandas as pd
@@ -532,15 +533,30 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
         self.task.adb_ok.connect(self.adb_ok)
-        self.task.trigger_snk.connect(self.snk_hnd)
+        self.task.trigger_snk.connect(self.soundcheck_handle)
+        self.task.trigger_klippel.connect(self.klippel_handle)
 
-    def snk_hnd(self, message):
+    def soundcheck_handle(self, message):
         import pyautogui as pag
         wins = pag.getWindowsWithTitle('soundcheck')
         win = [e for e in wins if '-' in e.title][0]
         my = pag.getActiveWindow()
         win.activate()
         pag.hotkey('f2')
+        my.activate()
+
+    def klippel_handle(self, asn):
+        import pyautogui as pag
+        print('klippel_handle', 'asn', asn)
+        win = pag.getWindowsWithTitle('SAP109 - v1.2 - DVT1')[0]
+        my = pag.getActiveWindow()
+        win.activate()
+        pag.click(127, 80)
+        pag.click(127, 80)
+        pag.typewrite(f'{asn}')
+        pag.typewrite('\r\n')
+        time.sleep(0.5)
+        pag.typewrite('\r\n')
         my.activate()
 
     def serial_ok(self, ok):

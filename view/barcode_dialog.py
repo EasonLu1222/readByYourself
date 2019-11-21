@@ -11,8 +11,9 @@ class BarcodeRe(Enum):
     """
     Define the regular expression for different types of barcode
     """
-    PRODUCT = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+    MSN = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
     #WPC = r"^\w{4}\d{3,4}[A-Z]\d{5}"
+    ASN = r'SAP\w{11}'
     WPC = r"\w*"
 
 
@@ -31,8 +32,10 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         self.total_barcode = -1
         if station == 'WPC':
             self.regex = BarcodeRe.WPC.value
+        elif station == 'AcousticListen':
+            self.regex = BarcodeRe.ASN.value
         else:
-            self.regex = BarcodeRe.PRODUCT.value
+            self.regex = BarcodeRe.MSN.value
 
     def set_total_barcode(self, num):
         self.total_barcode = num
