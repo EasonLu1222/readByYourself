@@ -50,8 +50,8 @@ class Distribute:
                 "file_prefix": "Station10_SA",
             },
             {
-                "station": "Acoustic",
-                "file_prefix": "Station11_Acoustic",
+                "station": "AcousticListen",
+                "file_prefix": "Station11_AcousticListen",
             },
             {
                 "station": "Download",

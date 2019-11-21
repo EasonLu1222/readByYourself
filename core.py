@@ -349,7 +349,6 @@ class MyHandler(FileSystemEventHandler):
     def __init__(self, ob, file_to_monitor):
         self.file = self._path(file_to_monitor)
         self.lines = self.readlines(self.file)
-        #  print('lines', len(self.lines))
         self.to_stop = False
         self.result = None
 
@@ -363,7 +362,6 @@ class MyHandler(FileSystemEventHandler):
     def on_modified(self, event):
         results = []
         if self._path(event.src_path) == self.file:
-            #  print("The file is modified")
             lines = [e.strip() for e in self.readlines(self.file)]
             if len(lines) > len(self.lines):
                 diff = lines[len(self.lines):]
@@ -838,6 +836,40 @@ class Task(QThread):
             th.start()
         for dut_idx, th in threads.items():
             th.join()
+
+    def run_task20(self, group, items):
+        from datetime import datetime
+        row, next_item = items[0]['index'], items[0]
+
+        self.trigger_snk.emit('run_sqc')
+
+        observer = Observer()
+        path = 'F:\SAP 109 DATA'
+        now = datetime.now().strftime('%m-%d-%Y')
+        filename = f'SAP109 Results {now}.txt'
+        filepath = os.path.join(path, filename)
+        print('filepath', filepath)
+        event_handler = MyHandler(observer, filepath)
+        observer.schedule(event_handler, path=path)
+        observer.start()
+        try:
+            while not event_handler.to_stop:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+
+        output = [e.capitalize() for e in event_handler.result]
+        r1, r2 = row, row + len(items)
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+        if len(self.window.dut_selected) == 1:
+            output = [[e] for e in output]
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': output
+        })
+        self.df.iloc[r1:r2, c1:c2] = output
+        self.task_result.emit(result)
 
     def run(self):
         time_ = lambda: datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M:%S')
