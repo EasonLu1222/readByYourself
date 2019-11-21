@@ -791,13 +791,16 @@ class Task(QThread):
         self.task_result.emit(result)
 
     def run_task10(self, group, items):
+        from datetime import datetime
         row, next_item = items[0]['index'], items[0]
 
         self.trigger_snk.emit('run_sqc')
 
         observer = Observer()
         path = 'F:\SAP 109 DATA'
-        filename = 'SAP109 Results 11-20-2019.txt'
+        now = datetime.now().strftime('%m-%d-%Y')
+        #  filename = 'SAP109 Results 11-20-2019.txt'
+        filename = f'SAP109 Results {now}.txt'
         filepath = os.path.join(path, filename)
         print('filepath', filepath)
         event_handler = MyHandler(observer, filepath)
