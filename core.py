@@ -810,6 +810,11 @@ class Task(QThread):
         filename = f'SAP109 Results {now}.txt'
         filepath = os.path.join(path, filename)
         print('filepath', filepath)
+
+        if not os.path.isfile(filepath):
+            with open(filepath, 'w') as f:
+                f.write('Time: 	Name	Margin	Unit	Result	Tolerance	Limits\n')
+
         event_handler = MyHandler(observer, filepath)
         observer.schedule(event_handler, path=path)
         observer.start()
