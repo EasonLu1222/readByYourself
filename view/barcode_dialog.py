@@ -12,9 +12,8 @@ class BarcodeRe(Enum):
     Define the regular expression for different types of barcode
     """
     MSN = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-    #WPC = r"^\w{4}\d{3,4}[A-Z]\d{5}"
-    ASN = r'SAP\w{11}'
-    WPC = r"\w*"
+    ASN = r'SAP\d{2}F\d[1-9A-C]{2}\d{5}'
+    WPC = r"[\w|\d]{6}\d[\w|\d]{2}\w[\w|\d]{5}"
 
 
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
