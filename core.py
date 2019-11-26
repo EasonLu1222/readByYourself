@@ -500,6 +500,14 @@ class Task(QThread):
         return (min_, expect, max_)
 
     @property
+    def sfc_station_id(self):
+        try:
+            rtn = self.base['sfc_station_id']
+        except Exception:
+            rtn = None
+        return rtn
+
+    @property
     def devices(self):
         all_devices = {}
         if self.serial_devices:

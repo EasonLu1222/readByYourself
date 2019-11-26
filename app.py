@@ -32,6 +32,7 @@ from config import station_json, LANG_LIST, STATION
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
 
+from sfc import send_result_to_sfc
 from mylogger import logger
 
 
@@ -688,9 +689,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             dut_num = self.task.dut_num
 
-            print(d)
-            print(d.columns)
-            print(d.columns[-dut_num])
+            sfc_station_id = self.task.sfc_station_id
 
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
@@ -705,8 +704,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 cols1 = (df.group + ': ' + df.item).values.tolist()
                 dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
 
+                msn = None
                 if self.barcodes:
                     dd.index = [self.barcodes[j]]
+                    msn = self.barcodes[j]
                 dd.index.name = 'pid'
 
                 cols2_value = {
@@ -716,7 +717,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     'Test Stop Time': t1,
                     'index': dut_i+1,
                 }
+
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
+
+                if sfc_station_id:
+                    send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
