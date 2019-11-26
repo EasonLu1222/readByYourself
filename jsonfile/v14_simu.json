@@ -1,0 +1,122 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "version": "13.0",
+ "devices": {
+    "dut": {
+        "name": "cygnal_cp2102",
+        "num": 2,
+        "sn": []
+    },
+    "pwr": {
+        "name": "gw_powersupply",
+        "num": 1,
+        "sn": []
+    },
+    "dmm": {
+        "name": "gw_dmm",
+        "num": 1,
+        "sn": []
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4],
+     "columns_width": [1, 1, 1, 1, 1, 150, 250, 90, 90, 90, 90, 280, 280]
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [
+         {
+             "first": "dummy_com_first",
+             "args": ["win", "COM11", "COM22"]
+         }
+     ],
+     "actions": [
+         {
+            "action": "enter_prompt_simu",
+            "args": []
+         }
+         ,{
+            "action": "set_power_simu",
+            "args": ["win"]
+         }
+         ,{
+            "action": "dummy_com",
+            "args": ["task"]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid_dummy"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "19V",
+            "script": "simu_group",
+            "args": [101, 109],
+            "auto": true,
+            "min": 18.05,
+            "expect": 19,
+            "max": 19.95,
+            "unit": "V"
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "5V",
+            "script": "simu_group",
+            "args": [102, 110],
+            "auto": true,
+            "min": 4.75,
+            "expect": 5,
+            "max": 5.25,
+            "unit": "V"
+        }
+        ,{
+            "group": "BT",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "BT_Interface",
+            "script": "task_runeach",
+            "args": ["check_something"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "WiFi",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "WiFi_Interface",
+            "script": "task_runeach",
+            "args": ["check_something"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+
+
+

@@ -1,0 +1,158 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "version": "13.0",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 1,
+        "sn": ["AQ0010ZIA"]
+    },
+    "pws": {
+        "name": "ks_powersensor",
+        "num": 1,
+        "sn": ["MY59190011"]
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4],
+     "columns_width": [1, 1, 1, 1, 1, 250, 380, 60, 60, 60, 60, 350]
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         },
+         {
+           "action": "enter_prompt2",
+           "args": ["win", 0.2]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Tx 11n 2442MHz ch1 [0]",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Set TX to 11n 2442MHZ CH1",
+            "script": "task_runeach",
+            "args": ["tx_power_11n_2442mhz_ch1"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Tx 11n 2442MHz ch1 [1]",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "measure 11n 2442MHZ TX power CH1",
+            "script": "task_powersensor",
+            "args": ["2442MHz"],
+            "auto": true,
+            "min": 0,
+            "expect": null,
+            "max": null,
+            "unit": "dBm"
+        }
+        ,{
+            "group": "TX Power 11ac 5500MHZ CH1 [0]",
+            "group": "Tx 11ac 5500MHz ch1",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Set TX to 11ac 5500MHZ CH1",
+            "script": "task_runeach",
+            "args": ["tx_power_11ac_5500mhz_ch1"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Tx 11ac 5500MHz ch1 [1]",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "measure 11ac 5500MHZ TX power CH1",
+            "script": "task_powersensor",
+            "args": ["5500MHz"],
+            "auto": true,
+            "min": 0,
+            "expect": null,
+            "max": null,
+            "unit": "dBm"
+        }
+        ,{
+            "group": "Tx 11n 2442MHz ch2 [0]",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Set TX to 11n 2442MHZ CH2",
+            "script": "task_runeach",
+            "args": ["tx_power_11n_2442mhz_ch2"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Tx 11n 2442MHz ch2 [1]",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "measure 11n 2442MHZ TX power CH2",
+            "script": "task_powersensor",
+            "args": ["2442MHz"],
+            "auto": true,
+            "min": 0,
+            "expect": null,
+            "max": null,
+            "unit": "dBm"
+        }
+
+        ,{
+            "group": "Tx 11ac 5500MHz ch2 [0]",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Set TX to 11ac 5500MHZ CH2",
+            "script": "task_runeach",
+            "args": ["tx_power_11ac_5500mhz_ch2"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "Tx 11ac 5500MHz ch2 [1]",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "measure 11ac 5500MHZ TX power CH2",
+            "script": "task_powersensor",
+            "args": ["5500MHz"],
+            "auto": true,
+            "min": 0,
+            "expect": null,
+            "max": null,
+            "unit": "dBm"
+        }
+    ]
+}

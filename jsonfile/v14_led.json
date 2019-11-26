@@ -1,0 +1,81 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
+ "version": "13.0",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 2,
+        "sn": ["A50285BIA", "22222222A"]
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10],
+     "columns_width": [1, 1, 1, 1, 1, 250, 400, 1, 1, 1, 1, 220, 220]
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         }
+         ,{
+            "action": "serial_ignore_xff",
+            "args": ["win"]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "Load LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["load_led_driver"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+        ,{
+            "group": "LED Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "set all led color to Red/Green/Blue/White ",
+            "script": "task_led",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        },
+        {
+            "group": "Unload LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["unload_led_driver"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null
+        }
+    ]
+}
+
+
+
+
