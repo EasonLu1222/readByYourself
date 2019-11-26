@@ -10,9 +10,11 @@
         "min",
         "expect",
         "max",
-        "unit"
+        "unit",
+        "sfc_name"
     ],
-    "version": "13.0",
+    "version": "14.0",
+    "sfc_station_id": "RF01",
     "devices": {
         "dut": {
             "name": "ftdi",
@@ -100,7 +102,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -113,7 +116,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -126,7 +130,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -139,7 +144,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -152,7 +158,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -165,7 +172,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -178,7 +186,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -191,7 +200,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -204,7 +214,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -217,7 +228,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -230,7 +242,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -243,7 +256,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -256,7 +270,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -269,7 +284,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -282,7 +298,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -295,7 +312,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -308,7 +326,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -321,7 +340,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -334,7 +354,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -347,7 +368,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -360,7 +382,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -373,7 +396,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -386,7 +410,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -399,7 +424,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -412,7 +438,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -425,7 +452,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -438,7 +466,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -451,7 +480,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -464,7 +494,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -477,7 +508,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -490,7 +522,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -503,7 +536,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -516,7 +550,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -529,7 +564,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -542,7 +578,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -555,7 +592,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -568,7 +606,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -581,7 +620,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -594,7 +634,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -607,7 +648,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -620,7 +662,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -633,7 +676,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -646,7 +690,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "RF",
@@ -659,7 +704,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
     ]
 }

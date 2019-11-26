@@ -1,6 +1,7 @@
 {"header":
-    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
- "version": "13.0",
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": null,
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -49,7 +50,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "Cap Touch FW Download",
@@ -62,7 +64,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "Cap Touch Test",
@@ -75,7 +78,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
     ]
 }

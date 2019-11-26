@@ -1,6 +1,7 @@
 {"header":
-    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
- "version": "13.0",
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": null,
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -55,7 +56,8 @@
             "min": null,
             "expect": "True",
             "max": null,
-            "unit": "Bool"
+            "unit": "Bool",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -68,7 +70,8 @@
             "min": 18.05,
             "expect": 19,
             "max": 19.95,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -81,7 +84,8 @@
             "min": 3.135,
             "expect": 3.3,
             "max": 3.465,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -94,7 +98,8 @@
             "min": 1.425,
             "expect": 1.5,
             "max": 1.575,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -107,7 +112,8 @@
             "min": 0.86,
             "expect": 1.1,
             "max": 1.2,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -120,7 +126,8 @@
             "min": 0.81,
             "expect": 0.95,
             "max": 1.09,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power Rail",
@@ -133,7 +140,8 @@
             "min": 4.75,
             "expect": 5,
             "max": 5.25,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "Power On",
@@ -146,7 +154,8 @@
             "min": null,
             "expect": null,
             "max": 0.08,
-            "unit": "V"
+            "unit": "V",
+            "sfc_name": null
         }
         ,{
             "group": "LS",
@@ -159,7 +168,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "WiFi",
@@ -172,7 +182,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "BT",
@@ -185,7 +196,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "CPU1",
@@ -198,7 +210,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "CPU2",
@@ -211,7 +224,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "DDR",
@@ -224,7 +238,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "I2C1",
@@ -237,7 +252,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "I2C2",
@@ -250,7 +266,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "I2C3",
@@ -263,7 +280,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "SpeakerSetup1",
@@ -276,7 +294,8 @@
             "min": 995,
             "expect": null,
             "max": 1005,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "SpeakerSetup2",
@@ -289,7 +308,8 @@
             "min": 995,
             "expect": null,
             "max": 1005,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "Speaker",
@@ -302,7 +322,8 @@
             "min": 995,
             "expect": null,
             "max": 1005,
-            "unit": "Hz"
+            "unit": "Hz",
+            "sfc_name": null
         }
         ,{
             "group": "Speaker",
@@ -315,7 +336,8 @@
             "min": 995,
             "expect": null,
             "max": 1005,
-            "unit": "Hz"
+            "unit": "Hz",
+            "sfc_name": null
         }
         ,{
             "group": "SpeakerSetup3",
@@ -328,7 +350,8 @@
             "min": 995,
             "expect": null,
             "max": 1005,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
     ]
 }

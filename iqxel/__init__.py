@@ -136,7 +136,8 @@ def generate_jsonfile():
         "min": None,
         "expect": None,
         "max": None,
-        "unit": None
+        "unit": None,
+        "sfc_name": None
     }
     j = Task(source_json).base
 

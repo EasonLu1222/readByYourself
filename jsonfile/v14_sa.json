@@ -1,6 +1,7 @@
 {"header":
-    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit"],
- "version": "13.0",
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": "SA01",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -45,7 +46,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": "msn"
         },
         {
             "group": "Load LED driver",
@@ -58,7 +60,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         }
         ,{
             "group": "LED Test",
@@ -71,7 +74,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": null
         },
         {
             "group": "Unload LED driver",
@@ -84,7 +88,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": "led"
         }
         ,{
             "group": "Cap Touch Test",
@@ -97,7 +102,8 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null
+            "unit": null,
+            "sfc_name": "captouch"
         }
         ,{
             "group": "Write Wifi and BT Mac",
@@ -110,7 +116,8 @@
             "min": null,
             "expect": "True",
             "max": null,
-            "unit": "Bool"
+            "unit": "Bool",
+            "sfc_name": "wifi_bt_mac"
         }
         ,{
             "group": "Write Country Code",
@@ -123,7 +130,8 @@
             "min": null,
             "expect": "True",
             "max": null,
-            "unit": "Bool"
+            "unit": "Bool",
+            "sfc_name": "write_country_code"
         }
     ]
 }
