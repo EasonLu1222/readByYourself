@@ -10,27 +10,27 @@ VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
 station_json = {
-    'SIMULATION': 'v13_simu',
+    'SIMULATION': 'v14_simu',
 
     # --- SMT ---
-    'MainBoard': 'v13_mb',                  # pyinstaller exe  tested on clean windows
-    'LED': 'v13_led',                       # pyinstaller exe  tested on clean windows
-    'CapTouch': 'v13_cap_touch',            # pyinstaller exe  tested on clean windows
-    'CapTouchMic': 'v13_cap_touch_mic',
+    'MainBoard': 'v14_mb',                  # pyinstaller exe  tested on clean windows
+    'LED': 'v14_led',                       # pyinstaller exe  tested on clean windows
+    'CapTouch': 'v14_cap_touch',            # pyinstaller exe  tested on clean windows
+    'CapTouchMic': 'v14_cap_touch_mic',
 
     # --- FATP ---
-    'RF': 'v13_rf',
-    'Audio': 'v13_audio',
-    'AudioPath': 'v13_audio_path',
-    'AudioListen': 'v13_audio_listener',
-    'Leak': 'v13_leak',
-    'WPC': 'v13_wpc',                       # pyinstaller exe  tested on clean windows
-    'PowerSensor': 'v13_power_sensor',      # pyinstaller exe  tested on clean windows
-    'SA': 'v13_sa',                         # pyinstaller exe  tested on clean windows
-    'Acoustic': 'v13_acoustic',
-    'AcousticListen': 'v13_acoustic_listener',
-    'BTMacFix': 'v13_btmacfix',
-    'Download': 'v13_download',
+    'RF': 'v14_rf',
+    'Audio': 'v14_audio',
+    'AudioPath': 'v14_audio_path',
+    'AudioListen': 'v14_audio_listener',
+    'Leak': 'v14_leak',
+    'WPC': 'v14_wpc',                       # pyinstaller exe  tested on clean windows
+    'PowerSensor': 'v14_power_sensor',      # pyinstaller exe  tested on clean windows
+    'SA': 'v14_sa',                         # pyinstaller exe  tested on clean windows
+    'Acoustic': 'v14_acoustic',
+    'AcousticListen': 'v14_acoustic_listener',
+    'BTMacFix': 'v14_btmacfix',
+    'Download': 'v14_download',
 }
 
 LANG_LIST = [
