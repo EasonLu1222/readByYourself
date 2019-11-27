@@ -202,7 +202,8 @@ def write_wifi_bt_mac(dynamic_info):
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
             return "Fail(failed to write product ID to DB)"
 
-        return 'Pass'
+        #  return 'Pass'
+        return f'Pass({mac_wifi_addr})'
 
 
 def reboot_and_enter_dl_mode(portname):
@@ -281,7 +282,9 @@ def write_country_code(dynamic_info):
             issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.match(ccode, e)
+        #  result = f'Pass' if any(re.match(ccode, e)
+                                  #  for e in lines) else 'Fail'
+        result = f'Pass({ccode})' if any(re.match(ccode, e)
                                   for e in lines) else 'Fail'
         return result
 
