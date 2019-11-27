@@ -7,7 +7,7 @@ from requests.exceptions import ConnectTimeout
 PADDING = ' ' * 8
 
 # SFC_HOST = 'http://10.228.14.99:7109'   # debug
-SFC_HOST = 'http://10.228.16.99'  # production
+SFC_HOST = 'http://10.228.16.99:7109'  # production
 
 endpoint_dict = {
     'SA01': 'add_data_sa',
