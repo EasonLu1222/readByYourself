@@ -28,6 +28,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
     dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
 
     cols2_value = {
+        'msn': '',
         'station_id': sfc_station_id,
         'result': res,
         'fail_list': '',
@@ -41,7 +42,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         post_data = dd.to_dict('records')[0]
         if not msn:
             regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-            matches = re.search(regex, post_data['msn'])
+            matches = re.search(regex, post_data['read_pid'])
             if matches:
                 msn = matches.group()
         post_data['msn'] = msn

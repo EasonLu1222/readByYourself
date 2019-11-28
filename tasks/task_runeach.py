@@ -83,7 +83,7 @@ def read_pid(portname, dut_idx):
             response = lines[-1]
         except IndexError as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
-            return 'Fail'
+            return 'Fail(no response when querying pid)'
         logger.debug(f'{PADDING}response: {response}')
 
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"

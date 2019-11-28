@@ -48,7 +48,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "msn"
+            "sfc_name": "read_pid"
         }
         ,{
             "group": "Tx 11n 2442MHz ch1 [0]",
