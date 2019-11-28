@@ -685,6 +685,7 @@ class Task(QThread):
     def run_task1(self, group, items):
         row_idx, next_item = items[0]['index'], items[0]
         procs = {}
+        dynamic_info = ''
         if any(self.window.port_barcodes.values()):
             for port, barcode in self.window.port_barcodes.items():
                 if barcode:
@@ -693,7 +694,6 @@ class Task(QThread):
                     procs[port] = proc
         else:
             func = next_item['args'][0]
-            dynamic_info = ''
             if func == 'write_wifi_bt_mac':
                 dynamic_info = fetch_addr()
             if func == 'write_country_code':
@@ -738,6 +738,7 @@ class Task(QThread):
                     self.window.barcodes.append(pid)
 
             self.task_result.emit(result)
+        self.window.reset_port_barcodes()
 
     def run_task2(self, group, items):
         row = items[0]['index']

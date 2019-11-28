@@ -747,6 +747,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.barcode_dialog.barcodeLineEdit.clear()
         logger.debug('show_barcode_dialog end')
 
+    def reset_port_barcodes(self):
+        self.port_barcodes = {}
+
     def btn_clicked(self):
         logger.debug('\n')
         self.barcodes = []
