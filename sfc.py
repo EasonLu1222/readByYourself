@@ -45,6 +45,8 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
             matches = re.search(regex, post_data['read_pid'])
             if matches:
                 msn = matches.group()
+        if 'read_pid' in post_data:
+            post_data['read_pid'] = post_data['read_pid'][:4]
         post_data['msn'] = msn
     except IndexError as ex:
         logger.error(f"{PADDING}cannot generate POST data")
