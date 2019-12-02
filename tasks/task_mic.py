@@ -1,14 +1,11 @@
 import os
 import re
 import subprocess
-from math import ceil
-from scipy.fftpack import fft
-from scipy.io import wavfile
-from scipy.signal import find_peaks
+import wavfile
+from numpy.fft import fft
 from playsound import playsound
-from subprocess import Popen, PIPE
 from mylogger import logger
-from utils import resource_path, get_env, run
+from utils import resource_path, run
 
 wav_dir = './wav'
 PADDING = ' ' * 8
@@ -62,7 +59,6 @@ def analyze_recorded_sound(wav_file_path):
     """
     rtn = []
     sample_rate, data = wavfile.read(wav_file_path)  # Load the wav data
-    channel_data = data.T[1] if len(data.T) == 2 else data.T  # Detect number of channels. data.T is the transposed data
     for channel_data in data.T:
         normalized_channel_data = [ele / 2 ** 16. for ele in channel_data]  # This is signed 16-bit track, b is now normalized on [-1,1)
         fft_data = fft(normalized_channel_data)  # Calculate fourier transform (complex numbers list)
@@ -70,12 +66,13 @@ def analyze_recorded_sound(wav_file_path):
         data_len = len(data)
         total_seconds = data_len / sample_rate
 
-        abs_fft = abs(fft_data[:(half_fft_data_len - 1)])
-        peaks, _ = find_peaks(abs_fft, height=10, width=11, distance=200)
-        peak_amplitudes = [int(abs_fft[p]) for p in peaks]
-        peak_freqs = [ceil(p / total_seconds) for p in peaks]
+        abs_fft = abs(fft_data[:(half_fft_data_len)])
 
-        rtn.append(dict(zip(peak_freqs, peak_amplitudes)))
+        freq_checkpoints = [500, 1000, 10000, 19000]
+        checkpoints = [int(p * total_seconds) for p in freq_checkpoints]
+        peak_amplitudes = [int(abs_fft[p]) for p in checkpoints]
+
+        rtn.append(dict(zip(freq_checkpoints, peak_amplitudes)))
 
     logger.info(f'{PADDING}[MicTest] Deleting {wav_file_path}')
     os.remove(wav_file_path)
@@ -106,20 +103,16 @@ def judge_fft_result(freq_and_amp_dict_list):
         19000: 130,
         # '20000': 1,
     }
+    logger.info(f'{PADDING}Frequency to amplitude dict: {freq_and_amp_dict_list}')
     for freq_and_amp_dict in freq_and_amp_dict_list:
-        logger.info(f'{PADDING}Frequency to amplitude dict: {freq_and_amp_dict}')
         for freq in freq_amp_threshold_dict:
             amp_threshold = freq_amp_threshold_dict[freq]
 
-            amp = -1
-            if freq in freq_and_amp_dict:
-                amp = freq_and_amp_dict[freq]
-            elif (freq+1) in freq_and_amp_dict:
-                amp = freq_and_amp_dict[freq+1]
+            amp = freq_and_amp_dict[freq]
 
             if amp_threshold > amp:
                 rtn = 'Fail'
-                logger.warning(f'{PADDING}Freq {freq} test fail, expect >{amp_threshold}, got {amp}')
+                logger.error(f'{PADDING}Freq {freq} test fail, expect >{amp_threshold}, got {amp}')
                 break
         if rtn == 'Fail':
             break
@@ -147,4 +140,8 @@ def push_result_to_device(transport_id, test_result_path):
 if __name__ == '__main__':
     # with daemon.DaemonContext(working_directory=os.getcwd()):
     # play_tone()
-    pull_recorded_sound()
+    # pull_recorded_sound()
+    # wav_file_path = '/PATH/TO/WAV'
+    # r = analyze_recorded_sound(wav_file_path)
+    # judge_fft_result(r)
+    pass
