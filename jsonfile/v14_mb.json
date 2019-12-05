@@ -20,8 +20,8 @@
     }
  },
  "appearance": {
-     "columns_hidden": [0, 1, 2, 3, 4],
-     "columns_width": [1, 1, 1, 1, 1, 150, 200, 90, 90, 90, 90, 220, 220]
+     "columns_hidden": [0, 1, 2, 3, 4, 11],
+     "columns_width": [1, 1, 1, 1, 1, 150, 200, 90, 90, 90, 90, 1, 220, 220]
  },
  "behaviors": {
      "barcode-scan": true,

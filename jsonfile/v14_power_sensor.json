@@ -15,8 +15,8 @@
     }
  },
  "appearance": {
-     "columns_hidden": [0, 1, 2, 3, 4],
-     "columns_width": [1, 1, 1, 1, 1, 250, 380, 60, 60, 60, 60, 350]
+     "columns_hidden": [0, 1, 2, 3, 4, 11],
+     "columns_width": [1, 1, 1, 1, 1, 250, 380, 60, 60, 60, 60, 1, 350]
  },
  "behaviors": {
      "barcode-scan": false,
