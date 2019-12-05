@@ -50,6 +50,12 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         post_data['msn'] = msn
     except IndexError as ex:
         logger.error(f"{PADDING}cannot generate POST data")
+
+    # Discard any string after the pass or fail
+    for k in post_data:
+        if isinstance(post_data[k], str) and re.match(r'Pass|Fail', post_data[k], re.I):
+            post_data[k] = post_data[k][:4]
+
     endpoint = endpoint_dict[post_data['station_id']]
     url = f"{SFC_HOST}/{endpoint}.asp"
 
