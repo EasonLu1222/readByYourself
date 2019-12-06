@@ -814,7 +814,9 @@ class Task(QThread):
 
         observer = Observer()
         path = 'F:\SAP 109 DATA'
-        now = datetime.now().strftime('%m-%d-%Y')
+        #now = datetime.now().strftime('%m-%d-%Y')
+        nw = datetime.now()
+        now = f'{nw.month}-{nw.day}-{nw.year}'
         #  filename = 'SAP109 Results 11-20-2019.txt'
         filename = f'SAP109 Results {now}.txt'
         filepath = os.path.join(path, filename)
