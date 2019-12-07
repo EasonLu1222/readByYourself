@@ -29,7 +29,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
 
     cols2_value = {
         'msn': '',
-        'station_id': sfc_station_id,
+        'station_id': f"{sfc_station_id}{dut_i+1:2}",
         'result': res,
         'fail_list': '',
         'start_time': t0,
