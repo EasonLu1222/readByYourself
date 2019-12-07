@@ -209,9 +209,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.msg_dialog_signal.connect(self.show_message_dialog)
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
-        self.showMaximized()
         self.loading_dialog = LoadingDialog(self)
         self.set_togglebutton()
+        self.showMaximized()
 
     def set_togglebutton(self):
         self.pushButton2 = QPushButton(self.container)
