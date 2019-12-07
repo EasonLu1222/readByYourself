@@ -79,21 +79,20 @@ def read_pid(portname, dut_idx):
             issue_command(ser, cmd, False)
         lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
         logger.debug(f'{PADDING}{lines}')
-        try:
-            response = lines[-1]
-        except IndexError as ex:
-            logger.error(f'{PADDING}{type_(ex)}, {ex}')
+
+        if len(lines) <= 0:
+            logger.error(f'{PADDING}No response when querying pid')
             return 'Fail(no response when querying pid)'
-        logger.debug(f'{PADDING}response: {response}')
 
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-        matches = re.search(regex, response)
-        if not matches:
-            result = 'Fail(no pid found)'
-        else:
-            pid = matches.group()
-            logger.debug(f'{PADDING}pid: {pid}')
-            result = f'Pass({pid})'
+        result = 'Fail(no pid found)'
+        for l in lines:
+            matches = re.search(regex, l)
+            if matches:
+                pid = matches.group()
+                logger.debug(f'{PADDING}pid: {pid}')
+                result = f'Pass({pid})'
+                break
 
     return result
 
@@ -129,7 +128,7 @@ def write_usid(dynamic_info):
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
         result = f'Pass' if any(re.search(sid, e)
-                                  for e in lines) else 'Fail'
+                                for e in lines) else 'Fail'
         return result
 
 
@@ -283,9 +282,9 @@ def write_country_code(dynamic_info):
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
         #  result = f'Pass' if any(re.match(ccode, e)
-                                  #  for e in lines) else 'Fail'
+        #  for e in lines) else 'Fail'
         result = f'Pass({ccode})' if any(re.match(ccode, e)
-                                  for e in lines) else 'Fail'
+                                         for e in lines) else 'Fail'
         return result
 
 
@@ -295,7 +294,7 @@ def record_sound(portname):
         wav_duration = 12  # In seconds
 
         # Start recording
-        cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d {wav_duration+1} {wav_file_path}'
+        cmd = f'arecord -Dhw:0,3 -c 2 -r 48000 -f S16_LE -d {wav_duration + 1} {wav_file_path}'
 
         logger.info(f'{PADDING}[MicTest]Recording sound and save to {wav_file_path}')
         lines = issue_command(ser, cmd)
@@ -313,7 +312,7 @@ def get_mic_test_result(portname):
         cmd = f'cat {test_result_path}'
         lines = issue_command(ser, cmd)
         result = f'Pass' if any(re.match('Pass', e)
-                                  for e in lines) else 'Fail'
+                                for e in lines) else 'Fail'
 
         # Delete test result
         logger.info(f'{PADDING}[MicTest] Deleting {test_result_path}')
@@ -342,14 +341,16 @@ def unload_led_driver(portname):
         cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
         result = f'Fail' if any(re.search('leds_lp50xx', e)
-                                  for e in lines) else 'Pass'
+                                for e in lines) else 'Pass'
         return result
 
 
 def decrease_playback_volume(portname):
     logger.info(f'{PADDING}decrease_playback_volume start')
     with get_serial(portname, 115200, timeout=1) as ser:
-        lines = issue_command(ser, 'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60', fetch=True)
+        lines = issue_command(ser,
+                              'i2cset -f -y 0 0x4e 0x00 0x00;i2cset -f -y 0 0x4e 0x3d 0x60;i2cset -f -y 0 0x4e 0x3e 0x60',
+                              fetch=True)
         for e in lines:
             logger.info(f'{PADDING}{e}')
         return None
@@ -376,7 +377,7 @@ def check_wifi_if(portname):
     with get_serial(portname, 115200, timeout=3) as ser:
         lines = issue_command(ser, 'ifconfig -a')
         result = 'Pass' if any(re.match('wlan[\d]+', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}check_wifi_if: {result}')
         return result
 
@@ -386,7 +387,7 @@ def check_bt(portname):
         lines = issue_command(ser, 'hciconfig hci0 up')
         lines = issue_command(ser, 'hciconfig')
         result = 'Pass' if any(re.search('UP RUNNING', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         lines = issue_command(ser, 'hciconfig hci0 down')
         logger.info(f'{PADDING}has BT: {result}')
         return result
@@ -396,7 +397,7 @@ def check_cpu_cores(portname):
     with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
         lines = issue_command(ser, 'cat /proc/cpuinfo |grep processor|wc -l')
         result = 'Pass' if any(re.match('4\r\n', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}Check CPU Cores: {result}')
         return result
 
@@ -406,7 +407,7 @@ def check_cpu_freq(portname):
         lines = issue_command(
             ser, 'cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq')
         result = 'Pass' if any(re.match('[\d]+', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}Check CPU Freq: {result}')
         return result
 
@@ -425,7 +426,7 @@ def check_i2c_tas5766(portname):
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-0/0-004e/name')
         result = 'Pass' if any(re.match('tas5766m', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}has tas5766m: {result}')
         return result
 
@@ -435,7 +436,7 @@ def check_i2c_msp430(portname):
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-1/1-001f/name')
         result = 'Pass' if any(re.match('msp430', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}has msp430: {result}')
         return result
 
@@ -445,7 +446,7 @@ def check_i2c_lp5018(portname):
         lines = issue_command(ser,
                               'cat /sys/class/i2c-adapter/i2c-1/1-0028/name')
         result = 'Pass' if any(re.match('lp5018', e)
-                                 for e in lines) else 'Fail'
+                               for e in lines) else 'Fail'
         logger.info(f'{PADDING}has lp5018: {result}')
         return result
 
@@ -461,7 +462,6 @@ def hciup(portname):
 
 
 def check_max_current(dut_idx):
-
     def is_file_empty(fl):
         with open(fl, 'r') as f:
             content = f.read()

@@ -14,7 +14,7 @@
         "sfc_name"
     ],
     "version": "14.0",
-    "sfc_station_id": "RF01",
+    "sfc_station_id": "RF",
     "devices": {
         "dut": {
             "name": "ftdi",
