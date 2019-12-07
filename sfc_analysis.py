@@ -10,16 +10,16 @@ pd.set_option('display.width', 1000)
 pd.option_context('display.colheader_justify','right')
 
 
-station = 'PowerSensor'
+station = 'Audio'
 stations_downloads = {
     'SA': 'downloads/SA',
     'RF': 'downloads/RF',
     'PowerSensor': 'downloads/PowerSensor',
 }
 stations_cols = {
-    'SA': ['pid', 'result', 'failed', 't0', 't1', 'sta_id', 
+    'SA': ['pid', 'result', 'failed', 't0', 't1', 'sta_id',
            'read_pid', 'load_led', 'led', 'unload_led', 'captouch', 'wifibt', 'ccode'],
-    'PowerSensor': ['pid', 'result', 'failed', 't0', 't1', 'sta_id', 
+    'PowerSensor': ['pid', 'result', 'failed', 't0', 't1', 'sta_id',
            'read_pid', '1n-a', '1n-b', '1ac-a', '1ac-b', '2n-a', '2n-b', '2ac-a', '2ac-b']
 }
 
@@ -43,6 +43,11 @@ def failed(df, col=None):
     col = col if col else 'result'
     ff = df[df[col].str.startswith('Fail')]
     return ff
+
+
+def fails(df, col):
+    #  df.loc[230,'failed'].split(',')
+    return df.loc[col,'failed'].split(',')
 
 
 if __name__ == "__main__":

@@ -4,12 +4,13 @@ from ftplib import FTP
 import pandas as pd
 
 
-station = 'PowerSensor'
+station = 'Audio'
 stations_ftp = {
     'SA': 'Belkin109/lk_test/SA',
     'RF': 'Belkin109/lk_test/RF',
     'PowerSensor': 'Belkin109/lk_test/PowerSensor',
     'WPC': 'Belkin109/lk_test/WPC',
+    'Audio': 'Belkin109/lk_test/Audio',
 }
 stations_downloads = {
     'SA': 'downloads/SA',
