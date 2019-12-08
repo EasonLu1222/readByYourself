@@ -14,7 +14,8 @@ endpoint_dict = {
     'WP': 'add_data_wpc',
     'AU': 'add_data_audio',
     'PS': 'add_data_PowerSensor',
-    'RF': 'add_data_RF'
+    'RF': 'add_data_RF',
+    'AC': 'add_data_Acoustic'
 }
 
 
