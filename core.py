@@ -15,6 +15,7 @@ from PyQt5.QtCore import QThread, pyqtSignal as QSignal
 from PyQt5.QtWidgets import QMessageBox
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from watchdog.events import RegexMatchingEventHandler
 
 from utils import resource_path, get_env, python_path, s_
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
@@ -371,17 +372,55 @@ class MyHandler(FileSystemEventHandler):
                         _, name, _, _, result, _, _ = e.strip().split('\t')
                         print('name', name, 'result', result)
                         results.append(result)
-                elif STATION == 'AcousticListen':
-                    if len(diff) == 1:
-                        from parse_klippel import parse
-                        df = parse(self.file)
-                        results = df.values[-1].tolist()
-                        results = [{1:'Pass', 0:'Fail'}[e] for e in results]
-                        print(results)
                 print('\n\n\n')
                 self.result = results
                 self.to_stop = True
             self.lines = lines
+
+
+class FileEventHandler(RegexMatchingEventHandler):
+    #REGEX = [r"Summary SAP109.*\.log$"]
+    REGEX = [r".*\.log$"]
+
+    def __init__(self):
+        super().__init__(self.REGEX)
+        self.to_stop = False
+        self.result = None
+
+    def readlines(self, file):
+        with open(file) as f:
+            return f.readlines()
+
+    def on_created(self, event):
+        print('created', event.src_path)
+
+    def on_modified(self, event):
+        from parse_klippel import parse
+        print('modified', event.src_path)
+        results = []
+        df = parse(event.src_path)
+        results = df.values[-1].tolist()
+        results = [{1:'Pass', 0:'Fail'}[e] for e in results]
+        print(results)
+        print('\n\n\n')
+        self.result = results
+        self.to_stop = True
+
+
+class FileWatcher:
+    def __init__(self, src_path):
+        self.src_path = src_path
+        self.handler = FileEventHandler()
+        self.observer = Observer()
+
+    def run(self):
+        self.observer.schedule(self.handler, self.src_path, recursive=True)
+        self.observer.start()
+
+        while not self.handler.to_stop:
+            time.sleep(1)
+        self.observer.stop()
+        self.observer.join()
 
 
 class Task(QThread):
@@ -872,7 +911,6 @@ class Task(QThread):
         print('asn', asn)
         self.trigger_klippel.emit(asn)
 
-        observer = Observer()
 
         projname = 'SAP109 - v1.2 - DVT1 - 191114'
         workdir = f'D:\QC_Log_Files\{projname}'
@@ -885,20 +923,11 @@ class Task(QThread):
         #filename = 'Summary SAP109 - v1.2 - DVT1 - 191114 2019-11-21 07-47-27-5 UTC+0700'
         #filename = 'Summary {projname} {x2} 09-01-29-3 UTC+0700'
 
-        files = glob.glob(f'{path}\\*.log')
-        filepath = max(files)
-        print('filepath', filepath)
 
-        event_handler = MyHandler(observer, filepath)
-        observer.schedule(event_handler, path=path)
-        observer.start()
-        try:
-            while not event_handler.to_stop:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            observer.stop()
+        watcher = FileWatcher(path)
+        watcher.run()
 
-        output = [e.capitalize() for e in event_handler.result]
+        output = [e.capitalize() for e in watcher.handler.result]
         r1, r2 = row, row + len(items)
         c1 = len(self.header()) + self.window.dut_selected[0]
         c2 = c1 + len(self.window.dut_selected)
