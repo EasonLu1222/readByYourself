@@ -26,7 +26,7 @@
             "args": ["win", "task"]
          }
          ,{
-            "action": "enter_prompt2",
+            "action": "enter_prompt",
             "args": ["win", 0.2, 10]
          }
      ],
