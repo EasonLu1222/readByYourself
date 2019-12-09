@@ -543,7 +543,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         win = [e for e in wins if '-' in e.title][0]
         my = pag.getActiveWindow()
         win.activate()
+        time.sleep(1)
         pag.hotkey('f2')
+        time.sleep(1)
         my.activate()
 
     def klippel_handle(self, asn):
@@ -552,12 +554,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         win = pag.getWindowsWithTitle('SAP109 - v1.2 - DVT1')[0]
         my = pag.getActiveWindow()
         win.activate()
+        time.sleep(1)
         pag.click(127, 80)
         pag.click(127, 80)
         pag.typewrite(f'{asn}')
         pag.typewrite('\r\n')
         time.sleep(0.5)
         pag.typewrite('\r\n')
+        time.sleep(0.5)
         my.activate()
 
     def serial_ok(self, ok):
