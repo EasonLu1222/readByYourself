@@ -118,7 +118,11 @@ def is_pid_used(pid):
 
 
 def first_run():
+    """
     start_mac = 0xc4411e6a09ac
+    total_mac = 1000
+    """
+    start_mac = 0xc4411e79bd16
     total_mac = 1000
 
     create_table()
