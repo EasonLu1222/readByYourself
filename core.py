@@ -912,7 +912,8 @@ class Task(QThread):
         self.trigger_klippel.emit(asn)
 
 
-        projname = 'SAP109 - v1.2 - DVT1 - 191114'
+        # projname = 'SAP109 - v1.2 - DVT1 - 191114'
+        projname = 'SAP109 - v1.3 - DVT2 - 191209'
         workdir = f'D:\QC_Log_Files\{projname}'
         year = now.strftime('%Y')   #2019
         week = int(now.strftime('%W')) + 1   #47
@@ -920,10 +921,13 @@ class Task(QThread):
         x2 = now.strftime('%Y-%m-%d') #20191121
         path = f'{workdir}\{year}\CW{week}\{x1}'
 
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         #filename = 'Summary SAP109 - v1.2 - DVT1 - 191114 2019-11-21 07-47-27-5 UTC+0700'
         #filename = 'Summary {projname} {x2} 09-01-29-3 UTC+0700'
 
-
+        print('path to watch', path)
         watcher = FileWatcher(path)
         watcher.run()
 
