@@ -28,7 +28,7 @@ station_json = {
     'PowerSensor': 'v14_power_sensor',      # pyinstaller exe  tested on clean windows
     'SA': 'v14_sa',                         # pyinstaller exe  tested on clean windows
     'Acoustic': 'v14_acoustic',
-    'AcousticListen': 'v14_acoustic_listener',
+    'AcousticListen': 'v14_acoustic_listener_klippel_v1_3',
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download',
 }
@@ -39,6 +39,9 @@ LANG_LIST = [
     'zh_CN',
     'vi'
 ]
+
+KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
+KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
 

@@ -21,10 +21,11 @@ from utils import resource_path, get_env, python_path, s_
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
-                    VISA_DEVICE_NAME, STATION)
+                    VISA_DEVICE_NAME, STATION, KLIPPEL_PROJECT)
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from db.sqlite import fetch_addr
+from parse_klippel import parse_dvt1_v1_2, parse_dvt2_v1_3
 
 from actions import (
     disable_power_check, set_power_simu, dummy_com,
@@ -395,10 +396,13 @@ class FileEventHandler(RegexMatchingEventHandler):
         print('created', event.src_path)
 
     def on_modified(self, event):
-        from parse_klippel import parse
+
         print('modified', event.src_path)
         results = []
-        df = parse(event.src_path)
+        if KLIPPEL_PROJECT == 'SAP109 - v1.2 - DVT1 - 191114':
+            df = parse_dvt1_v1_2(event.src_path)
+        elif KLIPPEL_PROJECT == 'SAP109 - v1.3 - DVT2 - 191209':
+            df = parse_dvt2_v1_3(event.src_path)
         results = df.values[-1].tolist()
         results = [{1:'Pass', 0:'Fail'}[e] for e in results]
         print(results)
@@ -912,7 +916,7 @@ class Task(QThread):
         self.trigger_klippel.emit(asn)
 
 
-        projname = 'SAP109 - v1.2 - DVT1 - 191114'
+        projname = KLIPPEL_PROJECT
         workdir = f'D:\QC_Log_Files\{projname}'
         year = now.strftime('%Y')   #2019
         week = int(now.strftime('%W')) + 1   #47
@@ -920,10 +924,13 @@ class Task(QThread):
         x2 = now.strftime('%Y-%m-%d') #20191121
         path = f'{workdir}\{year}\CW{week}\{x1}'
 
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         #filename = 'Summary SAP109 - v1.2 - DVT1 - 191114 2019-11-21 07-47-27-5 UTC+0700'
         #filename = 'Summary {projname} {x2} 09-01-29-3 UTC+0700'
 
-
+        print('path to watch', path)
         watcher = FileWatcher(path)
         watcher.run()
 
