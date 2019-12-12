@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import inspect
@@ -66,6 +67,7 @@ def run(cmd, strip=False):
     logger.info(decoded_output)
     return decoded_output
 
+
 def get_env():
     pyi_env = os.environ.copy()
     if hasattr(sys, '_MEIPASS'):
@@ -74,11 +76,23 @@ def get_env():
 
     return pyi_env
 
+
 def set_property(widget, attr, val):
     widget.setProperty(attr, val)
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     widget.update()
+
+
+def get_md5(file_path):
+    # Open, close, read file and calculate MD5 on its contents
+    with open(file_path, 'rb') as file_to_check:
+        # read contents of the file
+        data = file_to_check.read()
+        # pipe contents of the file through
+        md5_returned = hashlib.md5(data).hexdigest()
+
+    return md5_returned
 
 
 class QssTools(object):
