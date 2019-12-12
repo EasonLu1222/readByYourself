@@ -12,7 +12,7 @@ class BarcodeRe(Enum):
     Define the regular expression for different types of barcode
     """
     MSN = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-    ASN = r'SAP\d{2}F\d[1-9A-C]{2}\d{5}'
+    ASN = r'SAP\d{2}F\d[1-9A-C]{2}\w{5}'
     WPC = r"[\w|\d]{6}\d[\w|\d]{2}\w[\w|\d]{5}"
 
 

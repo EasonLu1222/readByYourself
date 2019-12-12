@@ -32,10 +32,14 @@ def create_table():
 def gen_mac_list(start_mac, total_mac):
     """
     Generate a continuous list of mac addresses given the starting mac address and the total number of them
-    :param start_mac: e.g. 0xc4411e6a09ac
-    :param total_mac: e.g. 1000
-    :return: ["c4:41:1e:6a:09:ac", "c4:41:1e:6a:09:ad",...]
+    Args:
+        start_mac: e.g. 0xc4411e6a09ac
+        total_mac: e.g. 1000
+
+    Returns: ["c4:41:1e:6a:09:ac", "c4:41:1e:6a:09:ad",...]
+
     """
+
     mac_list = []
     for i in range(total_mac):
         mac = format(start_mac + i, 'x')    # Convert hex number to hex string, e.g. 0xc4411e6a09ac to "c4411e6a09ac"

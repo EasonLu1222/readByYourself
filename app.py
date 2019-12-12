@@ -550,9 +550,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def klippel_handle(self, asn):
         print('klippel_handle', 'asn', asn)
-        win = pag.getWindowsWithTitle('SAP109 - v1.2 - DVT1')[0]
+        win = pag.getWindowsWithTitle('SAP109 - v1.3 - DVT2')[0]
         my = pag.getActiveWindow()
-        time.sleep(0.5)
+        time.sleep(1)
         win.maximize()
         win.activate()
         time.sleep(1)
@@ -560,7 +560,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         pag.click(127, 80)
         pag.typewrite(f'{asn}')
         pag.press('enter')
-        time.sleep(0.5)
+        time.sleep(1)
         pag.press('enter')
         win.minimize()
         my.activate()
