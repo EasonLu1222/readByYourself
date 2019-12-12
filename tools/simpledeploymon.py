@@ -204,6 +204,15 @@ class FileWatcher:
 
 
 if __name__ == "__main__":
+    '''
+        this daemon program must be used with nssm on windows
+        usage:
+            install a service
+                nssm install servcie_name path_to_the_program
+            remove a service
+                nssm remove servcie_name confirm
+        reference: https://nssm.cc/usage
+    '''
 
     path = f'C:\\temp'
     if not os.path.isdir(path):
