@@ -161,70 +161,6 @@ def step3_create_shortcut(targetname):
         log(f'[ERROR]{type_(ex)}, {ex}')
 
 
-#  def debug_step3():
-    #  pythoncom.CoInitialize()
-    #  try:
-        #  log('.....1')
-        #  x1 = shell.SHGetFolderPath
-        #  log(x1)
-
-        #  log('.....2')
-        #  x2 = shellcon.CSIDL_DESKTOP
-        #  log(x2)
-
-        #  log('.....2.5')
-        #  x25 = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
-        #  log(x25)
-
-        #  log('.....3')
-        #  x3 = shell.CLSID_ShellLink
-        #  log(x3)
-
-        #  log('.....4')
-        #  x4 = shell.IID_IShellLink
-        #  log(x4)
-
-        #  log('.....5')
-    #  except Exception as ex:
-        #  log(f'{type_(ex)}, {ex}')
-
-
-def step4_restart():
-    log('step4_restart')
-    wx.MessageBox('Please restart the testing program')
-
-
-class TestThread(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.start()    # start the thread
-
-    def run(self):
-        #  log('.......debug_step3')
-        #  wx.CallAfter(pub.sendMessage, "update", message='debug_step3')
-        #  debug_step3()
-
-        log('.......1')
-        wx.CallAfter(pub.sendMessage, "update", message='step1')
-        step1_delete_files()
-
-        log('.......2')
-        wx.CallAfter(pub.sendMessage, "update", message='step2')
-        targetname = step2_download()
-
-        log('.......3')
-        wx.CallAfter(pub.sendMessage, "update", message='step3')
-        step3_create_shortcut(targetname)
-
-        log('.......4')
-        wx.CallAfter(pub.sendMessage, "update", message='step4')
-        step4_restart()
-
-        pub.sendMessage('end')
-        #  wx.CallAfter(pub.sendMessage, "end")
-        log('TestThread end')
-
-
 class FileEventHandler(RegexMatchingEventHandler):
     REGEX = [r".*sap109-testing-upgrade-starting-\d+"]
     def __init__(self):
@@ -235,7 +171,17 @@ class FileEventHandler(RegexMatchingEventHandler):
         x = event.src_path
         pid = int(x[x.rfind('-')+1:])
         wait_for_process_end(pid)
-        pub.sendMessage('set_visible')
+
+        # doing stuff...
+        try:
+            step1_delete_files()
+            targetname = step2_download()
+            step3_create_shortcut(targetname)
+        except Exception as ex:
+            log(f'[ERROR]{type_(ex)}, {ex}')
+
+        self.to_stop = True
+        log('TestThread end')
 
 
 class FileWatcher:
@@ -257,63 +203,6 @@ class FileWatcher:
         log('watcher ...3')
 
 
-class MonitorApp(wx.App):
-    def __init__(self):
-        wx.App.__init__(self)
-        pub.subscribe(self.set_visible, 'set_visible')
-        pub.subscribe(self.end, 'end')
-        self.watcher = FileWatcher(path)
-        self.watcher.app = self
-        self.watcher.run()
-
-    def end(self):
-        log('app end start')
-        self.watcher.handler.to_stop = True
-        #  wx.MessageBox('Please restart the testing program')
-
-    def set_visible(self):
-        self.frame = MainFrame()
-        pub.subscribe(self.frame.update, 'update')
-        log('aaa')
-        TestThread()
-        log('bbb')
-        #  try:
-        self.frame.ShowModal()
-        #  except Exception as ex:
-            #  log(f'[ERROR]{type_(ex)}, {ex}')
-        log('ccc')
-
-
-class MainFrame(wx.Dialog):
-    def __init__(self):
-        wx.Dialog.__init__(self, None, title='progress',size=(500,80))
-        self.progress = wx.Gauge(self, wx.ID_ANY, 4, wx.DefaultPosition, wx.Size( 100,15 ), wx.GA_HORIZONTAL)
-
-        #  self.progress = PG.PyGauge(self, -1, size=(100, 25), style=wx.GA_HORIZONTAL)
-        #  self.progress.SetDrawValue(draw=True, drawPercent=True, font=None, colour=wx.BLACK, formatString=None)
-        #  self.progress.SetBackgroundColour(wx.WHITE)
-        #  self.progress.SetBorderColor(wx.BLACK)
-
-
-        #  sizer = wx.BoxSizer(wx.VERTICAL)
-        #  sizer.Add(self.progress, 0, wx.EXPAND)
-        #  self.SetSizer(sizer)
-        self.count = 0
-
-    def update(self, message):
-        log('-----------update')
-        self.count += 1
-        try:
-            if self.count >= 4:
-                log('count==4, Destroy!')
-                self.Destroy()
-            log('update .....2')
-            self.progress.SetValue(self.count)
-        except Exception as ex:
-            log(f'[ERROR]{type_(ex)}, {ex}')
-        log('update .....3')
-
-
 if __name__ == "__main__":
 
     path = f'C:\\temp'
@@ -323,10 +212,5 @@ if __name__ == "__main__":
     pid = os.getpid()
     log(f'pid {pid}')
 
-    app = MonitorApp()
-    app.MainLoop()
-
-
-    #  targetname = 'app_20191211_1188.exe'
-    #  print("targetname", targetname)
-    #  step3_create_shortcut(targetname)
+    watcher = FileWatcher(path)
+    watcher.run()
