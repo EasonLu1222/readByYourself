@@ -1,23 +1,19 @@
 import os
 import io
 import sys
+import time
 import glob
 import errno
 import psutil
 import shutil
 import ftplib
+import hashlib
 from ftplib import FTP
 from threading import Thread
-import time
 from subprocess import Popen
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from watchdog.events import RegexMatchingEventHandler
-import wx
-import wx.lib.agw.pygauge as PG
-from pubsub import pub
-
-
 from win32com.shell import shell, shellcon
 import pythoncom
 
@@ -51,6 +47,14 @@ def log(text):
 
 #  log = print
 
+
+def get_md5(file_path):
+    with open(file_path, 'rb') as file_to_check:
+        data = file_to_check.read()
+        md5_returned = hashlib.md5(data).hexdigest()
+    return md5_returned
+
+
 class MyFtp():
     def __init__(self):
         ip = '10.228.14.92'
@@ -58,14 +62,11 @@ class MyFtp():
         self.ftp = FTP(ip)
         self.ftp.login(user=user, passwd=passwd)
 
-    def download(self, ftp_path, downloads_path):
-        self.ftp.cwd(ftp_path)
-
-        for file in self.ftp.nlst():
-            log("Downloading..." + file)
-            if not os.path.isdir(downloads_path):
-                os.mkdir(downloads_path)
-            self.ftp.retrbinary("RETR " + file, open(f'{downloads_path}/{file}' , 'wb').write)
+    def downloadfile(self, path, filepath):
+        dirname = os.path.dirname(path)
+        filename = os.path.basename(path)
+        self.ftp.cwd(dirname)
+        self.ftp.retrbinary(f'RETR {filename}', open(filepath, 'wb').write)
 
     def mkdir_p(self, path):
         try:
@@ -100,15 +101,15 @@ class MyFtp():
             except ftplib.error_perm:
                 # this is for file download
                 des = f'{destination}/{file}'
-                print(f'ftp workdir: {self.ftp.pwd()}')
-                print(f'loc workdir: {os.getcwd()}')
+                #  print(f'ftp workdir: {self.ftp.pwd()}')
+                #  print(f'loc workdir: {os.getcwd()}')
+                #  print(f'download file: {file}')
+                #  print(f'des: {des}')
                 print(f'download file: {file}')
-                print(f'des: {des}')
-
-                log(f'download file: {file}')
                 self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
                 log(f'{file} downloaded')
         self.ftp.cwd('../')
+        os.chdir('../')
         return
 
 
@@ -118,35 +119,62 @@ def wait_for_process_end(pid):
     log(f'process {pid} is closed')
     time.sleep(1)
 
-def step1_delete_files():
+def delete_files(exclude_exe=None):
     exefiles = glob.glob(f'{EXE_DIR}/*.exe')
+    if exclude_exe:
+        exefiles = [e for e in exefiles if exclude_exe not in e]
+    log(f'exefiles {exefiles}')
     jsondir = f'{EXE_DIR}/jsonfile'
     for exe in exefiles:
         os.remove(exe)
+    os.remove(f'{EXE_DIR}/md5.txt')
     if os.path.isdir(jsondir):
         shutil.rmtree(jsondir)
     log('step1 done')
 
-def step2_download():
-    log('step2_download')
-    ftp_path = f'/Belkin109/Latest_App'
+
+def prepare_ftp():
     log('prepare ftp...')
     ftp = MyFtp()
     log('ftp connected...')
-    ftp.downloadFiles(ftp_path, EXE_DIR)
-    log(f'ftp_path {ftp_path}')
-    log(f'downloads_path {EXE_DIR}')
-    target = glob.glob(f'{EXE_DIR}/*.exe')[0]
-    targetname = target[target.rfind('\\')+1:]
+    return ftp
 
-    #  targetname ='xxx.exe'
-    log(f'targetname {targetname}')
-    return targetname
 
-def step3_create_shortcut(targetname):
+def download_app(ftp):
+    log('download_app')
+    ftp_path = f'/Belkin109/Latest_App'
+    ftp.ftp.cwd(ftp_path)
+    exes = [e for e in ftp.ftp.nlst() if 'exe' in e]
+    md5txts = [e for e in ftp.ftp.nlst() if 'md5.txt' in e]
+    log(f'exes {exes}')
+    log(f'md5txts {md5txts}')
+    if len(exes)==1 and len(md5txts)==1:
+        targetname, md5txt = exes[0], md5txts[0]
+        ftp.downloadfile(targetname, f'{EXE_DIR}/{targetname}')
+        ftp.downloadfile(md5txt, f'{EXE_DIR}/md5.txt')
+        md5txt = glob.glob(f'{EXE_DIR}/md5.txt')[0]
+        md5_expected = open(md5txt, 'r').read().strip()
+        log(f'targetname {targetname}')
+        return targetname, md5_expected
+    else:
+        return None
+
+
+def download_jsonfile(ftp):
+    log('download_jsonfile')
+    ftp_path = f'/Belkin109/Latest_App/jsonfile'
+    ftp.downloadFiles(ftp_path, f'{EXE_DIR}/jsonfile')
+
+
+def checkmd5(targetname, md5_expected):
+    app_path = f'{EXE_DIR}/{targetname}'
+    md5_actual = get_md5(app_path)
+    return True if md5_actual==md5_expected else False
+
+def create_shortcut(targetname):
     try:
         pythoncom.CoInitialize()
-        log('step3_create_shortcut')
+        log('create_shortcut')
         shortcutname = 'app.lnk'
         #  desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
         desktop_path = '\\\\Mac\\Home\\Desktop'
@@ -169,6 +197,15 @@ def step3_create_shortcut(targetname):
         log(f'[ERROR]{type_(ex)}, {ex}')
 
 
+def upgrade_task():
+    ftp = prepare_ftp()
+    appname, md5_expected = download_app(ftp)
+    if checkmd5(appname, md5_expected):
+        delete_files(appname)
+        download_jsonfile(ftp)
+        create_shortcut(appname)
+
+
 class FileEventHandler(RegexMatchingEventHandler):
     REGEX = [r".*sap109-testing-upgrade-starting-\d+"]
     def __init__(self):
@@ -182,9 +219,7 @@ class FileEventHandler(RegexMatchingEventHandler):
 
         # doing stuff...
         try:
-            step1_delete_files()
-            targetname = step2_download()
-            step3_create_shortcut(targetname)
+            upgrade_task()
         except Exception as ex:
             log(f'[ERROR]{type_(ex)}, {ex}')
 
