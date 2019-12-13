@@ -83,8 +83,8 @@ class MyFtp():
             self.mkdir_p(destination)
             log("Created: " + destination)
             os.chdir(destination)
-        except OSError:
-            pass
+        except OSError as ex:
+            log(f'OSError {ex}')
         except ftplib.error_perm:
             log("Error: could not change to " + path)
             sys.exit("Ending Application")
@@ -98,9 +98,17 @@ class MyFtp():
                 self.downloadFiles(f'{path}/{file}', f'{destination}/{file}')
 
             except ftplib.error_perm:
+                # this is for file download
                 des = f'{destination}/{file}'
+                print(f'ftp workdir: {self.ftp.pwd()}')
+                print(f'loc workdir: {os.getcwd()}')
+                print(f'download file: {file}')
+                print(f'des: {des}')
+
+                log(f'download file: {file}')
                 self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
                 log(f'{file} downloaded')
+        self.ftp.cwd('../')
         return
 
 

@@ -9,32 +9,32 @@ from ftplib import FTP
 import pandas as pd
 
 #  station = 'Audio'
-#  stations_ftp = {
-    #  'SA': 'Belkin109/lk_test/SA',
-    #  'RF': 'Belkin109/lk_test/RF',
-    #  'PowerSensor': 'Belkin109/lk_test/PowerSensor',
-    #  'WPC': 'Belkin109/lk_test/WPC',
-    #  'Audio': 'Belkin109/lk_test/Audio',
-#  }
-#  stations_downloads = {
-    #  'SA': 'downloads/SA',
-    #  'RF': 'downloads/RF',
-    #  'PowerSensor': 'downloads/PowerSensor',
-    #  'WPC': 'downloads/WPC',
-#  }
+stations_ftp = {
+    'RF': 'Belkin109/lk_test/RF',
+    'Audio': 'Belkin109/lk_test/Audio',
+    'WPC': 'Belkin109/lk_test/WPC',
+    'SA': 'Belkin109/lk_test/SA',
+    'PowerSensor': 'Belkin109/lk_test/PowerSensor',
+}
+stations_downloads = {
+    'RF': 'downloads/RF',
+    'Audio': 'downloads/Audio',
+    'WPC': 'downloads/WPC',
+    'SA': 'downloads/SA',
+    'PowerSensor': 'downloads/PowerSensor',
+}
 
-STATION = 'AudioListen'
 STATIONS = {
     "MainBoard": "Station02_MainBoard",
     "CapTouchMic": "Station03_SwBoard",
     "LED": "Station04_LedBoard",
     "RF": "Station05_BtWiFi",
-    "AudioListen": "Station06_AudioListen",
+    "Audio": "Station06_AudioListen",
     "Leak": "Station07_Leak",
     "WPC": "Station08_WPC",
     "PowerSensor": "Station09_Antenna",
     "SA": "Station10_SA",
-    "AcousticListen": "Station11_AcousticListen",
+    "Acoustic": "Station11_AcousticListen",
     "Download": "Station12_Download",
     "BTMacFix": "StationXX_BTMacFixDownload",
 }
@@ -65,48 +65,49 @@ class MyFtp():
             else:
                 raise
 
-    def downloadFiles(self, path, destination):
+    def downloadFiles(self, ftp_path, target_path):
+        '''
+            target_path must be in absolute path format
+        '''
         interval = 0.05
         try:
-            self.ftp.cwd(path)
-            self.mkdir_p(destination)
-            print("Created: " + destination)
-            os.chdir(destination)
-        except OSError:
-            pass
+            self.ftp.cwd(ftp_path)
+            self.mkdir_p(target_path)
+            print("Created: " + target_path)
+            os.chdir(target_path)
+        except OSError as ex:
+            print(f'OSError {ex}')
         except ftplib.error_perm:
-            print("Error: could not change to " + path)
+            print("Error: could not change to " + ftp_path)
             sys.exit("Ending Application")
 
         filelist=self.ftp.nlst()
         for file in filelist:
-            print(f'downloading {file}...')
             time.sleep(interval)
             try:
-                cwd = f'{path}/{file}' 
-                print('cwd', cwd)
+                cwd = f'{ftp_path}/{file}'
                 self.ftp.cwd(cwd)
-                self.downloadFiles(f'{path}/{file}', f'{destination}/{file}')
+                self.downloadFiles(f'{ftp_path}/{file}', f'{target_path}/{file}')
 
             except ftplib.error_perm:
-                des = f'{destination}/{file}'
-                print('des', des)
+                # this is for file download
+                des = f'{target_path}/{file}'
+                print(f'download file: {file}', end='')
                 self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
-                print(f'{file} downloaded')
+                print(f' ---> downloaded')
+        self.ftp.cwd('../')
         return
-
 
 
 if __name__ == "__main__":
 
-    ftp_path = f'/Belkin109/Latest_App'
-    #  downloads_path = f'{stations_downloads[station]}'
-    downloads_path = f'C:/Users/zealz/temp'
+
+    station_to_download = ['RF', 'Audio', 'WPC', 'SA', 'PowerSensor']
 
     ftp = MyFtp()
-    #  ftp.download(ftp_path, downloads_path)
-
-    print('ftp_path', ftp_path)
-    print('downloads_path', downloads_path)
-
-    ftp.downloadFiles(ftp_path, downloads_path)
+    ftp_paths = [f'/Belkin109/{STATIONS[sta]}' for sta in station_to_download]
+    loc_paths = [f"{os.path.abspath('.')}/{stations_downloads[s]}" for s in station_to_download]
+    for ftp_path, loc_path in zip(ftp_paths, loc_paths):
+        print('ftp_path', ftp_path)
+        print('loc_path', loc_path)
+        ftp.downloadFiles(ftp_path, loc_path)
