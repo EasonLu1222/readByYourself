@@ -124,6 +124,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.app = app
+        self.desktop = app.desktop()
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -212,6 +213,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
         self.showMaximized()
+        self.setGeometry(self.desktop.availableGeometry())
         self.loading_dialog = LoadingDialog(self)
         self.set_togglebutton()
         self.version_checker = VersionChecker()
