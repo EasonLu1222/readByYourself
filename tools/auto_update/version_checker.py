@@ -6,8 +6,12 @@ from ftplib import FTP
 from PyQt5.QtWidgets import QApplication
 from mylogger import logger
 from PyQt5.QtCore import QThread, pyqtSignal
+import getpass
 
-LOCAL_APP_PATH = 'D:\\SAP109_STATION'
+
+# === The packaged app folder must be LOCAL_APP_PATH ===
+USER_PATH = f'C:/Users/{getpass.getuser()}'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
 
 
 class VersionChecker(QThread):
@@ -63,7 +67,12 @@ class VersionChecker(QThread):
         """
         rtn = None
         try:
+            # ip for offic intranet
+            #  ftp = FTP('10.228.14.92', timeout=3)
+
+            # ip for production line intranet
             ftp = FTP('10.228.16.92', timeout=3)
+
             ftp.login(user='SAP109', passwd='sapsfc')
             ftp.cwd('Belkin109/Latest_App')
             rtn = ftp
