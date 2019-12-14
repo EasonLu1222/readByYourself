@@ -215,7 +215,8 @@ def create_shortcut(targetname):
         log('create_shortcut')
         shortcutname = 'app.lnk'
 
-        desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
+        #  desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
+        desktop_path = 'C:/Users/Admin/Desktop'
         #  desktop_path = '\\\\Mac\\Home\\Desktop'
 
         shortcut_path = os.path.join(desktop_path, shortcutname)
