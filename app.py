@@ -221,13 +221,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.version_checker.start()
 
     def handle_update(self, need_update):
+        for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
+            p.unlink()
         if need_update:
             quit_msg = "An update is available, do you want to download it now?"
             reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
             if reply == QMessageBox.Yes:
-                for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
-                    p.unlink()
                 with open(f'{LOCAL_APP_PATH}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
                     pass
                 sys.exit()
