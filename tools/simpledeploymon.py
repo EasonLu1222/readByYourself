@@ -214,8 +214,10 @@ def create_shortcut(targetname):
         pythoncom.CoInitialize()
         log('create_shortcut')
         shortcutname = 'app.lnk'
-        #  desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
-        desktop_path = '\\\\Mac\\Home\\Desktop'
+
+        desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
+        #  desktop_path = '\\\\Mac\\Home\\Desktop'
+
         shortcut_path = os.path.join(desktop_path, shortcutname)
         target_path = f'{EXE_DIR}/{targetname}'
         log(f'desktop_path {desktop_path}')
