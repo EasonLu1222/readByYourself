@@ -10,8 +10,10 @@ import getpass
 
 
 # === The packaged app folder must be LOCAL_APP_PATH ===
-USER_PATH = f'C:/Users/{getpass.getuser()}'
-LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+#  USER_PATH = f'C:/Users/{getpass.getuser()}'
+#  LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+
+LOCAL_APP_PATH = 'D:/SAP109_STATION'
 
 
 class VersionChecker(QThread):
