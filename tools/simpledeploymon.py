@@ -74,7 +74,13 @@ def get_md5(file_path):
 
 class MyFtp():
     def __init__(self):
-        ip = '10.228.14.92'
+
+        # ip for office intranet
+        #  ip = '10.228.14.92'
+
+        # ip for production line intranet
+        ip = '10.228.16.92'
+
         user, passwd = 'SAP109', 'sapsfc'
         self.ftp = FTP(ip)
         self.ftp.login(user=user, passwd=passwd)
