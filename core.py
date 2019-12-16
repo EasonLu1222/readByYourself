@@ -401,8 +401,10 @@ class FileEventHandler(RegexMatchingEventHandler):
         results = []
         if KLIPPEL_PROJECT == 'SAP109 - v1.2 - DVT1 - 191114':
             df = parse_dvt1_v1_2(event.src_path)
-        elif KLIPPEL_PROJECT == 'SAP109 - v1.3 - DVT2 - 191209':
-            df = parse_dvt2_v1_3(event.src_path)
+        #  elif KLIPPEL_PROJECT == 'SAP109 - v1.3 - DVT2 - 191209':
+            #  df = parse_dvt2_v1_3(event.src_path)
+        elif KLIPPEL_PROJECT == 'SAP109-v1.5-DVT2-191214':
+            df = parse_dvt2_v1_5(event.src_path)
         results = df.values[-1].tolist()
         results = [{1:'Pass', 0:'Fail'}[e] for e in results]
         print(results)

@@ -37,7 +37,7 @@ def parse_dvt1_v1_2(path):
     return DF
 
 
-def parse_dvt2_v1_3(path):
+def parse_dvt2_v1_5(path):
     #path = '/Users/zealzel/Downloads/Summary SAP109 - v1.2 - DVT1 - 191114 2019-11-20 08-11-51-0 UTC+0700.log'
     df = pd.read_csv(path, encoding='latin-1', sep='\t')
     DF = df[df.columns[:41]]
