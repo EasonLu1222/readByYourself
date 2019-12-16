@@ -1,11 +1,10 @@
 import re
 import os
-import sys
 import json
 from datetime import datetime
 from shutil import copyfile, make_archive, rmtree
 from distutils.dir_util import copy_tree
-from utils import run
+from utils import run, get_md5
 import argparse
 
 
@@ -99,6 +98,11 @@ class Distribute:
         output = run("pyinstaller --onefile app.spec")
         print(output)
 
+    def gen_checksum(self):
+        md5_hash = get_md5("dist/app.exe")
+        with open('dist/md5.txt', 'w') as f:
+            f.write(md5_hash)
+
     def make_zip(self):
         """
         1. Create folders for each station defined in self.STATION with current datetime as suffix
@@ -112,6 +116,7 @@ class Distribute:
             target_dir = f"dist/{sta['file_prefix']}_{self.ts}"
             os.mkdir(target_dir)
             copyfile("dist/app.exe", f"{target_dir}/app_{self.ts}.exe")
+            copyfile("dist/md5.txt", f"{target_dir}/md5.txt")
             copy_tree("dist/jsonfile", f"{target_dir}/jsonfile")
 
             if sta['station']=='RF':
@@ -151,5 +156,6 @@ if __name__ == '__main__':
     d = Distribute(stations)
     d.gen_version_num()
     d.gen_installer()
+    d.gen_checksum()
     d.make_zip()
     d.cleanup()

@@ -67,34 +67,6 @@
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "00 10-20Hz Woofer L RBZ",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null,
-            "sfc_name": "T10_20hz_woofer_L_Rbz"
-        }
-        ,{
-            "group": "Klippel",
-            "hidden": false,
-            "tasktype": 20,
-            "item": "00 10-20Hz Woofer R RBZ",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null,
-            "sfc_name": "T10_20hz_woofer_R_Rbz"
-        }
-        ,{
-            "group": "Klippel",
-            "hidden": false,
-            "tasktype": 20,
             "item": "02 20-800Hz Woofer L FR",
             "script": null,
             "args": null,
@@ -103,35 +75,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T20_800hz_woofer_L_FR"
-        }
-        ,{
-            "group": "Klippel",
-            "hidden": false,
-            "tasktype": 20,
-            "item": "02 20-800Hz Woofer L AL",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null,
-            "sfc_name": "T20_800hz_woofer_L_AL"
-        }
-        ,{
-            "group": "Klippel",
-            "hidden": false,
-            "tasktype": 20,
-            "item": "02 20-800Hz Woofer L RBZ",
-            "script": null,
-            "args": null,
-            "auto": true,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null,
-            "sfc_name": "T20_800hz_woofer_L_Rbz"
+            "sfc_name": null
         }
         ,{
             "group": "Klippel",
@@ -145,13 +89,13 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T20_800hz_woofer_R_FR"
+            "sfc_name": null
         }
         ,{
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "02 20-800Hz Woofer R AL",
+            "item": "03 10-20Hz Woofer L RBZ",
             "script": null,
             "args": null,
             "auto": true,
@@ -159,13 +103,13 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T20_800hz_woofer_R_AL"
+            "sfc_name": null
         }
         ,{
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "02 20-800Hz Woofer R RBZ",
+            "item": "03 10-20Hz Woofer R RBZ",
             "script": null,
             "args": null,
             "auto": true,
@@ -173,13 +117,12 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T20_800hz_woofer_R_Rbz"
-        }
-        ,{
+            "sfc_name": null
+        },{
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "04 200-20kHz FR FR",
+            "item": "04 20-90Hz Woofer L RBZ",
             "script": null,
             "args": null,
             "auto": true,
@@ -187,13 +130,13 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T200_20Khz_woofer_FR_FR"
+            "sfc_name": null
         }
         ,{
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "04 200-20kHz FR AL",
+            "item": "04 20-90Hz Woofer R RBZ",
             "script": null,
             "args": null,
             "auto": true,
@@ -201,13 +144,12 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T200_20Khz_woofer_FR_AL"
-        }
-        ,{
+            "sfc_name": null
+        },{
             "group": "Klippel",
             "hidden": false,
             "tasktype": 20,
-            "item": "04 200-20kHz FR RBZ",
+            "item": "05 90-150Hz Woofer L RBZ",
             "script": null,
             "args": null,
             "auto": true,
@@ -215,7 +157,129 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "T200_20Khz_woofer_FR_Rbz"
+            "sfc_name": null
+        }
+        ,{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "05 90-150Hz Woofer R RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "06 150-220Hz Woofer L RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "06 150-220Hz Woofer R RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "07 220-300Hz Woofer L RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "07 220-300Hz Woofer R RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "08 300-800Hz Woofer L RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "08 300-800Hz Woofer R RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "10 200-20kHz Front FR",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Klippel",
+            "hidden": false,
+            "tasktype": 20,
+            "item": "10 200-20kHz Front RBZ",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
         }
     ]
 }

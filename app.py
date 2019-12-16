@@ -5,17 +5,17 @@ import time
 import re
 import pickle
 import pandas as pd
+import pyautogui as pag
 from datetime import datetime
 from operator import itemgetter
-import pyautogui as pag
-
+from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont, QColor, QPixmap, QPainter, QPainterPath
 from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox, QMessageBox, QPushButton)
+                             QWidget, QCheckBox, QMessageBox, QPushButton, QMessageBox)
 
 
 from view.pwd_dialog import PwdDialog
@@ -34,6 +34,7 @@ from config import station_json, LANG_LIST, STATION
 from iqxel import generate_jsonfile
 
 from sfc import send_result_to_sfc
+from tools.auto_update.version_checker import VersionChecker, LOCAL_APP_PATH
 from mylogger import logger
 
 
@@ -123,6 +124,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
         self.app = app
+        self.desktop = app.desktop()
         self.setupUi(self)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -211,8 +213,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
         self.showMaximized()
+        self.setGeometry(self.desktop.availableGeometry())
         self.loading_dialog = LoadingDialog(self)
         self.set_togglebutton()
+        self.version_checker = VersionChecker()
+        self.version_checker.version_checked.connect(self.handle_update)
+        self.version_checker.start()
+
+    def handle_update(self, need_update):
+        for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
+            p.unlink()
+        if need_update:
+            quit_msg = "An update is available, do you want to download it now?"
+            reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                with open(f'{LOCAL_APP_PATH}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+                    pass
+                sys.exit()
 
     def set_togglebutton(self):
         self.pushButton2 = QPushButton(self.container)
@@ -550,7 +568,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def klippel_handle(self, asn):
         print('klippel_handle', 'asn', asn)
-        #win = pag.getWindowsWithTitle('SAP109 - v1.2 - DVT1')[0]
         win = pag.getWindowsWithTitle('SAP109 - v1.3 - DVT2')[0]
         my = pag.getActiveWindow()
         time.sleep(1)

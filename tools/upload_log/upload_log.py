@@ -4,7 +4,7 @@ Usage:
     1. Compile this script to executable with the following command:
         # pyinstaller --onefile upload_log.py
     2. Put the upload_log.exe to C:\\Program Files
-    3. Open "Computer Management" set the scheduler to run upload_log.exe periodically
+    3. Open "Computer Management" and set the scheduler to run upload_log.exe periodically
         For now, the command is C:\\Program Files\\upload_log.exe C:\\SAP109_STATION
 """
 
