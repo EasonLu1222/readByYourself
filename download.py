@@ -29,33 +29,6 @@ class MyDialog(QDialog):
         self.progressBar.setValue(value)
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        self.centralwidget = QWidget(MainWindow)
-        self.centralwidget.setStyleSheet("")
-        MainWindow.resize(817, 200)
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.updateButton = QPushButton(self.centralwidget)
-        self.verticalLayout.addWidget(self.updateButton)
-        self.updateButton.clicked.connect(self.download_file)
-
-    def download_file(self):
-        self.dialog = MyDialog(self)
-        self.thread = DownloadThread()
-        self.thread.win = self.dialog
-        self.thread.data_downloaded.connect(self.dialog.on_data_ready)
-        self.thread.progress_update.connect(self.dialog.update_progress)
-        self.thread.start()
-        self.dialog.show()
-
-    def on_data_ready(self, data):
-        print('on_data_ready', data)
-        self.updateStatusText.setText(str(data))
-
-
 class DownloadThread(QtCore.QThread):
     data_downloaded = QtCore.pyqtSignal(object)
     progress_update = QtCore.pyqtSignal(int)
@@ -86,12 +59,35 @@ class DownloadThread(QtCore.QThread):
         self.progress_update.emit(self.dlsize)
 
 
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setStyleSheet("")
+        MainWindow.resize(817, 200)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.updateButton = QPushButton(self.centralwidget)
+        self.verticalLayout.addWidget(self.updateButton)
+        self.updateButton.clicked.connect(self.download_file)
+
+
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
         self.app = app
         self.show()
+
+    def download_file(self):
+        self.dialog = MyDialog(self)
+        self.thread = DownloadThread()
+        self.thread.win = self.dialog
+        self.thread.data_downloaded.connect(self.dialog.on_data_ready)
+        self.thread.progress_update.connect(self.dialog.update_progress)
+        self.thread.start()
+        self.dialog.show()
 
 
 if __name__ == "__main__":
