@@ -10,10 +10,10 @@ import getpass
 
 
 # === The packaged app folder must be LOCAL_APP_PATH ===
-#  USER_PATH = f'C:/Users/{getpass.getuser()}'
-#  LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+USER_PATH = f'C:/Users/{getpass.getuser()}'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
 
-LOCAL_APP_PATH = 'D:/SAP109_STATION'
+#  LOCAL_APP_PATH = 'D:/SAP109_STATION'
 
 
 class VersionChecker(QThread):
@@ -70,10 +70,10 @@ class VersionChecker(QThread):
         rtn = None
         try:
             # ip for offic intranet
-            #  ftp = FTP('10.228.14.92', timeout=3)
+            ftp = FTP('10.228.14.92', timeout=3)
 
             # ip for production line intranet
-            ftp = FTP('10.228.16.92', timeout=3)
+            #  ftp = FTP('10.228.16.92', timeout=3)
 
             ftp.login(user='SAP109', passwd='sapsfc')
             ftp.cwd('Belkin109/Latest_App')
