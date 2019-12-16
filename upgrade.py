@@ -11,7 +11,7 @@ import hashlib
 import getpass
 from ftplib import FTP
 from threading import Thread
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from watchdog.events import RegexMatchingEventHandler
@@ -30,29 +30,11 @@ type_ = lambda ex: f'<{type(ex).__name__}>'
 EXE_DIR = os.path.abspath('.')
 
 
-STATION = 'AudioListen'
-STATIONS = {
-    "MainBoard": "Station02_MainBoard",
-    "CapTouchMic": "Station03_SwBoard",
-    "LED": "Station04_LedBoard",
-    "RF": "Station05_BtWiFi",
-    "AudioListen": "Station06_AudioListen",
-    "Leak": "Station07_Leak",
-    "WPC": "Station08_WPC",
-    "PowerSensor": "Station09_Antenna",
-    "SA": "Station10_SA",
-    "AcousticListen": "Station11_AcousticListen",
-    "Download": "Station12_Download",
-    "BTMacFix": "StationXX_BTMacFixDownload",
-}
-
-
 def get_md5(file_path):
     with open(file_path, 'rb') as file_to_check:
         data = file_to_check.read()
         md5_returned = hashlib.md5(data).hexdigest()
     return md5_returned
-
 
 
 def wait_for_process_end(pid):
@@ -87,27 +69,6 @@ def delete_files(exclude_exe=None):
     print('delete_files done')
 
 
-def download_app(ftp):
-    print('download_app start')
-    ftp_path = f'/Belkin109/Latest_App'
-    ftp.ftp.cwd(ftp_path)
-    exes = [e for e in ftp.ftp.nlst() if 'exe' in e]
-    md5txts = [e for e in ftp.ftp.nlst() if 'md5.txt' in e]
-    print(f'exes {exes}')
-    print(f'md5txts {md5txts}')
-    if len(exes)==1 and len(md5txts)==1:
-        targetname, md5txt = exes[0], md5txts[0]
-        ftp.downloadfile(targetname, f'{EXE_DIR}/{targetname}')
-        ftp.downloadfile(md5txt, f'{EXE_DIR}/md5.txt')
-        md5txt = glob.glob(f'{EXE_DIR}/md5.txt')[0]
-        md5_expected = open(md5txt, 'r').read().strip()
-        print(f'targetname {targetname}')
-        print('download_app done')
-        return targetname, md5_expected
-    else:
-        return None
-
-
 def download_jsonfile(ftp):
     print('download_jsonfile start')
     ftp_path = f'/Belkin109/Latest_App/jsonfile'
@@ -116,6 +77,7 @@ def download_jsonfile(ftp):
 
 
 def checkmd5(targetname, md5_expected):
+    #  md5_expected = '688373fa36d4f3827fee8bef7d81e223'
     app_path = f'{EXE_DIR}/{targetname}'
     md5_actual = get_md5(app_path)
     return True if md5_actual==md5_expected else False
@@ -147,16 +109,6 @@ def create_shortcut(targetname):
     print('create_shortcut done')
 
 
-def upgrade_task():
-    pass
-    #  ftp = prepare_ftp()
-    #  appname, md5_expected = download_app(ftp)
-    #  if checkmd5(appname, md5_expected):
-        #  delete_files(appname)
-        #  download_jsonfile(ftp)
-        #  create_shortcut(appname)
-
-
 class MyFtp():
     def __init__(self, cwd='/Belkin109/Latest_App'):
 
@@ -171,11 +123,17 @@ class MyFtp():
         self.ftp.login(user=user, passwd=passwd)
         self.ftp.cwd(cwd)
 
-    def downloadfile(self, path, filepath):
-        dirname = os.path.dirname(path)
-        filename = os.path.basename(path)
-        self.ftp.cwd(dirname)
-        self.ftp.retrbinary(f'RETR {filename}', open(filepath, 'wb').write)
+    def size(self, filename):
+        return self.ftp.size(filename)
+
+    def retrbinary(self, cmd, callback):
+        self.ftp.retrbinary(cmd, callback)
+
+    def quit(self):
+        self.ftp.quit()
+
+    def nlst(self):
+        return self.ftp.nlst()
 
     def mkdir_p(self, path):
         try:
@@ -211,7 +169,7 @@ class MyFtp():
                 # this is for file download
                 des = f'{destination}/{file}'
                 print(f'download file: {file}')
-                self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
+                self.retrbinary("RETR " + file, open(des, 'wb').write)
                 print(f'{file} downloaded')
         self.ftp.cwd('../')
         os.chdir('../')
@@ -234,7 +192,7 @@ class MyDialog(QDialog):
     def on_data_ready(self, data):
         print('on_data_ready', data)
         self.updateStatusText.setText(str(data))
-        if data=='Status: Updated!':
+        if data=='Updated':
             self.hide()
 
     def update_progress(self, value):
@@ -244,26 +202,61 @@ class MyDialog(QDialog):
 class DownloadThread(QtCore.QThread):
     data_downloaded = QtCore.pyqtSignal(object)
     progress_update = QtCore.pyqtSignal(int)
+    quit = QtCore.pyqtSignal()
     def run(self):
         self.data_downloaded.emit('Status: Connecting...')
-        ftp = MyFtp()
-        filename = 'app_20191214_1833.exe'
-        self.totalsize = ftp.ftp.size(filename)
-        self.dlsize = 0
-        print(self.totalsize)
-        self.win.progressBar.setMaximum(self.totalsize)
-        self.data_downloaded.emit('Status: Downloading...')
+        self.ftp = MyFtp()
 
+        # download exe & md5
+        appname, md5_expected = self.download_app()
+        print(f'md5_expected {md5_expected}')
+        print(f'appname {appname}')
+
+        # if checksum ok, proceed
+        if checkmd5(appname, md5_expected):
+            print('ready to update')
+
+            # download & overwrite jsonfile
+
+            #  === open another process with new exe
+            proc = Popen(f'{os.path.abspath(".")}/{appname}', stdout=PIPE)
+
+            #  === close current process, emit a signal for MyWindow to quit
+            self.quit.emit()
+
+            # for new process, do following...
+            #  - delete app.exe
+            #  - delete md5.txt
+        else:
+            print('checksum error, plz download again.')
+
+            #  === delete downloaded exe
+
+
+    def download_app(self):
+        exes = [e for e in self.ftp.nlst() if 'exe' in e]
+        md5txts = [e for e in self.ftp.nlst() if 'md5.txt' in e]
+        if len(exes)==1 and len(md5txts)==1:
+            targetname, md5txt = exes[0], md5txts[0]
+            self.download_file(md5txt, 'Downloading...', 'Updated')
+            md5_expected = open(md5txt, 'r').read().strip()
+            print('md5_expected', md5_expected)
+            self.download_file(targetname, 'Downloading...', 'Updated')
+        return targetname, md5_expected
+
+    def download_file(self, filename, msg1, msg2):
+        self.dlsize = 0
+        self.dialog.progressBar.setMaximum(self.ftp.size(filename))
+        self.data_downloaded.emit(msg1)
         self.localfile = open(filename, 'wb')
-        ftp.ftp.retrbinary('RETR ' + filename, self.file_write)
-        ftp.ftp.quit()
+        self.ftp.retrbinary('RETR ' + filename, self.file_write)
         self.localfile.close()
-        self.data_downloaded.emit('Status: Updated!')
+        self.ftp.quit()
+        self.data_downloaded.emit(msg2)
 
     def file_write(self, data):
         self.localfile.write(data)
-        dlen = len(data)
-        self.dlsize += dlen
+        self.dlsize += len(data)
         self.progress_update.emit(self.dlsize)
 
 
@@ -282,23 +275,27 @@ class Ui_MainWindow(object):
 
 
 class MyWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, app, *args):
+    def __init__(self, *args):
         super(QMainWindow, self).__init__(*args)
         self.setupUi(self)
-        self.app = app
         self.show()
 
     def download_file(self):
         self.dialog = MyDialog(self)
+        self.dialog.setModal(True)
         self.thread = DownloadThread()
-        self.thread.win = self.dialog
-        self.thread.data_downloaded.connect(self.dialog.on_data_ready)
+        self.thread.dialog = self.dialog
         self.thread.progress_update.connect(self.dialog.update_progress)
+        self.thread.data_downloaded.connect(self.dialog.on_data_ready)
+        self.thread.quit.connect(self.quit)
         self.thread.start()
         self.dialog.show()
 
+    def quit(self):
+        print('MyWindow quit')
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    win = MyWindow(app)
+    win = MyWindow()
     app.exec_()
