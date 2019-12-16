@@ -72,4 +72,4 @@ def parse_dvt2_v1_5(path):
     ]
     DF = DF[kk]
 
-    return DF, df
+    return DF

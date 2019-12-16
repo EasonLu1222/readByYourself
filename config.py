@@ -28,7 +28,7 @@ station_json = {
     'PowerSensor': 'v14_power_sensor',      # pyinstaller exe  tested on clean windows
     'SA': 'v14_sa',                         # pyinstaller exe  tested on clean windows
     'Acoustic': 'v14_acoustic',
-    'AcousticListen': 'v14_acoustic_listener_klippel_v1_3',
+    'AcousticListen': 'v14_acoustic_listener_klippel_v1_5',
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download',
 }

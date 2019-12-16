@@ -28,7 +28,7 @@ from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path, QssTools
 from ui.main import Ui_MainWindow
-from config import station_json, LANG_LIST, STATION
+from config import station_json, LANG_LIST, STATION, KLIPPEL_PROJECT
 
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
@@ -568,7 +568,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def klippel_handle(self, asn):
         print('klippel_handle', 'asn', asn)
-        win = pag.getWindowsWithTitle('SAP109 - v1.3 - DVT2')[0]
+        #win = pag.getWindowsWithTitle('SAP109 - v1.3 - DVT2')[0]
+        win = pag.getWindowsWithTitle(KLIPPEL_PROJECT)[0]
         my = pag.getActiveWindow()
         time.sleep(1)
         win.maximize()

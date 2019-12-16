@@ -25,7 +25,7 @@ from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from db.sqlite import fetch_addr
-from parse_klippel import parse_dvt1_v1_2, parse_dvt2_v1_3
+from parse_klippel import parse_dvt1_v1_2, parse_dvt2_v1_5
 
 from actions import (
     disable_power_check, set_power_simu, dummy_com,
