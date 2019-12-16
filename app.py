@@ -216,9 +216,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setGeometry(self.desktop.availableGeometry())
         self.loading_dialog = LoadingDialog(self)
         self.set_togglebutton()
-        self.version_checker = VersionChecker()
-        self.version_checker.version_checked.connect(self.handle_update)
-        self.version_checker.start()
+        #  self.version_checker = VersionChecker()
+        #  self.version_checker.version_checked.connect(self.handle_update)
+        #  self.version_checker.start()
 
     def handle_update(self, need_update):
         for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
