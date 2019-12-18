@@ -1,4 +1,5 @@
 import json
+import getpass
 from utils import resource_path
 
 
@@ -56,4 +57,4 @@ FTP_DIR = '/Belkin109/Latest_App'
 TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
 OFFICE_IP = '10.228.14.92'
 FACTORY_IP = '10.228.16.92'
-IP_USED = FACTORY_IP
+IP_USED = OFFICE_IP
