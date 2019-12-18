@@ -17,7 +17,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayo
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
                              QWidget, QCheckBox, QMessageBox, QPushButton, QMessageBox)
 
-
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
@@ -28,7 +27,6 @@ from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
 from utils import resource_path, QssTools
 from ui.main import Ui_MainWindow
-from config import station_json, LANG_LIST, STATION, KLIPPEL_PROJECT
 
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
@@ -36,9 +34,14 @@ from iqxel import generate_jsonfile
 from sfc import send_result_to_sfc
 from upgrade import (
     wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
-    delete_app_exe, MyDialog, DownloadThread, LOCAL_APP_PATH, FTP_DIR,
+    delete_app_exe, MyDialog, DownloadThread,
 )
-from tools.auto_update.version_checker import VersionChecker, LOCAL_APP_PATH
+from config import (
+    station_json, LANG_LIST, STATION, KLIPPEL_PROJECT,
+    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
+    OFFICE_IP, FACTORY_IP, IP_USED,
+)
+from tools.auto_update.version_checker import VersionChecker
 from mylogger import logger
 
 
@@ -222,7 +225,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.set_togglebutton()
         self.version_checker = VersionChecker()
         self.version_checker.version_checked.connect(self.handle_update)
-        #  self.version_checker.start()
         self.can_download = False
         self.download_state_check()
 
@@ -252,7 +254,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if need_update:
             quit_msg = "An update is available, do you want to download it now?"
             reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
-
             if reply == QMessageBox.Yes:
                 logger.info('============= path3 check version yes download ==============')
                 self.dialog = MyDialog(self)

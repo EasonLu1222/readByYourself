@@ -3,6 +3,7 @@ import getpass
 from utils import resource_path
 
 
+# =============== Instruments =============== 
 DEVICES = json.load(open(resource_path('device.json'), 'r'))
 SERIAL_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='serial'}
 VISA_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='visa'}
@@ -10,6 +11,7 @@ SERIAL_DEVICE_NAME = [e[0] for e in SERIAL_DEVICES.values()]
 VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
+# =============== Station Related =============== 
 station_json = {
     'SIMULATION': 'v14_simu',
 
@@ -33,7 +35,10 @@ station_json = {
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download',
 }
+STATION = json.loads(open('jsonfile/station.json', 'r').\
+                     read())['STATION']
 
+# =============== Language =============== 
 LANG_LIST = [
     'en_US',
     'zh_TW',
@@ -41,20 +46,25 @@ LANG_LIST = [
     'vi'
 ]
 
+
+# =============== Acoustic Station =============== 
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
 
+
+# =============== Acoustic Station =============== 
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
-STATION = json.loads(open('jsonfile/station.json', 'r').\
-                     read())['STATION']
 
-# === testing program upgrade ===
-USER_PATH = f'C:/Users/{getpass.getuser()}'
-LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+# =============== Testing Progream Upgrade =============== 
+# == ftp ==
 FTP_DIR = '/Belkin109/Latest_App'
-TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
 OFFICE_IP = '10.228.14.92'
 FACTORY_IP = '10.228.16.92'
-IP_USED = OFFICE_IP
+IP_USED = FACTORY_IP
+
+# == local ==
+USER_PATH = f'C:/Users/{getpass.getuser()}'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'

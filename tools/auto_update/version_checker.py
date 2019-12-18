@@ -7,8 +7,11 @@ from PyQt5.QtWidgets import QApplication
 from mylogger import logger
 from PyQt5.QtCore import QThread, pyqtSignal
 import getpass
-from upgrade import FTP_DIR, MyFtp
-
+from upgrade import MyFtp
+from config import (
+    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX, 
+    OFFICE_IP, FACTORY_IP, IP_USED,
+)
 
 class VersionChecker(QThread):
 

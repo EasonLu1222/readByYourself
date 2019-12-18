@@ -57,6 +57,7 @@ def delete_trigger_file():
     for e in trigger_file:
         os.remove(e)
 
+
 def delete_app_exe(exclude_exe=None):
     exefiles = glob.glob(f'{LOCAL_APP_PATH}/*.exe')
     if exclude_exe:
@@ -66,6 +67,7 @@ def delete_app_exe(exclude_exe=None):
     print(f'exefiles {exefiles}')
     for exe in exefiles:
         os.remove(exe)
+
 
 def delete_md5():
     os.remove(f'{LOCAL_APP_PATH}/md5.txt')
@@ -79,25 +81,11 @@ def delete_jsonfile():
     print('delete_files done')
 
 
-def delete_files(exclude_exe=None):
-    delete_trigger_file()
-    delete_app_exe()
-    delete_md5()
-    delete_jsonfile()
-
-
-def download_jsonfile(ftp):
-    print('download_jsonfile start')
-    ftp_path = f'{FTP_DIR}/jsonfile'
-    ftp.downloadFiles(ftp_path, f'{LOCAL_APP_PATH}/jsonfile')
-    print('download_jsonfile done')
-
-
 def checkmd5(targetname, md5_expected):
-    #  md5_expected = '688373fa36d4f3827fee8bef7d81e223'
     app_path = f'{LOCAL_APP_PATH}/{targetname}'
     md5_actual = get_md5(app_path)
     return True if md5_actual==md5_expected else False
+
 
 def create_shortcut(targetname):
     logger.info('create_shortcut start')
@@ -141,6 +129,7 @@ class MyFtp():
     def __init__(self, cwd=FTP_DIR):
         user, passwd = 'SAP109', 'sapsfc'
         try:
+            logger.info(f'ftp ip_used: {IP_USED}')
             self.ftp = FTP(IP_USED, timeout=3)
             self.ftp.login(user=user, passwd=passwd)
             self.ftp.cwd(cwd)
