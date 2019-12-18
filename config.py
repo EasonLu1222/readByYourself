@@ -48,3 +48,12 @@ CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']
+
+# === testing program upgrade ===
+USER_PATH = f'C:/Users/{getpass.getuser()}'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
+FTP_DIR = '/Belkin109/Latest_App'
+TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
+OFFICE_IP = '10.228.14.92'
+FACTORY_IP = '10.228.16.92'
+IP_USED = FACTORY_IP

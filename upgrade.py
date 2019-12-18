@@ -22,18 +22,14 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
                              QLabel, QWidget, QPushButton, QProgressBar)
 from PyQt5.QtCore import Qt
-from config import STATION
+from config import (
+    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX, 
+    OFFICE_IP, FACTORY_IP, IP_USED,
+)
 from mylogger import logger
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
-
-USER_PATH = f'C:/Users/{getpass.getuser()}'
-LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
-FTP_DIR = '/Belkin109/Latest_App_Test'
-TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
-OFFICE_IP = '10.228.14.92'
-FACTORY_IP = '10.228.16.92'
 
 
 def get_md5(file_path):
@@ -143,10 +139,9 @@ def wait_for_process_end_if_downloading():
 
 class MyFtp():
     def __init__(self, cwd=FTP_DIR):
-        ip = FACTORY_IP
         user, passwd = 'SAP109', 'sapsfc'
         try:
-            self.ftp = FTP(ip, timeout=3)
+            self.ftp = FTP(IP_USED, timeout=3)
             self.ftp.login(user=user, passwd=passwd)
             self.ftp.cwd(cwd)
         except socket.timeout as e:
@@ -226,7 +221,6 @@ class DownloadThread(QtCore.QThread):
             with open(f'{LOCAL_APP_PATH}/jsonfile/station.json', 'w') as f:
                 content = '{\n\r\t"STATION": "%s"\n\r}' % STATION
                 f.write(content)
-
 
             # create shortcut
             create_shortcut(appname)

@@ -7,14 +7,7 @@ from PyQt5.QtWidgets import QApplication
 from mylogger import logger
 from PyQt5.QtCore import QThread, pyqtSignal
 import getpass
-
 from upgrade import FTP_DIR, MyFtp
-
-# === The packaged app folder must be LOCAL_APP_PATH ===
-USER_PATH = f'C:/Users/{getpass.getuser()}'
-LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
-
-#  LOCAL_APP_PATH = 'D:/SAP109_STATION'
 
 
 class VersionChecker(QThread):
