@@ -8,6 +8,7 @@ from mylogger import logger
 from PyQt5.QtCore import QThread, pyqtSignal
 import getpass
 
+from upgrade import FTP_DIR, MyFtp
 
 # === The packaged app folder must be LOCAL_APP_PATH ===
 USER_PATH = f'C:/Users/{getpass.getuser()}'
@@ -34,7 +35,7 @@ class VersionChecker(QThread):
         Returns:
             Bool, True if a newer version exist, False otherwise
         """
-        ftp = self.get_ftp()
+        ftp = MyFtp()
         if not ftp:
             return False
 
@@ -61,29 +62,30 @@ class VersionChecker(QThread):
 
         return can_update
 
-    def get_ftp(self):
-        """
-        Connect to the FTP and navigate to the Latest_App folder
-        Returns:
-            ftp object
-        """
-        rtn = None
-        try:
-            # ip for offic intranet
-            ftp = FTP('10.228.14.92', timeout=3)
+    #  def get_ftp(self):
+        #  """
+        #  Connect to the FTP and navigate to the Latest_App folder
+        #  Returns:
+            #  ftp object
+        #  """
+        #  rtn = None
+        #  try:
+            #  # ip for offic intranet
+            #  ftp = FTP('10.228.14.92', timeout=3)
 
-            # ip for production line intranet
-            #  ftp = FTP('10.228.16.92', timeout=3)
+            #  # ip for production line intranet
+            #  #  ftp = FTP('10.228.16.92', timeout=3)
 
-            ftp.login(user='SAP109', passwd='sapsfc')
-            ftp.cwd('Belkin109/Latest_App')
-            rtn = ftp
-        except socket.timeout as e:
-            logger.error('Error: FTP connection timeout')
-        except OSError as e:
-            logger.error('Error: Network is unreachable')
+            #  ftp.login(user='SAP109', passwd='sapsfc')
+            #  ftp.cwd(FTP_DIR)
+            #  #  ftp.cwd('Belkin109/Latest_App')
+            #  rtn = ftp
+        #  except socket.timeout as e:
+            #  logger.error('Error: FTP connection timeout')
+        #  except OSError as e:
+            #  logger.error('Error: Network is unreachable')
 
-        return rtn
+        #  return rtn
 
     def get_app_name_in_dir(self, file_list):
         """

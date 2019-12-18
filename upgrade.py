@@ -4,6 +4,7 @@ import sys
 import time
 import glob
 import errno
+import socket
 import psutil
 import shutil
 import ftplib
@@ -22,15 +23,15 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
                              QLabel, QWidget, QPushButton, QProgressBar)
 from PyQt5.QtCore import Qt
 from config import STATION
+from mylogger import logger
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
 
-
-# not work for nssm
-EXE_DIR = os.path.abspath('.')
+USER_PATH = f'C:/Users/{getpass.getuser()}'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
 FTP_DIR = '/Belkin109/Latest_App_Test'
-#  FTP_DIR = '/Belkin109/Latest_App'
+TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
 
 
 def get_md5(file_path):
@@ -54,12 +55,12 @@ def wait_for_process_end(pid):
 
 
 def delete_trigger_file():
-    trigger_file = glob.glob(f'{EXE_DIR}/sap109-testing-upgrade-starting-*')
+    trigger_file = glob.glob(f'{LOCAL_APP_PATH}/{TRIGGER_PREFIX}-*')
     for e in trigger_file:
         os.remove(e)
 
 def delete_app_exe(exclude_exe=None):
-    exefiles = glob.glob(f'{EXE_DIR}/*.exe')
+    exefiles = glob.glob(f'{LOCAL_APP_PATH}/*.exe')
     if exclude_exe:
         exefiles = [e for e in exefiles if exclude_exe not in e]
     else:
@@ -69,11 +70,11 @@ def delete_app_exe(exclude_exe=None):
         os.remove(exe)
 
 def delete_md5():
-    os.remove(f'{EXE_DIR}/md5.txt')
+    os.remove(f'{LOCAL_APP_PATH}/md5.txt')
 
 
 def delete_jsonfile():
-    jsondir = f'{EXE_DIR}/jsonfile'
+    jsondir = f'{LOCAL_APP_PATH}/jsonfile'
     if os.path.isdir(jsondir):
         shutil.rmtree(jsondir)
     os.mkdir(jsondir)
@@ -90,25 +91,25 @@ def delete_files(exclude_exe=None):
 def download_jsonfile(ftp):
     print('download_jsonfile start')
     ftp_path = f'{FTP_DIR}/jsonfile'
-    ftp.downloadFiles(ftp_path, f'{EXE_DIR}/jsonfile')
+    ftp.downloadFiles(ftp_path, f'{LOCAL_APP_PATH}/jsonfile')
     print('download_jsonfile done')
 
 
 def checkmd5(targetname, md5_expected):
     #  md5_expected = '688373fa36d4f3827fee8bef7d81e223'
-    app_path = f'{EXE_DIR}/{targetname}'
+    app_path = f'{LOCAL_APP_PATH}/{targetname}'
     md5_actual = get_md5(app_path)
     return True if md5_actual==md5_expected else False
 
 def create_shortcut(targetname):
-    log('create_shortcut start')
+    logger.info('create_shortcut start')
     try:
         pythoncom.CoInitialize()
         print('create_shortcut')
         shortcutname = 'app.lnk'
         desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
         shortcut_path = os.path.join(desktop_path, shortcutname)
-        target_path = f'{EXE_DIR}/{targetname}'
+        target_path = f'{LOCAL_APP_PATH}/{targetname}'
         print(f'desktop_path {desktop_path}')
         print(f'shortcut_path {shortcut_path}')
         print(f'target_path {target_path}')
@@ -119,7 +120,7 @@ def create_shortcut(targetname):
             shell.IID_IShellLink
         )
         shortcut.SetPath(target_path)
-        shortcut.SetWorkingDirectory(EXE_DIR)
+        shortcut.SetWorkingDirectory(LOCAL_APP_PATH)
         persist_file = shortcut.QueryInterface (pythoncom.IID_IPersistFile)
         persist_file.Save(shortcut_path, 0)
     except Exception as ex:
@@ -128,7 +129,7 @@ def create_shortcut(targetname):
 
 
 def wait_for_process_end_if_downloading():
-    triggers = glob.glob('sap109-testing-upgrade-staring-*')
+    triggers = glob.glob(f'{LOCAL_APP_PATH}/{TRIGGER_PREFIX}-*')
     if len(triggers)==1:
         x = triggers[0]
         pid = int(x[x.rfind('-')+1:])
@@ -140,17 +141,17 @@ def wait_for_process_end_if_downloading():
 
 class MyFtp():
     def __init__(self, cwd=FTP_DIR):
-
-        # ip for office intranet
-        ip = '10.228.14.92'
-
-        # ip for production line intranet
-        #  ip = '10.228.16.92'
-
+        ip = '10.228.14.92' # ip for office intranet
+        #  ip = '10.228.16.92' # ip for production line intranet
         user, passwd = 'SAP109', 'sapsfc'
-        self.ftp = FTP(ip)
-        self.ftp.login(user=user, passwd=passwd)
-        self.ftp.cwd(cwd)
+        try:
+            self.ftp = FTP(ip, timeout=3)
+            self.ftp.login(user=user, passwd=passwd)
+            self.ftp.cwd(cwd)
+        except socket.timeout as e:
+            logger.error('Error: FTP connection timeout')
+        except OSError as e:
+            logger.error('Error: Network is unreachable')
 
     def cwd(self, path):
         return self.ftp.cwd(path)
@@ -175,37 +176,6 @@ class MyFtp():
                 pass
             else:
                 raise
-
-    #  def downloadFiles(self, path, destination):
-        #  interval = 0.05
-        #  try:
-            #  self.ftp.cwd(path)
-            #  self.mkdir_p(destination)
-            #  print("Created: " + destination)
-            #  os.chdir(destination)
-        #  except OSError as ex:
-            #  print(f'OSError {ex}')
-        #  except ftplib.error_perm:
-            #  print("Error: could not change to " + path)
-            #  sys.exit("Ending Application")
-
-        #  filelist=self.ftp.nlst()
-        #  for file in filelist:
-            #  time.sleep(interval)
-            #  try:
-                #  cwd = f'{path}/{file}'
-                #  self.ftp.cwd(cwd)
-                #  self.downloadFiles(f'{path}/{file}', f'{destination}/{file}')
-
-            #  except ftplib.error_perm:
-                #  # this is for file download
-                #  des = f'{destination}/{file}'
-                #  print(f'download file: {file}')
-                #  self.retrbinary("RETR " + file, open(des, 'wb').write)
-                #  print(f'{file} downloaded')
-        #  self.ftp.cwd('../')
-        #  os.chdir('../')
-        #  return
 
 
 class MyDialog(QDialog):
@@ -252,12 +222,16 @@ class DownloadThread(QtCore.QThread):
             self.download_folder('jsonfile')
 
             # change station.json to current one
-            with open('jsonfile/station.json', 'w') as f:
+            with open(f'{LOCAL_APP_PATH}/jsonfile/station.json', 'w') as f:
                 content = '{\n\r\t"STATION": "%s"\n\r}' % STATION
                 f.write(content)
 
+
+            # create shortcut
+            create_shortcut(appname)
+
             #  === open another process with new exe
-            proc = Popen(f'{os.path.abspath(".")}/{appname}', stdout=PIPE)
+            proc = Popen(f'{LOCAL_APP_PATH}/{appname}', stdout=PIPE)
 
             #  === close current process, emit a signal for MyWindow to quit
             self.quit.emit()
@@ -280,7 +254,7 @@ class DownloadThread(QtCore.QThread):
         self.data_downloaded.emit(f'downloading folder {folder}')
         self.dialog.progressBar.setMaximum(len(files))
         for i, filename in enumerate(files):
-            with open(f'jsonfile/{filename}', 'wb') as f:
+            with open(f'{LOCAL_APP_PATH}/jsonfile/{filename}', 'wb') as f:
                 self.ftp.retrbinary('RETR ' + filename, f.write)
             self.data_downloaded.emit(f'{filename} downloaded')
             self.progress_update.emit(i)
@@ -291,12 +265,17 @@ class DownloadThread(QtCore.QThread):
         md5txts = [e for e in self.ftp.nlst() if 'md5.txt' in e]
         if len(exes)==1 and len(md5txts)==1:
             targetname, md5txt = exes[0], md5txts[0]
+            #  targetname = f'{LOCAL_APP_PATH}/{targetname}'
+            #  md5txt = f'{LOCAL_APP_PATH}/{md5txt}'
+
+            self.data_downloaded.emit(f'Downloading {md5txt}...')
+            self.download_file(md5txt)
+            md5_expected = open(f'{LOCAL_APP_PATH}/{md5txt}', 'r').read().strip()
+            print('md5_expected', md5_expected)
 
             self.data_downloaded.emit(f'Downloading {targetname}...')
-            self.download_file(md5txt)
-            md5_expected = open(md5txt, 'r').read().strip()
-            print('md5_expected', md5_expected)
             self.download_file(targetname)
+
             self.data_downloaded.emit('Updated')
 
         return targetname, md5_expected
@@ -305,7 +284,7 @@ class DownloadThread(QtCore.QThread):
         print('filename', filename)
         self.dlsize = 0
         self.dialog.progressBar.setMaximum(self.ftp.size(filename))
-        self.localfile = open(filename, 'wb')
+        self.localfile = open(f'{LOCAL_APP_PATH}/{filename}', 'wb')
         self.ftp.retrbinary('RETR ' + filename, self.file_write)
         self.localfile.close()
 
@@ -358,7 +337,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.thread.quit.connect(self.quit)
         self.thread.start()
         self.dialog.show()
-        with open(f'{EXE_DIR}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+        with open(f'{LOCAL_APP_PATH}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
             pass
 
     def quit(self):

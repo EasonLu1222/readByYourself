@@ -34,6 +34,10 @@ from config import station_json, LANG_LIST, STATION, KLIPPEL_PROJECT
 from iqxel import generate_jsonfile
 
 from sfc import send_result_to_sfc
+from upgrade import (
+    wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
+    delete_app_exe, MyDialog, DownloadThread, LOCAL_APP_PATH, FTP_DIR,
+)
 from tools.auto_update.version_checker import VersionChecker, LOCAL_APP_PATH
 from mylogger import logger
 
@@ -216,9 +220,30 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setGeometry(self.desktop.availableGeometry())
         self.loading_dialog = LoadingDialog(self)
         self.set_togglebutton()
-        #  self.version_checker = VersionChecker()
-        #  self.version_checker.version_checked.connect(self.handle_update)
+        self.version_checker = VersionChecker()
+        self.version_checker.version_checked.connect(self.handle_update)
         #  self.version_checker.start()
+        self.can_download = False
+        self.download_state_check()
+
+    def download_state_check(self):
+        logger.info('download_state_check')
+        if wait_for_process_end_if_downloading():
+            logger.info('============= path1 clean job at reopening app ==============')
+            delete_trigger_file()
+            delete_app_exe()
+            return
+        self.can_download = True
+
+    def keyPressEvent(self, event):
+        if self.can_download and event.key() == Qt.Key_F2:
+            logger.info('f2 pressed')
+            self.version_checker.start()
+
+    def quit(self):
+        logger.info('MyWindow quit')
+        time.sleep(3)
+        self.close()
 
     def handle_update(self, need_update):
         for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
@@ -228,9 +253,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes, QMessageBox.No)
 
             if reply == QMessageBox.Yes:
-                with open(f'{LOCAL_APP_PATH}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+                logger.info('============= path3 check version yes download ==============')
+                self.dialog = MyDialog(self)
+                self.dialog.setModal(True)
+                self.thread = DownloadThread()
+                self.thread.dialog = self.dialog
+                self.thread.progress_update.connect(self.dialog.update_progress)
+                self.thread.data_downloaded.connect(self.dialog.on_data_ready)
+                self.thread.quit.connect(self.quit)
+                self.thread.start()
+                self.dialog.show()
+                with open(f'{LOCAL_APP_PATH}/sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
                     pass
-                sys.exit()
 
     def set_togglebutton(self):
         self.pushButton2 = QPushButton(self.container)
