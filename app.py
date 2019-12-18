@@ -221,6 +221,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         #  self.version_checker.start()
 
     def handle_update(self, need_update):
+        # Remove all files in LOCAL_APP_PATH with file name start with "sap109-testing-upgrade"
         for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
             p.unlink()
         if need_update:
