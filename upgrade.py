@@ -32,6 +32,8 @@ USER_PATH = f'C:/Users/{getpass.getuser()}'
 LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
 FTP_DIR = '/Belkin109/Latest_App_Test'
 TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
+OFFICE_IP = '10.228.14.92'
+FACTORY_IP = '10.228.16.92'
 
 
 def get_md5(file_path):
@@ -141,8 +143,7 @@ def wait_for_process_end_if_downloading():
 
 class MyFtp():
     def __init__(self, cwd=FTP_DIR):
-        ip = '10.228.14.92' # ip for office intranet
-        #  ip = '10.228.16.92' # ip for production line intranet
+        ip = FACTORY_IP
         user, passwd = 'SAP109', 'sapsfc'
         try:
             self.ftp = FTP(ip, timeout=3)
