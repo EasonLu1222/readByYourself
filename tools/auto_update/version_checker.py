@@ -94,11 +94,10 @@ class VersionChecker(QThread):
         Returns:
             app name, e.g.: app_20191212_1131.exe
         """
-        latest_app_name = None
+        latest_app_name = ''
         for file_name in file_list:
-            if file_name.startswith("app"):
+            if file_name.startswith("app") and file_name > latest_app_name:
                 latest_app_name = file_name
-                break
 
         return latest_app_name
 
