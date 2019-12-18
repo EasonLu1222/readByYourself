@@ -21,6 +21,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
                              QLabel, QWidget, QPushButton, QProgressBar)
 from PyQt5.QtCore import Qt
+from config import STATION
 
 
 type_ = lambda ex: f'<{type(ex).__name__}>'
@@ -28,6 +29,8 @@ type_ = lambda ex: f'<{type(ex).__name__}>'
 
 # not work for nssm
 EXE_DIR = os.path.abspath('.')
+FTP_DIR = '/Belkin109/Latest_App_Test'
+#  FTP_DIR = '/Belkin109/Latest_App'
 
 
 def get_md5(file_path):
@@ -37,41 +40,56 @@ def get_md5(file_path):
     return md5_returned
 
 
+def get_appname():
+    proc = psutil.Process(os.getpid())
+    appname = proc.name()
+    return appname
+
+
 def wait_for_process_end(pid):
     print(f'wait for pid to stop {pid}')
     while psutil.pid_exists(pid): pass
     print(f'process {pid} is closed')
     time.sleep(1)
 
-def delete_files(exclude_exe=None):
-    print('delete_files start')
 
-    # delete trigger file
+def delete_trigger_file():
     trigger_file = glob.glob(f'{EXE_DIR}/sap109-testing-upgrade-starting-*')
     for e in trigger_file:
         os.remove(e)
 
-    # delete app_xxx.exe
+def delete_app_exe(exclude_exe=None):
     exefiles = glob.glob(f'{EXE_DIR}/*.exe')
     if exclude_exe:
         exefiles = [e for e in exefiles if exclude_exe not in e]
+    else:
+        exefiles = [e for e in exefiles if get_appname() not in e]
     print(f'exefiles {exefiles}')
     for exe in exefiles:
         os.remove(exe)
 
-    # delete md5.txt
+def delete_md5():
     os.remove(f'{EXE_DIR}/md5.txt')
 
-    # delete jsonfile/
+
+def delete_jsonfile():
     jsondir = f'{EXE_DIR}/jsonfile'
     if os.path.isdir(jsondir):
         shutil.rmtree(jsondir)
+    os.mkdir(jsondir)
     print('delete_files done')
+
+
+def delete_files(exclude_exe=None):
+    delete_trigger_file()
+    delete_app_exe()
+    delete_md5()
+    delete_jsonfile()
 
 
 def download_jsonfile(ftp):
     print('download_jsonfile start')
-    ftp_path = f'/Belkin109/Latest_App/jsonfile'
+    ftp_path = f'{FTP_DIR}/jsonfile'
     ftp.downloadFiles(ftp_path, f'{EXE_DIR}/jsonfile')
     print('download_jsonfile done')
 
@@ -109,8 +127,19 @@ def create_shortcut(targetname):
     print('create_shortcut done')
 
 
+def wait_for_process_end_if_downloading():
+    triggers = glob.glob('sap109-testing-upgrade-staring-*')
+    if len(triggers)==1:
+        x = triggers[0]
+        pid = int(x[x.rfind('-')+1:])
+        print('pid', pid)
+        wait_for_process_end(pid)
+        return True
+    return False
+
+
 class MyFtp():
-    def __init__(self, cwd='/Belkin109/Latest_App'):
+    def __init__(self, cwd=FTP_DIR):
 
         # ip for office intranet
         ip = '10.228.14.92'
@@ -122,6 +151,9 @@ class MyFtp():
         self.ftp = FTP(ip)
         self.ftp.login(user=user, passwd=passwd)
         self.ftp.cwd(cwd)
+
+    def cwd(self, path):
+        return self.ftp.cwd(path)
 
     def size(self, filename):
         return self.ftp.size(filename)
@@ -144,36 +176,36 @@ class MyFtp():
             else:
                 raise
 
-    def downloadFiles(self, path, destination):
-        interval = 0.05
-        try:
-            self.ftp.cwd(path)
-            self.mkdir_p(destination)
-            print("Created: " + destination)
-            os.chdir(destination)
-        except OSError as ex:
-            print(f'OSError {ex}')
-        except ftplib.error_perm:
-            print("Error: could not change to " + path)
-            sys.exit("Ending Application")
+    #  def downloadFiles(self, path, destination):
+        #  interval = 0.05
+        #  try:
+            #  self.ftp.cwd(path)
+            #  self.mkdir_p(destination)
+            #  print("Created: " + destination)
+            #  os.chdir(destination)
+        #  except OSError as ex:
+            #  print(f'OSError {ex}')
+        #  except ftplib.error_perm:
+            #  print("Error: could not change to " + path)
+            #  sys.exit("Ending Application")
 
-        filelist=self.ftp.nlst()
-        for file in filelist:
-            time.sleep(interval)
-            try:
-                cwd = f'{path}/{file}'
-                self.ftp.cwd(cwd)
-                self.downloadFiles(f'{path}/{file}', f'{destination}/{file}')
+        #  filelist=self.ftp.nlst()
+        #  for file in filelist:
+            #  time.sleep(interval)
+            #  try:
+                #  cwd = f'{path}/{file}'
+                #  self.ftp.cwd(cwd)
+                #  self.downloadFiles(f'{path}/{file}', f'{destination}/{file}')
 
-            except ftplib.error_perm:
-                # this is for file download
-                des = f'{destination}/{file}'
-                print(f'download file: {file}')
-                self.retrbinary("RETR " + file, open(des, 'wb').write)
-                print(f'{file} downloaded')
-        self.ftp.cwd('../')
-        os.chdir('../')
-        return
+            #  except ftplib.error_perm:
+                #  # this is for file download
+                #  des = f'{destination}/{file}'
+                #  print(f'download file: {file}')
+                #  self.retrbinary("RETR " + file, open(des, 'wb').write)
+                #  print(f'{file} downloaded')
+        #  self.ftp.cwd('../')
+        #  os.chdir('../')
+        #  return
 
 
 class MyDialog(QDialog):
@@ -212,47 +244,70 @@ class DownloadThread(QtCore.QThread):
         print(f'md5_expected {md5_expected}')
         print(f'appname {appname}')
 
-        # if checksum ok, proceed
         if checkmd5(appname, md5_expected):
-            print('ready to update')
+            print('============= path4 checksum ok and proceed ==============')
 
-            # download & overwrite jsonfile
+            # replace old jsonfile/ with new one
+            delete_jsonfile()
+            self.download_folder('jsonfile')
+
+            # change station.json to current one
+            with open('jsonfile/station.json', 'w') as f:
+                content = '{\n\r\t"STATION": "%s"\n\r}' % STATION
+                f.write(content)
 
             #  === open another process with new exe
             proc = Popen(f'{os.path.abspath(".")}/{appname}', stdout=PIPE)
 
             #  === close current process, emit a signal for MyWindow to quit
             self.quit.emit()
+            self.ftp.quit()
 
             # for new process, do following...
-            #  - delete app.exe
-            #  - delete md5.txt
+            #  - delete old app.exe
         else:
             print('checksum error, plz download again.')
 
             #  === delete downloaded exe
+            delete_app_exe()
 
+        delete_md5()
+
+    def download_folder(self, folder):
+        print('folder', folder)
+        self.ftp.cwd(folder)
+        files = self.ftp.nlst()
+        self.data_downloaded.emit(f'downloading folder {folder}')
+        self.dialog.progressBar.setMaximum(len(files))
+        for i, filename in enumerate(files):
+            with open(f'jsonfile/{filename}', 'wb') as f:
+                self.ftp.retrbinary('RETR ' + filename, f.write)
+            self.data_downloaded.emit(f'{filename} downloaded')
+            self.progress_update.emit(i)
+        self.ftp.cwd('..')
 
     def download_app(self):
         exes = [e for e in self.ftp.nlst() if 'exe' in e]
         md5txts = [e for e in self.ftp.nlst() if 'md5.txt' in e]
         if len(exes)==1 and len(md5txts)==1:
             targetname, md5txt = exes[0], md5txts[0]
-            self.download_file(md5txt, 'Downloading...', 'Updated')
+
+            self.data_downloaded.emit(f'Downloading {targetname}...')
+            self.download_file(md5txt)
             md5_expected = open(md5txt, 'r').read().strip()
             print('md5_expected', md5_expected)
-            self.download_file(targetname, 'Downloading...', 'Updated')
+            self.download_file(targetname)
+            self.data_downloaded.emit('Updated')
+
         return targetname, md5_expected
 
-    def download_file(self, filename, msg1, msg2):
+    def download_file(self, filename):
+        print('filename', filename)
         self.dlsize = 0
         self.dialog.progressBar.setMaximum(self.ftp.size(filename))
-        self.data_downloaded.emit(msg1)
         self.localfile = open(filename, 'wb')
         self.ftp.retrbinary('RETR ' + filename, self.file_write)
         self.localfile.close()
-        self.ftp.quit()
-        self.data_downloaded.emit(msg2)
 
     def file_write(self, data):
         self.localfile.write(data)
@@ -281,6 +336,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def download_file(self):
+
+        if wait_for_process_end_if_downloading():
+            print('============= path1 clean job at reopening app ==============')
+            delete_trigger_file()
+            delete_app_exe()
+            return
+        else:
+            need_to_download_when_version_check = True
+            if not need_to_download_when_version_check:
+                print('============= path2 check version no download ==============')
+                return
+
+        print('============= path3 check version yes download ==============')
         self.dialog = MyDialog(self)
         self.dialog.setModal(True)
         self.thread = DownloadThread()
@@ -290,6 +358,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.thread.quit.connect(self.quit)
         self.thread.start()
         self.dialog.show()
+        with open(f'{EXE_DIR}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+            pass
 
     def quit(self):
         print('MyWindow quit')
@@ -298,4 +368,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MyWindow()
+    proc = psutil.Process(os.getpid())
+    proc_name = proc.name()
     app.exec_()
