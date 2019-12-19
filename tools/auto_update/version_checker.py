@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 import getpass
 from upgrade import MyFtp
 from config import (
-    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX, 
+    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
     OFFICE_IP, FACTORY_IP, IP_USED,
 )
 
@@ -32,7 +32,7 @@ class VersionChecker(QThread):
             Bool, True if a newer version exist, False otherwise
         """
         ftp = MyFtp()
-        if not ftp:
+        if not ftp.ftp:
             return False
 
         file_list = ftp.nlst()

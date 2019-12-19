@@ -132,6 +132,7 @@ class MyFtp():
         user, passwd = 'SAP109', 'sapsfc'
         try:
             logger.info(f'ftp ip_used: {IP_USED}')
+            self.ftp = None
             self.ftp = FTP(IP_USED, timeout=3)
             self.ftp.login(user=user, passwd=passwd)
             self.ftp.cwd(cwd)

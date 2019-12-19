@@ -266,6 +266,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.dialog.show()
                 with open(f'{LOCAL_APP_PATH}/sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
                     pass
+        else:
+            logger.info('no need to update')
 
     def set_togglebutton(self):
         self.pushButton2 = QPushButton(self.container)
