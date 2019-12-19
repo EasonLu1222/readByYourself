@@ -75,7 +75,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T20_800hz_woofer_L_FR"
         }
         ,{
             "group": "Klippel",
@@ -89,7 +89,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T20_800hz_woofer_R_FR"
         }
         ,{
             "group": "Klippel",
@@ -103,7 +103,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T10_20hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -117,7 +117,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T10_20hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -130,7 +130,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T20_90hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -144,7 +144,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T20_90hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -157,7 +157,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T90_150hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -171,7 +171,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T90_150hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -184,7 +184,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T150_220hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -198,7 +198,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T150_220hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -211,7 +211,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T220_300hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -225,7 +225,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T220_300hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -238,7 +238,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T300_800hz_woofer_L_Rbz"
         }
         ,{
             "group": "Klippel",
@@ -252,7 +252,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T300_800hz_woofer_R_Rbz"
         },{
             "group": "Klippel",
             "hidden": false,
@@ -265,7 +265,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T200_20Khz_Front_FR"
         }
         ,{
             "group": "Klippel",
@@ -279,7 +279,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "T200_20Khz_Front_Rbz"
         }
     ]
 }
