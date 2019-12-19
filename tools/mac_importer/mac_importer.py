@@ -1,3 +1,21 @@
+"""
+This is a helper program for importing WiFi and BT MAC address to address.db,
+which is used in SA station
+
+Usage:
+    1. Compile this script to executable with the following command:
+        # pyinstaller --onefile mac_importer.py
+    2. Put the mac_importer.exe and addr.txt to any folder of the SA station
+    3. Open mac_importer.exe --> click "browse" --> select addr.txt --> click "Start"
+    4. The MAC addressed will be imported to address.db
+
+Note:
+    addr.txt contains a starting MAC in hex format, followed by the total
+    amount of consecutive MAC address
+
+    Sample content of addr.txt:
+        0xc4411e79bd16,1000
+"""
 import os
 import sqlite3
 from pathlib import Path
@@ -27,6 +45,14 @@ def main():
 
 
 def gen_mac_list(start_mac, total_mac):
+    """
+    Generate a consecutive list of mac addresses given the starting mac address and the total number of them
+    Args:
+        start_mac: e.g. 0xc4411e6a09ac
+        total_mac: e.g. 1000
+
+    Returns: ["c4:41:1e:6a:09:ac", "c4:41:1e:6a:09:ad",...]
+    """
     mac_list = []
     for i in range(total_mac):
         mac = format(start_mac + i, 'x')  # Convert hex number to hex string, e.g. 0xc4411e6a09ac to "c4411e6a09ac"
