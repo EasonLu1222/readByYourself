@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
                              QLabel, QWidget, QPushButton, QProgressBar)
 from PyQt5.QtCore import Qt
 from config import (
-    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX, 
+    STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
     OFFICE_IP, FACTORY_IP, IP_USED,
 )
 from mylogger import logger
@@ -46,9 +46,9 @@ def get_appname():
 
 
 def wait_for_process_end(pid):
-    print(f'wait for pid to stop {pid}')
+    logger.info(f'wait for pid to stop {pid}')
     while psutil.pid_exists(pid): pass
-    print(f'process {pid} is closed')
+    logger.info(f'process {pid} is closed')
     time.sleep(1)
 
 
@@ -58,13 +58,13 @@ def delete_trigger_file():
         os.remove(e)
 
 
-def delete_app_exe(exclude_exe=None):
+def delete_app_exe(keep=None):
     exefiles = glob.glob(f'{LOCAL_APP_PATH}/*.exe')
-    if exclude_exe:
-        exefiles = [e for e in exefiles if exclude_exe not in e]
+    if keep:
+        exefiles = [e for e in exefiles if keep not in e]
     else:
         exefiles = [e for e in exefiles if get_appname() not in e]
-    print(f'exefiles {exefiles}')
+    logger.info(f'exefiles {exefiles}')
     for exe in exefiles:
         os.remove(exe)
 
@@ -78,12 +78,13 @@ def delete_jsonfile():
     if os.path.isdir(jsondir):
         shutil.rmtree(jsondir)
     os.mkdir(jsondir)
-    print('delete_files done')
+    logger.info('delete_files done')
 
 
 def checkmd5(targetname, md5_expected):
     app_path = f'{LOCAL_APP_PATH}/{targetname}'
     md5_actual = get_md5(app_path)
+    logger.info(f'md5_actual {md5_actual}')
     return True if md5_actual==md5_expected else False
 
 
@@ -91,14 +92,14 @@ def create_shortcut(targetname):
     logger.info('create_shortcut start')
     try:
         pythoncom.CoInitialize()
-        print('create_shortcut')
+        logger.info('create_shortcut')
         shortcutname = 'app.lnk'
         desktop_path = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, 0, 0)
         shortcut_path = os.path.join(desktop_path, shortcutname)
         target_path = f'{LOCAL_APP_PATH}/{targetname}'
-        print(f'desktop_path {desktop_path}')
-        print(f'shortcut_path {shortcut_path}')
-        print(f'target_path {target_path}')
+        logger.info(f'desktop_path {desktop_path}')
+        logger.info(f'shortcut_path {shortcut_path}')
+        logger.info(f'target_path {target_path}')
         shortcut = pythoncom.CoCreateInstance(
             shell.CLSID_ShellLink,
             None,
@@ -110,16 +111,17 @@ def create_shortcut(targetname):
         persist_file = shortcut.QueryInterface (pythoncom.IID_IPersistFile)
         persist_file.Save(shortcut_path, 0)
     except Exception as ex:
-        print(f'[ERROR]{type_(ex)}, {ex}')
-    print('create_shortcut done')
+        logger.error(f'[ERROR]{type_(ex)}, {ex}')
+    logger.info('create_shortcut done')
 
 
 def wait_for_process_end_if_downloading():
     triggers = glob.glob(f'{LOCAL_APP_PATH}/{TRIGGER_PREFIX}-*')
+    logger.info(f'triggers {triggers}')
     if len(triggers)==1:
         x = triggers[0]
         pid = int(x[x.rfind('-')+1:])
-        print('pid', pid)
+        logger.info(f'pid {pid}')
         wait_for_process_end(pid)
         return True
     return False
@@ -167,6 +169,8 @@ class MyDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
+        #  self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint |
+                            #  ~Qt.WindowContextHelpButtonHint)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.resize(600, 100)
         self.verticalLayout = QVBoxLayout(self)
@@ -175,9 +179,10 @@ class MyDialog(QDialog):
         self.updateStatusText = QLabel(self)
         self.verticalLayout.addWidget(self.progressBar)
         self.verticalLayout.addWidget(self.updateStatusText)
+        self.setWindowTitle('Upgrade...')
 
     def on_data_ready(self, data):
-        print('on_data_ready', data)
+        logger.info(f'on_data_ready {data}')
         self.updateStatusText.setText(str(data))
         if data=='Updated':
             self.hide()
@@ -196,11 +201,11 @@ class DownloadThread(QtCore.QThread):
 
         # download exe & md5
         appname, md5_expected = self.download_app()
-        print(f'md5_expected {md5_expected}')
-        print(f'appname {appname}')
+        logger.info(f'md5_expected {md5_expected}')
+        logger.info(f'appname {appname}')
 
         if checkmd5(appname, md5_expected):
-            print('============= path4 checksum ok and proceed ==============')
+            logger.info('============= path4 checksum ok and proceed ==============')
 
             # replace old jsonfile/ with new one
             delete_jsonfile()
@@ -214,6 +219,9 @@ class DownloadThread(QtCore.QThread):
             # create shortcut
             create_shortcut(appname)
 
+            # emit updated signal
+            self.data_downloaded.emit('Updated')
+
             #  === open another process with new exe
             proc = Popen(f'{LOCAL_APP_PATH}/{appname}', stdout=PIPE)
 
@@ -224,15 +232,16 @@ class DownloadThread(QtCore.QThread):
             # for new process, do following...
             #  - delete old app.exe
         else:
-            print('checksum error, plz download again.')
+            logger.info('checksum error, plz download again.')
 
             #  === delete downloaded exe
-            delete_app_exe()
+            os.remove(f'{LOCAL_APP_PATH}/{appname}')
 
         delete_md5()
+        logger.info('end of DownloadThread.run()')
 
     def download_folder(self, folder):
-        print('folder', folder)
+        logger.info(f'folder {folder}')
         self.ftp.cwd(folder)
         files = self.ftp.nlst()
         self.data_downloaded.emit(f'downloading folder {folder}')
@@ -255,21 +264,26 @@ class DownloadThread(QtCore.QThread):
             self.data_downloaded.emit(f'Downloading {md5txt}...')
             self.download_file(md5txt)
             md5_expected = open(f'{LOCAL_APP_PATH}/{md5txt}', 'r').read().strip()
-            print('md5_expected', md5_expected)
+            logger.info(f'md5_expected {md5_expected}')
 
             self.data_downloaded.emit(f'Downloading {targetname}...')
             self.download_file(targetname)
 
-            self.data_downloaded.emit('Updated')
+            #  self.data_downloaded.emit('Updated')
 
         return targetname, md5_expected
 
     def download_file(self, filename):
-        print('filename', filename)
+        logger.info(f'filename {filename}')
         self.dlsize = 0
         self.dialog.progressBar.setMaximum(self.ftp.size(filename))
         self.localfile = open(f'{LOCAL_APP_PATH}/{filename}', 'wb')
-        self.ftp.retrbinary('RETR ' + filename, self.file_write)
+        try:
+            self.ftp.retrbinary('RETR ' + filename, self.file_write)
+        except Exception as ex:
+            logger.info(f'[ERROR]{type_(ex)}, {ex}')
+            self.dialog.progressBar.setValue(0)
+            #  self.dialog.hide()
         self.localfile.close()
 
     def file_write(self, data):
@@ -301,17 +315,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def download_file(self):
 
         if wait_for_process_end_if_downloading():
-            print('============= path1 clean job at reopening app ==============')
+            logger.info('============= path1 clean job at reopening app ==============')
             delete_trigger_file()
             delete_app_exe()
             return
         else:
             need_to_download_when_version_check = True
             if not need_to_download_when_version_check:
-                print('============= path2 check version no download ==============')
+                logger.info('============= path2 check version no download ==============')
                 return
 
-        print('============= path3 check version yes download ==============')
+        logger.info('============= path3 check version yes download ==============')
         self.dialog = MyDialog(self)
         self.dialog.setModal(True)
         self.thread = DownloadThread()
@@ -325,7 +339,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             pass
 
     def quit(self):
-        print('MyWindow quit')
+        logger.info('MyWindow quit')
         self.close()
 
 if __name__ == "__main__":

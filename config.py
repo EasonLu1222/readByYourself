@@ -3,7 +3,7 @@ import getpass
 from utils import resource_path
 
 
-# =============== Instruments =============== 
+# =============== Instruments ===============
 DEVICES = json.load(open(resource_path('device.json'), 'r'))
 SERIAL_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='serial'}
 VISA_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='visa'}
@@ -11,7 +11,7 @@ SERIAL_DEVICE_NAME = [e[0] for e in SERIAL_DEVICES.values()]
 VISA_DEVICE_NAME = [e[0] for e in VISA_DEVICES.values()]
 
 
-# =============== Station Related =============== 
+# =============== Station Related ===============
 station_json = {
     'SIMULATION': 'v14_simu',
 
@@ -38,7 +38,7 @@ station_json = {
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']
 
-# =============== Language =============== 
+# =============== Language ===============
 LANG_LIST = [
     'en_US',
     'zh_TW',
@@ -47,22 +47,27 @@ LANG_LIST = [
 ]
 
 
-# =============== Acoustic Station =============== 
+# =============== Acoustic Station ===============
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
 
 
-# =============== Acoustic Station =============== 
+# =============== Acoustic Station ===============
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 
-# =============== Testing Progream Upgrade =============== 
+# =============== Testing Progream Upgrade ===============
 # == ftp ==
-FTP_DIR = '/Belkin109/Latest_App'
 OFFICE_IP = '10.228.14.92'
 FACTORY_IP = '10.228.16.92'
+
 IP_USED = FACTORY_IP
+IP_FTPDIR = {
+    FACTORY_IP: '/Belkin109/Latest_App',
+    OFFICE_IP: '/Belkin109/Latest_App_Test', # for test
+}
+FTP_DIR = IP_FTPDIR[IP_USED]
 
 # == local ==
 USER_PATH = f'C:/Users/{getpass.getuser()}'

@@ -234,7 +234,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.info('============= path1 clean job at reopening app ==============')
             delete_trigger_file()
             delete_app_exe()
-            return
         self.can_download = True
 
     def keyPressEvent(self, event):
