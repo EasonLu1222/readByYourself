@@ -15,7 +15,7 @@ def upload_folder(zip_name, local_path, remote_path):
     zip_path = f'{local_path}.zip'
     make_archive(local_path, 'zip', local_path)
 
-    ftp = FTP('10.228.16.92', timeout=3)
+    ftp = FTP('10.228.16.92', timeout=180)
     ftp.login(user='SAP109', passwd='sapsfc')
     ftp.cwd(remote_path)
 
