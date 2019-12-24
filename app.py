@@ -31,7 +31,7 @@ from ui.main import Ui_MainWindow
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
 
-from sfc import send_result_to_sfc
+from sfc import send_result_to_sfc, gen_ks_sfc_csv
 from upgrade import (
     wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
     delete_app_exe, MyDialog, DownloadThread,
@@ -780,9 +780,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 }
 
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
-
                 if sfc_station_id:
-                    send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
+                    if sfc_station_id == 'MB':
+                        gen_ks_sfc_csv(d, sfc_station_id=sfc_station_id, msn=msn, dut_num=dut_num, dut_i=dut_i, result=res)
+                    else:
+                        send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
