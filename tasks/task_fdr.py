@@ -21,10 +21,10 @@ PADDING = ' ' * 8
 
 class TouchPolling(QThread):
     """
-    This class detects which cap touch key is pressed
-    by polling the cap touch's i2c address.
+    This class detects whether FDR key is pressed
+    by polling the last line of debug message.
     """
-    touchSignal = QSignal(str, int)
+    touchSignal = QSignal(int)
     doneSignal = QSignal(list)
 
     def __init__(self, ser_list=[], dut_idx_list=[], parent=None):
@@ -54,7 +54,7 @@ class TouchPolling(QThread):
 
                     if match and not self.pass_list[i]:
                         self.pass_list[i] = True
-                        self.touchSignal.emit("0x01", dut_idx_list[i])
+                        self.touchSignal.emit(dut_idx_list[i])
                         time.sleep(0.05)
             if all(self.pass_list):
                 self.kill = True
@@ -79,7 +79,6 @@ class UnmuteMicDialog(QDialog, Ui_UnmuteMicDialog):
         self.portnames = portnames
         self.dut_idx_list = dut_idx_list
         self.btn_list = [self.b1, self.b2]
-
 
         self.continue_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.continue_button.clicked.connect(self.on_done)
@@ -120,9 +119,9 @@ class UnmuteMicDialog(QDialog, Ui_UnmuteMicDialog):
             except Exception as e:
                 logger.error(f"{PADDING}Failed to close serial port ({ser})\n{e}")
 
-    def on_touch(self, touched_key_code, dut_idx):
-        # When cap touch button is touched, set the corresponding label's background color to yellow
-        logger.info(f'{PADDING}{touched_key_code}, {dut_idx}')
+    def on_touch(self, dut_idx):
+        # When FDR button is touched, set the UI's background color to yellow
+        logger.info(f'{PADDING}dut_idx = {dut_idx}')
         btn_label = self.btn_list[dut_idx]
         btn_label.setStyleSheet('background-color: #FDD835')
         self.pass_list[dut_idx] = True
