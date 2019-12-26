@@ -78,7 +78,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         logger.error(f"{PADDING}SFC request error: {ex}")
 
 
-def gen_ks_sfc_csv(d, station, msn, dut_num, dut_i, result):
+def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     # d = pd.read_pickle('../led_pickle.txt')
     df = d[(d.hidden == False) & (d.sfc_name != "")]
     cols1 = (df.sfc_name).values.tolist()
@@ -87,7 +87,8 @@ def gen_ks_sfc_csv(d, station, msn, dut_num, dut_i, result):
     cols2_value = {
         'station': station,
         'usid': msn,
-        'dut_num': dut_i+1
+        'dut_num': dut_i+1,
+        'part_num': part_num
     }
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})

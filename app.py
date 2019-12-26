@@ -782,7 +782,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
                 if sfc_station_id:
                     if sfc_station_id == 'MB':
-                        gen_ks_sfc_csv(d, sfc_station_id=sfc_station_id, msn=msn, dut_num=dut_num, dut_i=dut_i, result=res)
+                        gen_ks_sfc_csv(d, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA101-600-G', dut_i=dut_i, result=res)
                     else:
                         send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
