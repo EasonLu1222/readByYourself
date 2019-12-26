@@ -922,7 +922,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setHorizontalHeaderLabels(header)
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
-        self.task.start()
 
     def toggle_loading_dialog(self, is_on=False):
         if is_on:
