@@ -85,10 +85,11 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
 
     cols2_value = {
+        'part_num': part_num,
         'station': station,
-        'usid': msn,
-        'dut_num': dut_i+1,
-        'part_num': part_num
+        'dut_num': dut_i + 1,
+        'usid': msn
+
     }
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})
@@ -105,7 +106,7 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     try:
         latest_hms = int(csv_list[0][16:22])
     except Exception as e:
-        logger.error(f"{PADDING}e")
+        logger.error(f"{PADDING}{e}")
         latest_hms = 0
 
     if hms - latest_hms < 20:
