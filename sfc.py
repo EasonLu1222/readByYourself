@@ -102,9 +102,10 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
 
     csv_list = [os.path.basename(p) for p in glob.glob('./logs/mb_log/*.csv')]
     csv_list.sort(reverse=True)
-    if len(csv_list)>0:
+    try:
         latest_hms = int(csv_list[0][16:22])
-    else:
+    except Exception as e:
+        logger.error(f"{PADDING}e")
         latest_hms = 0
 
     if hms - latest_hms < 20:
