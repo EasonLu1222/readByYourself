@@ -787,7 +787,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                         send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
-                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
+                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
 
             self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)

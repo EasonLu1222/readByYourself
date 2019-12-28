@@ -114,7 +114,7 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     else:
         csv_filename = f'mb_log_{ymd}_{hms}.csv'
     with open(f'./logs/mb_log/{csv_filename}', 'a') as f:
-        dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',')
+        dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',', line_terminator='\n')
 
 
 # gen_ks_sfc_csv(d=None, station='MB', msn='111-111-111-1111-1111-111111', dut_num=2, dut_i=1, result='Pass')
