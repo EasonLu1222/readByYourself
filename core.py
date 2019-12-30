@@ -429,6 +429,7 @@ class FileWatcher:
         self.observer.join()
 
 
+
 class Task(QThread):
     '''
     there's three types of tasks
@@ -459,11 +460,12 @@ class Task(QThread):
         self.jsonfile = f'{json_root}/{json_name}.json'
         logger.info(f'{PADDING}{self.jsonfile}')
         #  if not check_json_integrity(self.json_name):
-        #  if QMessageBox.warning(None, 'Warning',
-        #  'You can not change jsonfile content besides the serial numbers',
-        #  QMessageBox.Yes):
-        #  self.base = None
-        #  return
+            #  if QMessageBox.warning(
+                    #  None, 'Warning',
+                    #  'You can not change jsonfile content besides the serial numbers',
+                    #  QMessageBox.Yes):
+                #  self.base = None
+                #  return
 
         self.base = json.loads(open(self.jsonfile, 'r', encoding='utf8').read())
         self.groups = parse_json(self.jsonfile)
@@ -473,6 +475,7 @@ class Task(QThread):
         logger.debug(f'{PADDING}Task.instruments')
         for k, v in self.instruments.items():
             logger.debug(f'{PADDING}{k} ---> {v}')
+        self.wait_for_next = False
 
     @property
     def serial_instruments(self):
@@ -906,6 +909,18 @@ class Task(QThread):
             th.start()
         for dut_idx, th in threads.items():
             th.join()
+
+    def run_task12(self, group, items):
+        self.wait_for_next = True
+        row, next_item = items[0]['index'], items[0]
+        self.window.msg_dialog_signal.emit(f'HHHH')
+        while self.wait_for_next: pass
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': [['Pass', 'Pass']],
+        })
+        self.wait_for_next = False
+        self.task_result.emit(result)
 
     def run_task20(self, group, items):
         from datetime import datetime

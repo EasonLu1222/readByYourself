@@ -15,7 +15,7 @@ from PyQt5.QtCore import (QSettings, Qt, QTranslator, QCoreApplication,
                           pyqtSignal as QSignal)
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayout,
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
-                             QWidget, QCheckBox, QMessageBox, QPushButton, QMessageBox)
+                             QWidget, QCheckBox, QPushButton, QMessageBox)
 
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
@@ -638,6 +638,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         infoBox.setIcon(QMessageBox.Information)
         infoBox.setText(msg)
         infoBox.exec_()
+        if msg=='HHHH':
+            self.task.wait_for_next = False
 
     def printterm1(self, port_msg):
         port, msg = port_msg
