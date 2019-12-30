@@ -784,12 +784,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
                 if sfc_station_id:
                     if sfc_station_id == 'MB':
-                        gen_ks_sfc_csv(d, sfc_station_id=sfc_station_id, msn=msn, dut_num=dut_num, dut_i=dut_i, result=res)
+                        gen_ks_sfc_csv(d, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA101-600-G', dut_i=dut_i, result=res)
                     else:
                         send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
-                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',')
+                    dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
 
             self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)
@@ -924,7 +924,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setHorizontalHeaderLabels(header)
         self.pushButton.setEnabled(False)
         self.ser_listener.stop()
-        self.task.start()
 
     def toggle_loading_dialog(self, is_on=False):
         if is_on:

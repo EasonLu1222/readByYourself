@@ -78,16 +78,18 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         logger.error(f"{PADDING}SFC request error: {ex}")
 
 
-def gen_ks_sfc_csv(d, station, msn, dut_num, dut_i, result):
+def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     # d = pd.read_pickle('../led_pickle.txt')
     df = d[(d.hidden == False) & (d.sfc_name != "")]
     cols1 = (df.sfc_name).values.tolist()
     dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
 
     cols2_value = {
+        'part_num': part_num,
         'station': station,
-        'usid': msn,
-        'dut_num': dut_i+1
+        'dut_num': dut_i + 1,
+        'usid': msn
+
     }
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})
@@ -101,9 +103,10 @@ def gen_ks_sfc_csv(d, station, msn, dut_num, dut_i, result):
 
     csv_list = [os.path.basename(p) for p in glob.glob('./logs/mb_log/*.csv')]
     csv_list.sort(reverse=True)
-    if len(csv_list)>0:
+    try:
         latest_hms = int(csv_list[0][16:22])
-    else:
+    except Exception as e:
+        logger.error(f"{PADDING}{e}")
         latest_hms = 0
 
     if hms - latest_hms < 20:
@@ -111,7 +114,7 @@ def gen_ks_sfc_csv(d, station, msn, dut_num, dut_i, result):
     else:
         csv_filename = f'mb_log_{ymd}_{hms}.csv'
     with open(f'./logs/mb_log/{csv_filename}', 'a') as f:
-        dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',')
+        dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',', line_terminator='\n')
 
 
 # gen_ks_sfc_csv(d=None, station='MB', msn='111-111-111-1111-1111-111111', dut_num=2, dut_i=1, result='Pass')
