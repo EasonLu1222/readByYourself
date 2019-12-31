@@ -109,7 +109,7 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
         logger.error(f"{PADDING}{e}")
         latest_hms = 0
 
-    if hms - latest_hms < 20:
+    if hms - latest_hms < 30:
         csv_filename = csv_list[0]
     else:
         csv_filename = f'mb_log_{ymd}_{hms}.csv'
