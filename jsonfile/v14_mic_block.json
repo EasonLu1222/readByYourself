@@ -5,7 +5,7 @@
  "devices": {
     "dut": {
         "name": "cygnal_cp2102",
-        "num": 2,
+        "num": 1,
         "sn": []
     },
     "pwr": {
@@ -28,7 +28,7 @@
      "firsts": [
          {
              "first": "dummy_com_first",
-             "args": ["win", "COM11", "COM22"]
+             "args": ["win", "COM11"]
          }
      ],
      "actions": [

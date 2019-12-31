@@ -917,7 +917,7 @@ class Task(QThread):
         while self.wait_for_next: pass
         result = json.dumps({
             'index': [row, row + len(items)],
-            'output': [['Pass', 'Pass']],
+            'output': [['Pass']],
         })
         self.wait_for_next = False
         self.task_result.emit(result)
