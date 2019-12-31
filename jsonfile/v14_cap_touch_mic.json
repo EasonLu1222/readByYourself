@@ -82,21 +82,7 @@
           "sfc_name": null
       },
       {
-          "group": "Mic Test(1/5)",
-          "hidden": false,
-          "tasktype": 3,
-          "item": "ensure the mic is unmuted",
-          "script": "task_unmute_mic",
-          "args": null,
-          "auto": false,
-          "min": null,
-          "expect": null,
-          "max": null,
-          "unit": null,
-          "sfc_name": null
-      },
-      {
-          "group": "Mic Test(2/5)",
+          "group": "Mic Test(1/4)",
           "hidden": false,
           "tasktype": 4,
           "item": "play sweep tone from computer",
@@ -110,7 +96,7 @@
           "sfc_name": null
       },
       {
-          "group": "Mic Test(3/5)",
+          "group": "Mic Test(2/4)",
           "hidden": false,
           "tasktype": 1,
           "item": "record tone from mics",
@@ -124,7 +110,7 @@
           "sfc_name": null
       },
       {
-          "group": "Mic Test(4/5)",
+          "group": "Mic Test(3/4)",
           "hidden": false,
           "tasktype": 4,
           "item": "pull the recorded tone to computer",
@@ -138,7 +124,7 @@
           "sfc_name": null
       },
       {
-          "group": "Mic Test(5/5)",
+          "group": "Mic Test(4/4)",
           "hidden": false,
           "tasktype": 1,
           "item": "get FFT result",
