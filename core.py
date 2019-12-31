@@ -913,7 +913,7 @@ class Task(QThread):
     def run_task12(self, group, items):
         self.wait_for_next = True
         row, next_item = items[0]['index'], items[0]
-        self.window.msg_dialog_signal.emit(f'HHHH')
+        self.window.msg_dialog_signal.emit(f'Press enter to continue')
         while self.wait_for_next: pass
         result = json.dumps({
             'index': [row, row + len(items)],

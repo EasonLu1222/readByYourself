@@ -638,7 +638,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         infoBox.setIcon(QMessageBox.Information)
         infoBox.setText(msg)
         infoBox.exec_()
-        if msg=='HHHH':
+        if msg=='Press enter to continue':
             self.task.wait_for_next = False
 
     def printterm1(self, port_msg):
