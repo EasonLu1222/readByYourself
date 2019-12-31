@@ -924,7 +924,6 @@ class Task(QThread):
 
     def run_task20(self, group, items):
         from datetime import datetime
-        import glob
         now = datetime.now()
         row, next_item = items[0]['index'], items[0]
 
