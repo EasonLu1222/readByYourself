@@ -37,9 +37,9 @@ def pull_recorded_sound():
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             run(cmd)
 
+            is_duplicate = check_duplicate_channel_data(wav_file_path)
             top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
 
-            is_duplicate = check_duplicate_channel_data(wav_file_path)
             if is_duplicate:
                 test_result = 'Fail(one mic may be missing)'
             else:
