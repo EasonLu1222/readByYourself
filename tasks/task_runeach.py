@@ -117,14 +117,13 @@ def write_usid(dynamic_info):
     sid = dynamic_info
     logger.info(f'{PADDING}write usid')
     with get_serial(portname, 115200, timeout=1.6) as ser:
-        cmds = [
+        cmd = ";".join([
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo usid > /sys/class/unifykeys/name',
             f'echo {sid} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
+        ])
+        logger.info(f'{PADDING}cmd: {cmd}')
+        issue_command(ser, cmd, False)
         cmd = "cat /sys/class/unifykeys/read"
         lines = issue_command(ser, cmd)
         result = f'Pass' if any(re.search(sid, e)
