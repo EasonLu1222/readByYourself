@@ -116,7 +116,7 @@ def read_pid_dummy(portname, dut_idx):
 def write_usid(dynamic_info):
     sid = dynamic_info
     logger.info(f'{PADDING}write usid')
-    with get_serial(portname, 115200, timeout=1.6) as ser:
+    with get_serial(portname, 115200, timeout=2.5) as ser:
         cmd = ";".join([
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo usid > /sys/class/unifykeys/name',
