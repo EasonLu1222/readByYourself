@@ -118,7 +118,7 @@ def write_usid(dynamic_info):
     logger.info(f'{PADDING}write usid')
     retry_count = 0
     max_retry = 3
-    with get_serial(portname, 115200, timeout=2.5) as ser:
+    with get_serial(portname, 115200, timeout=1) as ser:
 
         while True:
             cmds = [
