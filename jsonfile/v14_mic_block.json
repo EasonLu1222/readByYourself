@@ -4,19 +4,9 @@
  "sfc_station_id": null,
  "devices": {
     "dut": {
-        "name": "cygnal_cp2102",
+        "name": "ftdi",
         "num": 1,
-        "sn": []
-    },
-    "pwr": {
-        "name": "gw_powersupply",
-        "num": 1,
-        "sn": []
-    },
-    "dmm": {
-        "name": "gw_dmm",
-        "num": 1,
-        "sn": []
+        "sn": ["A50285BIA"]
     }
  },
  "appearance": {
@@ -25,24 +15,23 @@
  },
  "behaviors": {
      "barcode-scan": false,
-     "firsts": [
-         {
-             "first": "dummy_com_first",
-             "args": ["win", "COM11"]
-         }
-     ],
+     "firsts": [],
      "actions": [
          {
-            "action": "enter_prompt_simu",
-            "args": []
-         }
-         ,{
-            "action": "set_power_simu",
+            "action": "disable_power_check",
             "args": ["win"]
-         }
-         ,{
-            "action": "dummy_com",
-            "args": ["task"]
+         },
+         {
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         },
+         {
+            "action": "is_adb_ok",
+            "args": ["win", "task"]
+         },
+         {
+            "action": "serial_ignore_xff",
+            "args": ["win"]
          }
      ],
      "prepares": [],
@@ -55,8 +44,8 @@
             "hidden": false,
             "tasktype": 1,
             "item": "Sensitivity w/o blocking",
-            "script": "task_runeach",
-            "args": ["check_something"],
+            "script": "task_mic_block_test",
+            "args": ["mic_test"],
             "auto": true,
             "min": null,
             "expect": null,
@@ -83,8 +72,8 @@
             "hidden": false,
             "tasktype": 1,
             "item": "Sensitivity with blocking",
-            "script": "task_runeach",
-            "args": ["check_something"],
+            "script": "task_mic_block_test",
+            "args": ["mic_test"],
             "auto": true,
             "min": null,
             "expect": null,
