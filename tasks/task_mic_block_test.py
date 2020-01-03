@@ -68,12 +68,13 @@ def pull_result(save_path, dest_path):
     outputs, _ = proc.communicate()
 
 
-def get_dbfs(wav_path):
+def get_dbfs(wav_path, dir_path):
     s = AudioSegment.from_wav(wav_path)
-    ss = s.split_to_mono()
+    s_cut = s[-4000:]
+    ss = s_cut.split_to_mono()
 
-    # with open(f'{dir}/test_result.txt', 'a') as f:
-    #      f.writelines(f'{wav_path}\t{ss[0].dBFS}\t{ss[1].dBFS}\n')
+    with open(f'{dir_path}/test_result.txt', 'a') as f:
+          f.writelines(f'{ss[0].dBFS},{ss[1].dBFS}\n')
 
     logger.info(f'{wav_path}\t{s.dBFS}\n')
 
@@ -88,7 +89,7 @@ def mic_test(portname):
 
     dir = make_experiment_dir()
 
-    duration = 2
+    duration = 5
     turn_off_gva()
     rtn = record_sound(save_path, duration)
 
@@ -98,10 +99,42 @@ def mic_test(portname):
         cmd = 'rm /usr/share/mic_record.wav'
         run(portname, cmd)
         wav_path = f'{dir}/mic_record.wav'
-        get_dbfs(wav_path)
+        get_dbfs(wav_path, dir)
+        result = 'Pass'
+        return result
+    if rtn == 0:
+        result = 'Fail'
+        return result
 
-    result = 'Pass'
-    return result
+def Sensitivity_calculate():
+    now = datetime.now().strftime('%Y%m%d')
+    dir_path = f"./wav/experiment_{now}"
+    with open(f'{dir_path}/test_result.txt', "r") as f:
+        line = f.readline()
+        mic_channel = line.split(",")
+        line = f.readline()
+        mic_block_channel = line.split(",")
+
+    os.remove(f'{dir_path}/test_result.txt')
+
+    channel_0_diff = float(mic_channel[0]) - float(mic_block_channel[0])
+    channel_1_diff = float(mic_channel[1]) - float(mic_block_channel[1])
+
+    logger.info(f"mic_channel[0]: {mic_channel[0]}")
+    logger.info(f"mic_channel[1]: {mic_channel[1]}")
+    logger.info(f"mic_block_channel[0]: {mic_block_channel[0]}")
+    logger.info(f"mic_block_channel[1]: {mic_block_channel[1]}")
+    logger.info(f"channel_0_diff: {channel_0_diff}")
+    logger.info(f"channel_1_diff: {channel_1_diff}")
+
+    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) > float('20.0')) :
+        return "Pass"
+    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) < float('20.0')) :
+        return 'Fail(channel 1)'
+    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) > float('20.0')) :
+        return 'Fail(channel 0)'
+    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) < float('20.0')) :
+        return 'Fail(channel 0 and channel 1)'
 
 
 if __name__ == "__main__":

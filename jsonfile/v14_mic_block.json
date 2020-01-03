@@ -81,5 +81,19 @@
             "unit": null,
             "sfc_name": null
         }
+        ,{
+            "group": "Mic Test Result",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Sensitivity Test Result",
+            "script": "task_mic_block_test",
+            "args": ["Sensitivity_calculate"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
     ]
 }
