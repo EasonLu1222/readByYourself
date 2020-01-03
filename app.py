@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import json
 import time
@@ -31,7 +32,7 @@ from ui.main import Ui_MainWindow
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
 
-from sfc import send_result_to_sfc, gen_ks_sfc_csv
+from sfc import send_result_to_sfc, gen_ks_sfc_csv, gen_ks_sfc_csv_filename
 from upgrade import (
     wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
     delete_app_exe, MyDialog, DownloadThread,
@@ -754,6 +755,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             sfc_station_id = self.task.sfc_station_id
 
+            csv_filename = gen_ks_sfc_csv_filename()
+
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
                 res = 'Pass' if all_pass(results_) else 'Fail'
@@ -784,12 +787,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
                 if sfc_station_id:
                     if sfc_station_id == 'MB':
-                        gen_ks_sfc_csv(d, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA101-600-G', dut_i=dut_i, result=res)
+                        gen_ks_sfc_csv(d, csv_filename=csv_filename, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA101-600-G', dut_i=dut_i, result=res)
                     else:
                         send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
+            try:
+                shutil.move(f'./logs/{csv_filename}', f'./logs/mb_log')
+            except FileNotFoundError as e:
+                logger.debug(f"{e}")
+
 
             self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)

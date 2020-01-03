@@ -78,7 +78,16 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         logger.error(f"{PADDING}SFC request error: {ex}")
 
 
-def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
+def gen_ks_sfc_csv_filename():
+    now = datetime.now()
+    ymd = now.strftime('%Y%m%d')
+    hms = int(now.strftime('%H%M%S'))
+    csv_filename = f'mb_log_{ymd}_{hms}.csv'
+
+    return csv_filename
+
+
+def gen_ks_sfc_csv(d, csv_filename, station, msn, part_num, dut_num, dut_i, result):
     # d = pd.read_pickle('../led_pickle.txt')
     df = d[(d.hidden == False) & (d.sfc_name != "")]
     cols1 = (df.sfc_name).values.tolist()
@@ -94,26 +103,10 @@ def gen_ks_sfc_csv(d, station, msn, part_num, dut_num, dut_i, result):
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})
 
-    now = datetime.now()
-    ymd = now.strftime('%Y%m%d')
-    hms = int(now.strftime('%H%M%S'))
+    if not os.path.exists('./logs'):
+        os.makedirs('./logs')
 
-    if not os.path.exists('./logs/mb_log'):
-        os.makedirs('./logs/mb_log')
-
-    csv_list = [os.path.basename(p) for p in glob.glob('./logs/mb_log/*.csv')]
-    csv_list.sort(reverse=True)
-    try:
-        latest_hms = int(csv_list[0][16:22])
-    except Exception as e:
-        logger.error(f"{PADDING}{e}")
-        latest_hms = 0
-
-    if hms - latest_hms < 20:
-        csv_filename = csv_list[0]
-    else:
-        csv_filename = f'mb_log_{ymd}_{hms}.csv'
-    with open(f'./logs/mb_log/{csv_filename}', 'a') as f:
+    with open(f'./logs/{csv_filename}', 'a') as f:
         dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',', line_terminator='\n')
 
 

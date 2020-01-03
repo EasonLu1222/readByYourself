@@ -6,6 +6,7 @@ from numpy.fft import fft
 from playsound import playsound
 from mylogger import logger
 from utils import resource_path, run
+from pydub import AudioSegment
 
 wav_dir = './wav'
 PADDING = ' ' * 8
@@ -36,15 +37,58 @@ def pull_recorded_sound():
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             run(cmd)
 
+            is_duplicate = check_duplicate_channel_data(wav_file_path)
             top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
-            test_result = judge_fft_result(top_n_freq_and_amp)
+
+            if is_duplicate:
+                test_result = 'Fail(one mic may be missing)'
+            else:
+                test_result = judge_fft_result(top_n_freq_and_amp)
 
             cmd = f'echo {test_result}'
             with open(test_result_path, "w+", encoding='utf8') as out_file:
                 subprocess.call(cmd.split(' '), shell=True, stdout=out_file)
 
-    for i,tid in enumerate(tid_list):
+    for i, tid in enumerate(tid_list):
         push_result_to_device(tid, trp_list[i])
+
+
+def check_duplicate_channel_data(wav_file_path):
+    """
+    This function checks whether the 2 channels of a wave file are too similar
+    If so, return True
+    Args:
+        wav_file_path: wav file path
+
+    Returns: bool
+
+    """
+    rtn = False
+    try:
+        s = AudioSegment.from_file(wav_file_path)
+        ss = s.split_to_mono()
+    except FileNotFoundError as e:
+        logger.error(f"{PADDING}{e}")
+        return True
+
+    try:
+        smp1 = ss[0].get_array_of_samples()
+        smp2 = ss[1].get_array_of_samples()
+    except IndexError as e:
+        logger.error(f"{PADDING}{e}")
+        return True
+
+    diff_count = 0
+    for i in range(len(smp1)):
+        diff = abs(smp1[i] - smp2[i])
+        if diff > 20:
+            diff_count += 1
+
+    if diff_count < 1000:
+        rtn = True
+    logger.debug(f"{PADDING}diff_count={diff_count}")
+
+    return rtn
 
 
 def analyze_recorded_sound(wav_file_path):

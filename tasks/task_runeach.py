@@ -116,19 +116,29 @@ def read_pid_dummy(portname, dut_idx):
 def write_usid(dynamic_info):
     sid = dynamic_info
     logger.info(f'{PADDING}write usid')
-    with get_serial(portname, 115200, timeout=1.2) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo usid > /sys/class/unifykeys/name',
-            f'echo {sid} > /sys/class/unifykeys/write',
-        ]
-        for cmd in cmds:
-            logger.info(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        cmd = "cat /sys/class/unifykeys/read"
-        lines = issue_command(ser, cmd)
-        result = f'Pass' if any(re.search(sid, e)
-                                for e in lines) else 'Fail'
+    retry_count = 0
+    max_retry = 3
+    with get_serial(portname, 115200, timeout=1) as ser:
+
+        while True:
+            cmds = [
+                f'echo 1 > /sys/class/unifykeys/attach',
+                f'echo usid > /sys/class/unifykeys/name',
+                f'echo {sid} > /sys/class/unifykeys/write',
+            ]
+            for cmd in cmds:
+                logger.info(f'{PADDING}cmd: {cmd}')
+                issue_command(ser, cmd, False)
+
+            cmd = "cat /sys/class/unifykeys/read"
+            lines = issue_command(ser, cmd)
+            result = f'Pass' if any(re.search(sid, e)
+                                    for e in lines) else 'Fail'
+            if result == 'Pass' or retry_count > max_retry:
+                break
+            logger.debug(f'{PADDING}write_usid retry_count={retry_count}')
+            retry_count += 1
+
         return result
 
 
