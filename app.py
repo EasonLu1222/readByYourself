@@ -794,7 +794,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
             try:
-                shutil.move(f'./logs/{csv_filename}', f'./logs/mb_log')
+                shutil.move(f'./logs/{csv_filename}', f'./logs/mb_log/{csv_filename}')
             except FileNotFoundError as e:
                 logger.debug(f"{e}")
 

@@ -103,8 +103,7 @@ def gen_ks_sfc_csv(d, csv_filename, station, msn, part_num, dut_num, dut_i, resu
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})
 
-    if not os.path.exists('./logs'):
-        os.makedirs('./logs')
+    os.makedirs('./logs/mb_log', exist_ok=True)
 
     with open(f'./logs/{csv_filename}', 'a') as f:
         dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',', line_terminator='\n')
