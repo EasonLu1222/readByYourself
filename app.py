@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import json
 import time
@@ -792,6 +793,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
+            try:
+                shutil.move(f'./logs/{csv_filename}', f'./logs/mb_log')
+            except FileNotFoundError as e:
+                logger.debug(f"{e}")
+
 
             self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)
