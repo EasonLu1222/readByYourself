@@ -70,7 +70,7 @@ def pull_result(save_path, dest_path):
 
 def get_dbfs(wav_path, dir_path):
     s = AudioSegment.from_wav(wav_path)
-    s_cut = s[-4000:]
+    s_cut = s[1000:]
     ss = s_cut.split_to_mono()
 
     with open(f'{dir_path}/test_result.txt', 'a') as f:
