@@ -68,6 +68,7 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         self.portnames = portnames
         self.dut_idx_list = dut_idx_list
         self.key_codes = ['0x01', '0x02', '0x04', '0x08', '0x10']
+        self.KeyStatus = 0
         self.btn_list = [
             [self.b11, self.b12, self.b13, self.b14, self.b15],
             [self.b21, self.b22, self.b23, self.b24, self.b25]
@@ -78,10 +79,11 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         ]
         self.pass_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.fail_button.setCursor(QCursor(Qt.PointingHandCursor))
-        self.pass_button.clicked.connect(self.pass_clicked)
+        # self.pass_button.clicked.connect(self.pass_clicked)
         self.fail_button.clicked.connect(self.fail_clicked)
-        QShortcut(QKeySequence(Qt.Key_Return), self, self.pass_clicked)
+        # QShortcut(QKeySequence(Qt.Key_Return), self, self.pass_clicked)
         QShortcut(QKeySequence(Qt.Key_Space), self, self.fail_clicked)
+        self.pass_button.setVisible(False)
 
         self.fade_disabled_duts()
 
@@ -122,7 +124,8 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         if hasattr(self, 'touchPollingThread'):
             self.touchPollingThread.kill = True
         logger.info(f'{PADDING}TouchPolling thread terminated!')
-        time.sleep(0.5)     # Wait for serial communication finish before closing serial connection
+        self.KeyStatus = 0
+        time.sleep(0.5)  # Wait for serial communication finish before closing serial connection
         try:
             logger.info(f'{PADDING}Closing serial port ({self.ser})')
             self.ser.close()
@@ -135,6 +138,20 @@ class CapTouchDialog(QDialog, Ui_CapTouchDialog):
         # When cap touch button is touched, set the corresponding label's background color to yellow
         btn_label = self.key_code_to_label_map[self.dut_ptr][touched_key_code]
         btn_label.setStyleSheet('background-color: #FDD835')
+
+        if touched_key_code == '0x01':
+            self.KeyStatus |= (1 << 0)
+        elif touched_key_code == '0x02':
+            self.KeyStatus |= (1 << 1)
+        elif touched_key_code == '0x04':
+            self.KeyStatus |= (1 << 2)
+        elif touched_key_code == '0x08':
+            self.KeyStatus |= (1 << 3)
+        elif touched_key_code == '0x10':
+            self.KeyStatus |= (1 << 4)
+
+        if self.KeyStatus == 0x1f:
+            self.pass_clicked()
 
     def pass_clicked(self):
         self.test_results.append("Pass")
