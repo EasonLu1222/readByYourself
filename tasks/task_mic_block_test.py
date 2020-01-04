@@ -12,6 +12,7 @@ from mylogger import logger
 
 PADDING = ' ' * 8
 
+
 def issue_command(serial, cmd):
     serial.write(f'{cmd}\n'.encode('utf-8'))
     lines = serial.readlines()
@@ -80,6 +81,7 @@ def get_dbfs(wav_path, dir_path):
 
     return s.dBFS
 
+
 def mic_test(portname):
     # parser = argparse.ArgumentParser()
     # parser.add_argument('ports', help='serial com port names', type=str)
@@ -103,17 +105,22 @@ def mic_test(portname):
         result = 'Pass'
         return result
     if rtn == 0:
-        result = 'Fail'
+        result = 'Fail(mic is muted)'
         return result
 
-def Sensitivity_calculate():
+
+def calculate_sensitivity():
     now = datetime.now().strftime('%Y%m%d')
     dir_path = f"./wav/experiment_{now}"
-    with open(f'{dir_path}/test_result.txt', "r") as f:
-        line = f.readline()
-        mic_channel = line.split(",")
-        line = f.readline()
-        mic_block_channel = line.split(",")
+    try:
+        with open(f'{dir_path}/test_result.txt', "r") as f:
+            line = f.readline()
+            mic_channel = line.split(",")
+            line = f.readline()
+            mic_block_channel = line.split(",")
+    except Exception as e:
+        logger.error(f'{PADDING}{e}')
+        return 'Fail(read test result failed)'
 
     os.remove(f'{dir_path}/test_result.txt')
 
@@ -127,18 +134,17 @@ def Sensitivity_calculate():
     logger.info(f"channel_0_diff: {channel_0_diff}")
     logger.info(f"channel_1_diff: {channel_1_diff}")
 
-    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) > float('20.0')) :
+    if channel_0_diff >= 20 and channel_1_diff >= 20:
         return "Pass"
-    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) < float('20.0')) :
-        return 'Fail(channel 1)'
-    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) > float('20.0')) :
-        return 'Fail(channel 0)'
-    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) < float('20.0')) :
+    elif channel_0_diff < 20 and channel_1_diff < 20:
         return 'Fail(channel 0 and channel 1)'
+    elif channel_0_diff < 20:
+        return 'Fail(channel 0)'
+    else:
+        return 'Fail(channel 1)'
 
 
 if __name__ == "__main__":
-
     thismodule = sys.modules[__name__]
 
     logger.info(f'{PADDING}task_runeach start...')
