@@ -69,7 +69,7 @@ def enter_burn_mode(portname, dut_idx):
 
 def read_pid(portname, dut_idx):
     logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+    with get_serial(portname, 115200, timeout=1.2) as ser:
         cmds = [
             f'echo 1 > /sys/class/unifykeys/attach',
             f'echo usid > /sys/class/unifykeys/name',
@@ -150,7 +150,7 @@ def write_wifi_bt_mac(dynamic_info):
     if mac_wifi_addr == "" or mac_bt_addr == "":
         return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
     logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
-    with get_serial(portname, 115200, timeout=1) as ser:
+    with get_serial(portname, 115200, timeout=1.2) as ser:
         # Read product ID
         cmd = ";".join([
             'echo 1 > /sys/class/unifykeys/attach',
@@ -338,7 +338,7 @@ def get_mic_test_result(portname):
 
 
 def load_led_driver(portname):
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+    with get_serial(portname, 115200, timeout=1.2) as ser:
         cmd = f'insmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
         result = f'Pass' if any(re.search('probe', e) for e in lines) or any(
@@ -347,7 +347,7 @@ def load_led_driver(portname):
 
 
 def unload_led_driver(portname):
-    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+    with get_serial(portname, 115200, timeout=1.2) as ser:
         cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
         result = f'Fail' if any(re.search('leds_lp50xx', e)
