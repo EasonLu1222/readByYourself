@@ -2,6 +2,7 @@
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
  "sfc_station_id": null,
+ "speaker_com": "COM38",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -43,6 +44,20 @@
             "group": "Mic1",
             "hidden": false,
             "tasktype": 1,
+            "item": "Play tone",
+            "script": "task_mic_block_test",
+            "args": ["play_tone"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Mic2",
+            "hidden": false,
+            "tasktype": 1,
             "item": "Sensitivity w/o blocking",
             "script": "task_mic_block_test",
             "args": ["mic_test"],
@@ -68,7 +83,21 @@
             "sfc_name": null
         }
         ,{
-            "group": "Mic2",
+            "group": "Mic3",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Play tone",
+            "script": "task_mic_block_test",
+            "args": ["play_tone"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Mic4",
             "hidden": false,
             "tasktype": 1,
             "item": "Sensitivity with blocking",
@@ -87,7 +116,7 @@
             "tasktype": 1,
             "item": "Sensitivity Test Result",
             "script": "task_mic_block_test",
-            "args": ["Sensitivity_calculate"],
+            "args": ["calculate_sensitivity"],
             "auto": true,
             "min": null,
             "expect": null,

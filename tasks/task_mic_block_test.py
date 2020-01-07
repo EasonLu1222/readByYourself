@@ -1,14 +1,17 @@
 import inspect
 import os
 import argparse
+import re
 import sys
 import time
-from serial import Serial
+import json
+from serial import Serial, SerialException
 from datetime import datetime
 from subprocess import Popen, PIPE
 from pydub import AudioSegment
 
 from mylogger import logger
+from config import station_json
 
 PADDING = ' ' * 8
 
@@ -34,6 +37,19 @@ def run(portname, cmd):
         lines = issue_command(ser, cmd)
         logger.info(lines)
     return lines
+
+
+def play_tone():
+    json_name = station_json['MicBlock']
+    jsonfile = f'jsonfile/{json_name}.json'
+    json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
+    com = json_obj["speaker_com"]
+    try:
+        lines = run(com, f"aplay /usr/share/1000hz_8s.wav")
+        result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
+    except SerialException:
+        result = 'Fail(bad serial port)'
+    return result
 
 
 def make_experiment_dir():
