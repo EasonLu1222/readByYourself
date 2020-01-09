@@ -1,16 +1,20 @@
 import inspect
 import os
 import argparse
+import re
 import sys
 import time
-from serial import Serial
+import json
+from serial import Serial, SerialException
 from datetime import datetime
 from subprocess import Popen, PIPE
 from pydub import AudioSegment
 
 from mylogger import logger
+from config import station_json
 
 PADDING = ' ' * 8
+
 
 def issue_command(serial, cmd):
     serial.write(f'{cmd}\n'.encode('utf-8'))
@@ -33,6 +37,20 @@ def run(portname, cmd):
         lines = issue_command(ser, cmd)
         logger.info(lines)
     return lines
+
+
+def play_tone():
+    json_name = station_json['MicBlock']
+    jsonfile = f'jsonfile/{json_name}.json'
+    json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
+    com = json_obj["speaker_com"]
+    logger.debug(f"{PADDING}speaker_com: {com}")
+    try:
+        lines = run(com, f"aplay /usr/share/1000hz_8s.wav")
+        result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
+    except SerialException:
+        result = 'Fail(bad serial port)'
+    return result
 
 
 def make_experiment_dir():
@@ -80,6 +98,7 @@ def get_dbfs(wav_path, dir_path):
 
     return s.dBFS
 
+
 def mic_test(portname):
     # parser = argparse.ArgumentParser()
     # parser.add_argument('ports', help='serial com port names', type=str)
@@ -103,17 +122,22 @@ def mic_test(portname):
         result = 'Pass'
         return result
     if rtn == 0:
-        result = 'Fail'
+        result = 'Fail(mic is muted)'
         return result
 
-def Sensitivity_calculate():
+
+def calculate_sensitivity():
     now = datetime.now().strftime('%Y%m%d')
     dir_path = f"./wav/experiment_{now}"
-    with open(f'{dir_path}/test_result.txt', "r") as f:
-        line = f.readline()
-        mic_channel = line.split(",")
-        line = f.readline()
-        mic_block_channel = line.split(",")
+    try:
+        with open(f'{dir_path}/test_result.txt', "r") as f:
+            line = f.readline()
+            mic_channel = line.split(",")
+            line = f.readline()
+            mic_block_channel = line.split(",")
+    except Exception as e:
+        logger.error(f'{PADDING}{e}')
+        return 'Fail(read test result failed)'
 
     os.remove(f'{dir_path}/test_result.txt')
 
@@ -127,18 +151,17 @@ def Sensitivity_calculate():
     logger.info(f"channel_0_diff: {channel_0_diff}")
     logger.info(f"channel_1_diff: {channel_1_diff}")
 
-    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) > float('20.0')) :
+    if channel_0_diff >= 20 and channel_1_diff >= 20:
         return "Pass"
-    if (abs(channel_0_diff) > float('20.0') and abs(channel_1_diff) < float('20.0')) :
-        return 'Fail(channel 1)'
-    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) > float('20.0')) :
-        return 'Fail(channel 0)'
-    if (abs(channel_0_diff) < float('20.0') and abs(channel_1_diff) < float('20.0')) :
+    elif channel_0_diff < 20 and channel_1_diff < 20:
         return 'Fail(channel 0 and channel 1)'
+    elif channel_0_diff < 20:
+        return 'Fail(channel 0)'
+    else:
+        return 'Fail(channel 1)'
 
 
 if __name__ == "__main__":
-
     thismodule = sys.modules[__name__]
 
     logger.info(f'{PADDING}task_runeach start...')

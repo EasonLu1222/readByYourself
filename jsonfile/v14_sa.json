@@ -92,6 +92,20 @@
             "sfc_name": "led"
         }
         ,{
+            "group": "FDR Key Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "",
+            "script": "task_fdr",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "fdr"
+        }
+        ,{
             "group": "Cap Touch Test",
             "hidden": false,
             "tasktype": 3,

@@ -1,7 +1,8 @@
 {"header":
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
- "sfc_station_id": null,
+ "sfc_station_id": "MS",
+ "speaker_com": "COM12",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -40,7 +41,35 @@
  "test_items":
     [
         {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "read_pid"
+        },
+        {
             "group": "Mic1",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Play tone",
+            "script": "task_mic_block_test",
+            "args": ["play_tone"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "mic_play_tone"
+        }
+        ,{
+            "group": "Mic2",
             "hidden": false,
             "tasktype": 1,
             "item": "Sensitivity w/o blocking",
@@ -51,7 +80,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_w/o_blocking"
         }
         ,{
             "group": "Misc",
@@ -68,7 +97,21 @@
             "sfc_name": null
         }
         ,{
-            "group": "Mic2",
+            "group": "Mic3",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Play tone",
+            "script": "task_mic_block_test",
+            "args": ["play_tone"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "mic_block_play_tone"
+        }
+        ,{
+            "group": "Mic4",
             "hidden": false,
             "tasktype": 1,
             "item": "Sensitivity with blocking",
@@ -79,7 +122,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_with_blocking"
         }
         ,{
             "group": "Mic Test Result",
@@ -87,13 +130,13 @@
             "tasktype": 1,
             "item": "Sensitivity Test Result",
             "script": "task_mic_block_test",
-            "args": ["Sensitivity_calculate"],
+            "args": ["calculate_sensitivity"],
             "auto": true,
             "min": null,
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_test_result"
         }
     ]
 }
