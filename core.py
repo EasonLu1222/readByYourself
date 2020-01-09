@@ -745,7 +745,8 @@ class Task(QThread):
             if func == 'write_wifi_bt_mac':
                 dynamic_info = fetch_addr()
             if func == 'write_country_code':
-                dynamic_info = 'CN01'
+                #  dynamic_info = 'CN01'
+                dynamic_info = 'US988'
 
             for dut_idx in self.window.dut_selected:
                 proc = self.runeach(row_idx, dut_idx, dynamic_info)
