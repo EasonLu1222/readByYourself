@@ -1,7 +1,7 @@
 {"header":
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
- "sfc_station_id": null,
+ "sfc_station_id": "MS",
  "speaker_com": "COM12",
  "devices": {
     "dut": {
@@ -41,6 +41,20 @@
  "test_items":
     [
         {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "read_pid"
+        },
+        {
             "group": "Mic1",
             "hidden": false,
             "tasktype": 1,
@@ -52,7 +66,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "mic_play_tone"
         }
         ,{
             "group": "Mic2",
@@ -66,7 +80,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_w/o_blocking"
         }
         ,{
             "group": "Misc",
@@ -94,7 +108,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "mic_block_play_tone"
         }
         ,{
             "group": "Mic4",
@@ -108,7 +122,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_with_blocking"
         }
         ,{
             "group": "Mic Test Result",
@@ -122,7 +136,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "sensitivity_test_result"
         }
     ]
 }
