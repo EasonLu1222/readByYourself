@@ -1,9 +1,9 @@
 """
 This is a helper program to zip and upload local folder to FTP server.
 Usage:
-    python upload_folder.py LOCAL_DIR REMOTE_DIR
+    python upload_folder.py ZIP_NAME LOCAL_DIR REMOTE_DIR
 
-    e.g.: python upload_folder.py "C:\QC_Log_Files" "Belkin109/Station11_AcousticListen"
+    e.g.: python upload_folder.py klippel "C:\QC_Log_Files" "Belkin109/Station11_AcousticListen"
 """
 import os
 import argparse
