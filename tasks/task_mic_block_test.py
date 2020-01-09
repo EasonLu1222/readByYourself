@@ -44,6 +44,7 @@ def play_tone():
     jsonfile = f'jsonfile/{json_name}.json'
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     com = json_obj["speaker_com"]
+    logger.debug(f"{PADDING}speaker_com: {com}")
     try:
         lines = run(com, f"aplay /usr/share/1000hz_8s.wav")
         result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'

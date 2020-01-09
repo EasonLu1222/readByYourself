@@ -2,7 +2,7 @@
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
  "sfc_station_id": null,
- "speaker_com": "COM38",
+ "speaker_com": "COM12",
  "devices": {
     "dut": {
         "name": "ftdi",
