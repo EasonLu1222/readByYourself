@@ -12,14 +12,14 @@ PADDING = ' ' * 8
 # SFC_HOST = 'http://10.228.14.99:7109'   # debug
 SFC_HOST = 'http://10.228.16.99:7109'  # production
 
-# TODO: Add mic block api
 endpoint_dict = {
     'SA': 'add_data_sa',
     'WP': 'add_data_wpc',
     'AU': 'add_data_audio',
     'PS': 'add_data_PowerSensor',
     'RF': 'add_data_RF',
-    'AC': 'add_data_Acoustic'
+    'AC': 'add_data_Acoustic',
+    'MS': 'add_data_MicBlock'
 }
 
 
