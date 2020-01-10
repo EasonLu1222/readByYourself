@@ -62,6 +62,10 @@ STATIONS = [
         "station": "BTMacFix",
         "file_prefix": "StationXX_BTMacFixDownload",
     },
+    {
+        "station": "MicBlock",
+        "file_prefix": "Station13_MicBlock",
+    },
 ]
 
 
