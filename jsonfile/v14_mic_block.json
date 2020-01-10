@@ -27,6 +27,10 @@
             "args": ["win", "task"]
          },
          {
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
+         },
+         {
             "action": "is_adb_ok",
             "args": ["win", "task"]
          },
