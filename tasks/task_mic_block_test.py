@@ -127,6 +127,7 @@ def mic_test(portname):
 
 
 def calculate_sensitivity():
+    rtn = ""
     now = datetime.now().strftime('%Y%m%d')
     dir_path = f"./wav/experiment_{now}"
     try:
@@ -141,24 +142,26 @@ def calculate_sensitivity():
 
     os.remove(f'{dir_path}/test_result.txt')
 
-    channel_0_diff = float(mic_channel[0]) - float(mic_block_channel[0])
-    channel_1_diff = float(mic_channel[1]) - float(mic_block_channel[1])
+    channel_r_diff = float(mic_channel[0]) - float(mic_block_channel[0])
+    channel_l_diff = float(mic_channel[1]) - float(mic_block_channel[1])
 
     logger.info(f"mic_channel[0]: {mic_channel[0]}")
     logger.info(f"mic_channel[1]: {mic_channel[1]}")
     logger.info(f"mic_block_channel[0]: {mic_block_channel[0]}")
     logger.info(f"mic_block_channel[1]: {mic_block_channel[1]}")
-    logger.info(f"channel_0_diff: {abs(channel_0_diff)}")
-    logger.info(f"channel_1_diff: {abs(channel_1_diff)}")
+    logger.info(f"channel_0_diff: {channel_r_diff}")
+    logger.info(f"channel_1_diff: {channel_l_diff}")
 
-    if abs(channel_0_diff) >= 20 and abs(channel_1_diff) >= 20:
-        return "Pass"
-    elif abs(channel_0_diff) < 20 and abs(channel_1_diff) < 20:
-        return 'Fail(Left and Right)'
-    elif abs(channel_0_diff) < 20:
-        return 'Fail(Right)'
+    if channel_r_diff >= 20 and channel_l_diff >= 20:
+        rtn = "Pass"
     else:
-        return 'Fail(Left)'
+        rtn = "Fail"
+
+    channel_r_diff_fmt = "%.3f" % channel_r_diff    # Round the float to 3 decimal places and convert it to str
+    channel_l_diff_fmt = "%.3f" % channel_l_diff    # e.g. 3.1415926 -> "3.142"
+    rtn += f"(R:{channel_r_diff_fmt}, L:{channel_l_diff_fmt})"
+
+    return rtn
 
 
 if __name__ == "__main__":
