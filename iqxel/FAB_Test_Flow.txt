@@ -780,9 +780,9 @@ WIFI_11AC:
 	TX_MULTI_VERIFICATION
 		#Input Parameters:
 		>ARRAY_HANDLING_METHOD [Integer]  = 0 
-		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5180 
+		>BSS_FREQ_MHZ_PRIMARY [Integer]  = 5500
 		>BSS_FREQ_MHZ_SECONDARY [Integer]  = 0 
-		>CH_FREQ_MHZ [Integer]  = 5180 
+		>CH_FREQ_MHZ [Integer]  = 5500
 		>CH_FREQ_MHZ_PRIMARY_20MHz [Integer]  = 0 
 		>ENABLE_EVM [Integer]  = 1 
 		>ENABLE_MASK [Integer]  = 1 

@@ -237,7 +237,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "TX_MULTI_VERIFICATION  5180 MCS7 HT_MF BW-20 TX1",
+            "item": "TX_MULTI_VERIFICATION  5500 MCS7 HT_MF BW-20 TX1",
             "script": null,
             "args": null,
             "auto": true,
