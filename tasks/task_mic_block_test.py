@@ -148,17 +148,17 @@ def calculate_sensitivity():
     logger.info(f"mic_channel[1]: {mic_channel[1]}")
     logger.info(f"mic_block_channel[0]: {mic_block_channel[0]}")
     logger.info(f"mic_block_channel[1]: {mic_block_channel[1]}")
-    logger.info(f"channel_0_diff: {channel_0_diff}")
-    logger.info(f"channel_1_diff: {channel_1_diff}")
+    logger.info(f"channel_0_diff: {abs(channel_0_diff)}")
+    logger.info(f"channel_1_diff: {abs(channel_1_diff)}")
 
-    if channel_0_diff >= 20 and channel_1_diff >= 20:
+    if abs(channel_0_diff) >= 20 and abs(channel_1_diff) >= 20:
         return "Pass"
-    elif channel_0_diff < 20 and channel_1_diff < 20:
-        return 'Fail(channel 0 and channel 1)'
-    elif channel_0_diff < 20:
-        return 'Fail(channel 0)'
+    elif abs(channel_0_diff) < 20 and abs(channel_1_diff) < 20:
+        return 'Fail(Left and Right)'
+    elif abs(channel_0_diff) < 20:
+        return 'Fail(Right)'
     else:
-        return 'Fail(channel 1)'
+        return 'Fail(Left)'
 
 
 if __name__ == "__main__":
