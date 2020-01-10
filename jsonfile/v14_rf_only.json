@@ -671,7 +671,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "RX_LE  2440 1LE",
+            "item": "RX_LE  2442 1LE",
             "script": null,
             "args": null,
             "auto": true,
