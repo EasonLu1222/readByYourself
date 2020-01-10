@@ -657,7 +657,7 @@
             "group": "RF",
             "hidden": false,
             "tasktype": 11,
-            "item": "RX_EDR  2441 2DH1",
+            "item": "RX_EDR  2439 2DH1",
             "script": null,
             "args": null,
             "auto": true,

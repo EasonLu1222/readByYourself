@@ -2761,7 +2761,7 @@ BT:
 	RX_EDR
 		#Input Parameters:
 		>ENABLE_RX_LEVEL2_TEST [Integer]  = 0 
-		>FREQ_MHZ [Integer]  = 2441 
+		>FREQ_MHZ [Integer]  = 2439
 		>PACKET_LENGTH [Integer]  = 0 
 		>TIMEOUT [Integer]  = 10 
 		>CABLE_LOSS_DB [Double]  = 0.00 
