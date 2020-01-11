@@ -84,7 +84,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "sensitivity_w/o_blocking"
+            "sfc_name": "sensitivity_w_o_blocking"
         }
         ,{
             "group": "Misc",
