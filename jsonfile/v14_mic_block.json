@@ -120,7 +120,7 @@
             "tasktype": 1,
             "item": "Sensitivity with blocking",
             "script": "task_mic_block_test",
-            "args": ["mic_test"],
+            "args": ["mic_test_block"],
             "auto": true,
             "min": null,
             "expect": null,
