@@ -7,6 +7,7 @@ import re
 import pickle
 import pandas as pd
 import pyautogui as pag
+import fix_qt_import_error
 from datetime import datetime
 from operator import itemgetter
 from pathlib import Path

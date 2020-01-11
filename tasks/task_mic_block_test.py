@@ -40,6 +40,10 @@ def run(portname, cmd):
 
 
 def play_tone():
+    with Serial(portname, baudrate=115200, timeout=0.2) as ser:
+        # simulate press enter & ignore all the garbage
+        issue_command(ser, '', False)
+
     json_name = station_json['MicBlock']
     jsonfile = f'jsonfile/{json_name}.json'
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
@@ -126,6 +130,33 @@ def mic_test(portname):
         return result
 
 
+def mic_test_block(portname):
+        # parser = argparse.ArgumentParser()
+        # parser.add_argument('ports', help='serial com port names', type=str)
+        # parser.add_argument('filename', help='filename', type=str)
+        # args = parser.parse_args()
+        save_path = f'/usr/share/mic_block_record.wav'
+
+        dir = make_experiment_dir()
+
+        duration = 5
+        turn_off_gva()
+        rtn = record_sound(save_path, duration)
+
+        if rtn == 1:
+            time.sleep(duration + 1)
+            pull_result(save_path, dir)
+            cmd = 'rm /usr/share/mic_block_record.wav'
+            run(portname, cmd)
+            wav_path = f'{dir}/mic_block_record.wav'
+            get_dbfs(wav_path, dir)
+            result = 'Pass'
+            return result
+        if rtn == 0:
+            result = 'Fail(mic is muted)'
+            return result
+
+
 def calculate_sensitivity():
     rtn = ""
     now = datetime.now().strftime('%Y%m%d')
@@ -145,12 +176,12 @@ def calculate_sensitivity():
     channel_r_diff = float(mic_channel[0]) - float(mic_block_channel[0])
     channel_l_diff = float(mic_channel[1]) - float(mic_block_channel[1])
 
-    logger.info(f"mic_channel[0]: {mic_channel[0]}")
-    logger.info(f"mic_channel[1]: {mic_channel[1]}")
-    logger.info(f"mic_block_channel[0]: {mic_block_channel[0]}")
-    logger.info(f"mic_block_channel[1]: {mic_block_channel[1]}")
-    logger.info(f"channel_0_diff: {channel_r_diff}")
-    logger.info(f"channel_1_diff: {channel_l_diff}")
+    logger.info(f"mic_channel_left: {mic_channel[1]}")
+    logger.info(f"mic_channel_right: {mic_channel[0]}")
+    logger.info(f"mic_block_channel_left: {mic_block_channel[1]}")
+    logger.info(f"mic_block_channel_right: {mic_block_channel[0]}")
+    logger.info(f"channel_left_diff: {channel_l_diff}")
+    logger.info(f"channel_right_diff: {channel_r_diff}")
 
     if channel_r_diff >= 20 and channel_l_diff >= 20:
         rtn = "Pass"
@@ -159,7 +190,7 @@ def calculate_sensitivity():
 
     channel_r_diff_fmt = "%.3f" % channel_r_diff    # Round the float to 3 decimal places and convert it to str
     channel_l_diff_fmt = "%.3f" % channel_l_diff    # e.g. 3.1415926 -> "3.142"
-    rtn += f"(R:{channel_r_diff_fmt}, L:{channel_l_diff_fmt})"
+    rtn += f"(L:{channel_l_diff_fmt}, R:{channel_r_diff_fmt})"
 
     return rtn
 
