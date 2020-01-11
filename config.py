@@ -16,25 +16,24 @@ station_json = {
     'SIMULATION': 'v14_simu',
 
     # --- SMT ---
-    'MainBoard': 'v14_mb',                  # pyinstaller exe  tested on clean windows
-    'LED': 'v14_led',                       # pyinstaller exe  tested on clean windows
-    'CapTouch': 'v14_cap_touch',            # pyinstaller exe  tested on clean windows
+    'MainBoard': 'v14_mb',
+    'LED': 'v14_led',
+    'CapTouch': 'v14_cap_touch',
     'CapTouchMic': 'v14_cap_touch_mic',
 
     # --- FATP ---
     'RF': 'v14_rf',
-    'Audio': 'v14_audio',
-    'AudioPath': 'v14_audio_path',
     'AudioListen': 'v14_audio_listener',
     'Leak': 'v14_leak',
-    'WPC': 'v14_wpc',                       # pyinstaller exe  tested on clean windows
-    'PowerSensor': 'v14_power_sensor',      # pyinstaller exe  tested on clean windows
-    'SA': 'v14_sa',                         # pyinstaller exe  tested on clean windows
-    'Acoustic': 'v14_acoustic',
+    'WPC': 'v14_wpc',
+    'PowerSensor': 'v14_power_sensor',
+    'SA': 'v14_sa',
+    'MicBlock': 'v14_mic_block',
+    #  'Acoustic': 'v14_acoustic',
     'AcousticListen': 'v14_acoustic_listener_klippel_v1_5',
+
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download',
-    'MicBlock': 'v14_mic_block',
 }
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']

@@ -38,8 +38,6 @@ from actions import (
 # for prepares
 from iqxel import prepare_for_testflow_files
 
-if STATION == 'Audio':
-    from soundcheck import soundcheck_init
 
 PADDING = ' ' * 2
 
