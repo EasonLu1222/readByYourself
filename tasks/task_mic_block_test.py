@@ -40,6 +40,10 @@ def run(portname, cmd):
 
 
 def play_tone():
+    with Serial(portname, baudrate=115200, timeout=0.2) as ser:
+        # simulate press enter & ignore all the garbage
+        issue_command(ser, '', False)
+
     json_name = station_json['MicBlock']
     jsonfile = f'jsonfile/{json_name}.json'
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
