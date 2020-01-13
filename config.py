@@ -21,6 +21,9 @@ station_json = {
     'CapTouch': 'v14_cap_touch',
     'CapTouchMic': 'v14_cap_touch_mic',
 
+    # --- IQC ---
+    'MainBoardIqc': 'v14_mb_iqc',
+
     # --- FATP ---
     'RF': 'v14_rf',
     'AudioListen': 'v14_audio_listener',

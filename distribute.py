@@ -17,6 +17,10 @@ class Distribute:
                 "file_prefix": "Station02_MainBoard",
             },
             {
+                "station": "MainBoardIqc",
+                "file_prefix": "Station01_MainBoardIqc",
+            },
+            {
                 "station": "CapTouchMic",
                 "file_prefix": "Station03_SwBoard",
             },
