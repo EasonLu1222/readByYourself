@@ -40,15 +40,14 @@ def run(portname, cmd):
 
 
 def play_tone():
-    with Serial(portname, baudrate=115200, timeout=0.2) as ser:
-        # simulate press enter & ignore all the garbage
-        issue_command(ser, '', False)
-
     json_name = station_json['MicBlock']
     jsonfile = f'jsonfile/{json_name}.json'
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     com = json_obj["speaker_com"]
     logger.debug(f"{PADDING}speaker_com: {com}")
+    with Serial(com, baudrate=115200, timeout=0.2) as ser:
+        # simulate press enter & ignore all the garbage
+        issue_command(ser, '')
     try:
         lines = run(com, f"aplay /usr/share/1000hz_8s.wav")
         result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
@@ -190,7 +189,7 @@ def calculate_sensitivity():
 
     channel_r_diff_fmt = "%.3f" % channel_r_diff    # Round the float to 3 decimal places and convert it to str
     channel_l_diff_fmt = "%.3f" % channel_l_diff    # e.g. 3.1415926 -> "3.142"
-    rtn += f"(L:{channel_l_diff_fmt}, R:{channel_r_diff_fmt})"
+    rtn += f"(L:{channel_l_diff_fmt}, R:{channel_r_diff_fmt} dBFS)"
 
     return rtn
 
