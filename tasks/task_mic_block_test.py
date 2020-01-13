@@ -103,6 +103,8 @@ def get_dbfs(wav_path, dir_path):
 
 
 def mic_test(portname):
+    now = datetime.now().strftime('%Y%m%d')
+    dir_path = f"./wav/experiment_{now}"
     # parser = argparse.ArgumentParser()
     # parser.add_argument('ports', help='serial com port names', type=str)
     # parser.add_argument('filename', help='filename', type=str)
@@ -124,7 +126,7 @@ def mic_test(portname):
         get_dbfs(wav_path, dir)
         with open(f'{dir_path}/test_result.txt', "r") as f:
             line = f.readlines()[0]
-            mic_r, mic_l = line.split(",")
+            mic_r, mic_l = [float(e) for e in line.split(",")]
         result = f'Pass(L:{mic_l:.3f}, R:{mic_r:.3f})'
         return result
     if rtn == 0:
@@ -133,33 +135,35 @@ def mic_test(portname):
 
 
 def mic_test_block(portname):
-        # parser = argparse.ArgumentParser()
-        # parser.add_argument('ports', help='serial com port names', type=str)
-        # parser.add_argument('filename', help='filename', type=str)
-        # args = parser.parse_args()
-        save_path = f'/usr/share/mic_block_record.wav'
+    now = datetime.now().strftime('%Y%m%d')
+    dir_path = f"./wav/experiment_{now}"
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('ports', help='serial com port names', type=str)
+    # parser.add_argument('filename', help='filename', type=str)
+    # args = parser.parse_args()
+    save_path = f'/usr/share/mic_block_record.wav'
 
-        dir = make_experiment_dir()
+    dir = make_experiment_dir()
 
-        duration = 3
-        turn_off_gva()
-        rtn = record_sound(save_path, duration)
+    duration = 3
+    turn_off_gva()
+    rtn = record_sound(save_path, duration)
 
-        if rtn == 1:
-            time.sleep(duration + 1)
-            pull_result(save_path, dir)
-            cmd = 'rm /usr/share/mic_block_record.wav'
-            run(portname, cmd)
-            wav_path = f'{dir}/mic_block_record.wav'
-            get_dbfs(wav_path, dir)
-            with open(f'{dir_path}/test_result.txt', "r") as f:
-                line = f.readlines()[1]
-                mic_r, mic_l = line.split(",")
-            result = f'Pass(L:{mic_l:.3f}, R:{mic_r:.3f})'
-            return result
-        if rtn == 0:
-            result = 'Fail(mic is muted)'
-            return result
+    if rtn == 1:
+        time.sleep(duration + 1)
+        pull_result(save_path, dir)
+        cmd = 'rm /usr/share/mic_block_record.wav'
+        run(portname, cmd)
+        wav_path = f'{dir}/mic_block_record.wav'
+        get_dbfs(wav_path, dir)
+        with open(f'{dir_path}/test_result.txt', "r") as f:
+            line = f.readlines()[1]
+            mic_r, mic_l = [float(e) for e in line.split(",")]
+        result = f'Pass(L:{mic_l:.3f}, R:{mic_r:.3f})'
+        return result
+    if rtn == 0:
+        result = 'Fail(mic is muted)'
+        return result
 
 
 def calculate_sensitivity():

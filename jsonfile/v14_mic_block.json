@@ -83,7 +83,7 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null,
+            "unit": "dBFS",
             "sfc_name": "sensitivity_w_o_blocking"
         }
         ,{
@@ -125,7 +125,7 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null,
+            "unit": "dBFS",
             "sfc_name": "sensitivity_with_blocking"
         }
         ,{
