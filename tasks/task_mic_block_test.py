@@ -111,7 +111,7 @@ def mic_test(portname):
 
     dir = make_experiment_dir()
 
-    duration = 5
+    duration = 3
     turn_off_gva()
     rtn = record_sound(save_path, duration)
 
@@ -138,7 +138,7 @@ def mic_test_block(portname):
 
         dir = make_experiment_dir()
 
-        duration = 5
+        duration = 3
         turn_off_gva()
         rtn = record_sound(save_path, duration)
 
