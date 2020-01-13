@@ -49,7 +49,7 @@ def play_tone():
         # simulate press enter & ignore all the garbage
         issue_command(ser, '')
     try:
-        lines = run(com, f"aplay /usr/share/1000hz_8s.wav")
+        lines = run(com, f"aplay /usr/share/1000hz_4s.wav")
         result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
     except SerialException:
         result = 'Fail(bad serial port)'
