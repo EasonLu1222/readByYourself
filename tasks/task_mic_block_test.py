@@ -189,7 +189,7 @@ def calculate_sensitivity():
 
     channel_r_diff_fmt = "%.3f" % channel_r_diff    # Round the float to 3 decimal places and convert it to str
     channel_l_diff_fmt = "%.3f" % channel_l_diff    # e.g. 3.1415926 -> "3.142"
-    rtn += f"(L:{channel_l_diff_fmt}, R:{channel_r_diff_fmt} dBFS)"
+    rtn += f"(L:{channel_l_diff_fmt}, R:{channel_r_diff_fmt})"
 
     return rtn
 

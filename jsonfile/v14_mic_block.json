@@ -139,7 +139,7 @@
             "min": null,
             "expect": null,
             "max": null,
-            "unit": null,
+            "unit": "dBFS",
             "sfc_name": "sensitivity_test_result"
         }
     ]
