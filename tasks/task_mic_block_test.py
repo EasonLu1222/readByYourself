@@ -122,7 +122,10 @@ def mic_test(portname):
         run(portname, cmd)
         wav_path = f'{dir}/mic_record.wav'
         get_dbfs(wav_path, dir)
-        result = 'Pass'
+        with open(f'{dir_path}/test_result.txt', "r") as f:
+            line = f.readlines()[0]
+            mic_r, mic_l = line.split(",")
+        result = f'Pass(L:{mic_l:.3f}, R:{mic_r:.3f})'
         return result
     if rtn == 0:
         result = 'Fail(mic is muted)'
@@ -149,7 +152,10 @@ def mic_test_block(portname):
             run(portname, cmd)
             wav_path = f'{dir}/mic_block_record.wav'
             get_dbfs(wav_path, dir)
-            result = 'Pass'
+            with open(f'{dir_path}/test_result.txt', "r") as f:
+                line = f.readlines()[1]
+                mic_r, mic_l = line.split(",")
+            result = f'Pass(L:{mic_l:.3f}, R:{mic_r:.3f})'
             return result
         if rtn == 0:
             result = 'Fail(mic is muted)'
