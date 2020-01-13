@@ -127,6 +127,9 @@ def press_ctrl_c(window, ser_timeout=0.2):
 
 
 def disable_power_check(win):
+    # TODO: Should do it the opposite way. That is, to make "disable_power_check" the default behavior,
+    #  and usd "enable_power_check" in MainBoard station instead. That way, a lot of disable_power_check
+    #  in jsonfile can be removed.
     win.power_recieved = True
     return True
 
