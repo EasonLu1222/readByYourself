@@ -450,6 +450,7 @@ class Task(QThread):
     show_task_dialog = QSignal(list)
     trigger_snk = QSignal(str)
     trigger_klippel = QSignal(str)
+    trigger_usbburntool = QSignal(str)
 
     def __init__(self, json_name, json_root='jsonfile'):
         super(Task, self).__init__()
@@ -960,6 +961,16 @@ class Task(QThread):
             'output': output
         })
         self.df.iloc[r1:r2, c1:c2] = output
+        self.task_result.emit(result)
+
+    def run_task30(self, group, items):
+        row, next_item = items[0]['index'], items[0]
+        msg = next_item['args']
+        self.trigger_usbburntool.emit(msg)
+        result = json.dumps({
+            'index': [row, row + len(items)],
+            'output': [['Pass'] * len(self.window.dut_selected)],
+        })
         self.task_result.emit(result)
 
     def run(self):

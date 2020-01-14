@@ -105,7 +105,8 @@ def wait_for_prompt(serial, prompt, thread_timeout=25, printline=True):
         try:
             line = serial.readline().decode('utf-8').rstrip('\n')
             # TODO: Change "logger.debug" to "print" after all stations are stable
-            if line and printline: logger.debug(f'{PADDING}{line}')
+            logger.info(f'{PADDING}{line}')
+            #  if line and printline: logger.debug(f'{PADDING}{line}')
         except UnicodeDecodeError as ex: # ignore to proceed
             logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
             continue
@@ -158,7 +159,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
         'aml_dai_set_bclk_ratio',
         'Initializing random number generator',
         'asoc-aml-card auge_sound: tdm playback enable',
-        'axg_s420_v1#',
+        'axg_s420_v1_gva#',
         'hci0 is up',
     ]
     wait_for_prompt(serial, waitwords[waitwordidx], printline=printline)

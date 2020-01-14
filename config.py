@@ -36,7 +36,7 @@ station_json = {
     'AcousticListen': 'v14_acoustic_listener_klippel_v1_5',
 
     'BTMacFix': 'v14_btmacfix',
-    'Download': 'v14_download',
+    'Download': 'v14_download_sfc',
 }
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']

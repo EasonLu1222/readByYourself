@@ -229,6 +229,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.version_checker.version_checked.connect(self.handle_update)
         self.can_download = False
         self.download_state_check()
+        self.my = pag.getActiveWindow()
 
     def download_state_check(self):
         logger.info('download_state_check')
@@ -594,6 +595,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.adb_ok.connect(self.adb_ok)
         self.task.trigger_snk.connect(self.soundcheck_handle)
         self.task.trigger_klippel.connect(self.klippel_handle)
+        self.task.trigger_usbburntool.connect(self.usbburntool_handle)
 
     def soundcheck_handle(self, message):
         wins = pag.getWindowsWithTitle('soundcheck')
@@ -622,6 +624,22 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         pag.press('enter')
         win.minimize()
         my.activate()
+
+    def usbburntool_handle(self, message):
+        print('usb_burning_tool start/stop')
+        win = pag.getWindowsWithTitle('USB_Burning_Tool')[0]
+        #  my = pag.getActiveWindow()
+        win.maximize()
+        win.activate()
+        time.sleep(1)
+        pag.click(1220, 90) # press start/stop button
+
+        if message=='start':
+            print('usb_burning_tool start')
+        elif message == 'stop':
+            print('usb_burning_tool stop')
+            self.my.activate()
+        time.sleep(1)
 
     def serial_ok(self, ok):
         if ok:

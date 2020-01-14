@@ -263,6 +263,22 @@ def reboot_and_enter_dl_mode(portname):
     return 'Pass'
 
 
+def sap109_downlaod(portname):
+    lines = [
+        'reboot mode: normal',
+        '[EFUSE_MSG]keynum',
+        'BULKcmd[key is_burned secure_boot_set]',
+        '[info]success:key[secure_boot_set] was  burned',
+        'BULKcmd[burn_complete 3]',
+        '[MSG]Pls un-plug USB line to poweroff',
+    ]
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        logger.info('usb_burning_tool downloading...')
+        for line in lines:
+            wait_for_prompt(ser, line)
+    return 'Pass'
+
+
 # TODO: This function should be removed when all DUTs with incorrect mac_bt are fixed at SA station
 def fix_mac_bt(portname):
     """
