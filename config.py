@@ -37,6 +37,7 @@ station_json = {
 
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download_sfc',
+    'UsidFix': 'v14_usid_fix',
 }
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']
