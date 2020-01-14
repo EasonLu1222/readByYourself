@@ -61,13 +61,17 @@ class Distribute:
                 "file_prefix": "Station12_Download",
             },
             {
+                "station": "MicBlock",
+                "file_prefix": "Station13_MicBlock",
+            },
+            {
                 "station": "BTMacFix",
                 "file_prefix": "StationXX_BTMacFixDownload",
             },
             {
-                "station": "MicBlock",
-                "file_prefix": "Station13_MicBlock",
-            },
+                "station": "UsidFix",
+                "file_prefix": "StationXX_UsidFix",
+            }
         ]
         if stations:
             self.STATION = [e for e in STATIONS if e['station'] in stations]

@@ -36,6 +36,7 @@ station_json = {
     'AcousticListen': 'v14_acoustic_listener_klippel_v1_5',
 
     'BTMacFix': 'v14_btmacfix',
+    'UsidFix': 'v14_usid_fix',
     'Download': 'v14_download',
 }
 STATION = json.loads(open('jsonfile/station.json', 'r').\
