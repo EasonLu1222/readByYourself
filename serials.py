@@ -159,7 +159,7 @@ def enter_factory_image_prompt(serial, waitwordidx=2, press_enter=True, printlin
         'aml_dai_set_bclk_ratio',
         'Initializing random number generator',
         'asoc-aml-card auge_sound: tdm playback enable',
-        'axg_s420_v1_gva#',
+        'axg_s420_v1',
         'hci0 is up',
     ]
     wait_for_prompt(serial, waitwords[waitwordidx], printline=printline)

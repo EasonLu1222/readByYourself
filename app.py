@@ -628,11 +628,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def usbburntool_handle(self, message):
         print('usb_burning_tool start/stop')
         win = pag.getWindowsWithTitle('USB_Burning_Tool')[0]
-        #  my = pag.getActiveWindow()
         win.maximize()
         win.activate()
         time.sleep(1)
-        pag.click(1220, 90) # press start/stop button
+        pag.click(1065, 95) # press start/stop button
 
         if message=='start':
             print('usb_burning_tool start')

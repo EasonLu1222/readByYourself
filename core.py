@@ -966,11 +966,17 @@ class Task(QThread):
     def run_task30(self, group, items):
         row, next_item = items[0]['index'], items[0]
         msg = next_item['args']
+        output = [['Pass'] * len(self.window.dut_selected)]
+        r1, r2 = row, row + len(items)
+        c1 = len(self.header()) + self.window.dut_selected[0]
+        c2 = c1 + len(self.window.dut_selected)
+
         self.trigger_usbburntool.emit(msg)
         result = json.dumps({
             'index': [row, row + len(items)],
-            'output': [['Pass'] * len(self.window.dut_selected)],
+            'output': output,
         })
+        self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
 
     def run(self):

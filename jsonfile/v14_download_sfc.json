@@ -5,8 +5,8 @@
  "devices": {
     "dut": {
         "name": "ftdi",
-        "num": 1,
-        "sn": ["AQ000SHLA"]
+        "num": 2,
+        "sn": ["AQ0011SBA", "AQ000SHLA"]
     }
  },
  "appearance": {
