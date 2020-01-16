@@ -192,7 +192,7 @@ def calculate_sensitivity():
     logger.info(f"channel_left_diff: {channel_l_diff}")
     logger.info(f"channel_right_diff: {channel_r_diff}")
 
-    if channel_r_diff >= 25 and channel_l_diff >= 25:
+    if channel_r_diff >= 20 and channel_l_diff >= 20:
         rtn = "Pass"
     else:
         rtn = "Fail"
