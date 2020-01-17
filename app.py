@@ -933,7 +933,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
 
-        if STATION in ["WPC", 'AcousticListen']:
+        if STATION in ["WPC", 'AcousticListen', 'Leak']:
             pass
         else:
             infoBox = QMessageBox()  #Message Box that doesn't run

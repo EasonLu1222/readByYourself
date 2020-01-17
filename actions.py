@@ -29,7 +29,7 @@ def set_appearance(win):
 def set_acoustic_appearance(win):
     #  flags = win.windowFlags()
     #  flags &= ~Qt.FramelessWindowHint & ~Qt.WindowMaximizeButtonHint
-    flags = Qt.WindowCloseButtonHint 
+    flags = Qt.WindowCloseButtonHint
     win.setWindowFlags(flags)
     win.container.setVisible(False)
     win.horizontalLayout_3.addWidget(win.pushButton)
@@ -55,17 +55,22 @@ def wait_for_leak_result(win):
 
     prompt = '):'
     prompt_ok='(OK)'
-    while win.pushButton2.isChecked():
+    while True:
         portname = win.comports()[0]
-        #  logger.debug(portname)
+        #  logger.debug(por
         with get_serial(portname, 9600, timeout=0.2) as ser:
             line = ''
             try:
-                line = ser.readline().decode('utf-8').rstrip('\n')
+                line0 = ser.readline()
+                logger.debug(line0)
+                line = line0.decode('utf-8').rstrip('\n')
+                #line = ser.readline().decode('utf-8').rstrip('\n')
                 if line: logger.debug(f'{PADDING}{line}')
             except UnicodeDecodeError as ex: # ignore to proceed
                 logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
-                continue
+                leak_result = f'Fail(UnicodeDecodeError)'
+                with open('leak_result', 'w') as f:
+                    f.write(leak_result)
 
             if prompt in line:
                 logger.info(f'{PADDING}get %s' % prompt)

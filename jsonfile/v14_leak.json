@@ -14,13 +14,8 @@
      "columns_width": [1, 1, 1, 1, 1, 300, 300, 90, 90, 90, 90, 1, 300]
  },
  "behaviors": {
-     "barcode-scan": false,
-     "firsts": [
-         {
-             "first": "set_appearance",
-             "args": ["win"]
-         }
-     ],
+     "barcode-scan": true,
+     "firsts": [],
      "actions": [
          {
             "action": "disable_power_check",
@@ -32,12 +27,7 @@
          }
      ],
      "prepares": [],
-     "afters": [
-         {
-             "after": "wait_and_window_click_run",
-             "args": ["win"]
-         }
-     ]
+     "afters": []
  },
  "test_items":
     [
