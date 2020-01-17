@@ -268,7 +268,6 @@ def sap109_downlaod(portname):
         'reboot mode: normal',
         '[EFUSE_MSG]keynum',
         'BULKcmd[key is_burned secure_boot_set]',
-        '[info]success:key[secure_boot_set] was  burned',
         'BULKcmd[burn_complete 3]',
         '[MSG]Pls un-plug USB line to poweroff',
     ]
