@@ -75,12 +75,14 @@ def wait_for_leak_result(win):
             if prompt in line:
                 logger.info(f'{PADDING}get %s' % prompt)
                 index=line.find('):')
+                leak_value = line[index + 2:-2].strip()
                 if prompt_ok in line:
-                    leak_result = f'Pass({line[index+2:-2]})'
+
+                    leak_result = f'Pass({leak_value})'
                     with open(resource_path('leak_result'), 'w') as f:
                      f.write(leak_result)
                 else:
-                    leak_result = f'Fail({line[index+2:-2]})'
+                    leak_result = f'Fail({leak_value})'
                     with open(resource_path('leak_result'), 'w') as f:
                      f.write(leak_result)
 
