@@ -69,7 +69,7 @@ def wait_for_leak_result(win):
             except UnicodeDecodeError as ex: # ignore to proceed
                 logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
                 leak_result = f'Fail(UnicodeDecodeError)'
-                with open('leak_result', 'w') as f:
+                with open(resource_path('leak_result'), 'w') as f:
                     f.write(leak_result)
 
             if prompt in line:
