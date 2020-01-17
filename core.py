@@ -25,7 +25,7 @@ from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from db.sqlite import fetch_addr
-from parse_klippel import parse_dvt1_v1_5, parse_dvt2_v1_7
+from parse_klippel import parse_pvt_v1_7
 
 from actions import (
     disable_power_check, set_power_simu, dummy_com,
@@ -403,8 +403,8 @@ class FileEventHandler(RegexMatchingEventHandler):
             #  df = parse_dvt2_v1_3(event.src_path)
         elif KLIPPEL_PROJECT == 'SAP109-v1.5-DVT2-191214':
             df = parse_dvt2_v1_5(event.src_path)
-        elif KLIPPEL_PROJECT == 'SAP109 - v1.7 - PVT - 200118':
-            df = parse_dvt2_v1_7(event.src_path)
+        elif KLIPPEL_PROJECT == 'SAP109 - v1.7 - PVT - 200108':
+            df = parse_pvt_v1_7(event.src_path)
 
         results = df.values[-1].tolist()
         results = [{1:'Pass', 0:'Fail'}[e] for e in results]
@@ -941,7 +941,7 @@ class Task(QThread):
         week = int(now.strftime('%W')) + 1   #47
         x1 = now.strftime('%Y%m%d') #20191121
         x2 = now.strftime('%Y-%m-%d') #20191121
-        path = f'{workdir}\{year}\CW{week}\{x1}'
+        path = f'{workdir}\{year}\CW{week:02d}\{x1}'
 
         if not os.path.exists(path):
             os.makedirs(path)

@@ -54,7 +54,8 @@ LANG_LIST = [
 # =============== Acoustic Station ===============
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
-KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
+# KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
+KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
 
 
 # =============== Acoustic Station ===============
