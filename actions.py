@@ -72,11 +72,11 @@ def wait_for_leak_result(win):
                 index=line.find('):')
                 if prompt_ok in line:
                     leak_result = f'Pass({line[index+2:-2]})'
-                    with open('leak_result', 'w') as f:
+                    with open(resource_path('leak_result'), 'w') as f:
                      f.write(leak_result)
                 else:
                     leak_result = f'Fail({line[index+2:-2]})'
-                    with open('leak_result', 'w') as f:
+                    with open(resource_path('leak_result'), 'w') as f:
                      f.write(leak_result)
 
                 return True
