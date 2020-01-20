@@ -17,7 +17,7 @@ from serials import issue_command, get_serial, wait_for_prompt, enter_factory_im
 #  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
-from db.sqlite import write_addr, is_pid_used
+from db.sqlite import write_addr, is_pid_used, clean_tmp_flag
 
 SERIAL_TIMEOUT = 0.8
 PADDING = ' ' * 8
@@ -186,7 +186,7 @@ def write_wifi_bt_mac(dynamic_info):
     mac_wifi_addr = mac_list[0]
     mac_bt_addr = mac_list[1].replace(":", "")
     if mac_wifi_addr == "" or mac_bt_addr == "":
-        return 'Fail(mac_wifi_addr or mac_wifi_addr not available)'
+        return 'Fail(mac_wifi_addr or mac_bt_addr not available)'
     logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
     with get_serial(portname, 115200, timeout=1.2) as ser:
         # Read product ID
@@ -245,6 +245,7 @@ def write_wifi_bt_mac(dynamic_info):
         # Mark the mac_wifi and mac_bt have been used by pid
         try:
             write_addr(mac_wifi_addr, pid)
+            clean_tmp_flag()
         except Exception as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
             return "Fail(failed to write product ID to DB)"

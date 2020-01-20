@@ -744,13 +744,13 @@ class Task(QThread):
                     procs[port] = proc
         else:
             func = next_item['args'][0]
-            if func == 'write_wifi_bt_mac':
-                dynamic_info = fetch_addr()
             if func == 'write_country_code':
                 #  dynamic_info = 'CN01'
                 dynamic_info = 'US988'
 
             for dut_idx in self.window.dut_selected:
+                if func == 'write_wifi_bt_mac':
+                    dynamic_info = fetch_addr()
                 proc = self.runeach(row_idx, dut_idx, dynamic_info)
                 port = self.window.comports()[dut_idx]
                 procs[port] = proc

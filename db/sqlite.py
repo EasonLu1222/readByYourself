@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sqlite3
+from datetime import datetime
 from sqlite3 import IntegrityError, OperationalError
 from mylogger import logger
 
@@ -85,6 +86,12 @@ def fetch_addr():
 
         cursor = c.execute("SELECT ADDRESS_WIFI, ADDRESS_BT from ADDRESS where SN is null")
         result = cursor.fetchone()
+        if result:
+            mac_wifi = result[0]
+            logger.info(mac_wifi)
+            now = datetime.now().timestamp()
+            c.execute(f'UPDATE ADDRESS set SN = "tmp_{now}" where ADDRESS_WIFI="{mac_wifi}"')
+            conn.commit()
     except OperationalError as ex:
         logger.error(f"{PADDING}Error: {ex}")
 
@@ -119,6 +126,14 @@ def is_pid_used(pid):
     conn.close()
 
     return count[0] > 0
+
+
+def clean_tmp_flag():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    cursor = c.execute("UPDATE ADDRESS set sn = null where sn like 'tmp%'")
+    conn.commit()
+    conn.close()
 
 
 def first_run():
