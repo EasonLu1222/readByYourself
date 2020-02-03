@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './ui/main.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(817, 509)
+        MainWindow.resize(823, 509)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("")
         self.centralwidget.setObjectName("centralwidget")
@@ -24,7 +24,6 @@ class Ui_MainWindow(object):
         self.container.setStyleSheet("QWidget#container{background-color:#FFFFFF}")
         self.container.setObjectName("container")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.container)
-        self.horizontalLayout_4.setContentsMargins(12, 12, 12, 12)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
@@ -35,6 +34,19 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.cCodeSelectMenu = QtWidgets.QComboBox(self.container)
+        self.cCodeSelectMenu.setMinimumSize(QtCore.QSize(110, 0))
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        font.setPointSize(14)
+        self.cCodeSelectMenu.setFont(font)
+        self.cCodeSelectMenu.setStyleSheet("")
+        self.cCodeSelectMenu.setObjectName("cCodeSelectMenu")
+        self.cCodeSelectMenu.addItem("")
+        self.cCodeSelectMenu.addItem("")
+        self.cCodeSelectMenu.addItem("")
+        self.cCodeSelectMenu.addItem("")
+        self.horizontalLayout_2.addWidget(self.cCodeSelectMenu)
         self.langSelectMenu = QtWidgets.QComboBox(self.container)
         self.langSelectMenu.setMinimumSize(QtCore.QSize(110, 0))
         font = QtGui.QFont()
@@ -93,7 +105,7 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.pushButton.setFont(font)
         self.pushButton.setAutoFillBackground(False)
-        #  self.pushButton.setStyleSheet("padding:10px")
+        self.pushButton.setStyleSheet("padding:10px")
         self.pushButton.setObjectName("pushButton")
         self.verticalLayout.addWidget(self.pushButton)
         self.horizontalLayout_4.addLayout(self.verticalLayout)
@@ -109,6 +121,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.cCodeSelectMenu.setItemText(0, _translate("MainWindow", "US"))
+        self.cCodeSelectMenu.setItemText(1, _translate("MainWindow", "CA"))
+        self.cCodeSelectMenu.setItemText(2, _translate("MainWindow", "EU"))
+        self.cCodeSelectMenu.setItemText(3, _translate("MainWindow", "ETC"))
         self.langSelectMenu.setItemText(0, _translate("MainWindow", "en_US"))
         self.langSelectMenu.setItemText(1, _translate("MainWindow", "zh_TW"))
         self.langSelectMenu.setItemText(2, _translate("MainWindow", "zh_CN"))

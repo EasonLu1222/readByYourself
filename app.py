@@ -102,6 +102,7 @@ class MySettings():
         for i in range(1, self.dut_num+1):
             setattr(self, f'is_fx{i}_checked',
                 self.get(f'fixture_{i}', False, bool))
+        self.ccode_index =  self.get('ccode_index', 0, int)
         self.lang_index = self.get('lang_index', 0, int)
         self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
 
@@ -149,6 +150,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.settings = MySettings(dut_num=self.task.dut_num)
         self.make_checkboxes()
 
+        self.cCodeSelectMenu.setCurrentIndex(self.settings.ccode_index)
         self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
         self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
 
@@ -210,6 +212,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.power_process = {}
         self.power_results = {}
 
+        self.on_ccode_changed(self.settings.ccode_index)
         self.on_lang_changed(self.settings.lang_index)
 
         self.col_dut_start = len(self.task.header())
@@ -580,6 +583,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         for i, b in enumerate(self.checkboxes, 1):
             chk_box_state_changed = lambda state, i=i: self.chk_box_fx_state_changed(state, i)
             b.stateChanged.connect(chk_box_state_changed)
+        self.cCodeSelectMenu.currentIndexChanged.connect(self.on_ccode_changed)
         self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
         self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
         self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
@@ -907,6 +911,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.splitter.show()
         else:
             self.splitter.hide()
+
+    def on_ccode_changed(self, index):
+        self.settings.set("ccode_index", index)
 
     def on_lang_changed(self, index):
         """

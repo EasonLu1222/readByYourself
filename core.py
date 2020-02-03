@@ -21,7 +21,7 @@ from utils import resource_path, get_env, python_path, s_
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
-                    VISA_DEVICE_NAME, STATION, KLIPPEL_PROJECT)
+                    VISA_DEVICE_NAME, STATION, KLIPPEL_PROJECT, COUNTRY_CODE)
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
 from db.sqlite import fetch_addr
@@ -745,8 +745,8 @@ class Task(QThread):
         else:
             func = next_item['args'][0]
             if func == 'write_country_code':
-                #  dynamic_info = 'CN01'
-                dynamic_info = 'US988'
+                #  dynamic_info = 'US988'
+                dynamic_info = COUNTRY_CODE[self.window.settings.ccode_index]
 
             for dut_idx in self.window.dut_selected:
                 if func == 'write_wifi_bt_mac':
