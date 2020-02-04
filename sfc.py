@@ -19,7 +19,8 @@ endpoint_dict = {
     'PS': 'add_data_PowerSensor',
     'RF': 'add_data_RF',
     'AC': 'add_data_Acoustic',
-    'MS': 'add_data_MicBlock'
+    'MS': 'add_data_MicBlock',
+    'LK': 'add_data_Leak'
 }
 
 
