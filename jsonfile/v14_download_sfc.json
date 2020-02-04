@@ -1,7 +1,7 @@
 {"header":
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
- "sfc_station_id": null,
+ "sfc_station_id": "DL",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -75,7 +75,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "enter_dl_mode"
         }
         ,{
             "group": "Press Start",
@@ -89,7 +89,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "press_start"
         }
         ,{
             "group": "Downloading",
@@ -103,7 +103,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "download"
         }
         ,{
             "group": "Press Stop",
@@ -117,7 +117,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": null
+            "sfc_name": "press_stop"
         }
     ]
 }
