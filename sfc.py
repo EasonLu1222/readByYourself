@@ -68,15 +68,15 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
 
     try:
         logger.info(f"{PADDING}Requesting {url} with data:{post_data}")
-        r = requests.post(url=url, data=post_data)
+        r = requests.post(url=url, data=post_data, timeout=1)
         if r.status_code != 200:
             logger.error(f"{PADDING}The status code is{r.status_code}")
         else:
             logger.info(f"{PADDING}SFC response: {r.text}")
     except ConnectTimeout:
-        logger.error(f"{PADDING}Connection timeout")
+        logger.error(f"{PADDING}SFC server connection timeout")
     except ConnectionError:
-        logger.error(f"{PADDING}Connection error")
+        logger.error(f"{PADDING}SFC server connection error")
     except Exception as ex:
         logger.error(f"{PADDING}SFC request error: {ex}")
 
