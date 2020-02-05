@@ -43,7 +43,7 @@
             "expect": null,
             "max": null,
             "unit": null,
-            "sfc_name": "result"
+            "sfc_name": null
         }
     ]
 }
