@@ -46,9 +46,13 @@ STATION = json.loads(open('jsonfile/station.json', 'r').\
 # TODO: fill in real ccode mapping
 COUNTRY_CODE = [
     'US988',    # US
-    '',         # CA
-    '',         # AU/NZ
-    ''          # ETC
+    'CA2',      # Canada
+    'E02',      # EU
+    'GB996',    # UK
+    'AU6',      # ANZ
+    'IL14',     # MEA
+    'RU13',     # Russia
+    'QA0'       # Qatar
 ]
 
 # =============== Language ===============
