@@ -164,10 +164,8 @@ def write_usid(dynamic_info):
                 f'echo usid > /sys/class/unifykeys/name',
                 f'echo {usid} > /sys/class/unifykeys/write',
             ]
-            for cmd in cmds:
-                logger.info(f'{PADDING}cmd: {cmd}')
-                issue_command(ser, cmd, False)
-
+            issue_command(ser, ';'.join(cmds), False)
+            issue_command(ser, 'echo usid > /sys/class/unifykeys/name', False)
             cmd = "cat /sys/class/unifykeys/read"
             lines = issue_command(ser, cmd)
             result = f'Pass' if any(re.search(usid, e)
