@@ -273,4 +273,3 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--ports', help='serial com port names', type=str)
     args = parser.parse_args()
     ports = args.ports.split(',')
-    check_which_port_when_poweron(ports)
