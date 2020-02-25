@@ -184,6 +184,7 @@ def write_wifi_bt_mac(dynamic_info):
     mac_wifi_addr = mac_list[0]
     mac_bt_addr = mac_list[1].replace(":", "")
     if mac_wifi_addr == "" or mac_bt_addr == "":
+        clean_tmp_flag()
         return 'Fail(mac_wifi_addr or mac_bt_addr not available)'
     logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
     with get_serial(portname, 115200, timeout=1.2) as ser:
@@ -201,12 +202,14 @@ def write_wifi_bt_mac(dynamic_info):
             response = lines[-1]
         except IndexError as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
+            clean_tmp_flag()
             return "Fail(no respond when querying product ID)"
 
         logger.debug(f'{PADDING}response: {response}')
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
         matches = re.search(regex, response)
         if not matches:
+            clean_tmp_flag()
             return "Fail(no pid found)"
         else:
             pid = matches.group()
@@ -214,6 +217,7 @@ def write_wifi_bt_mac(dynamic_info):
 
         # Check if pid is in db
         if is_pid_used(pid):
+            clean_tmp_flag()
             return "Pass(pid exists in db)"
 
         # Write wifi_mac
@@ -226,6 +230,7 @@ def write_wifi_bt_mac(dynamic_info):
         lines = issue_command(ser, cmd)
         is_wifi_mac_written = any(re.match(mac_wifi_addr, e) for e in lines)
         if not is_wifi_mac_written:
+            clean_tmp_flag()
             return "Fail(failed to write wifi_mac to DUT)"
 
         # Write bt_mac
@@ -238,6 +243,7 @@ def write_wifi_bt_mac(dynamic_info):
         lines = issue_command(ser, cmd)
         is_bt_mac_written = any(re.match(mac_bt_addr, e) for e in lines)
         if not is_bt_mac_written:
+            clean_tmp_flag()
             return "Fail(failed to write bt_mac to DUT)"
 
         # Mark the mac_wifi and mac_bt have been used by pid
