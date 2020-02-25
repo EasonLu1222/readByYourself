@@ -13,7 +13,7 @@ class BarcodeRe(Enum):
     """
     MSN = r"^\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}$"
     ASN = r'^\w{14}$'
-    WPC = r"^[\w|\d]{6}\d[\w|\d]{2}\:wqw[\w|\d]{5}$"
+    WPC = r"^[\w|\d]{6}\d[\w|\d]{2}\w[\w|\d]{5}$"
 
 
 class BarcodeDialog(QDialog, Ui_BarcodeDialog):
