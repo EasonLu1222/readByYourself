@@ -48,11 +48,7 @@ COUNTRY_CODE = [
     'US988',    # US
     'CA2',      # Canada
     'E02',      # EU
-    'GB996',    # UK
     'AU6',      # ANZ
-    'IL14',     # MEA
-    'RU13',     # Russia
-    'QA0'       # Qatar
 ]
 
 # =============== Language ===============
