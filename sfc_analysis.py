@@ -3,7 +3,7 @@ import glob
 from ftplib import FTP
 import pandas as pd
 
-pd.set_option('display.max_colwidth', 30)
+pd.set_option('display.max_colwidth', 20)
 pd.set_option('display.max_columns', 25)
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.width', 1000)
@@ -26,7 +26,7 @@ stations_cols = {
     'WPC': ['pid', 'result', 'failed', 't0', 't1', 'sta_id', 'eff'],
     'SA': [
         'pid', 'result', 'failed', 't0', 't1', 'sta_id', 'read_pid', 'load_led',
-        'led', 'unload_led', 'captouch', 'wifibt', 'ccode'
+        'led', 'unload_led', 'fdr', 'captouch', 'wifibt', 'ccode'
     ],
     'PowerSensor': [
         'pid', 'result', 'failed', 't0', 't1', 'sta_id', 'read_pid', '1n-a',
@@ -94,7 +94,7 @@ def fails(df, col):
 
 
 if __name__ == "__main__":
-    station = 'RF'
+    station = 'SA'
     downloads_path = f'{stations_downloads[station]}'
     df = combine(downloads_path, station)
 
