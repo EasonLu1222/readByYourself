@@ -47,7 +47,7 @@ STATION = json.loads(open('jsonfile/station.json', 'r').\
 COUNTRY_CODE = [
     'US988',    # US
     'CA2',      # Canada
-    'E02',      # EU
+    'DE30',      # EU
     'AU6',      # ANZ
 ]
 
