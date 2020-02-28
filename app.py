@@ -178,7 +178,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             layout = QHBoxLayout(c)
             self.hboxPorts.addWidget(c)
             self.dut_layout.append(layout)
-        self.set_layout_visible(self.hboxPorts, self.settings.is_eng_mode_on)
 
         self.setsignal()
 
@@ -906,7 +905,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.splitter.hide()
             self.cCodeSelectMenu.hide()
-        self.set_layout_visible(self.hboxPorts, is_on)
 
     def on_ccode_changed(self, index):
         self.settings.set("ccode_index", index)
