@@ -900,7 +900,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if not isinstance(status, bool):
                 self.pwd_dialog.show()
             self.splitter.show()
-            if STATION == 'SA':
+            if STATION == 'Download':
                 self.cCodeSelectMenu.show()
         else:
             self.splitter.hide()

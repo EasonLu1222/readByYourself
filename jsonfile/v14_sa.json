@@ -133,19 +133,5 @@
             "unit": "Bool",
             "sfc_name": "wifi_bt_mac"
         }
-        ,{
-            "group": "Write Country Code",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "write country_code",
-            "script": "task_runeach",
-            "args": ["write_country_code"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool",
-            "sfc_name": "write_country_code"
-        }
     ]
 }

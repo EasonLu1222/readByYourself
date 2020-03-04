@@ -50,6 +50,20 @@
             "sfc_name": "read_pid"
         }
         ,{
+            "group": "Write Country Code",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write country_code",
+            "script": "task_runeach",
+            "args": ["write_country_code"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": "write_country_code"
+        }
+        ,{
             "group": "Reboot",
             "hidden": false,
             "tasktype": 1,
