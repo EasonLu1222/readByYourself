@@ -195,8 +195,7 @@ def write_wifi_bt_mac(dynamic_info):
             'cat /sys/class/unifykeys/read'
         ])
         logger.debug(f'{PADDING}cmd: {cmd}')
-        issue_command(ser, cmd)
-        lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+        lines = issue_command(ser, cmd)
         logger.debug(f'{PADDING}{lines}')
         try:
             response = lines[-1]

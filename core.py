@@ -925,6 +925,33 @@ class Task(QThread):
         self.wait_for_next = False
         self.task_result.emit(result)
 
+    def run_task13(self, group, items):
+        row_idx, next_item = items[0]['index'], items[0]
+        procs = {}  # {port: process}
+        for j, dut_idx in enumerate(self.window.dut_selected):
+            pid = self.window.barcodes[j]
+
+            proc = self.runeach(row_idx, dut_idx, dynamic_info = f"{self.sfc_station_id},{pid}")
+            port = self.window.comports()[dut_idx]
+            procs[port] = proc
+
+        logger.debug(f'{PADDING}procs {procs}')
+
+        for j, (port, proc) in enumerate(procs.items()):
+            output, _ = proc.communicate()
+            logger.critical(output)
+            output = output.decode('utf8')
+            msg2 = '[task %s][output: %s]' % (row_idx, output)
+            self.printterm_msg.emit(msg2)
+            result = json.dumps({
+                'index': row_idx,
+                'port': port,
+                'output': output
+            })
+            self.df.iat[row_idx, len(self.header()) + self.window.dut_selected[j]] = output
+            self.task_result.emit(result)
+
+
     def run_task20(self, group, items):
         from datetime import datetime
         now = datetime.now()

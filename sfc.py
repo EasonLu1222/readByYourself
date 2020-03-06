@@ -12,16 +12,28 @@ PADDING = ' ' * 8
 # SFC_HOST = 'http://10.228.14.99:7109'   # debug
 SFC_HOST = 'http://10.228.16.99:7109'  # production
 
-endpoint_dict = {
-    'SA': 'add_data_sa',
-    'WP': 'add_data_wpc',
-    'AU': 'add_data_audio',
-    'PS': 'add_data_PowerSensor',
+UPLOAD_ENDPOINT_DICT = {
     'RF': 'add_data_RF',
-    'AC': 'add_data_Acoustic',
-    'MS': 'add_data_MicBlock',
+    'AU': 'add_data_audio',
+    'WP': 'add_data_wpc',
     'LK': 'add_data_Leak',
+    'PS': 'add_data_PowerSensor',
+    'SA': 'add_data_sa',
+    'MS': 'add_data_MicBlock',
+    'AC': 'add_data_Acoustic',
     'DL': 'add_data_download'
+}
+
+CHECK_ENDPOINT_DICT = {
+    'RF': 'add_check_RF',
+    'AU': 'add_check_audio',
+    'WP': 'add_check_wpc',
+    'LK': 'add_check_Leak',
+    'PS': 'add_check_PowerSensor',
+    'SA': 'add_check_Sa',
+    'MS': 'add_check_Micblock',
+    'AC': 'add_check_Acoustic',
+    'DL': 'add_check_download'
 }
 
 
@@ -63,7 +75,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         if isinstance(post_data[k], str) and re.match(r'Pass|Fail', post_data[k], re.I):
             post_data[k] = post_data[k][:4]
 
-    endpoint = endpoint_dict[post_data['station_id'][:2]]
+    endpoint = UPLOAD_ENDPOINT_DICT[post_data['station_id'][:2]]
     url = f"{SFC_HOST}/{endpoint}.asp"
 
     try:
