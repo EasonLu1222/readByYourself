@@ -3,7 +3,7 @@ import glob
 from ftplib import FTP
 import pandas as pd
 
-pd.set_option('display.max_colwidth', 20)
+pd.set_option('display.max_colwidth', 30)
 pd.set_option('display.max_columns', 25)
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.width', 1000)
@@ -33,6 +33,13 @@ stations_cols = {
         '1n-b', '1ac-a', '1ac-b', '2n-a', '2n-b', '2ac-a', '2ac-b'
     ]
 }
+stations_col_drop = {
+    'RF': [],
+    'Audio': [],
+    'WPC': [],
+    'SA': ['t1', 'load_led', 'led', 'unload_led', 'fdr', 'captouch'],
+    'PowerSensor': [],
+}
 
 
 def combine(downloads_path, station):
@@ -59,53 +66,93 @@ def combine(downloads_path, station):
     return df
 
 
-def failed(df, col=None, exclude_no_pid=True):
-    col = col if col else 'result'
-    ff = df[df[col].str.startswith('F')]
-    if exclude_no_pid:
-        ff = ff[ff.pid!='0']
-    return ff
+
+class FailureAnalysis():
+    def __init__(self, df, station):
+        self.station = station
+        self.df = df
+
+    def failed(self, col=None, exclude_no_pid=True):
+        col = col if col else 'result'
+        ff = self.df[self.df[col].str.startswith('F')]
+        if exclude_no_pid:
+            ff = ff[ff.pid!='0']
+        fff = ff.drop(columns=stations_col_drop[self.station])
+        return fff
+
+    def summary(self):
+        dfd = self.df.drop_duplicates('pid')
+        columns = dfd.columns.values.tolist()
+        dfd = dfd.drop(['result', 't1'], axis=1)
+        columns.remove('t1')
+        lumped = pd.DataFrame(self.df.groupby('pid')['result'].sum())
+        lumped = lumped.reset_index('pid')
+        s = pd.merge(dfd, lumped)[columns]
+        # exclude no pid case
+        result = s[s.pid!='0']
+        return result
 
 
-def summary(df, has_pid=True):
-    dfd = df.drop_duplicates('pid')
-    columns = dfd.columns.values.tolist()
-    dfd = dfd.drop(['result', 't1'], axis=1)
-    if has_pid:
-        dfd = dfd.drop('read_pid', axis=1)
-        columns.remove('read_pid')
-    columns.remove('t1')
-
-    lumped = pd.DataFrame(df.groupby('pid')['result'].sum())
-    lumped = lumped.reset_index('pid')
-
-    failed = df.groupby('pid').failed.agg(lambda x: '--'.join(x))
-
-    s = pd.merge(dfd, lumped)[columns]
-
-    # exclude no pid case
-    result = s[s.pid!='0']
-    return result
-
-
-def fails(df, col):
-    #  df.loc[230,'failed'].split(',')
-    return df.loc[col, 'failed'].split(',')
-
-
-if __name__ == "__main__":
+def sa_fa():
     station = 'SA'
     downloads_path = f'{stations_downloads[station]}'
     df = combine(downloads_path, station)
 
-    has_pid = station not in ['WPC']
-    s = summary(df, has_pid=has_pid)
-    if has_pid:
-        # failed from no pid cases
-        fr = failed(df, 'read_pid', exclude_no_pid=False)
+    # 分析read_pid failed項目
+    f_readpid = failed(df, 'read_pid', exclude_no_pid=False)
+
+    # 分析mac wifibt failed項目
+    f_macaddr = failed(df, 'wifibt', exclude_no_pid=False)
 
     # failed summary
-    fs = s[s.result.str.endswith('F')]
+    f_summary = summary(df)
+    fs = f_summary[f_summary.result.str.endswith('F')]
 
     # individual failed cases
     f0 = failed(df)
+
+    return f_summary, fs, f0, f_readpid, f_macaddr
+
+
+def SA_FA(sa):
+    sa.df.fdr = sa.df.fdr.fillna('')
+    sa.df.wifibt = sa.df.wifibt.fillna('Fail(NaN)')
+
+    # 分析read_pid failed項目
+    f_readpid = sa.failed('read_pid', exclude_no_pid=False).reset_index(drop=True)
+
+    # 分析mac wifibt failed項目
+    x = sa.failed('wifibt', exclude_no_pid=False)
+    xx = x.sort_values(['t0', 'pid']).reset_index(drop=True).reset_index()
+    f_macaddr = xx.set_index(keys=['pid', 'index'])
+
+    # failed summary
+    f_summary = sa.summary()
+
+    # AAB failed summary
+    y = f_summary[f_summary.result.str.endswith('F')]
+    fs = (df[df['pid'].isin(y.pid)].sort_values(['t0', 'pid'])
+          .reset_index(drop=True).reset_index()
+          .set_index(['pid', 'index']))
+
+    # not very useful
+    f0 = sa.failed()
+
+    return fs, f_readpid, f_macaddr, f_summary
+
+
+if __name__ == "__main__":
+
+    writer = pd.ExcelWriter('SA_Analysis.xlsx', engine='xlsxwriter')
+
+    station = 'SA'
+    downloads_path = f'{stations_downloads[station]}'
+    df = combine(downloads_path, station)
+    sa = FailureAnalysis(df, station)
+
+    fs, fr, fm, ss = SA_FA(sa)
+
+    fs.to_excel(writer, sheet_name='summary')
+    fr.to_excel(writer, sheet_name='read_pid failure')
+    fm.to_excel(writer, sheet_name='mac_write failure')
+    writer.save()

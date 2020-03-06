@@ -69,7 +69,7 @@ class MyFtp():
         '''
             target_path must be in absolute path format
         '''
-        interval = 0.05
+        interval = 0.01
         try:
             self.ftp.cwd(ftp_path)
             self.mkdir_p(target_path)
@@ -92,17 +92,22 @@ class MyFtp():
             except ftplib.error_perm:
                 # this is for file download
                 des = f'{target_path}/{file}'
-                print(f'download file: {file}', end='')
-                self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
-                print(f' ---> downloaded')
-        self.ftp.cwd('../')
+
+                if not os.path.isfile(des):
+                    print(f'download file: {file}', end='')
+                    self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
+                    print(f' ---> downloaded')
+                else:
+                    print(f'{des} already downloaded.')
+            self.ftp.cwd('../')
         return
 
 
 if __name__ == "__main__":
 
 
-    station_to_download = ['RF', 'Audio', 'WPC', 'SA', 'PowerSensor']
+    #  station_to_download = ['RF', 'Audio', 'WPC', 'SA', 'PowerSensor']
+    station_to_download = ['SA']
 
     ftp = MyFtp()
     ftp_paths = [f'/Belkin109/{STATIONS[sta]}' for sta in station_to_download]
