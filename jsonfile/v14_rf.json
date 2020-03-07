@@ -106,7 +106,21 @@
             "max": null,
             "unit": null,
             "sfc_name": "read_pid"
-        },      
+        },
+        {
+            "group": "SFC",
+            "hidden": false,
+            "tasktype": 13,
+            "item": "Check if DUT passed in previous stations",
+            "script": "task_sfc",
+            "args": ["check_sfc"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
         {
             "group": "RF",
             "hidden": false,
