@@ -206,8 +206,16 @@ def write_wifi_bt_mac(dynamic_info):
 
         logger.debug(f'{PADDING}response: {response}')
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-        matches = re.search(regex, response)
-        if not matches:
+        no_pid_found = True
+        for l in lines:
+            matches = re.search(regex, l)
+            if matches:
+                pid = matches.group()
+                logger.debug(f'{PADDING}pid: {pid}')
+                no_pid_found = False
+                break
+
+        if no_pid_found:
             clean_tmp_flag()
             return "Fail(no pid found)"
         else:
