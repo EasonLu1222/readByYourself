@@ -144,6 +144,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.barcode_dialog = BarcodeDialog(self, STATION)
         self.barcodes = []
         self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
+        self.can_upload = {}    # E.g. {'1': False}, the key is dut_idx(0,1,...), value tells if this data should upload to SFC
 
         self.set_task(task)
         self.set_appearance()
@@ -807,7 +808,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     if sfc_station_id == 'MB':
                         gen_ks_sfc_csv(d, csv_filename=csv_filename, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA109-600-G', dut_i=dut_i, result=res)
                     else:
-                        send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
+                        if self.can_upload[dut_i]:
+                            send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
@@ -843,8 +845,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def btn_clicked(self):
         logger.debug('\n')
+        self.can_upload = {}
         self.barcodes = []
         for dut_i, port in self._comports_dut.items():
+            self.can_upload[dut_i] = True
             if port:
                 self.port_barcodes[port] = None
         if not any(self.get_checkboxes_status()):

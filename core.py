@@ -938,8 +938,9 @@ class Task(QThread):
         logger.debug(f'{PADDING}procs {procs}')
 
         for j, (port, proc) in enumerate(procs.items()):
+            dut_idx = self.window.dut_selected[j]
             output, _ = proc.communicate()
-            logger.critical(output)
+            logger.info(output)
             output = output.decode('utf8')
             msg2 = '[task %s][output: %s]' % (row_idx, output)
             self.printterm_msg.emit(msg2)
@@ -949,6 +950,9 @@ class Task(QThread):
                 'output': output
             })
             self.df.iat[row_idx, len(self.header()) + self.window.dut_selected[j]] = output
+
+            if output.startswith('Pass(1') or output.startswith('Fail'):
+                self.window.can_upload[dut_idx] = False
             self.task_result.emit(result)
 
 
