@@ -76,8 +76,8 @@
             "max": null,
             "unit": null,
             "sfc_name": null
-        }
-        ,{
+        },
+        {
             "group": "LED Test",
             "hidden": false,
             "tasktype": 3,
@@ -104,8 +104,8 @@
             "max": null,
             "unit": null,
             "sfc_name": "led"
-        }
-        ,{
+        },
+        {
             "group": "FDR Key Test",
             "hidden": false,
             "tasktype": 3,
@@ -118,8 +118,8 @@
             "max": null,
             "unit": null,
             "sfc_name": "fdr"
-        }
-        ,{
+        },
+        {
             "group": "Cap Touch Test",
             "hidden": false,
             "tasktype": 3,
@@ -132,8 +132,8 @@
             "max": null,
             "unit": null,
             "sfc_name": "captouch"
-        }
-        ,{
+        },
+        {
             "group": "Write Wifi and BT Mac",
             "hidden": false,
             "tasktype": 1,
@@ -146,6 +146,34 @@
             "max": null,
             "unit": "Bool",
             "sfc_name": "wifi_bt_mac"
+        },
+        {
+            "group": "Check Wi-Fi MAC",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["check_mac_wifi"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Check Bluetooth MAC",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["check_mac_bt"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
         }
     ]
 }

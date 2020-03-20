@@ -151,6 +151,60 @@ def check_usid(dynamic_info):
         return result
 
 
+def check_mac_wifi():
+    """
+    Check if Wi-Fi MAC address has the right format, and falls in the valid range
+
+    Returns: Pass/Fail
+
+    """
+    with get_serial(portname, 115200, timeout=0.4) as ser:
+
+        cmd = ";".join([
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_wifi > /sys/class/unifykeys/name',
+            f'cat /sys/class/unifykeys/read'
+        ])
+
+        lines = issue_command(ser, cmd)
+        regex = r"^c4:41:1e(?::[a-f|\d]{2}){3}"     #c4:41:1e:xx:xx:xx
+        result = 'Fail(empty or invalid mac_wifi)'
+        for l in lines:
+            matches = re.search(regex, l)
+            if matches:
+                result = 'Pass'
+                break
+
+        return result
+
+
+def check_mac_bt():
+    """
+    Check if Bluetooth MAC address has the right format, and falls in the valid range
+
+    Returns: Pass/Fail
+
+    """
+    with get_serial(portname, 115200, timeout=0.4) as ser:
+
+        cmd = ";".join([
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo mac_bt > /sys/class/unifykeys/name',
+            f'cat /sys/class/unifykeys/read'
+        ])
+
+        lines = issue_command(ser, cmd)
+        regex = r"^c4411e(?:[a-f|\d]{2}){3}"    # c4411exxxxxx
+        result = 'Fail(empty or invalid mac_bt)'
+        for l in lines:
+            matches = re.search(regex, l)
+            if matches:
+                result = 'Pass'
+                break
+
+        return result
+
+
 def write_usid(dynamic_info):
     usid = dynamic_info
     logger.info(f'{PADDING}write usid')
@@ -261,7 +315,6 @@ def write_wifi_bt_mac(dynamic_info):
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
             return "Fail(failed to write product ID to DB)"
 
-        #  return 'Pass'
         return f'Pass({mac_wifi_addr})'
 
 
