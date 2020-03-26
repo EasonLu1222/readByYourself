@@ -951,10 +951,9 @@ class Task(QThread):
             })
             self.df.iat[row_idx, len(self.header()) + self.window.dut_selected[j]] = output
 
-            if output.startswith('Pass(1') or output.startswith('Fail'):
+            if not output.startswith('Pass(0'):     # Do not upload data if SFC check fail
                 self.window.can_upload[dut_idx] = False
             self.task_result.emit(result)
-
 
     def run_task20(self, group, items):
         from datetime import datetime

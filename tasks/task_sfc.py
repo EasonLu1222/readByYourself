@@ -41,9 +41,7 @@ def check_sfc(portname, dut_idx, dynamic_info):
         r = requests.get(url, data=data, timeout=0.8)
         if r.status_code == 200:
             res = r.text
-            if res.startswith('0'):
-                rtn = 'Pass'
-            elif res.startswith('1-Pass'):
+            if res.startswith('0') or ('Pass Exist' in res):
                 rtn = f'Pass({res})'
             else:
                 rtn = f'Fail({res})'
