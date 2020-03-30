@@ -150,6 +150,60 @@ def check_usid(dynamic_info):
 
         return result
 
+def check_and_fix_usid(dynamic_info):
+    """
+    Check if the scanned usid matches the usid in unifykeys,
+    Args:
+        dynamic_info: Contains usid
+
+    Returns: Pass/Fail
+
+    """
+    need_fix = False
+    usid = dynamic_info
+    logger.info(f'{PADDING}check usid')
+    with get_serial(portname, 115200, timeout=0.4) as ser:
+
+        cmd = ";".join([
+            f'echo 1 > /sys/class/unifykeys/attach',
+            f'echo usid > /sys/class/unifykeys/name',
+            f'cat /sys/class/unifykeys/read'
+        ])
+
+        lines = issue_command(ser, cmd)
+        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+        result = 'Fail(no pid found)'
+        for l in lines:
+            matches = re.search(regex, l)
+            if matches:
+                matched_usid = matches.group()
+                logger.debug(f'{PADDING}scanned_usid: {usid}')
+                logger.debug(f'{PADDING}written_usid: {matched_usid}')
+                if matched_usid != usid:
+                    logger.debug(f'{PADDING}matched_usid: {matched_usid}')
+                    need_fix = True
+                    result = f'Fail(pid mismatch - {matched_usid})'
+                else:
+                    result = f'Pass(pid correct:{matched_usid})'
+                break
+
+        if need_fix:
+            result = 'Fail(fix pid failed)'
+            cmd = ";".join([
+                f'echo {usid} > /sys/class/unifykeys/write',
+                f'cat /sys/class/unifykeys/read'
+            ])
+            lines = issue_command(ser, cmd)
+            for l in lines:
+                matches = re.search(regex, l)
+                if matches:
+                    matched_usid = matches.group()
+                    logger.debug(f'{PADDING}written_usid: {matched_usid}')
+                    if matched_usid == usid:
+                        result = f'Pass(pid fixed:{matched_usid})'
+                    break
+
+        return result
 
 def check_mac_wifi():
     """
