@@ -26,8 +26,8 @@
             "args": ["win", "task"]
          }
          ,{
-            "action": "enter_prompt",
-            "args": ["win", 0.2, 10]
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
          }
      ],
      "prepares": [],
@@ -36,12 +36,12 @@
  "test_items":
     [
         {
-            "group": "Fix USID",
+            "group": "Check and Fix USID",
             "hidden": false,
             "tasktype": 1,
-            "item": "write usid",
+            "item": "check if the written mainboard id is the same with barcode, if not, fix it",
             "script": "task_runeach",
-            "args": ["write_usid"],
+            "args": ["check_and_fix_usid"],
             "auto": true,
             "min": null,
             "expect": "True",
