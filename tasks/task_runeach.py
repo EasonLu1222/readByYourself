@@ -767,7 +767,7 @@ def check_boot(portname):
             prompt = 'start fixing up free space'       # The system pause at this line about 11 seconds
             check_point_2 = check_stdout(ser, prompt, timeout=16)
             if check_point_2:
-                timeout = 32    # Timeout for first boot
+                timeout = 36    # Timeout for first boot
             else:
                 timeout = 12    # Timeout for non-first boot
             prompt = 'tee_user_mem_alloc:343: Allocate'     # The last line of a normal boot
