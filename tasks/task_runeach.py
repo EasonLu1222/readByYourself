@@ -13,6 +13,7 @@ import config
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 
 from subprocess import Popen, PIPE
+from datetime import datetime
 from serials import issue_command, get_serial, wait_for_prompt, enter_factory_image_prompt
 #  from view.loading_dialog import LoadingDialog
 from utils import resource_path
@@ -731,6 +732,49 @@ def read_leak_result(portname):
         result = f.readline()
     logger.debug(result)
     return result
+
+
+def check_stdout(ser, prompt, timeout=5):
+    rtn = False
+    start_time = datetime.now()
+    while True:
+        try:
+            line = ser.readline().decode('utf-8').rstrip('\n')
+            logger.info(f'{PADDING}{line}')
+        except UnicodeDecodeError as ex:  # ignore to proceed
+            logger.error(f'{PADDING}catch UnicodeDecodeError. ignore it: {ex}')
+            continue
+
+        now = datetime.now()
+        if prompt in line:
+            logger.info(f"found keyword: {prompt}")
+            rtn = True
+            break
+        elif (now - start_time).seconds > timeout:
+            rtn = False
+            break
+    return rtn
+
+
+def check_boot(portname):
+    rtn = 'Fail'
+
+    with get_serial(portname, 115200, timeout=0.8) as ser:
+        prompt = 'background thread "ubi_bgt'
+        check_point_1 = check_stdout(ser, prompt, timeout=60)
+        if check_point_1:   # Test if it's the first boot
+            prompt = 'start fixing up free space'       # The system pause at this line about 11 seconds
+            check_point_2 = check_stdout(ser, prompt, timeout=3)
+            if check_point_2:
+                timeout = 32    # Timeout for first boot
+            else:
+                timeout = 12    # Timeout for non-first boot
+            prompt = 'tee_user_mem_alloc:343: Allocate'     # The last line of a normal boot
+            check_point_3 = check_stdout(ser, prompt, timeout=timeout)
+            if check_point_3:
+                rtn = 'Pass'
+
+    return rtn
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
         self.total_barcode = -1
         if station == 'WPC':
             self.regex = BarcodeRe.WPC.value
-        elif station in ['AcousticListen', 'Leak']:
+        elif station in ['AcousticListen', 'Leak', 'BootCheck']:
             self.regex = BarcodeRe.ASN.value
         else:
             self.regex = BarcodeRe.MSN.value

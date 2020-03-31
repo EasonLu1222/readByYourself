@@ -34,6 +34,7 @@ station_json = {
     'MicBlock': 'v14_mic_block',
     #  'Acoustic': 'v14_acoustic',
     'AcousticListen': 'v14_acoustic_listener_klippel_v1_7',
+    'BootCheck': 'v14_boot_check',
 
     'BTMacFix': 'v14_btmacfix',
     'Download': 'v14_download_sfc',

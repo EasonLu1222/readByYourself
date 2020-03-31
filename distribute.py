@@ -65,6 +65,10 @@ class Distribute:
                 "file_prefix": "Station13_MicBlock",
             },
             {
+                "station": "BootCheck",
+                "file_prefix": "Station14_BootCheck",
+            },
+            {
                 "station": "BTMacFix",
                 "file_prefix": "StationXX_BTMacFixDownload",
             },
