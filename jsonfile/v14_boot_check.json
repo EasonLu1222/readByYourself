@@ -2,6 +2,7 @@
     ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
  "version": "14.0",
  "sfc_station_id": null,
+ "speaker_com": "COM44",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -43,6 +44,34 @@
             "expect": "True",
             "max": null,
             "unit": "Bool",
+            "sfc_name": null
+        },
+        {
+            "group": "Wake up test(1/2)",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "play OK Google",
+            "script": "task_runeach",
+            "args": ["play_ok_google"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": null
+        },
+        {
+            "group": "Wake up test(2/2)",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "mark wake test result",
+            "script": "task_boot_check",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
             "sfc_name": null
         }
     ]

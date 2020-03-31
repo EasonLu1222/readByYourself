@@ -19,6 +19,7 @@ from serials import issue_command, get_serial, wait_for_prompt, enter_factory_im
 from utils import resource_path
 from mylogger import logger
 from db.sqlite import write_addr, is_pid_used, clean_tmp_flag
+from config import station_json
 
 SERIAL_TIMEOUT = 0.8
 PADDING = ' ' * 8
@@ -734,7 +735,7 @@ def read_leak_result(portname):
     return result
 
 
-def check_stdout(ser, prompt, timeout=5):
+def check_stdout(ser, prompt, timeout=86400):
     rtn = False
     start_time = datetime.now()
     while True:
@@ -760,11 +761,11 @@ def check_boot(portname):
     rtn = 'Fail'
 
     with get_serial(portname, 115200, timeout=0.8) as ser:
-        prompt = 'background thread "ubi_bgt'
-        check_point_1 = check_stdout(ser, prompt, timeout=60)
+        prompt = 'sdio debug board detected'
+        check_point_1 = check_stdout(ser, prompt)
         if check_point_1:   # Test if it's the first boot
             prompt = 'start fixing up free space'       # The system pause at this line about 11 seconds
-            check_point_2 = check_stdout(ser, prompt, timeout=3)
+            check_point_2 = check_stdout(ser, prompt, timeout=16)
             if check_point_2:
                 timeout = 32    # Timeout for first boot
             else:
@@ -772,9 +773,40 @@ def check_boot(portname):
             prompt = 'tee_user_mem_alloc:343: Allocate'     # The last line of a normal boot
             check_point_3 = check_stdout(ser, prompt, timeout=timeout)
             if check_point_3:
-                rtn = 'Pass'
-
+                prompt = 'tee_user_mem_free:442: Free'
+                check_point_4 = check_stdout(ser, prompt, timeout=2)
+                if not check_point_4:
+                    rtn = 'Pass'
     return rtn
+
+
+def play_ok_google():
+    json_name = station_json['BootCheck']
+    jsonfile = f'jsonfile/{json_name}.json'
+    json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
+    portname = json_obj["speaker_com"]
+    logger.debug(f"{PADDING}speaker_com: {portname}")
+    try:
+        with get_serial(portname, baudrate=115200, timeout=0.2) as ser:
+            # simulate press enter & ignore all the garbage
+            issue_command(ser, '')
+            time.sleep(7)
+            try:
+                cmd = ";".join([
+                    'i2cset -f -y 0 0x4e 0x00 0x00',
+                    'i2cset -f -y 0 0x4e 0x3d 0x40',
+                    'i2cset -f -y 0 0x4e 0x3e 0x40',
+                    'aplay /usr/share/ok_google_female_chloe.wav'
+                ])
+                lines = issue_command(ser, cmd)
+                result = f'Fail(missing wav file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
+            except Exception as ex:
+                logger.error(f"{ex}")
+                result = 'Fail(issue_command error)'
+    except Exception as ex:
+        logger.error(f"{ex}")
+        result = 'Fail(bad serial port)'
+    return result
 
 
 if __name__ == "__main__":
