@@ -124,7 +124,7 @@ def check_usid(dynamic_info):
     """
     usid = dynamic_info
     logger.info(f'{PADDING}check usid')
-    with get_serial(portname, 115200, timeout=1) as ser:
+    with get_serial(portname, 115200, timeout=0.8) as ser:
 
         cmd = ";".join([
             f'echo 1 > /sys/class/unifykeys/attach',
