@@ -790,7 +790,7 @@ def play_ok_google():
         with get_serial(portname, baudrate=115200, timeout=0.2) as ser:
             # simulate press enter & ignore all the garbage
             issue_command(ser, '')
-            time.sleep(7)
+            time.sleep(5)
             try:
                 cmd = ";".join([
                     'i2cset -f -y 0 0x4e 0x00 0x00',
