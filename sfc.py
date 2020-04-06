@@ -21,7 +21,8 @@ UPLOAD_ENDPOINT_DICT = {
     'SA': 'add_data_sa',
     'MS': 'add_data_MicBlock',
     'AC': 'add_data_Acoustic',
-    'DL': 'add_data_download'
+    'DL': 'add_data_download',
+    'BC': 'add_data_boot'
 }
 
 CHECK_ENDPOINT_DICT = {
@@ -33,7 +34,8 @@ CHECK_ENDPOINT_DICT = {
     'SA': 'add_check_Sa',
     'MS': 'add_check_Micblock',
     'AC': 'add_check_Acoustic',
-    'DL': 'add_check_download'
+    'DL': 'add_check_download',
+    'BC': 'add_check_boot'
 }
 
 
