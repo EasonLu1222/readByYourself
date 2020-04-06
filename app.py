@@ -130,6 +130,7 @@ class Label(QLabel):
 class MyWindow(QMainWindow, Ui_MainWindow):
     show_animation_dialog = QSignal(bool)
     msg_dialog_signal = QSignal(str)
+    show_mac_address_signal = QSignal(int,int)
 
     def __init__(self, app, task, *args):
         super(QMainWindow, self).__init__(*args)
@@ -222,6 +223,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         self.show_animation_dialog.connect(self.toggle_loading_dialog)
         self.msg_dialog_signal.connect(self.show_message_dialog)
+        self.show_mac_address_signal.connect(self.show_mac_address_info)
         app.setOverrideCursor(Qt.ArrowCursor)
         self.render_port_plot()
         self.showMaximized()
@@ -657,6 +659,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         infoBox = QMessageBox()
         infoBox.setIcon(QMessageBox.Information)
         infoBox.setText(msg)
+        if STATION == 'SA':
+            infoBox.setWindowTitle("Warning")
         infoBox.exec_()
         if msg=='Press enter to continue':
             self.task.wait_for_next = False
@@ -987,6 +991,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.both_fx_not_checked_err = _translate(
             "MainWindow", "At least one of the fixture should be checked")
 
+    def show_mac_address_info(self, total_mac_address, remaining_mac_address):
+        if STATION == 'SA':
+            self.label.setVisible(True)
+            self.label_2.setVisible(True)
+            self.label.setText(f"Total mac addess : {total_mac_address}")
+            self.label_2.setText(f"Remaining mac addess : {remaining_mac_address}")
+        else:
+            self.label.setVisible(False)
+            self.label_2.setVisible(False)
 
 if __name__ == "__main__":
     version = ""

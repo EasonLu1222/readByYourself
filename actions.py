@@ -2,13 +2,16 @@ import os
 import re
 import time
 import threading
+import sqlite3
 from subprocess import Popen, PIPE
 from PyQt5.QtCore import QThread, Qt, QSize
 from PyQt5.QtWidgets import QHBoxLayout
 from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
 from utils import resource_path, get_env, python_path, run, move_mainwindow_centered
 from mylogger import logger
+from sqlite3 import OperationalError
 
+DB_PATH = 'C:\\db\\address.db'
 PADDING = ' ' * 4
 
 
@@ -198,6 +201,60 @@ def set_power(win):
     proc_listener.set_process(power_process)
     proc_listener.start()
     return True
+
+def remaining_addr_init(win):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        logger.info(f"{PADDING}Opened database successfully")
+
+        c.execute("SELECT COUNT(*) from ADDRESS")
+        conn.commit()
+        total_addr_count = c.fetchone()[0]
+        print(f"Total mac addess : {total_addr_count}")
+
+        c.execute("SELECT COUNT(*) from ADDRESS where SN is null")
+        conn.commit()
+        remaining_addr_count = c.fetchone()[0]
+        print(f"Remaining mac addess : {remaining_addr_count}")
+
+    except OperationalError as ex:
+        logger.error(f"{PADDING}Error: {ex}")
+    try:
+        conn.close()
+    except UnboundLocalError as ex:
+        logger.error(f"{PADDING}Error: failed to close connection, {ex}")
+
+    win.show_mac_address_signal.emit(total_addr_count, remaining_addr_count)
+
+
+def remaining_addr(win):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        logger.info(f"{PADDING}Opened database successfully")
+
+        c.execute("SELECT COUNT(*) from ADDRESS")
+        conn.commit()
+        total_addr_count = c.fetchone()[0]
+        print(f"Total mac addess : {total_addr_count}")
+
+        c.execute("SELECT COUNT(*) from ADDRESS where SN is null")
+        conn.commit()
+        remaining_addr_count = c.fetchone()[0]
+        print(f"Remaining mac addess : {remaining_addr_count}")
+
+    except OperationalError as ex:
+        logger.error(f"{PADDING}Error: {ex}")
+    try:
+        conn.close()
+    except UnboundLocalError as ex:
+        logger.error(f"{PADDING}Error: failed to close connection, {ex}")
+
+    win.show_mac_address_signal.emit(total_addr_count, remaining_addr_count)
+
+    if remaining_addr_count < 1000:
+        win.msg_dialog_signal.emit(f"Remaining mac addess : {remaining_addr_count} ,  less than 1000 !")
 
 
 # === STATION = SIMULATION ===

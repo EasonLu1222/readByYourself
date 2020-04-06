@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './ui/main.ui'
+# Form implementation generated from reading ui file 'main.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -69,6 +69,36 @@ class Ui_MainWindow(object):
         self.checkBoxEngMode.setFont(font)
         self.checkBoxEngMode.setObjectName("checkBoxEngMode")
         self.horizontalLayout_2.addWidget(self.checkBoxEngMode)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem1)
+        self.label = QtWidgets.QLabel(self.container)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setObjectName("label")
+        font = QtGui.QFont()
+        font.setFamily("Arial Narrow")
+        font.setPointSize(12)
+        self.label.setFont(font)
+        self.label.setVisible(False)
+        self.horizontalLayout_2.addWidget(self.label)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem2)
+        self.label_2 = QtWidgets.QLabel(self.container)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+        self.label_2.setSizePolicy(sizePolicy)
+        self.label_2.setObjectName("label_2")
+        font = QtGui.QFont()
+        font.setFamily("Arial Narrow")
+        font.setPointSize(12)
+        self.label_2.setFont(font)
+        self.label_2.setVisible(False)
+        self.horizontalLayout_2.addWidget(self.label_2)
         self.logo = QtWidgets.QLabel(self.container)
         self.logo.setMinimumSize(QtCore.QSize(100, 50))
         self.logo.setText("")
@@ -76,6 +106,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.logo)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.hboxPorts = QtWidgets.QHBoxLayout()
+        self.hboxPorts.setSpacing(6)
         self.hboxPorts.setObjectName("hboxPorts")
         self.verticalLayout.addLayout(self.hboxPorts)
         self.splitter_2 = QtWidgets.QSplitter(self.container)
@@ -131,5 +162,7 @@ class Ui_MainWindow(object):
         self.langSelectMenu.setItemText(2, _translate("MainWindow", "zh_CN"))
         self.langSelectMenu.setItemText(3, _translate("MainWindow", "vi"))
         self.checkBoxEngMode.setText(_translate("MainWindow", "Engineering mode"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt; font-weight:600;\">Total mac address :</span></p></body></html>"))
+        self.label_2.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt; font-weight:600;\">Remaining mac address :</span></p></body></html>"))
         self.pushButton.setText(_translate("MainWindow", "Run"))
 from view.myview import TableView

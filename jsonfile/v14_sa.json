@@ -15,7 +15,12 @@
  },
  "behaviors": {
      "barcode-scan": false,
-     "firsts": [],
+     "firsts": [
+         {
+             "first": "remaining_addr_init",
+             "args": ["win"]
+         }
+     ],
      "actions": [
          {
             "action": "disable_power_check",
@@ -31,7 +36,12 @@
          }
      ],
      "prepares": [],
-     "afters": []
+     "afters": [
+         {
+             "after": "remaining_addr",
+             "args": ["win"]
+         }
+     ]
  },
  "test_items":
     [
