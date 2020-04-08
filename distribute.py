@@ -71,7 +71,14 @@ class Distribute:
             {
                 "station": "UsidFix",
                 "file_prefix": "StationXX_UsidFix",
+            },
+
+            # The following are SAP209 stations
+            {
+                "station": "LedMfi",
+                "file_prefix": "Station04_LedMfi",
             }
+
         ]
         if stations:
             self.STATION = [e for e in STATIONS if e['station'] in stations]

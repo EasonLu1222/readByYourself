@@ -477,6 +477,14 @@ def unload_led_driver(portname):
         return result
 
 
+def check_mfi(portname):
+    with get_serial(portname, 115200, timeout=0.4) as ser:
+        cmd = f'i2cget -y 1 -f 0x10 0x00'
+        lines = issue_command(ser, cmd)
+        result = f'Fail' if any(re.search('read failed', e) for e in lines) else 'Pass'
+        return result
+
+
 def decrease_playback_volume(portname):
     logger.info(f'{PADDING}decrease_playback_volume start')
     with get_serial(portname, 115200, timeout=1) as ser:
