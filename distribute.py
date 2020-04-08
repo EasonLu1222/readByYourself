@@ -25,7 +25,7 @@ class Distribute:
                 "file_prefix": "Station03_SwBoard",
             },
             {
-                "station": "LED",
+                "station": "Led",
                 "file_prefix": "Station04_LedBoard",
             },
             {

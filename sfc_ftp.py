@@ -27,7 +27,7 @@ stations_downloads = {
 STATIONS = {
     "MainBoard": "Station02_MainBoard",
     "CapTouchMic": "Station03_SwBoard",
-    "LED": "Station04_LedBoard",
+    "Led": "Station04_LedBoard",
     "RF": "Station05_BtWiFi",
     "Audio": "Station06_AudioListen",
     "Leak": "Station07_Leak",

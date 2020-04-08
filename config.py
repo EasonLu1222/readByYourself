@@ -17,7 +17,7 @@ station_json = {
 
     # --- SMT ---
     'MainBoard': 'v14_mb',
-    'LED': 'v14_led',
+    'Led': 'v14_led',
     'CapTouch': 'v14_cap_touch',
     'CapTouchMic': 'v14_cap_touch_mic',
 

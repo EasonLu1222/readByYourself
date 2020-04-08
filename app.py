@@ -1012,7 +1012,7 @@ if __name__ == "__main__":
         --- SMT ---
         STATION = 'MainBoard'
         STATION = 'CapTouch'
-        STATION = 'LED'
+        STATION = 'Led'
 
         --- FATP ---
         STATION = 'RF'

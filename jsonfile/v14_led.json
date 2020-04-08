@@ -48,8 +48,8 @@
             "max": null,
             "unit": null,
             "sfc_name": null
-        }
-        ,{
+        },
+        {
             "group": "LED Test",
             "hidden": false,
             "tasktype": 3,
