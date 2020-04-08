@@ -69,10 +69,6 @@ class Distribute:
                 "file_prefix": "Station14_BootCheck",
             },
             {
-                "station": "BTMacFix",
-                "file_prefix": "StationXX_BTMacFixDownload",
-            },
-            {
                 "station": "UsidFix",
                 "file_prefix": "StationXX_UsidFix",
             }

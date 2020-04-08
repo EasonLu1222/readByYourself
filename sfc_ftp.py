@@ -36,7 +36,6 @@ STATIONS = {
     "SA": "Station10_SA",
     "Acoustic": "Station11_AcousticListen",
     "Download": "Station12_Download",
-    "BTMacFix": "StationXX_BTMacFixDownload",
 }
 
 
