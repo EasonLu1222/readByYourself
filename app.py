@@ -27,7 +27,7 @@ from core import (Task, ProcessListener, BaseVisaListener,
                  )
 from serials import se, get_devices_df, BaseSerialListener
 from instrument import update_serial
-from utils import resource_path, QssTools
+from utils import resource_path, QssTools, clear_tmp_folders
 from ui.main import Ui_MainWindow
 
 # for very begin before Task initialization
@@ -141,6 +141,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.simulation = False
 
+        clear_tmp_folders()
         self.pwd_dialog = PwdDialog(self)
         self.barcode_dialog = BarcodeDialog(self, STATION)
         self.barcodes = []

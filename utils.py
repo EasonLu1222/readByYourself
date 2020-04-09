@@ -2,6 +2,7 @@ import hashlib
 import os
 import sys
 import inspect
+import shutil
 from pathlib import Path
 from subprocess import Popen, PIPE
 
@@ -93,6 +94,31 @@ def get_md5(file_path):
         md5_returned = hashlib.md5(data).hexdigest()
 
     return md5_returned
+
+
+def clear_tmp_folders():
+    """
+    This will clear all temp folders created by executing app.exe(except for the currently using one)
+    The temp folder is located in C:\\Users\\USERNAME\\AppData\\Local\\Temp
+    """
+    try:
+        tmp_path = os.path.join(Path.home(), 'AppData', 'Local', 'Temp')
+        limit = 5
+        for name in os.listdir(tmp_path):
+            path = os.path.join(tmp_path, name)
+            is_dir = os.path.isdir(path)
+            is_app_tmp = name.startswith('_MEI')
+
+            if is_dir and is_app_tmp:
+                if hasattr(sys, '_MEIPASS') and name in sys._MEIPASS:
+                    continue
+                logger.info(f"Deleting {path}")
+                shutil.rmtree(path)
+                limit = limit - 1
+            if limit<=0:
+                break
+    except Exception as e:
+        logger.error(f"Failed when deleting temp app folder, error:{e}")
 
 
 class QssTools(object):
