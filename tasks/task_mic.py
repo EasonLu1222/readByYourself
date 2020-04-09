@@ -37,20 +37,28 @@ def pull_recorded_sound():
             cmd = f"adb -t {transport_id} pull /usr/share/recorded_sound.wav {wav_file_path}"
             run(cmd)
 
-            # is_duplicate = check_duplicate_channel_data(wav_file_path)
-            top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
+            if os.path.isfile(wav_file_path):
+                # is_duplicate = check_duplicate_channel_data(wav_file_path)
+                top_n_freq_and_amp = analyze_recorded_sound(wav_file_path)
 
-            # if is_duplicate:
-            #     test_result = 'Fail(one mic may be missing)'
-            # else:
-            test_result = judge_fft_result(top_n_freq_and_amp)
+                # if is_duplicate:
+                #     test_result = 'Fail(one mic may be missing)'
+                # else:
+                if top_n_freq_and_amp[0] == top_n_freq_and_amp[1]:
+                    test_result = 'Fail(one mic may be missing)'
+                else:
+                    test_result = judge_fft_result(top_n_freq_and_amp)
 
-            cmd = f'echo {test_result}'
+                cmd = f'echo {test_result}'
+            else:
+                test_result = 'Fail'
+
             with open(test_result_path, "w+", encoding='utf8') as out_file:
                 subprocess.call(cmd.split(' '), shell=True, stdout=out_file)
 
     for i, tid in enumerate(tid_list):
-        push_result_to_device(tid, trp_list[i])
+        if os.path.isfile(trp_list[i]):
+            push_result_to_device(tid, trp_list[i])
 
 
 def check_duplicate_channel_data(wav_file_path):
