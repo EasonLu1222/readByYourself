@@ -98,7 +98,6 @@ class MyFtp():
                     print(f' ---> downloaded')
                 else:
                     print(f'{des} already downloaded.')
-            self.ftp.cwd('../')
         return
 
 
