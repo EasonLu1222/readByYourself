@@ -652,8 +652,7 @@ class Task(QThread):
         proc = Popen([python_path(), '-m', script, '-p', coms] +
                      [json.dumps(args)],
                      stdout=PIPE,
-                     env=get_env(),
-                     cwd=resource_path('.'))
+                     env=get_env())
 
         return proc
 
@@ -669,8 +668,7 @@ class Task(QThread):
         if args: arguments.append(args)
         proc = Popen(arguments,
                      stdout=PIPE,
-                     env=get_env(),
-                     cwd=resource_path('.'))
+                     env=get_env())
         self.printterm_msg.emit(msg)
         return proc
 

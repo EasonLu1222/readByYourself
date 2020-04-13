@@ -195,7 +195,7 @@ def set_power(win):
     for idx in range(1, 3):
         args = [str(idx)]
 
-        proc = Popen([python_path(), '-m', script] + args, stdout=PIPE, env=get_env(), cwd=resource_path('.'))
+        proc = Popen([python_path(), '-m', script] + args, stdout=PIPE, env=get_env())
 
         power_process[idx] = proc
     proc_listener.set_process(power_process)
