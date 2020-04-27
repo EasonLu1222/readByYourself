@@ -5,6 +5,7 @@ import time
 import glob
 import ftplib
 import errno
+from datetime import datetime
 from ftplib import FTP
 import pandas as pd
 
@@ -19,9 +20,14 @@ stations_ftp = {
 stations_downloads = {
     'RF': 'downloads/RF',
     'Audio': 'downloads/Audio',
+    "Leak": "downloads/Leak",
     'WPC': 'downloads/WPC',
-    'SA': 'downloads/SA',
     'PowerSensor': 'downloads/PowerSensor',
+    'SA': 'downloads/SA',
+    "Acoustic": "downloads/Acoustic",
+    "Download": "downloads/Download",
+    'MicBlock': 'downloads/MicBlock',
+    "MAC_DB": "downloads/MAC_DB",
 }
 
 STATIONS = {
@@ -36,6 +42,8 @@ STATIONS = {
     "SA": "Station10_SA",
     "Acoustic": "Station11_AcousticListen",
     "Download": "Station12_Download",
+    "MicBlock": "Station13_MicBlock",
+    "MAC_DB": "MAC_DB",
 }
 
 
@@ -87,6 +95,7 @@ class MyFtp():
                 cwd = f'{ftp_path}/{file}'
                 self.ftp.cwd(cwd)
                 self.downloadFiles(f'{ftp_path}/{file}', f'{target_path}/{file}')
+                self.ftp.cwd('../')
 
             except ftplib.error_perm:
                 # this is for file download
@@ -94,18 +103,26 @@ class MyFtp():
 
                 if not os.path.isfile(des):
                     print(f'download file: {file}', end='')
-                    self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
+                    if "MAC_DB" in des :
+                        now = datetime.now().strftime('%Y%m%d%H%M%S')
+                        self.ftp.retrbinary("RETR " + file, open(f'{target_path}/{now}_{file}', 'wb').write)
+                    else :
+                        self.ftp.retrbinary("RETR " + file, open(des, 'wb').write)
                     print(f' ---> downloaded')
                 else:
-                    print(f'{des} already downloaded.')
+                    if "MAC_DB" in des :
+                        print(f'download file: {file}', end='')
+                        now = datetime.now().strftime('%Y%m%d%H%M%S')
+                        self.ftp.retrbinary("RETR " + file, open(f'{target_path}/{now}_{file}', 'wb').write)
+                        print(f' ---> downloaded')
+                    else :
+                        print(f'{des} already downloaded.')
         return
 
 
 if __name__ == "__main__":
 
-
-    #  station_to_download = ['RF', 'Audio', 'WPC', 'SA', 'PowerSensor']
-    station_to_download = ['SA']
+    station_to_download = ['RF', 'Audio', 'Leak', 'WPC', 'PowerSensor', 'SA', 'Acoustic', 'Download', 'MicBlock', 'MAC_DB']
 
     ftp = MyFtp()
     ftp_paths = [f'/Belkin109/{STATIONS[sta]}' for sta in station_to_download]
