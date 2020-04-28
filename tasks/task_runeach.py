@@ -465,13 +465,16 @@ def load_led_driver(portname):
     i2c_val = ''
     with get_serial(portname, 115200, timeout=0.4) as ser:
         while not is_i2c_ok and total_retry<3:
+            time.sleep(0.03)
             cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
             issue_command(ser, cmd)
+            time.sleep(0.03)
             cmd = f'insmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
             issue_command(ser, cmd)
 
             i2c_val = ''
             cmd = f'i2cget -f -y 1 0x28'
+            time.sleep(0.03)
             lines = issue_command(ser, cmd)
             logger.error(f"{lines}")
             total_retry = total_retry + 1
@@ -486,15 +489,14 @@ def load_led_driver(portname):
     result = f'Pass({i2c_val})' if is_i2c_ok else f'Fail({i2c_val})'
 
     return result
-    # result = f'Pass' if any(re.search('probe', e) for e in lines) or any(
-    #     re.search('File exists', e) for e in lines) else 'Fail'
-    # return result
 
 
 def unload_led_driver(portname):
     with get_serial(portname, 115200, timeout=0.4) as ser:
+        time.sleep(0.03)
         cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
         lines = issue_command(ser, cmd)
+        time.sleep(0.03)
         result = f'Fail' if any(re.search('leds_lp50xx', e)
                                 for e in lines) else 'Pass'
         return result
