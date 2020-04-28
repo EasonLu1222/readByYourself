@@ -464,7 +464,7 @@ def load_led_driver(portname):
     is_i2c_ok = False
     i2c_val = ''
     with get_serial(portname, 115200, timeout=0.4) as ser:
-        while not is_i2c_ok and total_retry<3:
+        while not is_i2c_ok and total_retry<5:
             time.sleep(0.03)
             cmd = f'rmmod /lib/modules/4.9.113/kernel/drivers/amlogic/ledring/leds-lp50xx.ko'
             issue_command(ser, cmd)
