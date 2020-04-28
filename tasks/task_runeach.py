@@ -479,7 +479,7 @@ def load_led_driver(portname):
             logger.error(f"{lines}")
             total_retry = total_retry + 1
             try:
-                if lines[1].startswith('0x'):
+                if lines[1].startswith('0x64'):
                     is_i2c_ok = True
                 i2c_val = lines[1].strip()
             except Exception as e:
