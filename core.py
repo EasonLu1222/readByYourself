@@ -995,8 +995,13 @@ class Task(QThread):
         self.task_result.emit(result)
 
     def run_task30(self, group, items):
+        """
+        This task is designed specifically the final download station.
+        The main purpose of this task is to send a signal to app.py,
+        which will then switch to the USB_Burning_Tool and click the Start/Stop button.
+        """
         row, next_item = items[0]['index'], items[0]
-        msg = next_item['args']
+        msg = next_item['args']     # The value is "start" or "stop", this is used for logging
         output = [['Pass'] * len(self.window.dut_selected)]
         r1, r2 = row, row + len(items)
         c1 = len(self.header()) + self.window.dut_selected[0]
@@ -1004,8 +1009,8 @@ class Task(QThread):
 
         self.trigger_usbburntool.emit(msg)
         result = json.dumps({
-            'index': [row, row + len(items)],
-            'output': output,
+            'index': row,
+            'output': 'Pass',
         })
         self.df.iloc[r1:r2, c1:c2] = output
         self.task_result.emit(result)
