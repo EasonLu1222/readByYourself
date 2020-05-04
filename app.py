@@ -49,6 +49,10 @@ from mylogger import logger
 
 class UsbPowerSensor(): comports_pws = QSignal(list)
 
+
+pag.FAILSAFE = False    # Tell PyAutoGUI not to throw exception when the cursor is moved to the corner of screen
+
+
 class VisaListener(BaseVisaListener, UsbPowerSensor):
     def __init__(self, *args, **kwargs):
         devices = kwargs.pop('devices')
