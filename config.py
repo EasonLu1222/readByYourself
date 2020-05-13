@@ -49,6 +49,7 @@ COUNTRY_CODE = [
     'CA2',      # Canada
     'DE30',      # EU
     'AU6',      # ANZ
+    'EUP2',     # Tunisia
 ]
 
 # =============== Language ===============

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file './ui/main.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -47,6 +47,7 @@ class Ui_MainWindow(object):
         self.cCodeSelectMenu.addItem("")
         self.cCodeSelectMenu.addItem("")
         self.cCodeSelectMenu.addItem("")
+        self.cCodeSelectMenu.addItem("")
         self.horizontalLayout_2.addWidget(self.cCodeSelectMenu)
         self.langSelectMenu = QtWidgets.QComboBox(self.container)
         self.langSelectMenu.setMinimumSize(QtCore.QSize(110, 0))
@@ -78,11 +79,6 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy)
         self.label.setObjectName("label")
-        font = QtGui.QFont()
-        font.setFamily("Arial Narrow")
-        font.setPointSize(12)
-        self.label.setFont(font)
-        self.label.setVisible(False)
         self.horizontalLayout_2.addWidget(self.label)
         spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
@@ -93,11 +89,6 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
         self.label_2.setSizePolicy(sizePolicy)
         self.label_2.setObjectName("label_2")
-        font = QtGui.QFont()
-        font.setFamily("Arial Narrow")
-        font.setPointSize(12)
-        self.label_2.setFont(font)
-        self.label_2.setVisible(False)
         self.horizontalLayout_2.addWidget(self.label_2)
         self.logo = QtWidgets.QLabel(self.container)
         self.logo.setMinimumSize(QtCore.QSize(100, 50))
@@ -157,6 +148,7 @@ class Ui_MainWindow(object):
         self.cCodeSelectMenu.setItemText(1, _translate("MainWindow", "Canada"))
         self.cCodeSelectMenu.setItemText(2, _translate("MainWindow", "EU"))
         self.cCodeSelectMenu.setItemText(3, _translate("MainWindow", "ANZ"))
+        self.cCodeSelectMenu.setItemText(4, _translate("MainWindow", "EU/P2"))
         self.langSelectMenu.setItemText(0, _translate("MainWindow", "en_US"))
         self.langSelectMenu.setItemText(1, _translate("MainWindow", "zh_TW"))
         self.langSelectMenu.setItemText(2, _translate("MainWindow", "zh_CN"))

@@ -96,6 +96,11 @@
                <string>ANZ</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>EU/P2</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
