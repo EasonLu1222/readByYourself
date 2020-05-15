@@ -73,9 +73,11 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         logger.error(f"{PADDING}cannot generate POST data")
 
     # Discard any string after the pass or fail
+    fields_to_keep_value = ['write_country_code']   # The "sfc_name" in this list will not omit the test value
     for k in post_data:
         if isinstance(post_data[k], str) and re.match(r'Pass|Fail', post_data[k], re.I):
-            post_data[k] = post_data[k][:4]
+            if k not in fields_to_keep_value:
+                post_data[k] = post_data[k][:4]
 
     endpoint = UPLOAD_ENDPOINT_DICT[post_data['station_id'][:2]]
     url = f"{SFC_HOST}/{endpoint}.asp"
