@@ -74,15 +74,16 @@ CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 # =============== Testing Progream Upgrade ===============
 # == ftp ==
-OFFICE_IP = '10.228.14.92'
-FACTORY_IP = '10.228.16.92'
+OFFICE_FTP_IP = '10.228.14.92'
+FACTORY_FTP_IP = '10.228.16.92'
 
-IP_USED = FACTORY_IP
+FTP_IP_USED = FACTORY_FTP_IP
+
 IP_FTPDIR = {
-    FACTORY_IP: '/Belkin109/Latest_App',
-    OFFICE_IP: '/Belkin109/Latest_App_Test', # for test
+    FACTORY_FTP_IP: '/Belkin109/Latest_App',
+    OFFICE_FTP_IP: '/Belkin109/Latest_App_Test', # for test
 }
-FTP_DIR = IP_FTPDIR[IP_USED]
+FTP_DIR = IP_FTPDIR[FTP_IP_USED]
 
 # == local ==
 USER_PATH = f'C:/Users/{getpass.getuser()}'

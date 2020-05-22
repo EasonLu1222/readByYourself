@@ -41,7 +41,7 @@ from upgrade import (
 from config import (
     station_json, LANG_LIST, STATION, KLIPPEL_PROJECT,
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
-    OFFICE_IP, FACTORY_IP, IP_USED,
+    OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED,
 )
 from tools.auto_update.version_checker import VersionChecker
 from mylogger import logger

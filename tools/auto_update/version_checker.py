@@ -10,7 +10,7 @@ import getpass
 from upgrade import MyFtp
 from config import (
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
-    OFFICE_IP, FACTORY_IP, IP_USED,
+    OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED,
 )
 
 class VersionChecker(QThread):

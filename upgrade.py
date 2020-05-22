@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
 from PyQt5.QtCore import Qt
 from config import (
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
-    OFFICE_IP, FACTORY_IP, IP_USED,
+    OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED,
 )
 from mylogger import logger
 
@@ -131,9 +131,9 @@ class MyFtp():
     def __init__(self, cwd=FTP_DIR):
         user, passwd = 'SAP109', 'sapsfc'
         try:
-            logger.info(f'ftp ip_used: {IP_USED}')
+            logger.info(f'ftp ip_used: {FTP_IP_USED}')
             self.ftp = None
-            self.ftp = FTP(IP_USED, timeout=3)
+            self.ftp = FTP(FTP_IP_USED, timeout=3)
             self.ftp.login(user=user, passwd=passwd)
             self.ftp.cwd(cwd)
         except socket.timeout as e:
