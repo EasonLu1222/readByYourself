@@ -11,9 +11,9 @@ from datetime import datetime
 from subprocess import Popen, PIPE
 from pydub import AudioSegment
 from requests.exceptions import ConnectTimeout
-from sfc import SFC_HOST, UPLOAD_ENDPOINT_DICT, CHECK_ENDPOINT_DICT
+from sfc import UPLOAD_ENDPOINT_DICT, CHECK_ENDPOINT_DICT
 from mylogger import logger
-from config import station_json
+from config import station_json, SFC_URL
 
 PADDING = ' ' * 8
 
@@ -33,7 +33,7 @@ def check_sfc(portname, dut_idx, dynamic_info):
     station_id = f'{station_id}{dut_idx+1:02}'
 
     endpoint = CHECK_ENDPOINT_DICT[station_id[:2]]
-    url = f"{SFC_HOST}/{endpoint}.asp"
+    url = f"{SFC_URL}/{endpoint}.asp"
 
     try:
         data = {'msn': pid, 'station_id': station_id}

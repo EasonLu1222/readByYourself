@@ -72,6 +72,12 @@ KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 
+# =============== SFC System ===============
+OFFICE_SFC_URL = 'http://10.228.14.99:7109'
+FACTORY_SFC_URL = 'http://10.228.16.99:7109'
+
+SFC_URL = FACTORY_SFC_URL
+
 # =============== Testing Progream Upgrade ===============
 # == ftp ==
 OFFICE_FTP_IP = '10.228.14.92'

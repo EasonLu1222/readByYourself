@@ -6,11 +6,9 @@ import pandas as pd
 from datetime import datetime
 from mylogger import logger
 from requests.exceptions import ConnectTimeout
+from config import SFC_URL
 
 PADDING = ' ' * 8
-
-# SFC_HOST = 'http://10.228.14.99:7109'   # debug
-SFC_HOST = 'http://10.228.16.99:7109'  # production
 
 UPLOAD_ENDPOINT_DICT = {
     'RF': 'add_data_RF',
@@ -80,7 +78,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
                 post_data[k] = post_data[k][:4]
 
     endpoint = UPLOAD_ENDPOINT_DICT[post_data['station_id'][:2]]
-    url = f"{SFC_HOST}/{endpoint}.asp"
+    url = f"{SFC_URL}/{endpoint}.asp"
 
     try:
         logger.info(f"{PADDING}Requesting {url} with data:{post_data}")
