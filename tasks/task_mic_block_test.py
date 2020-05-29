@@ -45,10 +45,10 @@ def play_tone():
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
     com = json_obj["speaker_com"]
     logger.debug(f"{PADDING}speaker_com: {com}")
-    with Serial(com, baudrate=115200, timeout=0.2) as ser:
-        # simulate press enter & ignore all the garbage
-        issue_command(ser, '')
     try:
+        # simulate press enter & ignore all the garbage
+        run(com, "")
+
         lines = run(com, f"aplay /usr/share/1000hz_4s.wav")
         result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
     except SerialException:
