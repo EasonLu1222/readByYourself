@@ -817,7 +817,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     if sfc_station_id == 'MB':
                         gen_ks_sfc_csv(d, csv_filename=csv_filename, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA109-600-G', dut_i=dut_i, result=res)
                     else:
-                        if self.can_upload[dut_i]:
+                        if sfc_station_id == 'WP' or sfc_station_id == 'LK' or self.can_upload[dut_i]:
                             send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
