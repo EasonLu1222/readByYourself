@@ -116,6 +116,20 @@
             "sfc_name": "led"
         },
         {
+            "group": "MFi chip detection",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Make sure this is not a 209 product",
+            "script": "task_runeach",
+            "args": ["check_no_mfi"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
             "group": "FDR Key Test",
             "hidden": false,
             "tasktype": 3,

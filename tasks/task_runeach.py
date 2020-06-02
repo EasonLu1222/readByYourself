@@ -510,6 +510,14 @@ def check_mfi(portname):
         return result
 
 
+def check_no_mfi(portname):
+    with get_serial(portname, 115200, timeout=0.4) as ser:
+        cmd = f'i2cget -y 1 -f 0x10 0x00'
+        lines = issue_command(ser, cmd)
+        result = f'Pass' if any(re.search('read failed', e) for e in lines) else 'Fail(209 LED detected)'
+        return result
+
+
 def decrease_playback_volume(portname):
     logger.info(f'{PADDING}decrease_playback_volume start')
     with get_serial(portname, 115200, timeout=1) as ser:
