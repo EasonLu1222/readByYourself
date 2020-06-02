@@ -718,7 +718,7 @@ def tx_power_11ac_5500mhz_ch2(portname):
 
 def read_leak_result(portname):
     logger.debug('read_leak_result')
-    with open('leak_result', 'r') as f:
+    with open(resource_path('leak_result'), 'r') as f:
         result = f.readline()
     logger.debug(result)
     return result
