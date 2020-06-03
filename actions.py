@@ -10,8 +10,9 @@ from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
 from utils import resource_path, get_env, python_path, run, move_mainwindow_centered
 from mylogger import logger
 from sqlite3 import OperationalError
+from db.sqlite import DB_PATH
 
-DB_PATH = 'C:\\db\\address.db'
+
 PADDING = ' ' * 4
 
 

@@ -1,11 +1,13 @@
 #!/usr/bin/python
+import os
 import sqlite3
 from datetime import datetime
 from sqlite3 import IntegrityError, OperationalError
 from mylogger import logger
 
 
-DB_PATH = 'C:\\db\\address.db'
+DB_DIR = 'C:\\db'
+DB_PATH = os.path.join(DB_DIR, 'address.db')
 PADDING = ' ' * 8
 
 

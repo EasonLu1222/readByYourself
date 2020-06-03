@@ -1,13 +1,12 @@
 """
-This is a helper program for importing WiFi and BT MAC address to address.db,
-which is used in SA station
+This is a helper program for importing WiFi and BT MAC address to database which is used in SA station
 
 Usage:
     1. Compile this script to executable with the following command:
         # pyinstaller --onefile mac_importer.py
     2. Put the mac_importer.exe and addr.txt to any folder of the SA station
     3. Open mac_importer.exe --> click "browse" --> select addr.txt --> click "Start"
-    4. The MAC addressed will be imported to address.db
+    4. The MAC addressed will be imported to the database
 
 Note:
     addr.txt contains a starting MAC in hex format, followed by the total
