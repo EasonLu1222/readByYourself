@@ -27,8 +27,8 @@
             "args": ["win"]
          },
          {
-           "action": "enter_prompt2",
-           "args": ["win", 0.2]
+            "action": "enter_prompt",
+            "args": ["win", 0.2, 10]
          }
      ],
      "prepares": [],
