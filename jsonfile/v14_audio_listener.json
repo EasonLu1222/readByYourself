@@ -14,7 +14,7 @@
      "columns_width": [1, 1, 1, 1, 1, 300, 300, 90, 90, 90, 90, 1, 400]
  },
  "behaviors": {
-     "barcode-scan": false,
+     "barcode-scan": true,
      "firsts": [],
      "actions": [
          {
@@ -36,17 +36,17 @@
  "test_items":
     [
         {
-            "group": "Read ProductID",
+            "group": "Initialize",
             "hidden": false,
             "tasktype": 1,
-            "item": "",
+            "item": "check mainboard id",
             "script": "task_runeach",
-            "args": ["read_pid"],
-            "auto": false,
+            "args": ["check_usid"],
+            "auto": true,
             "min": null,
-            "expect": null,
+            "expect": "True",
             "max": null,
-            "unit": null,
+            "unit": "Bool",
             "sfc_name": "read_pid"
         },
         {
