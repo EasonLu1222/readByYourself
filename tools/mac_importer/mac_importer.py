@@ -115,5 +115,33 @@ def create_table():
     conn.close()
 
 
+def check_total(conn):
+    c = conn.cursor()
+    c.execute('select count(*) from ADDRESS')
+    num_total = c.fetchone()[0]
+    return num_total
+
+
+def check_used(conn):
+    c = conn.cursor()
+    c.execute('select count(*) from ADDRESS where SN is not null;')
+    num_used = c.fetchone()[0]
+    return num_used
+
+
+def show_recommendations(message):
+    import wx
+    app = wx.App()
+    dlg = wx.MessageDialog(None, message, 'MAC Address Info', wx.ICON_INFORMATION)
+    dlg.ShowModal()
+
+
 if __name__ == '__main__':
+    conn = sqlite3.connect(DB_PATH)
+    print(check_total(conn))
+    show_recommendations(f'''
+        MAC Address Total: {check_total(conn)}
+
+        MAC Address Used: {check_used(conn)}
+    ''')
     main()
