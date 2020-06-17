@@ -769,6 +769,18 @@ def check_boot(portname):
     return rtn
 
 
+def check_usb(portname):
+    rtn = 'Pass'
+
+    with get_serial(portname, 115200, timeout=0.8) as ser:
+        prompt = 'Cannot enable. Maybe the USB cable is bad?'
+        check_point_1 = check_stdout(ser, prompt, timeout=6)
+        if check_point_1:
+            rtn = 'Fail'
+
+    return rtn
+
+
 def play_ok_google():
     json_name = station_json['BootCheck']
     jsonfile = f'jsonfile/{json_name}.json'
