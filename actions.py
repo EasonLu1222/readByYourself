@@ -11,7 +11,7 @@ from utils import resource_path, get_env, python_path, run, move_mainwindow_cent
 from mylogger import logger
 from sqlite3 import OperationalError
 from db.sqlite import DB_PATH
-
+from tasks.task_sfc import check_sfc
 
 PADDING = ' ' * 4
 
@@ -46,6 +46,19 @@ def set_acoustic_appearance(win):
     #  win.setFixedSize(1000, 50)
     win.setFixedHeight(80)
     move_mainwindow_centered(win.app, win)
+
+
+def is_sfc_ok(win, task):
+    signal_from = task.general_ok
+    for barcode in win.barcodes:
+        res = check_sfc("", 0, f"{task.sfc_station_id},{barcode}")
+
+        if res.startswith('Fail'):
+            win.msg_dialog_signal.emit(f"{barcode} SFC check failed! {res}")
+            signal_from.emit(False)
+            return False
+
+    return True
 
 
 # for leak test
@@ -96,9 +109,6 @@ def wait_for_leak_result(win):
 
                 logger.debug(f'{PADDING}[Leak Debug] return True')
                 return True
-
-    logger.debug(f'{PADDING}[Leak Debug] return False')
-    return False
 
 
 def enter_prompt_simu():

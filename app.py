@@ -601,6 +601,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
         self.task.adb_ok.connect(self.adb_ok)
+        self.task.general_ok.connect(self.general_ok)
         self.task.trigger_snk.connect(self.soundcheck_handle)
         self.task.trigger_klippel.connect(self.klippel_handle)
         self.task.trigger_usbburntool.connect(self.usbburntool_handle)
@@ -647,6 +648,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             print('usb_burning_tool stop')
             self.my.activate()
         time.sleep(1)
+
+    def general_ok(self, ok):
+        if not ok:
+            self.pushButton.setEnabled(True)
 
     def serial_ok(self, ok):
         if ok:

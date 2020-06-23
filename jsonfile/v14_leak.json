@@ -21,6 +21,10 @@
             "action": "disable_power_check",
             "args": ["win"]
          },
+          {
+            "action": "is_sfc_ok",
+            "args": ["win", "task"]
+         },
          {
             "action": "wait_for_leak_result",
             "args": ["win"]

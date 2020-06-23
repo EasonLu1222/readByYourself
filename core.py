@@ -32,7 +32,8 @@ from actions import (
     window_click_run, is_serial_ok, set_power, is_adb_ok,
     serial_ignore_xff, dummy_com_first, enter_prompt_simu,
     wait_and_window_click_run, wait_for_leak_result, set_appearance,
-    press_ctrl_c, set_acoustic_appearance, remaining_addr, remaining_addr_init
+    press_ctrl_c, set_acoustic_appearance, remaining_addr, remaining_addr_init,
+    is_sfc_ok,
 )
 
 # for prepares
@@ -448,6 +449,7 @@ class Task(QThread):
     task_result = QSignal(str)
     serial_ok = QSignal(bool)
     adb_ok = QSignal(bool)
+    general_ok = QSignal(bool)
     message = QSignal(str)
     printterm_msg = QSignal(str)
     show_task_dialog = QSignal(list)
