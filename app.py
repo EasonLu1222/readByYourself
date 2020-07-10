@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 import json
 import time
@@ -33,7 +32,7 @@ from ui.main import Ui_MainWindow
 # for very begin before Task initialization
 from iqxel import generate_jsonfile
 
-from sfc import send_result_to_sfc, gen_ks_sfc_csv, gen_ks_sfc_csv_filename
+from sfc import send_result_to_sfc, gen_ks_sfc_csv, gen_ks_sfc_csv_filename, move_ks_sfc_csv
 from upgrade import (
     wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
     delete_app_exe, MyDialog, DownloadThread,
@@ -544,9 +543,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.actions.action_signal.emit('prepare')
-            if STATION == 'CapTouchMic':
-                logger.debug('ser_listener.to_stop')
-                self.ser_listener.to_stop()
 
     def instrument_ready(self, ready):
         logger.debug('instrument_ready start')
@@ -568,10 +564,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             logger.debug('===READY===')
             self.pushButton.setEnabled(True)
             self.actions.action_signal.emit('prepare')
-            if STATION == 'CapTouchMic':
-                logger.debug('ser_listener.to_stop')
-                self.ser_listener.to_stop()
-
         else:
             logger.debug('===NOT READY===')
             self.pushButton.setEnabled(False)
@@ -759,8 +751,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if msg.startswith('tasks done') and self.power_recieved:
             self.pushButton.setEnabled(True)
 
-            if STATION != "CapTouchMic":
-                self.ser_listener.start()
+            self.ser_listener.start()
             if not self.simulation:
                 for power in self.task.instruments['gw_powersupply']:
                     if not power.is_open:
@@ -788,7 +779,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
             sfc_station_id = self.task.sfc_station_id
 
-            csv_filename = gen_ks_sfc_csv_filename()
+            csv_filename = gen_ks_sfc_csv_filename(sfc_station_id)
 
             for j, dut_i in enumerate(self.dut_selected):
                 results_ = d[d.hidden == False][d.columns[-dut_num + dut_i]]
@@ -819,19 +810,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
                 dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
                 if sfc_station_id:
-                    if sfc_station_id == 'MB':
-                        gen_ks_sfc_csv(d, csv_filename=csv_filename, station=sfc_station_id, msn=msn, dut_num=dut_num, part_num='1003SA109-600-G', dut_i=dut_i, result=res)
+                    if sfc_station_id in ['MB', 'CT']:
+                        gen_ks_sfc_csv(d, csv_filename=csv_filename, station=sfc_station_id, msn=msn, dut_num=dut_num, dut_i=dut_i, result=res)
                     else:
-                        if sfc_station_id == 'WP' or sfc_station_id == 'LK' or self.can_upload[dut_i]:
+                        if sfc_station_id in ['WP', 'LK'] or self.can_upload[dut_i]:
                             send_result_to_sfc(d, sfc_station_id=sfc_station_id, msn=msn, res=res, dut_num=dut_num, dut_i=dut_i, t0=t0, t1=t1)
 
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
-            try:
-                shutil.move(f'./logs/{csv_filename}', f'./logs/mb_log/{csv_filename}')
-            except FileNotFoundError as e:
-                logger.debug(f"{e}")
 
+            move_ks_sfc_csv(sfc_station_id, csv_filename)
 
             self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)
@@ -887,10 +875,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.show_barcode_dialog()
         else:
             self.pushButton.setEnabled(False)
-            if STATION != 'CapTouchMic':
-                self.ser_listener.stop()
-            else:
-                self.task.start()
+            self.ser_listener.stop()
 
     def actions_ready(self):
         print('actions_ready')

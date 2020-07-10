@@ -2,6 +2,7 @@ import os
 import re
 import requests
 import glob
+import shutil
 import pandas as pd
 from datetime import datetime
 from mylogger import logger
@@ -95,35 +96,46 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
         logger.error(f"{PADDING}SFC request error: {ex}")
 
 
-def gen_ks_sfc_csv_filename():
+def gen_ks_sfc_csv_filename(station):
     now = datetime.now()
     ymd = now.strftime('%Y%m%d')
     hms = int(now.strftime('%H%M%S'))
-    csv_filename = f'mb_log_{ymd}_{hms}.csv'
+    csv_filename = f'{station.lower()}_log_{ymd}_{hms}.csv'
 
     return csv_filename
 
 
-def gen_ks_sfc_csv(d, csv_filename, station, msn, part_num, dut_num, dut_i, result):
+def gen_ks_sfc_csv(d, csv_filename, station, msn, dut_num, dut_i, result):
     # d = pd.read_pickle('../led_pickle.txt')
     df = d[(d.hidden == False) & (d.sfc_name != "")]
     cols1 = (df.sfc_name).values.tolist()
     dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
+
+    if station == 'MB':
+        part_num = '1003SA109-600-G'
+    elif station == 'CT':
+        part_num = '1003MT109-600-G'
+    else:
+        part_num = ''
 
     cols2_value = {
         'part_num': part_num,
         'station': station,
         'dut_num': dut_i + 1,
         'usid': msn
-
     }
     dd = dd.assign(**cols2_value)[list(cols2_value) + cols1]
     dd = dd.assign(**{'result': result})
 
-    os.makedirs('./logs/mb_log', exist_ok=True)
-
     with open(f'./logs/{csv_filename}', 'a') as f:
         dd.to_csv(f, index=False, mode='a', header=f.tell() == 0, sep=',', line_terminator='\n')
 
+
+def move_ks_sfc_csv(station, csv_filename):
+    os.makedirs(f'./logs/{station.lower()}_log', exist_ok=True)
+    try:
+        shutil.move(f'./logs/{csv_filename}', f'./logs/{station.lower()}_log/{csv_filename}')
+    except FileNotFoundError as e:
+        logger.debug(f"{e}")
 
 # gen_ks_sfc_csv(d=None, station='MB', msn='111-111-111-1111-1111-111111', dut_num=2, dut_i=1, result='Pass')
