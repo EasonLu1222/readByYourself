@@ -138,4 +138,7 @@ dmypy.json
 # PyCharm
 .idea/*
 
+#
+tools/sn_mac_list/sap109_sn_mac_list/*
+
 # End of https://www.gitignore.io/api/python
