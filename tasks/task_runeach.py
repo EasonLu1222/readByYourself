@@ -658,6 +658,15 @@ def check_max_current(dut_idx):
     return result
 
 
+def check_touch_fw_version(portname):
+    expected_version = '0x06'
+    with get_serial(portname, 115200, timeout=SERIAL_TIMEOUT) as ser:
+        cmd = f'i2cget -f -y 1 0x1f 0x03'
+        lines = issue_command(ser, cmd)
+        result = f'Pass' if any(re.search(expected_version, e) for e in lines) else f'Fail(wrong touch fw version)'
+        return result
+
+
 def check_something(portname):
     time.sleep(1.5)
     return random.choice(['Pass'] * 9 + ['Fail'])
