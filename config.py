@@ -68,7 +68,7 @@ LANG_LIST = [
 KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
 
 
-# =============== Acoustic Station ===============
+# =============== CapTouch Station ===============
 CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 
