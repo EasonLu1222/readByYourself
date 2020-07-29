@@ -144,6 +144,20 @@
             "sfc_name": "fdr"
         },
         {
+            "group": "CapTouch Firmware",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "check touch firmware version",
+            "script": "task_runeach",
+            "args": ["check_touch_fw_version"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
             "group": "Cap Touch Test",
             "hidden": false,
             "tasktype": 3,
