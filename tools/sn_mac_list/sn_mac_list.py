@@ -25,18 +25,18 @@ from datetime import datetime
 from pathlib import Path
 from gooey import Gooey, GooeyParser
 
-
+PRODUCT = '109'
 DB_DIR = 'C:\\db'
 DB_PATH = os.path.join(DB_DIR, 'address.db')
-CSV_DIR = 'sap109_sn_mac_list'
+CSV_DIR = f'sap{PRODUCT}_sn_mac_list'
 
 
-@Gooey(program_name="SAP109 SN to MAC Table Generator", progress_regex=r"^progress: (\d+)%$", show_restart_button=False)
+@Gooey(program_name=f"SAP{PRODUCT} SN to MAC Table Generator", progress_regex=r"^progress: (\d+)%$", show_restart_button=False)
 def main():
     pid_list = []
     sn_pid_dict = {}
     desc = "SN to MAC table generator "
-    file_help_msg = "Please choose a SAP109 sn list in txt format"
+    file_help_msg = f"Please choose a SAP{PRODUCT} sn list in txt format"
     my_cool_parser = GooeyParser(description=desc)
     my_cool_parser.add_argument("FileChooser", help=file_help_msg, widget="FileChooser")
     args = my_cool_parser.parse_args()
@@ -63,7 +63,7 @@ def main():
 
 
 def find_pid_by_sn(sn):
-    url = 'http://10.228.14.99:8109/search/Query_trace.asp'
+    url = f'http://10.228.14.99:8{PRODUCT}/search/Query_trace.asp'
     d = {'g_search1': sn, 'Submit': 'Search'}
     r = requests.post(url, data=d)
     res = r.text
