@@ -49,20 +49,6 @@
             "unit": null,
             "sfc_name": "read_pid"
         }
-        , {
-            "group": "USB check",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "check if USB can enable",
-            "script": "task_runeach",
-            "args": ["check_usb"],
-            "auto": true,
-            "min": null,
-            "expect": "True",
-            "max": null,
-            "unit": "Bool",
-            "sfc_name": null
-        }
         ,{
             "group": "SFC",
             "hidden": false,
