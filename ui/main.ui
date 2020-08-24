@@ -101,6 +101,16 @@
                <string>EU/P2</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>JP</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>KR</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
