@@ -97,6 +97,8 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
 
 
 def gen_ks_sfc_csv_filename(station):
+    if not station:
+        return 'null.csv'
     now = datetime.now()
     ymd = now.strftime('%Y%m%d')
     hms = int(now.strftime('%H%M%S'))
@@ -132,6 +134,8 @@ def gen_ks_sfc_csv(d, csv_filename, station, msn, dut_num, dut_i, result):
 
 
 def move_ks_sfc_csv(station, csv_filename):
+    if not station:
+        return
     os.makedirs(f'./logs/{station.lower()}_log', exist_ok=True)
     try:
         shutil.move(f'./logs/{csv_filename}', f'./logs/{station.lower()}_log/{csv_filename}')
