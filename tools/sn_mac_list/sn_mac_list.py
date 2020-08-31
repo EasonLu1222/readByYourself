@@ -23,6 +23,8 @@ import csv
 import requests
 from datetime import datetime
 from pathlib import Path
+
+from bs4 import BeautifulSoup
 from gooey import Gooey, GooeyParser
 
 PRODUCT = '109'
@@ -41,21 +43,34 @@ def main():
     my_cool_parser.add_argument("FileChooser", help=file_help_msg, widget="FileChooser")
     args = my_cool_parser.parse_args()
 
-    sn_list_path = args.FileChooser
-    with open(sn_list_path, 'r') as f:
-        all_sn = f.read()
-        sn_list = all_sn.split("\n")
+    sn_or_pid_list_path = args.FileChooser
+    with open(sn_or_pid_list_path, 'r') as f:
+        all_sn_or_pid = f.read()
+        sn_or_pid_list = all_sn_or_pid.split("\n")
 
-    sn_list = list(filter(lambda x:len(x)==14, sn_list))
+    sn_list = list(filter(lambda x:len(x)==14, sn_or_pid_list))
     total_sn = len(sn_list)
-    for i, sn in enumerate(sn_list):
-        pid = find_pid_by_sn(sn)
-        if pid:
-            print(f"{sn} ({i+1}/{total_sn})")
-            sn_pid_dict[pid] = sn
-            pid_list.append(pid)
-        else:
-            print(f"{sn} pid not found ({i+1}/{total_sn})")
+    pid_list = list(filter(lambda x: len(x) == 28, sn_or_pid_list))
+    total_pid = len(pid_list)
+
+    if total_sn>0:
+        for i, sn in enumerate(sn_list):
+            pid = find_pid_by_sn(sn)
+            if pid:
+                print(f"{sn} ({i+1}/{total_sn})")
+                sn_pid_dict[pid] = sn
+                pid_list.append(pid)
+            else:
+                print(f"{sn} pid not found ({i+1}/{total_sn})")
+    elif total_pid>0:
+        for i, pid in enumerate(pid_list):
+            sn = find_sn_by_pid(pid)
+            if sn:
+                print(f"{sn} ({i+1}/{total_pid})")
+                sn_pid_dict[pid] = sn
+            else:
+                print(f"{pid} sn not found ({i+1}/{total_pid})")
+
     gen_sn_mac_table(pid_list, sn_pid_dict)
 
     print('\n')
@@ -78,6 +93,19 @@ def find_pid_by_sn(sn):
         return False
 
 
+def find_sn_by_pid(pid):
+    url = f'http://10.228.14.99:8{PRODUCT}/search/Query_trace.asp'
+    d = {'g_search1': pid, 'Submit': 'Search'}
+    r = requests.post(url, data=d)
+    res = r.text
+    soup = BeautifulSoup(res, 'html.parser')
+    try:
+        sn = soup.select('table')[1].find_all('tr')[1].find_all('td')[1].find('b').text
+        return sn
+    except:
+        return False
+
+
 def gen_sn_mac_table(pid_list, sn_pid_dict):
     if Path(DB_PATH).is_file():
         conn = sqlite3.connect(DB_PATH)
@@ -91,8 +119,8 @@ def gen_sn_mac_table(pid_list, sn_pid_dict):
         if not os.path.exists(CSV_DIR):
             os.makedirs(CSV_DIR)
         now = datetime.now()
-        y, m, d, h, min = now.year, now.month, now.day, now.hour, now.minute
-        path = f'{CSV_DIR}\{y}{m:02d}{d:02d}_{h:02d}{min:02d}.csv'
+        y, m, d, h, min, sec = now.year, now.month, now.day, now.hour, now.minute, now.second
+        path = f'{CSV_DIR}\{y}{m:02d}{d:02d}_{h:02d}{min:02d}{sec:02d}.csv'
         with open(path, 'w') as f:
             writer = csv.writer(f)
             writer.writerow(['SN', 'Mainboard ID', 'Wi-Fi MAC', 'BT MAC'])
