@@ -6,7 +6,7 @@
     "dut": {
         "name": "ftdi",
         "num": 3,
-        "sn": ["AQ0011S7A", "AQ000RXSA", "AQ000TATA"]
+        "sn": ["AQ0011S7A", "AQ000TATA", "AQ000RXSA"]
     }
  },
  "appearance": {
