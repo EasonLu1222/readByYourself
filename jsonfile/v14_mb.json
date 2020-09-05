@@ -153,8 +153,8 @@
             "auto": true,
             "min": null,
             "expect": null,
-            "max": 0.08,
-            "unit": "V",
+            "max": 0.1,
+            "unit": "A",
             "sfc_name": "max_current"
         }
         ,{

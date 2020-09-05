@@ -635,6 +635,7 @@ def hciup(portname):
 
 
 def check_max_current(dut_idx):
+    MAX_CURRENT_UPPER_LIMIT = 0.1
     def is_file_empty(fl):
         with open(fl, 'r') as f:
             content = f.read()
@@ -651,10 +652,16 @@ def check_max_current(dut_idx):
                     break
         else:
             logger.info(f'{PADDING}no power_results')
-    result = x[str(dut_idx + 1)]
-    logger.info(f'{PADDING}result: {result}')
+    try:
+        max_current = float(x[str(dut_idx + 1)])
+    except Exception as e:
+        max_current = 'NaN'
+        logger.error(f'{PADDING}{e}')
+    logger.info(f'{PADDING}result: {max_current}')
     logger.info(f'{PADDING}check_max_current end')
-    result = f'Pass({result})'
+    result = 'Pass' if max_current <= MAX_CURRENT_UPPER_LIMIT else 'Fail'
+    result = f'{result}({max_current})'
+
     return result
 
 
