@@ -6,6 +6,8 @@ import shutil
 from pathlib import Path
 from subprocess import Popen, PIPE
 
+from PyQt5.QtCore import QEventLoop, QTimer
+
 from mylogger import logger
 
 
@@ -119,6 +121,14 @@ def clear_tmp_folders():
                 break
     except Exception as e:
         logger.error(f"Failed when deleting temp app folder, error:{e}")
+
+
+def my_sleep(msec):
+    logger.info(f"Sleeping for {msec}ms (start)")
+    loop = QEventLoop()
+    QTimer.singleShot(msec, loop.quit)
+    loop.exec_()
+    logger.info(f"Sleeping for {msec}ms (end)")
 
 
 class QssTools(object):

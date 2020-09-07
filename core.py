@@ -17,7 +17,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from watchdog.events import RegexMatchingEventHandler
 
-from utils import resource_path, get_env, python_path, s_
+from utils import resource_path, get_env, python_path, s_, my_sleep
 from instrument import get_visa_devices, generate_instruments, INSTRUMENT_MAP
 from mylogger import logger
 from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
@@ -910,6 +910,7 @@ class Task(QThread):
                 args=(self, dut_idx, port, group,)
             )
             th.start()
+            my_sleep(5000)
         for dut_idx, th in threads.items():
             th.join()
 
