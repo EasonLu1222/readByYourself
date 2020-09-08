@@ -313,7 +313,7 @@ def prepare_for_testflow_files(win):
                     elif (dut_idx+1) ==2:
                         iqtester = '192.168.100.254:B'
                     elif (dut_idx+1) ==3:
-                        iqtester = '192.168.100.254:B'
+                        iqtester = '192.168.100.254:A'
 
                     old_str = line
                     l = line.split()
