@@ -79,7 +79,7 @@ FACTORY_SFC_URL = 'http://10.228.16.99:7109'
 
 SFC_URL = FACTORY_SFC_URL
 
-# =============== Testing Progream Upgrade ===============
+# =============== Testing Program Upgrade ===============
 # == ftp ==
 OFFICE_FTP_IP = '10.228.14.92'
 FACTORY_FTP_IP = '10.228.16.92'
