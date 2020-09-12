@@ -74,10 +74,14 @@ CAP_TOUCH_FW = 'msp430Upgrade_V06'
 
 
 # =============== SFC System ===============
-OFFICE_SFC_URL = 'http://10.228.14.99:7109'
-FACTORY_SFC_URL = 'http://10.228.16.99:7109'
+OFFICE_SFC_IP = 'http://10.228.14.99'
+FACTORY_SFC_IP = 'http://10.228.16.99'
 
-SFC_URL = FACTORY_SFC_URL
+SFC_IP = FACTORY_SFC_IP
+
+SFC_URL = f'{SFC_IP}:7109'
+TOTAL_MAC_URL = f'{SFC_IP}:9009/get_MacTotal_109.asp?product=SAP109'
+GET_MAC_URL = f'{SFC_IP}:9009/get_mac_109.asp?&mac_type=wifi+bt&product=SAP109'
 
 # =============== Testing Program Upgrade ===============
 # == ftp ==
