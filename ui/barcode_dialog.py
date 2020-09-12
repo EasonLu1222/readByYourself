@@ -36,6 +36,7 @@ class Ui_BarcodeDialog(object):
         self.verticalLayout_2.addWidget(self.barcodeLineEdit)
         self.errorMsgLabel = QtWidgets.QLabel(BarcodeDialog)
         self.errorMsgLabel.setStyleSheet("color:red;margin-top:10")
+        self.errorMsgLabel.setText("")
         self.errorMsgLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.errorMsgLabel.setWordWrap(False)
         self.errorMsgLabel.setObjectName("errorMsgLabel")
@@ -53,4 +54,3 @@ class Ui_BarcodeDialog(object):
     def retranslateUi(self, BarcodeDialog):
         _translate = QtCore.QCoreApplication.translate
         BarcodeDialog.setWindowTitle(_translate("BarcodeDialog", "Barcode"))
-        self.errorMsgLabel.setText(_translate("BarcodeDialog", "TextLabel"))
