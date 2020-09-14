@@ -319,7 +319,7 @@ def write_wifi_bt_mac(dynamic_info):
         # Fetch wifi_mac and bt_mac from SFC
         try:
             url = f'{config.GET_MAC_URL}&sn={pid}'
-            r = requests.get(url)
+            r = requests.get(url, timeout=10)
             res_json = json.loads(r.text)
             mac_wifi_addr = res_json['Data'][0]['MACAddress1']
             mac_bt_addr = res_json['Data'][1]['MACAddress2'].replace(":", "")
