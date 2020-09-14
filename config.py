@@ -81,7 +81,7 @@ SFC_IP = FACTORY_SFC_IP
 
 SFC_URL = f'{SFC_IP}:7109'
 TOTAL_MAC_URL = f'{SFC_IP}:9009/get_MacTotal_109.asp?product=SAP109'
-GET_MAC_URL = f'{SFC_IP}:9009/get_mac_109.asp?&mac_type=wifi+bt&product=SAP109'
+GET_MAC_URL = f'{SFC_IP}:9009/get_mac_109.asp?mac_type=wifi+bt&product=SAP109'
 
 # =============== Testing Program Upgrade ===============
 # == ftp ==
