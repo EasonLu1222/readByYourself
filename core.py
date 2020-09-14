@@ -24,7 +24,6 @@ from config import (DEVICES, SERIAL_DEVICES, VISA_DEVICES, SERIAL_DEVICE_NAME,
                     VISA_DEVICE_NAME, STATION, KLIPPEL_PROJECT, COUNTRY_CODE)
 from serials import enter_factory_image_prompt, get_serial, wait_for_prompt2
 from iqxel import run_iqfactrun_console
-from db.sqlite import fetch_addr
 from parse_klippel import parse_pvt_v1_7
 
 from actions import (
@@ -749,8 +748,6 @@ class Task(QThread):
                 dynamic_info = COUNTRY_CODE[self.window.settings.ccode_index]
 
             for dut_idx in self.window.dut_selected:
-                if func == 'write_wifi_bt_mac':
-                    dynamic_info = fetch_addr()
                 proc = self.runeach(row_idx, dut_idx, dynamic_info)
                 port = self.window.comports()[dut_idx]
                 procs[port] = proc

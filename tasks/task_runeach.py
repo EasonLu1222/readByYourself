@@ -6,19 +6,16 @@ import json
 import time
 import random
 import argparse
-import threading
 import inspect
+
+import requests
+
 import config
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow)
-
-from subprocess import Popen, PIPE
 from datetime import datetime
 from serials import issue_command, get_serial, wait_for_prompt, enter_factory_image_prompt
-#  from view.loading_dialog import LoadingDialog
 from utils import resource_path
 from mylogger import logger
-from db.sqlite import write_addr, is_pid_used, clean_tmp_flag
 from config import station_json
 
 SERIAL_TIMEOUT = 0.8
@@ -289,14 +286,6 @@ def write_usid(dynamic_info):
 
 
 def write_wifi_bt_mac(dynamic_info):
-    pid = None
-    mac_list = dynamic_info.split(",")
-    mac_wifi_addr = mac_list[0]
-    mac_bt_addr = mac_list[1].replace(":", "")
-    if mac_wifi_addr == "" or mac_bt_addr == "":
-        clean_tmp_flag()
-        return 'Fail(mac_wifi_addr or mac_bt_addr not available)'
-    logger.info(f'{PADDING}fetched mac_wifi({mac_wifi_addr}) and mac_bt({mac_bt_addr}) from db')
     with get_serial(portname, 115200, timeout=1.2) as ser:
         # Read product ID
         cmd = ";".join([
@@ -304,17 +293,13 @@ def write_wifi_bt_mac(dynamic_info):
             'echo usid > /sys/class/unifykeys/name',
             'cat /sys/class/unifykeys/read'
         ])
-        logger.debug(f'{PADDING}cmd: {cmd}')
         lines = issue_command(ser, cmd)
-        logger.debug(f'{PADDING}{lines}')
         try:
             response = lines[-1]
         except IndexError as ex:
             logger.error(f'{PADDING}{type_(ex)}, {ex}')
-            clean_tmp_flag()
             return "Fail(no respond when querying product ID)"
 
-        logger.debug(f'{PADDING}response: {response}')
         regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
         no_pid_found = True
         for l in lines:
@@ -326,16 +311,25 @@ def write_wifi_bt_mac(dynamic_info):
                 break
 
         if no_pid_found:
-            clean_tmp_flag()
             return "Fail(no pid found)"
         else:
             pid = matches.group()
             logger.debug(f'{PADDING}pid: {pid}')
 
-        # Check if pid is in db
-        if is_pid_used(pid):
-            clean_tmp_flag()
-            return "Pass(pid exists in db)"
+        # Fetch wifi_mac and bt_mac from SFC
+        try:
+            url = f'{config.GET_MAC_URL}&sn={pid}'
+            r = requests.get(url)
+            res_json = json.loads(r.text)
+            mac_wifi_addr = res_json['Data'][0]['MACAddress1']
+            mac_bt_addr = res_json['Data'][1]['MACAddress2'].replace(":", "")
+
+            if (len(mac_wifi_addr) != 17) or (len(mac_bt_addr) != 12):
+                logger.error(f'{PADDING}mac_wifi_addr len:{len(mac_wifi_addr)}, mac_bt_addr len:{len(mac_bt_addr)}')
+                return "Fail(wrong mac address format)"
+        except Exception as e:
+            logger.error(f'{PADDING}error fetching mac addresses, error message: {e}')
+            return "Fail(fail to fetch mac addresses)"
 
         # Write wifi_mac
         cmd = ";".join([
@@ -347,7 +341,6 @@ def write_wifi_bt_mac(dynamic_info):
         lines = issue_command(ser, cmd)
         is_wifi_mac_written = any(re.match(mac_wifi_addr, e) for e in lines)
         if not is_wifi_mac_written:
-            clean_tmp_flag()
             return "Fail(failed to write wifi_mac to DUT)"
 
         # Write bt_mac
@@ -360,16 +353,7 @@ def write_wifi_bt_mac(dynamic_info):
         lines = issue_command(ser, cmd)
         is_bt_mac_written = any(re.match(mac_bt_addr, e) for e in lines)
         if not is_bt_mac_written:
-            clean_tmp_flag()
             return "Fail(failed to write bt_mac to DUT)"
-
-        # Mark the mac_wifi and mac_bt have been used by pid
-        try:
-            write_addr(mac_wifi_addr, pid)
-            clean_tmp_flag()
-        except Exception as ex:
-            logger.error(f'{PADDING}{type_(ex)}, {ex}')
-            return "Fail(failed to write product ID to DB)"
 
         return f'Pass({mac_wifi_addr})'
 
