@@ -320,9 +320,12 @@ def write_wifi_bt_mac(dynamic_info):
         try:
             url = f'{config.GET_MAC_URL}&sn={pid}'
             r = requests.get(url, timeout=10)
+            logger.debug(f'{PADDING}get_mac response:{r.text}')
             res_json = json.loads(r.text)
             mac_wifi_addr = res_json['Data'][0]['MACAddress1']
             mac_bt_addr = res_json['Data'][1]['MACAddress2'].replace(":", "")
+            mac_wifi_addr = mac_wifi_addr.lower()
+            mac_bt_addr = mac_bt_addr.lower()
 
             if (len(mac_wifi_addr) != 17) or (len(mac_bt_addr) != 12):
                 logger.error(f'{PADDING}mac_wifi_addr len:{len(mac_wifi_addr)}, mac_bt_addr len:{len(mac_bt_addr)}')
