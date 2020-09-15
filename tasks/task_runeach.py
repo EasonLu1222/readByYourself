@@ -285,7 +285,7 @@ def write_usid(dynamic_info):
         return result
 
 
-def write_wifi_bt_mac(dynamic_info):
+def write_wifi_bt_mac(portname, dut_idx):
     with get_serial(portname, 115200, timeout=1.2) as ser:
         # Read product ID
         cmd = ";".join([
@@ -319,6 +319,7 @@ def write_wifi_bt_mac(dynamic_info):
         # Fetch wifi_mac and bt_mac from SFC
         try:
             url = f'{config.GET_MAC_URL}&sn={pid}'
+            time.sleep(float(dut_idx))  # stagger the requests of each DUT to prevent competing for the same MAC
             r = requests.get(url, timeout=10)
             logger.debug(f'{PADDING}get_mac response:{r.text}')
             res_json = json.loads(r.text)
