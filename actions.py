@@ -241,8 +241,8 @@ def remaining_addr_init(win):
 def remaining_addr(win):
     remaining_addr_count = remaining_addr_init(win)
 
-    if remaining_addr_count < 1000:
-        win.msg_dialog_signal.emit(f"Remaining mac address : {remaining_addr_count} ,  less than 1000 !")
+    if remaining_addr_count < 2000:
+        win.msg_dialog_signal.emit(f"Remaining mac address : {remaining_addr_count} ,  less than 2000!")
 
 
 # === STATION = SIMULATION ===
