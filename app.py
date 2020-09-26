@@ -315,6 +315,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.horizontalLayout.addWidget(cbox)
             cbox.setChecked(getattr(self.settings, f'is_fx{i}_checked'))
             cbox.setText(f'{self.cbox_text_translate}#{i}')
+            if STATION == 'MainBoard':
+                cbox.setChecked(True)
+                cbox.setDisabled(True)
 
     def get_checkboxes_status(self):
         status_all = [self.checkboxes[i].isChecked() for i in range(self.task.dut_num)]
