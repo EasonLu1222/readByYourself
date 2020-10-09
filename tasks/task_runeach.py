@@ -68,30 +68,37 @@ def enter_burn_mode(portname, dut_idx):
 
 def read_pid(portname, dut_idx):
     logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
+    retry_count = 0
+    max_retry = 3
     with get_serial(portname, 115200, timeout=1.2) as ser:
-        cmds = [
-            f'echo 1 > /sys/class/unifykeys/attach',
-            f'echo usid > /sys/class/unifykeys/name',
-        ]
-        for cmd in cmds:
-            logger.debug(f'{PADDING}cmd: {cmd}')
-            issue_command(ser, cmd, False)
-        lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
-        logger.debug(f'{PADDING}{lines}')
+        while True:
+            cmds = [
+                f'echo 1 > /sys/class/unifykeys/attach',
+                f'echo usid > /sys/class/unifykeys/name',
+            ]
+            for cmd in cmds:
+                logger.debug(f'{PADDING}cmd: {cmd}')
+                issue_command(ser, cmd, False)
+            lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+            logger.debug(f'{PADDING}{lines}')
 
-        if len(lines) <= 0:
-            logger.error(f'{PADDING}No response when querying pid')
-            return 'Fail(no response when querying pid)'
+            if len(lines) <= 0:
+                logger.error(f'{PADDING}No response when querying pid')
+                return 'Fail(no response when querying pid)'
 
-        regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
-        result = 'Fail(no pid found)'
-        for l in lines:
-            matches = re.search(regex, l)
-            if matches:
-                pid = matches.group()
-                logger.debug(f'{PADDING}pid: {pid}')
-                result = f'Pass({pid})'
+            regex = r"\d{3}-\d{3}-\d{3}-\d{4}-\d{4}-\d{6}"
+            result = 'Fail(no pid found)'
+            for l in lines:
+                matches = re.search(regex, l)
+                if matches:
+                    pid = matches.group()
+                    logger.debug(f'{PADDING}pid: {pid}')
+                    result = f'Pass({pid})'
+                    break
+            if result.startswith('Pass') or retry_count > max_retry:
                 break
+            logger.debug(f'{PADDING}read_pid retry_count={retry_count}')
+            retry_count += 1
 
     return result
 

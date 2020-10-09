@@ -56,7 +56,7 @@ class BarcodeDialog(QDialog, Ui_BarcodeDialog):
                 self.barcodeLineEdit.clear()
         else:
             self.errorMsgLabel.setText("")
-            QtTest.QTest.qWait(150)
+            QtTest.QTest.qWait(100)
             self.errorMsgLabel.setText("二维码格式错误")
             self.barcodeLineEdit.clear()
 
