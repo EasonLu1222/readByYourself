@@ -70,16 +70,15 @@ def read_pid(portname, dut_idx):
     logger.debug(f'{PADDING}portname: {portname}, dut_idx: {dut_idx}')
     retry_count = 0
     max_retry = 3
-    with get_serial(portname, 115200, timeout=1.2) as ser:
+    with get_serial(portname, 115200, timeout=2) as ser:
+        issue_command(ser, '')
         while True:
-            cmds = [
-                f'echo 1 > /sys/class/unifykeys/attach',
-                f'echo usid > /sys/class/unifykeys/name',
-            ]
-            for cmd in cmds:
-                logger.debug(f'{PADDING}cmd: {cmd}')
-                issue_command(ser, cmd, False)
-            lines = issue_command(ser, 'cat /sys/class/unifykeys/read')
+            cmd = ";".join([
+                'echo 1 > /sys/class/unifykeys/attach',
+                'echo usid > /sys/class/unifykeys/name',
+                'cat /sys/class/unifykeys/read'
+            ])
+            lines = issue_command(ser, cmd)
             logger.debug(f'{PADDING}{lines}')
 
             if len(lines) <= 0:
@@ -95,11 +94,13 @@ def read_pid(portname, dut_idx):
                     logger.debug(f'{PADDING}pid: {pid}')
                     result = f'Pass({pid})'
                     break
+                if 'key usid may not burned yet' in l:
+                    result = f'Fail(pid not burned yet)'
+                    break
             if result.startswith('Pass') or retry_count > max_retry:
                 break
             logger.debug(f'{PADDING}read_pid retry_count={retry_count}')
             retry_count += 1
-
     return result
 
 
