@@ -172,6 +172,20 @@
             "sfc_name": null
         }
         ,{
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "read_pid"
+        }
+        ,{
             "group": "WiFi",
             "hidden": false,
             "tasktype": 1,
@@ -352,20 +366,6 @@
             "max": 1005,
             "unit": null,
             "sfc_name": null
-        }
-        ,{
-            "group": "Read ProductID",
-            "hidden": false,
-            "tasktype": 1,
-            "item": "",
-            "script": "task_runeach",
-            "args": ["read_pid"],
-            "auto": false,
-            "min": null,
-            "expect": null,
-            "max": null,
-            "unit": null,
-            "sfc_name": "read_pid"
         }
     ]
 }
