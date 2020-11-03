@@ -180,29 +180,29 @@ def is_serial_ok(win, task):
 
 
 def is_adb_ok(win, task):
-    dut_selected = win.get_dut_selected
     signal_from = task.adb_ok
-    print('is_adb_ok start')
-    cmd = "adb start-server"
-    output = run(cmd)
-    cmd = "adb devices -l"
-    output = run(cmd, strip=True)
-    lines = output.split('\n')[1:]
-
-    # Count the number of devices that are not offline and has transport_id
-    result = sum([(not re.search('offline', l)) and (re.search('transport_id', l) is not None) for l in lines])
-    ds = len(dut_selected())
-    rtn = result >= ds
-    if not rtn:
-        print('adb devices not ready, restarting adb')
-        cmd = "adb kill-server"
-        run(cmd)
-        cmd = "adb start-server"
-        run(cmd)
-        signal_from.emit(False)
-    else:
-        print('adb devices ready')
+    cmd = 'echo ff400000.dwc2_a > /sys/kernel/config/usb_gadget/amlogic/UDC'    # This command revives adb
+    comports = win.comports
+    adb_status = []
+    for i in win.dut_selected:
+        is_adb_alive = False
+        port = comports()[i]
+        with get_serial(port, 115200, 0.1) as ser:
+            lines = issue_command(ser, cmd)
+        if not lines:
+            lines = []
+        for l in lines:
+            if ('USB_STATE=CONNECTED' in l) or ('resource busy' in l):
+                is_adb_alive = True
+                break
+        adb_status.append(is_adb_alive)
+    rtn = all(adb_status)
+    if rtn:
+        logger.debug('adb devices ready')
         signal_from.emit(True)
+    else:
+        logger.debug('adb devices not ready')
+        signal_from.emit(False)
 
     return rtn
 

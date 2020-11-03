@@ -1029,9 +1029,7 @@ class Task(QThread):
                 self.window.show_animation_dialog.emit(False)
                 if STATION != 'Leak':
                     self.window.msg_dialog_signal.emit(f"發生錯誤({action})")
-
-                if STATION != 'CapTouchMic':
-                    self.window.ser_listener.start()
+                self.window.ser_listener.start()
                 return
 
         #  QThread.msleep(500)
