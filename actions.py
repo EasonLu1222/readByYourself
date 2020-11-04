@@ -180,11 +180,13 @@ def is_serial_ok(win, task):
 
 
 def is_adb_ok(win, task):
+    # Force revives adb
+    dut_selected = win.get_dut_selected()
     signal_from = task.adb_ok
-    cmd = 'echo ff400000.dwc2_a > /sys/kernel/config/usb_gadget/amlogic/UDC'    # This command revives adb
+    cmd = 'echo ff400000.dwc2_a > /sys/kernel/config/usb_gadget/amlogic/UDC'
     comports = win.comports
     adb_status = []
-    for i in win.dut_selected:
+    for i in dut_selected:
         is_adb_alive = False
         port = comports()[i]
         with get_serial(port, 115200, 0.1) as ser:
@@ -196,7 +198,16 @@ def is_adb_ok(win, task):
                 is_adb_alive = True
                 break
         adb_status.append(is_adb_alive)
-    rtn = all(adb_status)
+
+    # Count the number of devices that are not offline and has transport_id
+    cmd = "adb devices -l"
+    output = run(cmd, strip=True)
+    lines = output.split('\n')[1:]
+    result = sum([(not re.search('offline', l)) and (re.search('transport_id', l) is not None) for l in lines])
+    ds = len(dut_selected)
+    is_adb_list_ok = result >= ds
+
+    rtn = all(adb_status) and is_adb_list_ok
     if rtn:
         logger.debug('adb devices ready')
         signal_from.emit(True)

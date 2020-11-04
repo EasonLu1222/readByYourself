@@ -26,12 +26,12 @@
             "args": ["win", "task"]
          },
          {
-            "action": "is_adb_ok",
-            "args": ["win", "task"]
-         },
-         {
             "action": "serial_ignore_xff",
             "args": ["win"]
+         },
+         {
+            "action": "is_adb_ok",
+            "args": ["win", "task"]
          }
      ],
      "prepares": [],
