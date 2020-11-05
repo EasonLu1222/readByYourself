@@ -38,6 +38,9 @@ station_json = {
 
     'Download': 'v14_download',
     'UsidFix': 'v14_usid_fix',
+
+    # --- FATP repair ---
+    'Gcms': 'v14_factory_img_download',
 }
 STATION = json.loads(open('jsonfile/station.json', 'r').\
                      read())['STATION']

@@ -1,7 +1,6 @@
 import os
 import re
 import requests
-import glob
 import shutil
 import pandas as pd
 from datetime import datetime
@@ -21,7 +20,8 @@ UPLOAD_ENDPOINT_DICT = {
     'MS': 'add_data_MicBlock',
     'AC': 'add_data_Acoustic',
     'DL': 'add_data_download',
-    'BC': 'add_data_boot'
+    'BC': 'add_data_boot',
+    'GCMS': 'add_data_download'
 }
 
 CHECK_ENDPOINT_DICT = {
@@ -38,11 +38,28 @@ CHECK_ENDPOINT_DICT = {
 }
 
 
-def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
-# def send_result_to_sfc(d=None, sfc_station_id='SA', msn="111-111-111-1111-1111-111111", res='Pass', dut_num=1, dut_i=0, t0='2019/11/27 08:00:00', t1='2019/11/27 08:00:00'):
-    # d.to_pickle('../sa_test_result.pkl')
-    # d = pd.read_pickle('../led_pickle.txt')
+def gen_gcms_data(post_data):
+    """
+    gcms stands for "工廠模式".
+    This function generate dummy data for SFC
+    The test data goes into Final downloads db.
+    The "Station" field will be "GCMS".
+    This is for the packing station(ST19) to recognize that this DUT has factory firmware inside and cannot packing.
+    """
+    rtn = post_data.copy()
+    dummy_data = {
+        'station_id': 'GCMS',
+        'write_country_code': 'Pass',
+        'enter_dl_mode': 'Pass',
+        'press_start': 'Pass',
+        'download': 'Pass',
+        'press_stop': 'Pass'
+    }
+    rtn.update(dummy_data)
+    return rtn
 
+
+def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
     df = d[(d.hidden == False) & (d.sfc_name != "")]
     cols1 = (df.sfc_name).values.tolist()
     dd = pd.DataFrame(df[[d.columns[-dut_num + dut_i]]].values.T, columns=cols1)
@@ -67,6 +84,8 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
                 msn = matches.group()
         if 'read_pid' in post_data:
             post_data['read_pid'] = post_data['read_pid'][:4]
+        if sfc_station_id == "GCMS":
+            post_data = gen_gcms_data(post_data)
         post_data['msn'] = msn
     except IndexError as ex:
         logger.error(f"{PADDING}cannot generate POST data")
@@ -78,7 +97,7 @@ def send_result_to_sfc(d, sfc_station_id, msn, res, dut_num, dut_i, t0, t1):
             if k not in fields_to_keep_value:
                 post_data[k] = post_data[k][:4]
 
-    endpoint = UPLOAD_ENDPOINT_DICT[post_data['station_id'][:2]]
+    endpoint = UPLOAD_ENDPOINT_DICT[sfc_station_id]
     url = f"{SFC_URL}/{endpoint}.asp"
 
     try:

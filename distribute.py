@@ -72,6 +72,10 @@ class Distribute:
                 "station": "UsidFix",
                 "file_prefix": "StationXX_UsidFix",
             },
+            {
+                "station": "Gcms",
+                "file_prefix": "StationXX_Gcms",
+            },
 
             # The following are SAP209 stations
             {
