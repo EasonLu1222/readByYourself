@@ -35,7 +35,7 @@ def ls_test(portname):
 
 def arecord_aplay_path(portname):
     with get_serial(portname, 115200, timeout=1) as ser:
-        cmd = f'arecord -Dhw:0,4 -c 2 -r 48000 -f S16_LE | aplay -Dhw:0,2'
+        cmd = f'arecord -Dhw:0,4 -c 2 -r 48000 -f S24_LE | aplay -Dhw:0,2'
         lines = issue_command(ser, cmd)
         expected = 'asoc-aml-card auge_sound: tdm playback enable'
         result = f'Pass' if any(re.search(expected, e) for e in lines) else 'Fail'
