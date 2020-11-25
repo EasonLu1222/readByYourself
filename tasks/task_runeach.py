@@ -641,7 +641,7 @@ def hciup(portname):
 
 
 def check_max_current(dut_idx):
-    MAX_CURRENT_UPPER_LIMIT = 0.1
+    MAX_CURRENT_UPPER_LIMIT = 0.25
     def is_file_empty(fl):
         with open(fl, 'r') as f:
             content = f.read()
@@ -665,8 +665,7 @@ def check_max_current(dut_idx):
         logger.error(f'{PADDING}{e}')
     logger.info(f'{PADDING}result: {max_current}')
     logger.info(f'{PADDING}check_max_current end')
-    # result = 'Pass' if max_current <= MAX_CURRENT_UPPER_LIMIT else 'Fail'
-    result = 'Pass'
+    result = 'Pass' if max_current <= MAX_CURRENT_UPPER_LIMIT else 'Fail'
     result = f'{result}({max_current})'
 
     return result
