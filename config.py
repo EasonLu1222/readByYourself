@@ -33,7 +33,7 @@ station_json = {
     'PowerSensor': 'v14_power_sensor',
     'SA': 'v14_sa',
     'MicBlock': 'v14_mic_block',
-    'AcousticListen': 'v14_acoustic_listener_klippel_v1_7',
+    'AcousticListen': 'v14_acoustic_listener_klippel_v2',
     'BootCheck': 'v14_boot_check',
 
     'Download': 'v14_download',
@@ -69,7 +69,8 @@ LANG_LIST = [
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 #  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
 # KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
-KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
+# KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
+KLIPPEL_PROJECT = 'SAP109-209 - v2 - MP - 201106'
 
 
 # =============== CapTouch Station ===============

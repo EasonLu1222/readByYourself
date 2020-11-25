@@ -112,3 +112,8 @@ def parse_pvt_v1_7(path):
     DF = DF[kk]
 
     return DF
+
+
+def parse_mp_v2(path):
+    rtn = parse_pvt_v1_7(path)
+    return rtn
