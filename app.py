@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QErrorMessage, QHBoxLayo
                              QTableWidgetItem, QLabel, QTableView, QAbstractItemView,
                              QWidget, QCheckBox, QPushButton, QMessageBox)
 
+from tasks.task_mic_block_test import sent_final_test_result_to_fixture
 from view.pwd_dialog import PwdDialog
 from view.barcode_dialog import BarcodeDialog
 from view.loading_dialog import LoadingDialog
@@ -660,7 +661,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton.setEnabled(True)
 
     def show_message_dialog(self, msg):
-        # TODO: Build a dialog helper that works with the translation library
         infoBox = QMessageBox()
         infoBox.setIcon(QMessageBox.Information)
         infoBox.setText(msg)
@@ -822,9 +822,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 with open(self.logfile, 'a') as f:
                     dd.to_csv(f, mode='a', header=f.tell()==0, sep=',', line_terminator='\n')
 
+            is_all_dut_pass = all(e == 'Pass' for e in all_res)
+            if sfc_station_id in ['MS']:
+                sent_final_test_result_to_fixture(is_all_dut_pass)
+
             move_ks_sfc_csv(sfc_station_id, csv_filename)
 
-            self.set_window_color('pass' if all(e == 'Pass' for e in all_res) else 'fail')
+            self.set_window_color('pass' if is_all_dut_pass else 'fail')
             self.table_view.setFocusPolicy(Qt.NoFocus)
             self.table_view.clearFocus()
             self.table_view.clearSelection()

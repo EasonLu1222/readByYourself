@@ -32,18 +32,22 @@ def issue_command(serial, cmd):
     return lines_encoded
 
 
-def run(portname, cmd):
-    with Serial(portname, baudrate=115200, timeout=0.2) as ser:
+def run(portname, cmd, baudrate=115200, timeout=0.2):
+    with Serial(portname, baudrate=baudrate, timeout=timeout) as ser:
         lines = issue_command(ser, cmd)
         logger.info(lines)
     return lines
 
 
-def play_tone():
+def get_json_val_by_attr(attr):
     json_name = station_json['MicBlock']
     jsonfile = f'jsonfile/{json_name}.json'
     json_obj = json.loads(open(jsonfile, 'r', encoding='utf8').read())
-    com = json_obj["speaker_com"]
+    return json_obj[attr]
+
+
+def play_tone():
+    com = get_json_val_by_attr("speaker_com")
     logger.debug(f"{PADDING}speaker_com: {com}")
     try:
         # simulate press enter & ignore all the garbage
@@ -51,9 +55,40 @@ def play_tone():
 
         lines = run(com, f"aplay /usr/share/1000hz_4s.wav")
         result = f'Fail(missing 1000hz file)' if any(re.search("such file or directory", e) for e in lines) else 'Pass'
-    except SerialException:
+    except SerialException as e:
+        logger.error(f'{e}')
         result = 'Fail(bad serial port)'
     return result
+
+
+def trigger_block():
+    com = get_json_val_by_attr("valve_com")
+    try:
+        valve_signal_ok = False
+        with Serial(com, baudrate=19200, timeout=1) as ser:
+            cmd = "1"
+            ser.write(f'{cmd}\n'.encode('utf-8'))
+            while True:
+                l = ser.readline().strip()
+                logger.debug(f"Readline result: {l}")
+                if l == b'2':
+                    valve_signal_ok = True
+                    break
+
+        result = f'Pass' if valve_signal_ok else 'Fail'
+    except SerialException as e:
+        logger.error(f'{e}')
+        result = 'Fail(bad serial port)'
+    return result
+
+
+def sent_final_test_result_to_fixture(is_all_dut_pass):
+    com = get_json_val_by_attr("valve_com")
+    rtn = "4" if is_all_dut_pass else "3"
+    try:
+        lines = run(com, rtn, baudrate=19200, timeout=5)
+    except SerialException as e:
+        logger.error(f'{e}')
 
 
 def make_experiment_dir():

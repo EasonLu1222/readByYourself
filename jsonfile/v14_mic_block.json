@@ -3,6 +3,7 @@
  "version": "14.0",
  "sfc_station_id": "MS",
  "speaker_com": "COM12",
+ "valve_com": "COM1",
  "devices": {
     "dut": {
         "name": "ftdi",
@@ -85,8 +86,8 @@
             "max": null,
             "unit": null,
             "sfc_name": "mic_play_tone"
-        }
-        ,{
+        },
+        {
             "group": "Mic2",
             "hidden": false,
             "tasktype": 1,
@@ -99,22 +100,22 @@
             "max": null,
             "unit": "dBFS",
             "sfc_name": "sensitivity_w_o_blocking"
-        }
-        ,{
-            "group": "Misc",
+        },
+        {
+            "group": "Valve control",
             "hidden": true,
-            "tasktype": 12,
-            "item": "Stop",
-            "script": null,
-            "args": null,
+            "tasktype": 1,
+            "item": "Trigger block",
+            "script": "task_mic_block_test",
+            "args": ["trigger_block"],
             "auto": true,
             "min": null,
             "expect": null,
             "max": null,
             "unit": null,
             "sfc_name": null
-        }
-        ,{
+        },
+        {
             "group": "Mic3",
             "hidden": false,
             "tasktype": 1,
@@ -127,8 +128,8 @@
             "max": null,
             "unit": null,
             "sfc_name": "mic_block_play_tone"
-        }
-        ,{
+        },
+        {
             "group": "Mic4",
             "hidden": false,
             "tasktype": 1,
@@ -141,8 +142,8 @@
             "max": null,
             "unit": "dBFS",
             "sfc_name": "sensitivity_with_blocking"
-        }
-        ,{
+        },
+        {
             "group": "Mic Test Result",
             "hidden": false,
             "tasktype": 1,
