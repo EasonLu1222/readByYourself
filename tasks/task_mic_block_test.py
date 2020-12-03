@@ -86,7 +86,7 @@ def sent_final_test_result_to_fixture(is_all_dut_pass):
     com = get_json_val_by_attr("valve_com")
     rtn = "4" if is_all_dut_pass else "3"
     try:
-        lines = run(com, rtn, baudrate=19200, timeout=5)
+        lines = run(com, rtn, baudrate=19200, timeout=0.2)
     except SerialException as e:
         logger.error(f'{e}')
 
