@@ -667,8 +667,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if STATION == 'SA':
             infoBox.setWindowTitle("Warning")
         infoBox.exec_()
-        if msg=='Press enter to continue':
-            self.task.wait_for_next = False
 
     def printterm1(self, port_msg):
         port, msg = port_msg

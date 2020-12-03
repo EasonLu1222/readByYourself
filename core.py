@@ -471,7 +471,6 @@ class Task(QThread):
         logger.debug(f'{PADDING}Task.instruments')
         for k, v in self.instruments.items():
             logger.debug(f'{PADDING}{k} ---> {v}')
-        self.wait_for_next = False
 
     @property
     def serial_instruments(self):
@@ -903,18 +902,6 @@ class Task(QThread):
             my_sleep(5000)
         for dut_idx, th in threads.items():
             th.join()
-
-    def run_task12(self, group, items):
-        self.wait_for_next = True
-        row, next_item = items[0]['index'], items[0]
-        self.window.msg_dialog_signal.emit(f'Press enter to continue')
-        while self.wait_for_next: pass
-        result = json.dumps({
-            'index': [row, row + len(items)],
-            'output': [['Pass']],
-        })
-        self.wait_for_next = False
-        self.task_result.emit(result)
 
     def run_task13(self, group, items):
         row_idx, next_item = items[0]['index'], items[0]
