@@ -9,14 +9,7 @@ from datetime import datetime
 from ftplib import FTP
 import pandas as pd
 
-#  station = 'Audio'
-stations_ftp = {
-    'RF': 'Belkin109/lk_test/RF',
-    'Audio': 'Belkin109/lk_test/Audio',
-    'WPC': 'Belkin109/lk_test/WPC',
-    'SA': 'Belkin109/lk_test/SA',
-    'PowerSensor': 'Belkin109/lk_test/PowerSensor',
-}
+
 stations_downloads = {
     'RF': 'downloads/RF',
     'Audio': 'downloads/Audio',
