@@ -23,11 +23,11 @@ import csv
 import requests
 from datetime import datetime
 from pathlib import Path
+from config import PRODUCT
 
 from bs4 import BeautifulSoup
 from gooey import Gooey, GooeyParser
 
-PRODUCT = '109'
 DB_DIR = 'C:\\db'
 DB_PATH = os.path.join(DB_DIR, 'address.db')
 CSV_DIR = f'sap{PRODUCT}_sn_mac_list'

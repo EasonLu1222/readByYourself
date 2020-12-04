@@ -3,6 +3,8 @@ import getpass
 from utils import resource_path
 
 
+PRODUCT = '109'
+
 # =============== Instruments ===============
 DEVICES = json.load(open(resource_path('device.json'), 'r'))
 SERIAL_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='serial'}
