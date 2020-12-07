@@ -220,6 +220,10 @@ def calculate_sensitivity():
     channel_r_diff = float(mic_channel[0]) - float(mic_block_channel[0])
     channel_l_diff = float(mic_channel[1]) - float(mic_block_channel[1])
 
+    # If one mic channel is broken, the system will copy the data from the good channel to the bad channel,
+    # which makes the data of the 2 channels identical. This is a convenient way to judge if one mic is broken.
+    is_one_mic_broken = (float(mic_channel[0]) == float(mic_channel[1])) and (float(mic_block_channel[0]) == float(mic_block_channel[1]))
+
     logger.info(f"mic_channel_left: {mic_channel[1]}")
     logger.info(f"mic_channel_right: {mic_channel[0]}")
     logger.info(f"mic_block_channel_left: {mic_block_channel[1]}")
@@ -227,7 +231,7 @@ def calculate_sensitivity():
     logger.info(f"channel_left_diff: {channel_l_diff}")
     logger.info(f"channel_right_diff: {channel_r_diff}")
 
-    if channel_r_diff >= 20 and channel_l_diff >= 20:
+    if channel_r_diff >= 20 and channel_l_diff >= 20 and not is_one_mic_broken:
         rtn = "Pass"
     else:
         rtn = "Fail"
