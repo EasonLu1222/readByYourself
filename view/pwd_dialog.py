@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.pwd_dialog import Ui_PwdDialog
+from config import PRODUCT
 
 
 class PwdDialog(QDialog, Ui_PwdDialog):
@@ -16,7 +17,7 @@ class PwdDialog(QDialog, Ui_PwdDialog):
         self.is_eng_mode_on = False
 
     def check_pwd(self, password):
-        return password=='sap109vn'
+        return password==f'sap{PRODUCT}vn'
         
     def showEvent(self, event):
         super(PwdDialog, self).showEvent(event)

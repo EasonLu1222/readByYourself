@@ -12,6 +12,7 @@ import os
 import argparse
 import json
 from ftplib import FTP, error_perm
+from config import PRODUCT, FTP_USER, FTP_PWD
 
 STATIONS = [
     {
@@ -122,8 +123,8 @@ if __name__ == "__main__":
     app_dir = args.path
 
     ftp = FTP('10.228.16.92')
-    ftp.login(user='SAP109', passwd='sapsfc')
-    ftp.cwd('Belkin109')
+    ftp.login(user=FTP_USER, passwd=FTP_PWD)
+    ftp.cwd(f'Belkin{PRODUCT}')
 
     upload_log(ftp, app_dir)
 

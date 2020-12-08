@@ -41,7 +41,7 @@ from upgrade import (
 from config import (
     station_json, LANG_LIST, STATION, KLIPPEL_PROJECT,
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
-    OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED,
+    OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED, PRODUCT
 )
 from tools.auto_update.version_checker import VersionChecker
 from mylogger import logger
@@ -91,7 +91,7 @@ class MySettings():
     lang_list = LANG_LIST
 
     def __init__(self, dut_num):
-        self.settings = QSettings('FAB', 'SAP109')
+        self.settings = QSettings('FAB', f'SAP{PRODUCT}')
         self.dut_num = dut_num
         self.update()
 
@@ -261,7 +261,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def handle_update(self, need_update):
         # Remove all files in LOCAL_APP_PATH with file name start with "sap109-testing-upgrade"
-        for p in Path(f"{LOCAL_APP_PATH}").glob("sap109-testing-upgrade*"):
+        for p in Path(f"{LOCAL_APP_PATH}").glob(f"sap{PRODUCT}-testing-upgrade*"):
             p.unlink()
         if need_update:
             quit_msg = "An update is available, do you want to download it now?"
@@ -277,7 +277,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.thread.quit.connect(self.quit)
                 self.thread.start()
                 self.dialog.show()
-                with open(f'{LOCAL_APP_PATH}/sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+                with open(f'{LOCAL_APP_PATH}/sap{PRODUCT}-testing-upgrade-starting-{os.getpid()}', 'w'):
                     pass
         else:
             logger.info('no need to update')
@@ -614,7 +614,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def klippel_handle(self, asn):
         print('klippel_handle', 'asn', asn)
-        #win = pag.getWindowsWithTitle('SAP109 - v1.3 - DVT2')[0]
         win = pag.getWindowsWithTitle(KLIPPEL_PROJECT)[0]
         my = pag.getActiveWindow()
         time.sleep(1)

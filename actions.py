@@ -33,24 +33,6 @@ def set_appearance(win):
     win.pushButton.setVisible(False)
 
 
-def set_acoustic_appearance(win):
-    #  flags = win.windowFlags()
-    #  flags &= ~Qt.FramelessWindowHint & ~Qt.WindowMaximizeButtonHint
-    flags = Qt.WindowCloseButtonHint
-    win.setWindowFlags(flags)
-    win.container.setVisible(False)
-    win.horizontalLayout_3.addWidget(win.pushButton)
-    win.horizontalLayout_3.setContentsMargins(10, 10, 10, 10)
-    win.pushButton.setParent(win.centralwidget)
-    win.setWindowState(Qt.WindowNoState)
-    win.show()
-    win.setWindowTitle('SAP109 Acoustic Enable')
-    #  win.resize(1000, 50)
-    #  win.setFixedSize(1000, 50)
-    win.setFixedHeight(80)
-    move_mainwindow_centered(win.app, win)
-
-
 def is_sfc_ok(win, task):
     signal_from = task.general_ok
     for barcode in win.barcodes:

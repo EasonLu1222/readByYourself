@@ -16,7 +16,7 @@ from mylogger import logger
 from serials import get_serial, issue_command
 from ui.cap_touch_dialog import Ui_CapTouchDialog
 from utils import get_env, resource_path, run, set_property
-from config import LANG_LIST
+from config import LANG_LIST, PRODUCT
 
 PADDING = ' ' * 8
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    settings = QSettings('FAB', 'SAP109')
+    settings = QSettings('FAB', f'SAP{PRODUCT}')
     settings.lang_index = settings.value('lang_index', 0, int)
     translator = QTranslator()
     translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))

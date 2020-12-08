@@ -9,7 +9,7 @@ from PyQt5.QtGui import QKeySequence, QCursor
 from PyQt5.QtWidgets import QDialog, QApplication, QShortcut
 from serial.serialutil import SerialException
 
-from config import LANG_LIST
+from config import LANG_LIST, PRODUCT
 from mylogger import logger
 from serials import get_serial, issue_command
 from ui.unmute_mic import Ui_UnmuteMicDialog
@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    settings = QSettings('FAB', 'SAP109')
+    settings = QSettings('FAB', f'SAP{PRODUCT}')
     settings.lang_index = settings.value('lang_index', 0, int)
     translator = QTranslator()
     translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))

@@ -9,7 +9,7 @@ from ui.led_color_dialog import Ui_LedColorDialog
 from ui.led_result_marker_dialog import Ui_LedResultMarkerDialog
 from serials import issue_command, get_serial
 from utils import resource_path
-from config import LANG_LIST
+from config import LANG_LIST, PRODUCT
 
 PADDING = ' ' * 8
 num_key_list = [
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    settings = QSettings('FAB', 'SAP109')
+    settings = QSettings('FAB', f'SAP{PRODUCT}')
     settings.lang_index = settings.value('lang_index', 0, int)
     translator = QTranslator()
     translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))

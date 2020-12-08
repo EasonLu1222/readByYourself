@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QSettings, QTranslator
 from PyQt5.QtGui import QKeySequence, QCursor
 from PyQt5.QtWidgets import QDialog, QApplication, QShortcut
 
-from config import LANG_LIST
+from config import LANG_LIST, PRODUCT
 from ui.pass_fail_dialog import Ui_PassFailDialog
 from utils import resource_path
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    settings = QSettings('FAB', 'SAP109')
+    settings = QSettings('FAB', f'SAP{PRODUCT}')
     settings.lang_index = settings.value('lang_index', 0, int)
     translator = QTranslator()
     translator.load(resource_path(f"translate/{LANG_LIST[settings.lang_index]}"))

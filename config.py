@@ -68,10 +68,6 @@ LANG_LIST = [
 
 
 # =============== Acoustic Station ===============
-#  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
-#  KLIPPEL_PROJECT = 'SAP109 - v1.3 - DVT2 - 191209'
-# KLIPPEL_PROJECT = 'SAP109-v1.5-DVT2-191214'
-# KLIPPEL_PROJECT = 'SAP109 - v1.7 - PVT - 200108'
 KLIPPEL_PROJECT = 'SAP109-209 - v2 - MP - 201106'
 
 
@@ -85,24 +81,29 @@ FACTORY_SFC_IP = 'http://10.228.16.99'
 
 SFC_IP = FACTORY_SFC_IP
 
-SFC_URL = f'{SFC_IP}:7109'
-TOTAL_MAC_URL = f'{SFC_IP}:9009/get_MacTotal_109.asp?product=SAP109'
-GET_MAC_URL = f'{SFC_IP}:9009/get_mac_109.asp?mac_type=wifi+bt&product=SAP109'
+SFC_URL = f'{SFC_IP}:7{PRODUCT}'
+TOTAL_MAC_URL = f'{SFC_IP}:9009/get_MacTotal_{PRODUCT}.asp?product=SAP{PRODUCT}'
+GET_MAC_URL = f'{SFC_IP}:9009/get_mac_{PRODUCT}.asp?mac_type=wifi+bt&product=SAP{PRODUCT}'
 
 # =============== Testing Program Upgrade ===============
 # == ftp ==
+FTP_USER = 'SAP109'
+FTP_PWD = 'sapsfc'
 OFFICE_FTP_IP = '10.228.14.92'
 FACTORY_FTP_IP = '10.228.16.92'
 
 FTP_IP_USED = FACTORY_FTP_IP
 
+LATEST_APP_FOLDER = f'/Belkin{PRODUCT}/Latest_App'
+LATEST_APP_TEST_FOLDER = f'/Belkin{PRODUCT}/Latest_App_Test'
+
 IP_FTPDIR = {
-    FACTORY_FTP_IP: '/Belkin109/Latest_App',
-    OFFICE_FTP_IP: '/Belkin109/Latest_App_Test', # for test
+    FACTORY_FTP_IP: LATEST_APP_FOLDER,
+    OFFICE_FTP_IP: LATEST_APP_TEST_FOLDER, # for test
 }
 FTP_DIR = IP_FTPDIR[FTP_IP_USED]
 
 # == local ==
 USER_PATH = f'C:/Users/{getpass.getuser()}'
-LOCAL_APP_PATH = f'{USER_PATH}/SAP109_STATION'
-TRIGGER_PREFIX = 'sap109-testing-upgrade-starting'
+LOCAL_APP_PATH = f'{USER_PATH}/SAP{PRODUCT}_STATION'
+TRIGGER_PREFIX = f'sap{PRODUCT}-testing-upgrade-starting'

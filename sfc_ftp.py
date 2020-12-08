@@ -8,6 +8,7 @@ import errno
 from datetime import datetime
 from ftplib import FTP
 import pandas as pd
+from config import PRODUCT, FTP_USER, FTP_PWD
 
 
 stations_downloads = {
@@ -43,7 +44,7 @@ STATIONS = {
 class MyFtp():
     def __init__(self):
         ip = '10.228.14.92'
-        user, passwd = 'SAP109', 'sapsfc'
+        user, passwd = FTP_USER, FTP_PWD
         self.ftp = FTP(ip)
         self.ftp.login(user=user, passwd=passwd)
 
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     station_to_download = ['RF', 'Audio', 'Leak', 'WPC', 'PowerSensor', 'SA', 'Acoustic', 'Download', 'MicBlock', 'MAC_DB']
 
     ftp = MyFtp()
-    ftp_paths = [f'/Belkin109/{STATIONS[sta]}' for sta in station_to_download]
+    ftp_paths = [f'/Belkin{PRODUCT}/{STATIONS[sta]}' for sta in station_to_download]
     loc_paths = [f"{os.path.abspath('.')}/{stations_downloads[s]}" for s in station_to_download]
     for ftp_path, loc_path in zip(ftp_paths, loc_paths):
         print('ftp_path', ftp_path)

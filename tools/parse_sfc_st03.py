@@ -2,10 +2,11 @@ import requests
 from operator import itemgetter
 import pandas as pd
 from bs4 import BeautifulSoup
+from config import PRODUCT
 
 
 def find_page(page=1):
-    url = 'http://10.228.14.99:8109/search/Query_ST03.asp?g_flag=1&goPageFlag=1'
+    url = f'http://10.228.14.99:8{PRODUCT}/search/Query_ST03.asp?g_flag=1&goPageFlag=1'
     files = {
       'g_result': 'ALL',
       'goPage': page,

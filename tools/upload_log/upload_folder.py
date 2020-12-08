@@ -9,6 +9,7 @@ import os
 import argparse
 from shutil import make_archive
 from ftplib import FTP
+from config import FTP_USER, FTP_PWD
 
 
 def upload_folder(zip_name, local_path, remote_path):
@@ -16,7 +17,7 @@ def upload_folder(zip_name, local_path, remote_path):
     make_archive(local_path, 'zip', local_path)
 
     ftp = FTP('10.228.16.92', timeout=180)
-    ftp.login(user='SAP109', passwd='sapsfc')
+    ftp.login(user=FTP_USER, passwd=FTP_PWD)
     ftp.cwd(remote_path)
 
     with open(zip_path, 'rb') as f:

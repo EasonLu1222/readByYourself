@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
 from PyQt5.QtCore import Qt
 from config import (
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
+    FTP_USER, FTP_PWD,
     OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED,
 )
 from mylogger import logger
@@ -129,7 +130,7 @@ def wait_for_process_end_if_downloading():
 
 class MyFtp():
     def __init__(self, cwd=FTP_DIR):
-        user, passwd = 'SAP109', 'sapsfc'
+        user, passwd = FTP_USER, FTP_PWD
         try:
             logger.info(f'ftp ip_used: {FTP_IP_USED}')
             self.ftp = None
@@ -336,7 +337,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.thread.quit.connect(self.quit)
         self.thread.start()
         self.dialog.show()
-        with open(f'{LOCAL_APP_PATH}\sap109-testing-upgrade-starting-{os.getpid()}', 'w'):
+        with open(f'{LOCAL_APP_PATH}\sap{PRODUCT}-testing-upgrade-starting-{os.getpid()}', 'w'):
             pass
 
     def quit(self):

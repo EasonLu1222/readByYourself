@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QDialog,
                              QLabel, QWidget, QPushButton, QProgressBar)
 from PyQt5.QtCore import Qt
+from config import PRODUCT, FTP_USER, FTP_PWD
 
 
 class MyDialog(QDialog):
@@ -35,8 +36,8 @@ class DownloadThread(QtCore.QThread):
     def run(self):
         self.data_downloaded.emit('Status: Connecting...')
         ftp = FTP('10.228.14.92', timeout=3)
-        ftp.login(user='SAP109', passwd='sapsfc')
-        ftp.cwd('Belkin109/Latest_App')
+        ftp.login(user=FTP_USER, passwd=FTP_PWD)
+        ftp.cwd(f'Belkin{PRODUCT}/Latest_App')
         filename = 'app_20191214_1833.exe'
         self.totalsize = ftp.size(filename)
         self.dlsize = 0
