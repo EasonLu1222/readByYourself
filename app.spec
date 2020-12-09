@@ -86,4 +86,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True,
-          icon='images/ic_launcher.ico')
+          icon=f'images/ic_launcher_{PRODUCT}.ico')

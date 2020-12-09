@@ -119,7 +119,7 @@ class Label(QLabel):
         self.radius = 100
         self.target = QPixmap(self.size())  # 大小和控件一样
         self.target.fill(Qt.transparent)  # 填充背景为透明
-        p = QPixmap(resource_path("./images/fit_logo.png")).scaled(  # 加载图片并缩放和控件一样大
+        p = QPixmap(resource_path(f"./images/main_window_logo_{PRODUCT}.png")).scaled(  # 加载图片并缩放和控件一样大
             170, 1, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
         painter = QPainter(self.target)
         if self.Antialiasing:
@@ -381,7 +381,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.table_view.setSelectionBehavior(QTableView.SelectRows)
 
     def set_appearance(self):
-        logo_img = QPixmap(resource_path("./images/fit_logo.png"))
         self.logo = Label(self.container, antialiasing=True)
         self.logo.setText("")
         self.logo.setObjectName("logo")
