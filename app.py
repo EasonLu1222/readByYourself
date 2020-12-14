@@ -39,7 +39,7 @@ from upgrade import (
     delete_app_exe, MyDialog, DownloadThread,
 )
 from config import (
-    station_json, LANG_LIST, STATION, KLIPPEL_PROJECT,
+    station_json, LANG_LIST, KLIPPEL_PROJECT,
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
     OFFICE_FTP_IP, FACTORY_FTP_IP, FTP_IP_USED, PRODUCT
 )

@@ -1,91 +1,38 @@
 import re
 import os
 import json
+import argparse
 from datetime import datetime
 from shutil import copyfile, make_archive, rmtree
 from distutils.dir_util import copy_tree
 from utils import run, get_md5
-import argparse
+from config import PRODUCT
 
 
 class Distribute:
     def __init__(self, stations=None):
         self.ts = datetime.now().strftime("%Y%m%d_%H%M")
         STATIONS = [
-            {
-                "station": "MainBoard",
-                "file_prefix": "Station02_MainBoard",
-            },
-            {
-                "station": "MainBoardIqc",
-                "file_prefix": "Station01_MainBoardIqc",
-            },
-            {
-                "station": "CapTouchMic",
-                "file_prefix": "Station03_SwBoard",
-            },
-            {
-                "station": "Led",
-                "file_prefix": "Station04_LedBoard",
-            },
-            {
-                "station": "RF",
-                "file_prefix": "Station05_BtWiFi",
-            },
-            {
-                "station": "AudioListen",
-                "file_prefix": "Station06_AudioListen",
-            },
-            {
-                "station": "Leak",
-                "file_prefix": "Station07_Leak",
-            },
-            {
-                "station": "WPC",
-                "file_prefix": "Station08_WPC",
-            },
-            {
-                "station": "PowerSensor",
-                "file_prefix": "Station09_Antenna",
-            },
-            {
-                "station": "SA",
-                "file_prefix": "Station10_SA",
-            },
-            {
-                "station": "AcousticListen",
-                "file_prefix": "Station11_AcousticListen",
-            },
-            {
-                "station": "Download",
-                "file_prefix": "Station12_Download",
-            },
-            {
-                "station": "MicBlock",
-                "file_prefix": "Station13_MicBlock",
-            },
-            {
-                "station": "BootCheck",
-                "file_prefix": "Station14_BootCheck",
-            },
-            {
-                "station": "UsidFix",
-                "file_prefix": "StationXX_UsidFix",
-            },
-            {
-                "station": "Gcms",
-                "file_prefix": "StationXX_Gcms",
-            },
-
-            # The following are SAP209 stations
-            {
-                "station": "LedMfi",
-                "file_prefix": "Station04_LedMfi",
-            }
-
+            "MainBoard",
+            "MainBoardIqc",
+            "CapTouchMic",
+            "Led",
+            "RF",
+            "AudioListen",
+            "Leak",
+            "WPC",
+            "PowerSensor",
+            "SA",
+            "AcousticListen",
+            "Download",
+            "MicBlock",
+            "BootCheck",
+            "UsidFix",
+            "Gcms",
+            "LedMfi",
         ]
         if stations:
-            self.STATION = [e for e in STATIONS if e['station'] in stations]
+            self.STATION = [e for e in STATIONS if e in stations]
         else:
             self.STATION = STATIONS
         print(self.STATION)
@@ -136,17 +83,18 @@ class Distribute:
         """
 
         for sta in self.STATION:
-            target_dir = f"dist/{sta['file_prefix']}_{self.ts}"
+
+            target_dir = f"dist/SAP{PRODUCT}_{sta}_{self.ts}"
             os.mkdir(target_dir)
             copyfile("dist/app.exe", f"{target_dir}/app_{self.ts}.exe")
             copyfile("dist/md5.txt", f"{target_dir}/md5.txt")
             copy_tree("dist/jsonfile", f"{target_dir}/jsonfile")
 
-            if sta['station']=='RF':
+            if sta=='RF':
                 copy_tree("dist/iqxel", f"{target_dir}/iqxel")
 
-            sta_obj = {"STATION": sta["station"]}
-            station_json_path = f"dist/{sta['file_prefix']}_{self.ts}/jsonfile/station.json"
+            sta_obj = {"STATION": sta}
+            station_json_path = f"{target_dir}/jsonfile/station.json"
             with open(station_json_path, "w") as outfile:
                 json.dump(sta_obj, outfile)
 

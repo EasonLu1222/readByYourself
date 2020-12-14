@@ -18,6 +18,8 @@ exec_before = exec_statement('''
                     'dist/iqxel/FAB_Test_Flow.txt')
 ''')
 
+PRODUCT = '109'
+
 added_files = [
     ('db/*.py', 'db'),
     ('tasks/*', 'tasks'),
