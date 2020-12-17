@@ -17,7 +17,7 @@ class PwdDialog(QDialog, Ui_PwdDialog):
         self.is_eng_mode_on = False
 
     def check_pwd(self, password):
-        return password==f'sap{PRODUCT}vn'
+        return password==f'engmod{PRODUCT}vn'
         
     def showEvent(self, event):
         super(PwdDialog, self).showEvent(event)
