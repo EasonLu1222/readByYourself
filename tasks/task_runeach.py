@@ -228,15 +228,10 @@ def check_mac_wifi():
         ])
 
         lines = issue_command(ser, cmd)
-        regex = r"^c4:41:1e(?::[a-f|\d]{2}){3}"     #c4:41:1e:xx:xx:xx
-        regex2 = r"^e8:9f:80(?::[a-f|\d]{2}){3}"    #e8:9f:80:xx:xx:xx
+        regex = r"^(c4:41:1e|e8:9f:80|d8:ec:5e)(?::[a-f|\d]{2}){3}"     #c4:41:1e:xx:xx:xx or e8:9f:80:xx:xx:xx or d8:ec:5e:xx:xx:xx
         result = 'Fail(empty or invalid mac_wifi)'
         for l in lines:
             matches = re.search(regex, l)
-            if matches:
-                result = 'Pass'
-                break
-            matches = re.search(regex2, l)
             if matches:
                 result = 'Pass'
                 break
@@ -260,15 +255,10 @@ def check_mac_bt():
         ])
 
         lines = issue_command(ser, cmd)
-        regex = r"^c4411e(?:[a-f|\d]{2}){3}"    # c4411exxxxxx
-        regex2 = r"^e89f80(?:[a-f|\d]{2}){3}"    # e89f80xxxxxx
+        regex = r"^(c4411e|e89f80|d8ec5e)(?:[a-f|\d]{2}){3}"  # c4411exxxxxx or e89f80xxxxxx or d8ec5exxxxxx
         result = 'Fail(empty or invalid mac_bt)'
         for l in lines:
             matches = re.search(regex, l)
-            if matches:
-                result = 'Pass'
-                break
-            matches = re.search(regex2, l)
             if matches:
                 result = 'Pass'
                 break
