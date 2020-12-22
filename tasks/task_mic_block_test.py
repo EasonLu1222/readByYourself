@@ -222,11 +222,11 @@ def calculate_sensitivity():
 
     # If one mic channel is broken, the system will copy the data from the good channel to the bad channel,
     # which makes the data of the 2 channels identical. This is a convenient way to judge if one mic is broken.
-    mic_r = f'{mic_channel[0]:.3f}'
-    mic_l = f'{mic_channel[1]:.3f}'
-    mic_b_r = f'{mic_block_channel[0]:.3f}'
-    mic_b_l = f'{mic_block_channel[1]:.3f}'
-    is_one_mic_broken = (mic_r == mic_l) and (mic_b_r == mic_b_l)
+    mic_r = float(mic_channel[0])
+    mic_l = float(mic_channel[1])
+    mic_b_r = float(mic_block_channel[0])
+    mic_b_l = float(mic_block_channel[1])
+    is_one_mic_broken = abs(mic_r - mic_l) < 0.001 and abs(mic_b_r - mic_b_l) < 0.001
 
     logger.info(f"mic_channel_left: {mic_channel[1]}")
     logger.info(f"mic_channel_right: {mic_channel[0]}")
