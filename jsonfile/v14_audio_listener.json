@@ -1,0 +1,137 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": "AU",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 1,
+        "sn": ["AK08QPMXA"]
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10, 11],
+     "columns_width": [1, 1, 1, 1, 1, 300, 300, 90, 90, 90, 90, 1, 400]
+ },
+ "behaviors": {
+     "barcode-scan": true,
+     "firsts": [],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         }
+         ,{
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "Initialize",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "check mainboard id",
+            "script": "task_runeach",
+            "args": ["check_usid"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": "read_pid"
+        },
+        {
+            "group": "SFC",
+            "hidden": false,
+            "tasktype": 13,
+            "item": "Check if DUT passed in previous stations",
+            "script": "task_sfc",
+            "args": ["check_sfc"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Audio Path",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "trigger audio path",
+            "script": "task_runeach",
+            "args": ["arecord_aplay_path_audio"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": null
+        },
+        {
+            "group": "SoundCheck",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "frequency response [L]",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "FR_L"
+        }
+        ,{
+            "group": "SoundCheck",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "THD [L]",
+            "script": null,
+            "args": null,
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "THD_L"
+        },
+        {
+            "group": "SoundCheck",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "frequency response [R]",
+            "script": null,
+            "args": [],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "FR_R"
+        }
+        ,{
+            "group": "SoundCheck",
+            "hidden": false,
+            "tasktype": 10,
+            "item": "THD [R]",
+            "script": null,
+            "args": [],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "THD_R"
+        }
+    ]
+}

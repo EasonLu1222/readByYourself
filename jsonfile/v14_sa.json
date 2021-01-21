@@ -1,0 +1,217 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": "SA",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 2,
+        "sn": ["AQ00J4NDA", "AQ0011SBA"]
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4, 7, 8, 9, 10, 11],
+     "columns_width": [1, 1, 1, 1, 1, 220, 190, 90, 90, 90, 90, 1, 385, 385]
+ },
+ "behaviors": {
+     "barcode-scan": false,
+     "firsts": [
+         {
+             "first": "remaining_addr_init",
+             "args": ["win"]
+         }
+     ],
+     "actions": [
+         {
+            "action": "disable_power_check",
+            "args": ["win"]
+         }
+         ,{
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         }
+         ,{
+            "action": "enter_prompt2",
+            "args": ["win", 0.2]
+         }
+     ],
+     "prepares": [],
+     "afters": [
+         {
+             "after": "remaining_addr",
+             "args": ["win"]
+         }
+     ]
+ },
+ "test_items":
+    [
+        {
+            "group": "Read ProductID",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["read_pid"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "read_pid"
+        },
+        {
+            "group": "SFC",
+            "hidden": false,
+            "tasktype": 13,
+            "item": "Check if DUT passed in previous stations",
+            "script": "task_sfc",
+            "args": ["check_sfc"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Load LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["load_led_driver"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "LED Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "",
+            "script": "task_led",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Unload LED driver",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["unload_led_driver"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "led"
+        },
+        {
+            "group": "MFi chip detection",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "Make sure this is not a 209 product",
+            "script": "task_runeach",
+            "args": ["check_no_mfi"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "FDR Key Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "",
+            "script": "task_fdr",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "fdr"
+        },
+        {
+            "group": "CapTouch Firmware",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "check touch firmware version",
+            "script": "task_runeach",
+            "args": ["check_touch_fw_version"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Cap Touch Test",
+            "hidden": false,
+            "tasktype": 3,
+            "item": "",
+            "script": "task_cap_touch",
+            "args": null,
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": "captouch"
+        },
+        {
+            "group": "Write Wifi and BT Mac",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "write mac_wifi",
+            "script": "task_runeach",
+            "args": ["write_wifi_bt_mac"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": "wifi_bt_mac"
+        },
+        {
+            "group": "Check Wi-Fi MAC",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["check_mac_wifi"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        },
+        {
+            "group": "Check Bluetooth MAC",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "",
+            "script": "task_runeach",
+            "args": ["check_mac_bt"],
+            "auto": false,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+    ]
+}

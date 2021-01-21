@@ -1,0 +1,357 @@
+{"header":
+    ["script", "args", "auto", "tasktype", "hidden", "group", "item", "min", "expect", "max", "unit", "sfc_name"],
+ "version": "14.0",
+ "sfc_station_id": "MB",
+ "devices": {
+    "dut": {
+        "name": "ftdi",
+        "num": 2,
+        "sn": ["A50285BIA", "22222222A"]
+    },
+    "pwr": {
+        "name": "gw_powersupply",
+        "num": 2,
+        "sn": ["GES151079", "GES151078"]
+    },
+    "dmm": {
+        "name": "gw_dmm",
+        "num": 1,
+        "sn": []
+    }
+ },
+ "appearance": {
+     "columns_hidden": [0, 1, 2, 3, 4, 11],
+     "columns_width": [1, 1, 1, 1, 1, 150, 200, 90, 90, 90, 90, 1, 220, 220]
+ },
+ "behaviors": {
+     "barcode-scan": true,
+     "firsts": [],
+     "actions": [
+         {
+            "action": "is_serial_ok",
+            "args": ["win", "task"]
+         }
+         ,{
+            "action": "set_power",
+            "args": ["win"]
+         }
+         ,{
+            "action": "enter_prompt",
+            "args": ["win", 0.2, 10]
+         }
+     ],
+     "prepares": [],
+     "afters": []
+ },
+ "test_items":
+    [
+        {
+            "group": "Initialize",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "check usid",
+            "script": "task_runeach",
+            "args": ["check_usid"],
+            "auto": true,
+            "min": null,
+            "expect": "True",
+            "max": null,
+            "unit": "Bool",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDD_AMP(19V)",
+            "script": "power_check",
+            "args": [109, 101],
+            "auto": true,
+            "min": 18.05,
+            "expect": 19,
+            "max": 19.95,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDDAO(3.3V)",
+            "script": "power_check",
+            "args": [110, 102],
+            "auto": true,
+            "min": 3.135,
+            "expect": 3.3,
+            "max": 3.465,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDDQ(1.5V)",
+            "script": "power_check",
+            "args": [111, 103],
+            "auto": true,
+            "min": 1.425,
+            "expect": 1.5,
+            "max": 1.575,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDDCPU(1.1V)",
+            "script": "power_check",
+            "args": [112, 104],
+            "auto": true,
+            "min": 0.86,
+            "expect": 1.1,
+            "max": 1.2,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDD_EE(0.95V)",
+            "script": "power_check",
+            "args": [113, 105],
+            "auto": true,
+            "min": 0.81,
+            "expect": 0.95,
+            "max": 1.09,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power Rail",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "VDD5V(5V)",
+            "script": "power_check",
+            "args": [114, 106],
+            "auto": true,
+            "min": 4.75,
+            "expect": 5,
+            "max": 5.25,
+            "unit": "V",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Power On",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "max current",
+            "script": "task_runeach",
+            "args": ["check_max_current"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": 0.25,
+            "unit": "A",
+            "sfc_name": null
+        }
+        ,{
+            "group": "LS",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "LS",
+            "script": "task_runeach",
+            "args": ["ls_test"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "WiFi",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "WiFi_Interface",
+            "script": "task_runeach",
+            "args": ["check_wifi_if"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "BT",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "BT_Interface",
+            "script": "task_runeach",
+            "args": ["check_bt"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "CPU1",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "CPU_Freq",
+            "script": "task_runeach",
+            "args": ["check_cpu_freq"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "CPU2",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "CPU_Core_Num",
+            "script": "task_runeach",
+            "args": ["check_cpu_cores"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "DDR",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "DDR Size",
+            "script": "task_runeach",
+            "args": ["check_ddr_size"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "I2C1",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "I2C_Amp_TAS5766",
+            "script": "task_runeach",
+            "args": ["check_i2c_tas5766"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "I2C2",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "I2C_Cap_MSP430",
+            "script": "task_runeach",
+            "args": ["check_i2c_msp430"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "I2C3",
+            "hidden": false,
+            "tasktype": 1,
+            "item": "I2C_LED_LP5018",
+            "script": "task_runeach",
+            "args": ["check_i2c_lp5018"],
+            "auto": true,
+            "min": null,
+            "expect": null,
+            "max": null,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "SpeakerSetup1",
+            "hidden": true,
+            "tasktype": 1,
+            "item": "decrese playback volume",
+            "script": "task_runeach",
+            "args": ["decrease_playback_volume"],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "SpeakerSetup2",
+            "hidden": true,
+            "tasktype": 1,
+            "item": "play 1KHz frequency for 2 DUTs",
+            "script": "task_runeach",
+            "args": ["speaker_play_1kz"],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": null,
+            "sfc_name": null
+        }
+        ,{
+            "group": "Speaker",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "Woofer",
+            "script": "speaker_check",
+            "args": [115, 107],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": "Hz",
+            "sfc_name": null
+        }
+        ,{
+            "group": "Speaker",
+            "hidden": false,
+            "tasktype": 2,
+            "item": "Full Range",
+            "script": "speaker_check",
+            "args": [116, 108],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": "Hz",
+            "sfc_name": null
+        }
+        ,{
+            "group": "SpeakerSetup3",
+            "hidden": true,
+            "tasktype": 1,
+            "item": "close 1KHz frequency for 2 DUTs",
+            "script": "task_runeach",
+            "args": ["speaker_close_1kz"],
+            "auto": true,
+            "min": 995,
+            "expect": null,
+            "max": 1005,
+            "unit": null,
+            "sfc_name": null
+        }
+    ]
+}

@@ -1,0 +1,807 @@
+[2019.11.21 - 14:50]
+Audio station ok
+
+1. change fixed filename to dynamic one based on date
+
+2. adjust column width
+
+
+[2019.11.20 - 16:05]
+New way to integrate audio station [10%]
+
+1. use watchdog & pyautogui to automate/integrate with soundcheck
+
+[2019.11.16 - 16:55]
+Adjust column widths for some stations
+
+1. changed stations: RF, PowerSensor, SA
+
+2. delete v12 jsonfiles
+
+[2019.11.16 - 14:15]
+Change acoustic station appearance a little bit
+
+[2019.11.16 - 09:10]
+Modify acoustic station: minimized interface
+
+1. shrink original full screen to bar-like interface
+
+[2019.11.15 - 14:30]
+Add read_pid at RF station
+
+1. autogenerate v13_rf_only.json instead of v13_rf.json
+
+2. manually add read_pid test item into v13_rf.json
+
+3. update FAB_Test_Flow file : total 45 items
+
+
+[2019.11.14 - 11:10]
+Fix no pid in logs issue
+
+1. no pid in logs bugs fixed
+
+2. clear header to #1, #2, ... once run button clicked
+
+[2019.11.12 - 16:00]
+Modify acoustic station: add one item exit_aplay_path
+
+[2019.11.12 - 15:20]
+Add new station: acoustic
+
+[2019.11.9 - 01:00]
+Add argparser to distribute.py
+
+[2019.11.7 - 23:10]
+Change WPC station's actions
+
+1. staion PowerSensor: actions changed to enter_prompt2
+
+[2019.11.7 - 23:00]
+Modified wait_for_prompt
+
+1. add serials.wait_for_prompt2()
+	- work for both two cases
+		- in the prompt already
+		- if not powered, wait for powered and prompt appeared
+
+2. modify two stations
+	- SA: actions changed to enter_prompt2
+	- RF: actions changed to enter_prompt2
+
+[2019.11.6 - 23:30]
+Notorius is_serial_ok bug fixed (to be tested)
+
+1. use QSignal to handle the stopping of BaseSerialListener
+
+
+[2019.11.3 - 23:25]
+Leak station testing flow worked
+
+1. use toggle button to switch btw enable-fetch & fetching...
+	- once toggled on, it will listen to uart output
+	- tested with com0com --> ok
+	- real leaker output still needed to be parsed
+
+2. add wait_for_leak_result() & set_appearance() in actions.py
+	- modify v13_leak.json
+
+[2019.11.2 - 10:10]
+New station: preliminary framework for leak test
+
+1. remove QThread.msleep(1000) & QThread.msleep(500) from Task.run()
+   may be needed in the future. need more test.
+ 
+
+[2019.11.2 - 08:10]
+Make logger more readable
+
+1. format:
+	- date, level, module, pid, module.className.funcName:lineno, message
+
+[2019.11.2 - 00:55]
+Make logger more readable
+
+1. Add customized Formatter
+
+
+[2019.10.30 - 23:55]
+Some station avaiable at Mac environment
+
+1. include only necessary modules when needed
+
+2. worked stations at mac
+	- LED, CatTouch, MainBoard, SA, WPC, Download
+
+[2019.10.29 - 15:25]
+Move codes from core.py into actions.py
+
+[2019.10.29 - 15:00]
+Actions codes refactoring: firsts/prepares/actions/afters
+
+1. Actions & Action classes
+	- move actions related codes from app.py into core.py
+
+2. jsonfile modified
+	- v13_cap_touch, v13_download, v13_led, v13_mb, v13_sa, v13_wpc
+
+
+[2019.10.28 - 22:20]
+Beautify top port rendor: linear gradient background
+
+[2019.10.28 - 21:45]
+Product line readiness
+
+1. fix instrument render bug
+
+2. qss loading bug fixed when pyinstaller packageing
+
+3. modification for powersensor station
+	- device.json: vid update for U2040XA 
+	- modify jsonfile/v13_power_sensor.json
+
+4. others
+	- recover task_runeach.ls_test() 
+
+[2019.10.28 - 11:10]
+Unify actions creation & register
+
+1. new class core.Action
+	- MyWindow.register_action() to handle actions register
+
+2. do not render if dut name is null
+
+[2019.10.28 - 00:10]
+Move more qss string from app.py
+
+1. comment out self.pushButton.setStyleSheet("padding:10px") from ui/main.py
+
+
+[2019.10.27 - 21:50]
+Move qss string from set_appearance() into a separate qss file
+
+1. qss loading
+	- add utils.QssTools class to simplify qss file loading
+	- move all qss settings into ui/qss/style1.qss
+	- in MyWindow.set_appearance(), use QssTools.set_qss_to_obj
+	  to loading qss file
+
+[2019.10.27 - 00:45]
+Show duts & devices at top and colored when detected
+
+1. modify app.MyWindow.render_port_plot
+
+
+[2019.10.26 - 23:50]
+Change from waitcursor to arrowcursor when starting a new app
+
+[2019.10.26 - 16:20]
+Make logger more readable
+
+1. modify all files for padding logger
+	- files under tasks/
+
+[2019.10.26 - 16:20]
+Make logger more readable
+
+1. modify more files for padding logger
+	- files under tasks/
+
+[2019.10.26 - 15:40]
+Make logger more readable
+
+1. modify more files for padding logger
+
+[2019.10.26 - 15:00]
+Make logger more readable
+
+1. 8 space paddings for task_runeach
+
+[2019.10.26 - 14:55]
+Make logger more readable
+
+1. add changeable padding for each logger
+
+[2019.10.26 - 14:30]
+Make logger more readable
+
+1. files modified 
+	- instrument.__init__
+	- iqxel.__init__
+	- soundcheck
+
+[2019.10.26 - 14:05]
+Error handling for serial issues
+
+1. is_serial_ok: print out every failed com port
+	- modify actions.is_serial_ok()
+
+2. modify core.Task.run()
+	- add QThread.msleep(1000) before running actions
+	- add self.window.ser_listener.start() if actions failed
+
+
+[2019.10.26 - 09:20]
+Make logger more readable
+
+[2019.10.26 - 01:10]
+Make logger more readable
+
+1. set logger default level to debug
+
+2. add alignment for each logging item
+
+3. add indent for differnt modules
+	- app.py: 0 indent
+	- core.py: 2 indent
+	- else: 4 indent (To Be Added)
+
+4. remove some logs
+
+[2019.10.25 - 23:50]
+Serial error handling with description
+
+[2019.10.25 - 18:40]
+improve serial error handling
+
+1. handle \xff issue
+	- serial readlines() will have \xff issue when first plugging 
+	  in the uart connector
+	- add actions.serial_ignore_xff() to handle this situation
+	- for station without booting, must add this action
+		- modify v13_cap_touch.json
+		- modify v13_led.json
+
+2. modify issue_command
+	- for fetch=False case, force readlines()
+
+[2019.10.25 - 01:00]
+beautify all
+
+1. beautify using stylesheet
+	- modify MyWindow.set_appearance()
+
+[2019.10.24 - 21:00]
+beautify pushbutton
+
+[2019.10.24 - 18:30]
+Jsonfile v13
+
+1. Jsonfile version 13
+	- add appearance attribute to control table appearance for each station
+	- add 10 jsonfiles
+	- delete all v11 jsonfiles
+	- add MyWindow.set_appearance()
+
+2. anti-aliasing FIT logo
+	- add class Label
+
+
+[2019.9.26 - 23:55]
+Generate jsonfile based on testflow file
+
+1. generate rf jsonfile based on testflow file
+	- source_testflow: iqxel/FAB_Test_Flow.txt
+	- source_jsonfile: jsonfile/v12_rf_base.json
+	- generated_jsonfile: jsonfile/v12_rf.json
+
+2. delete all jsonfiles which's version < 11
+
+3. deploy on windows10 tested
+	- testflow can be modified after deployed
+
+
+[2019.9.23 - 00:55]
+Jsonfile v12 & winpty trick to recieve iqfact output
+
+1. Jsonfile version 12
+	- add firsts attribute under behaviors
+	- add dummy_com_first() at app.py to simulate com ports
+	- add 12 jsonfiles
+
+2. Capture realtime output from IQfactRun_Console
+	- previously iqfact output is buffered, so not realy in realtime
+	- use winpty to force iqfact program's stdout to be unbuffered
+	- copy dll & exe to iqxel/
+		- msys-2.0.dll
+		- winpty.dll
+		- winpty.exe , etc...
+	- change Popen arguments
+
+3. Move run_iqfactrun_console() from core.py to iqxel/__init__.py
+
+4. Three testflow files to copy into three iqfact bin/ respectively
+	- In this commit, rf station is simulated using dummy_com_first
+	  which 3 dummy com ports are com11, com87, com5. Three testflow
+	  files at iqxel/ are based on these com ports. For test, please
+	  copy these files into workdir of IQfactRun_Console. That should
+	  be bin1/ bin2/ bin3/
+
+
+
+[2019.9.20 - 16:20]
+New Station: SA (Semi Assembly)
+
+1. new jsonfile v11_sa.json
+
+2. change task_runeach.py & core.py
+	- add write_mac_wifi(), write_mac_bt(), write_country_code()
+	- change argument sid to dynamic_info to accomodate sid, mac_wifi, mac_bt & ccode
+
+
+
+[2019.9.19 - 16:55]
+WPC station bugs fixed
+
+1. fix crashing bug
+	- error handling to instrument/__init__.py > Eloader.measure_current()
+
+
+[2019.9.18 - 13:55]
+New Station: Power Sensor at FATP
+
+1. WiFiTest4U2xxxx needed on DUT board
+
+2. update v11_power_sensor.json
+	- modify task_powersensor.py
+	- modify task/task_runeach.py
+
+3. pyvisa hack to bypass pkg_resources no module found error
+	- modify pyvisa/__init__.py, comment out "import pkg_resources"
+	- define this file-copy at app.spec
+
+
+[2019.9.17 - 18:15]
+Show hboxPorts only in EngMode On
+
+
+[2019.9.17 - 16:15]
+Test packaged app.exe to work on clean window env
+
+1. package embedded python interpreter to allow Popen to use
+	- python-3.7.3-embed-amd64/
+
+2. three station tested: mb, captouch, led
+
+3. local app.py compatibility --> TBD
+
+4. comment out check_json_integrity() temporarily
+
+
+
+[2019.9.17 - 11:15]
+Refactoring core.py
+
+1. move codes from Task.run() into each task function
+   ex: run_task1(), run_task9(), ...
+
+
+[2019.9.16 - 15:45]
+New Station: Download at FATP
+
+1. always enabled (no need to click Pushbutton to start)
+	- once sense the booting, automatically enter burn-mode
+
+2. jsonfile version 11 (add field "afters")
+
+3. add window-maximized trick for app.py
+	- mainly for app after pyinstaller package
+
+4. add jsonfile/station.json for quick temporary develop
+	- allow dynamically change station after pyinstaller package
+
+
+[2019.9.15 - 13:50]
+Add program version & station version
+
+1. show version at statusbar
+	- programm version, define at app.py (for now)
+	- station version. defined at each jsonfile
+
+2. jsonfile version 10 (add field "version")
+
+
+[2019.9.15 - 10:50]
+Allow only DUT comports which serial numbers are in jsonfile definition
+
+
+[2019.9.15 - 10:35]
+Refactoring app.py
+
+1. app.py refactoring
+	- move class Task & related functions into core.py
+	- move actions related functions into actions.py
+	- adjust args fields for jsonfile
+	- move soundcheck_init() into soundcheck.py
+	- move get_visa_devices() etc into instrument/__init__.py
+	- move all STATION descriptions into app.py from config.py
+
+
+[2019.9.14 - 21:00]
+Move actions & prepares into each jsonfile & cleanup app.py
+
+1. jsonfile version 9
+	- define actions & prepares (moved from app.py)
+
+2. define station_json at config.py and only STATION needed at app.py
+	- define each station & related jsonfile using station_json
+	- hardcode STATION at app.py to determine the opend station
+
+
+[2019.9.11 - 16:50]
+Add template testflow files
+
+1. add testflow files
+	- iqxel/FIT_Wifi_Testflow.txt
+	- iqxel/FIT_BT_Testflow.txt
+	- iqxel/FIT_Wifi_Testflow_simplex.txt
+	- iqxel/FIT_BT_Testflow_simplex.txt
+
+
+[2019.9.11 - 11:15]
+New station: RF at FATP (Preliminary) & 3 DUTs work
+
+1. v8_rf_wifi.json & v8_rf_bt.json added
+
+2. add new task_type=11. no script.py needed.
+	- using 3 threads to call Task.run_iqfactrun_console()
+
+
+[2019.9.2 - 19:25]
+New station: Audio at FATP (Preliminary)
+
+1. port ACD brad's codes into soundcheck.py
+
+2. jsonfile/v8_audio.json added
+
+3. add new task_type=9. no script.py needed.
+   use instance & it's method in the program
+
+4. add prepares_args mechanism
+   once duts & instruments are ready, button will be enabled.
+   but before clicking the button, do prepares action first.
+   you can define these actions using register_prepares()
+
+
+[2019.8.28 - 17:30]
+New station: Power Sensor at FATP
+
+1. add visa interface for instruments
+	- new format for device.json
+	- add three classes at instrument/__init__.py
+		VisaInstrument & PowerSensor & Instrument
+
+2. add new device listeners
+	- add two classes at app.py
+		BaseVisaListener & VisaListener
+
+[2019.8.22 - 20:45]
+New jsonfile format (v08) & barcode-scan attribute
+
+1. jsonfile v08
+	- change structure to test_items
+	- add new attributes: behaviors > barcode_scan
+
+2. based on barcode_scan to toggle barcode scanner dialog
+
+3. add new task_runeach function: read_pid()
+
+[2019.8.22 - 08:25]
+Remove model.py
+
+[2019.8.22 - 08:20]
+Reorg Task.run(). Use task_type to distinguish each task
+
+[2019.8.21 - 18:20]
+Change fixed checkboxes to dynamic based on jsonfile
+
+[2019.8.21 - 15:20]
+Add WPC station test
+
+1. Add new jsonfile & py for this wpc station
+	- jsonfile/v7_wpc.json
+	- tasks/task_wpc.py
+
+2. Add new instrument Eloader & related commands
+
+3. Modify rungroup() & make all instrument-based measurement compatible
+	- modify power_check.py
+	- modify speaker_check.py
+
+[2019.8.15 - 18:00]
+1. add msp430 download item to station captouch
+	a. modify jsonfile/v7_cap_touch.json
+	b. modify app.py > enter_prompt() add argument waitwordidx
+	c. modify tasks/task_runeach.py: add msp430_download()
+	d. modify serials.py > wait_for_prompt()
+		change from
+			if line.startswith(prompt):
+		to
+			if prompt in line:
+	e. modify serials.py > enter_factory_image_prompt()
+		add one waitword: 'asoc-aml-card auge_sound: tdm playback enable'
+
+[2019.8.12 - 17:20]
+1. prepare for RF test station development
+	a. add one jasonfile v7_rf.json & modify tasks/task_runeach.py
+
+[2019.7.17 - 13:45]
+1. auto dut comport detection using ftdi uart-usb connector
+	a. v7 jasonfile: v7_ftdi_total.json & v7_cp2102_total.json
+	b. auto assigin dut comport according to serial number definition at jsonfile
+	c. remove pushDetect button
+
+[2019.7.16 - 10:30]
+1. logs for debug message
+	a. modify mylogger.py: add FileHandler, save logs at logs/error_logs.txt
+
+2. logs for testing results
+	a. save testing result 2019_xx_xx.csv at logs/ based on current date
+	b. modification app.py:MyWindow.taskdone()
+
+[2019.7.11 - 16:00]
+1. minor change
+	a. enter_factory_image_prompt
+	  - change from 'usb rndis & adb start: OK' to 'usb rndis'
+	    cause somtetimes comport log will not show whole line but partial line
+
+[2019.7.11 - 15:10]
+1. use powersupply's serial number to find #1 & #2
+	a. v6 jsonfile: add serial numbers info to gw_powersupply
+	b. use scpi command *IDN? to get powersupply's serial number
+	c. directly get correct order of powersupply
+	d. once powersupply order is confirmed, trigger auto-detect of dut comports
+		--> this will be changed in the future (use ftdi's serial number)
+	e. auto-detect button no needed
+
+2. bugs fixed
+	a. when one dut is selected, only occupy that serial port but not both
+	b. ignore UnicodeError in serials>issue_command()
+	   - this is important! otherwise sometimes it will cause test items error and blank in the tableview
+
+[2019.7.10 - 17:50]
+1. jsonfile version5
+	a. add tasks/task_runeach.py to handle all tasktype=1 case
+	b. remove old jsonfile & taskfile
+	c. new jsonfile: v5_total.json & v5_simu.json
+
+[2019.7.08 - 09:30]
+1. overhaul runeach(), remove tasktype=3 case
+	a.unify arguments
+		from
+			runeach(self, index, port, tasktype)
+		to
+			runeach(self, row_idx, dut_idx, sid, tasktype)
+	b. merge all separate py into one task_runeach.py (for tasktype=1 case)
+	c. v4_total_test1.json for test, including following tests
+		(1) max_current
+		(2) speaker test
+		(3) cpu freq test
+	d. most of the tasktype=1 py still need to be moved into new task_runeach.py
+
+
+[2019.7.04 - 19:00]
+1. jsonfile verions 4
+	a. re-org
+	b. add v4_total_two_dut.json, v4_led.json, v4_simu.json
+	c. delete jsonfile/en_us/* jsonfile/zh_TW/*
+	d. move INSTRUMENT_MAP from instrument/__init__.py to app.py
+
+2. accomdate both station jsonfile
+	a. choose STATION at app.py: main()
+
+[2019.7.04 - 16:40]
+1. re-arg SerialListener and change name to BaseSerialListener & move to serials module
+	a. inherent BaseSerialListener to modify for each station need
+	b. define instruments json and set_instruments()
+	c. json str need to be integrate into jsonfile (v4?)
+
+2. task_led
+	a. still bugs need to be fixed. all_pass logics
+	b. exit key need to be ignored
+
+3. add class MySetting
+	a. change MyWindow.__init__. add task parameters back
+	b. remove translate jsonfile function
+
+[2019.7.02 - 19:40]
+1. dut selectable (#1 or #2 or both). fix some bugs. preliminary correct version.
+
+[2019.7.02 - 18:40]
+1. dut selectable (#1 or #2 or both). somehow ugly. need to be organized.
+
+[2019.7.02 - 15:20]
+1. merged success. backgrounad color pass/fail change ok.
+
+[2019.7.02 - 14:40]
+1. set backgraound color based on pass/fail of two DUTs
+
+[2019.7.02 - 14:10]
+1. add transparent loading animation (apple style)
+	a. add images/AppleLoading.gif
+	b. add show_animation_dialog QSignal
+
+
+[2019.7.02 - 11:35]
+1. complete the comport auto detect process
+	a. two dut, two powersupply, one dmm on
+	b. click auto-detect button
+	c. turn on powersupply1 which connect to dut1
+	d. auto-detect the correct comport of dut & powersupply and display
+	e. turn on 2nd powersupply and display
+	f. ready to run test!
+
+2. modification
+	a. instrument/__init__.py: get_serial() function
+	update_serial(instruments) --> update_serial(instruments, inst_type, comports)
+
+	b. app.py
+	- SerialListener
+		self.comports_instrument --> self.comports_ps, self.comports_dmm
+		self.instruments --> self.ports_ps, self.ports_dmm
+	- MyWindow
+	  modified:
+		clean_power()
+		closeEvent()
+		taskdone()
+		instrument_ready()
+		ser_update()
+		instrument_update() --> ps_update() & dmm_update()
+	  added:
+		btn_detect_mb()
+		btn_detect_mb_after()
+
+[2019.6.28 - 16:50]
+1. auto detect the comport of #1 dut using button
+	a. when auto-detect button press, listening to current two comports
+	b. plug adator into #1 dut
+	c. detect the comport which response
+	d. change self._comports if necessary
+
+[2019.6.28 - 08:10]
+1. add comport label-box for instruments whenever serial ports get updated
+2. TBD: DUT/powersupply comports need to be correct according to the DUT's num
+
+[2019.6.26 - 17:35]
+1. start to write testing log
+
+[2019.6.26 - 15:40]
+1. fix bugs
+	a. class Task - limits()
+
+[2019.6.26 - 08:30]
+1. parse limits of jsonfile (currently for tasktype2)
+	a. change power_check2.py
+	b. chnage speaker_check.py
+
+[2019.6.25 - 16:40]
+1. add summary row to check pass/fail
+2. modifications for type2 task
+	a. modify tasks/power_check2.py, speaker_check.py to allow both 1 & 2 DUTs
+	b. change v3_total.json to v3_total_two_dut.json
+	c. new v3_total_one_dut.json
+
+
+[2019.6.24 - 16:15]
+1. reorg class Task to allow simulated task
+	a. register action mechanism to decouple some actions from class Task like
+	   is_serial_ok(), set_power(), enter_prompt(), ...
+	b. add simulated json and py
+		b1. jsonfile/v3_simu1.json
+		b2. tasks/simu_each1.py
+		b3. tasks/simu_group1.py
+
+2. remove model dependency from QTableWidget. setModel()->set_data()
+
+3. users can't select & focus the row now
+
+
+[2019.6.21 - 12:10]
+1. speaker test done
+	a. jsonfile template v3 proposed.
+		a.1 add hidden fields to handle complex tests
+		a.2 ex: use two scripts speaker_setup.py & speaker_check.py to handler
+		speaker test. speaker_setup.py is set hidden.
+	b. add two test scripts: speaker_setup.py & speaker_check.py
+	c. v3_speaker.json & v3_total.json for app.py
+
+2. UI modification
+	a. now row selection are highlighting the processing rows
+	b. multiple rows selection for task type 2
+
+3. minor adjust
+	app.py
+		a. change runeach1 & runeach3 to runeach
+		b. change runeach2 to rungroup
+		c. still need to be reorg
+
+[2019.6.19 - 14:40]
+1. unify logger into one module: mylogger.py
+   usage:
+		- from mylogger import logger
+		- logger.info(...)
+
+2. measure maximum current when boot up
+  mechanism:
+	a. move set_power() when button clicked
+	b. in set_power, use new class ProcessListener(QThread) to listen for
+	   two subprocess poweron.py to poweron and measure maximaum currents
+	   at the same time. When the measures are done, use recieve_power()
+	   to get the results and save it as a file "power_results".
+	c. use power_max_current.py to get results from "power_results".
+	   wait until the file exists and not empty.
+  modified
+	json:
+		a. add tasktype to json structure
+		b. power_new2.json for app.py
+	py:
+		a.instrument/__init__.py: add measure_current()
+
+  added:
+	a. tasks/poweron.py
+	b. tasks/power_max_current.py
+
+3. fix serial bugs
+    a. close window raise serial error
+	b. click button not working
+	   - actually not close serial for powersupply previously
+
+4. insturment update & ready
+	a. button enabled only when power1,power2,dmm1 are detected
+	a. add instrument_ready(), instrument_update() for MyWindow
+	c. pickle [dmm1,power1,power2] in file "instrument" for
+	   poweron.py to unpickle to get the correct com port of each
+	   instruments
+
+[2019.6.17 - 14:00]
+1. minor bug fixed to allow test2.json(both power & other tests) passed for 2 DUTs
+2. measure frequency test ok
+
+[2019.6.14 - 13:50]
+minor bug fixed to allow test2.json(both power & other tests) passed
+
+[2019.6.14 - 09:30]
+0. modify power rail measurments to all channles & DUTs all at once without chaning the json file format
+	a. add Task.runeach2
+1. power rail voltage for two DUTs : gui ok
+	a. power_new.json + tasks/power_check2.py
+	b. modify instrument package: SCPI commands less buggy
+
+[2019.6.11 - 16:52]
+0. use power supply to boot up DUT
+1. power rail voltage measurement : function ok
+2. power rail voltage for single DUT : gui ok
+3. add package instrument
+4. add power.json for test
+5. modify power_check.py
+
+[2019.5.27 - 15:50]
+1. multiple com ports for auto & manual mode all work
+2. solve serial ports confliction between comports update & tasks serial usages
+
+[2019.5.26 - 21:38]
+1. update com ports realtime and show it on top
+   a. new layout: design3.ui
+
+[2019.5.26 - 00:20]
+1. add two debug terminals
+   a. new layout: design2.ui
+   b. first attempt to try promote widget at Qt Designer
+   c. one term for serial output; the other for task output
+
+[2019.5.25 - 22:55]
+1. manual test framwork for multiple duts
+	a. new modules: view/imglist.py view/task_dialog.py
+2. led test
+	a. prototypes: proto/led.py
+	b. new modules: tasks/task_led.py
+	c. led test on one duts OK
+3. serial port listner
+	a. add class SerialListener (app.py) & func get_serial (serials.py)
+
+[2019.5.23 - 10:40]
+1. add module serials.py
+2. link to PCBA and wait for prompt to occur
+3. modify test1.py to actually connect to PCBA and do wifi interface check
+4. remove some redundant codes
+

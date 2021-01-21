@@ -1,0 +1,131 @@
+QLabel[state=default] {
+    padding: 6px;
+    background: grey;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-family: Trebuchet MS;
+    font-size: 16px;
+}
+
+QLabel[state=dut_detected] {
+    padding: 6px;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #369, stop: 1 #8588B2);
+}
+
+QLabel[state=gw_powersupply_detected] {
+    padding: 6px;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #712, stop: 1 #8588B2);
+}
+
+QLabel[state=gw_dmm_detected] {
+    padding: 6px;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #4a3, stop: 1 #8588B2);
+}
+
+QLabel[state=gw_eloader_detected] {
+    padding: 6px;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #a31, stop: 1 #8588B2);
+}
+
+QLabel[state=ks_powersensor_detected] {
+    padding: 6px;
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    outline: 0px;
+    font-size: 16px;
+    font-family: Trebuchet MS;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #1a3, stop: 1 #8588B2);
+}
+
+QCheckBox {font: 18pt Trebuchet MS}
+QComboBox {font: 18pt Trebuchet MS}
+
+QHeaderView::section:horizontal {
+    font-size: 16pt;
+    font-weight: bold;
+    font-family: Gill Sans;
+    Background-color:#eef7fd;
+    border-radius:6px;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
+QPushButton#pushButton {
+    font-size:30px;
+    font-weight: bold;
+    font-family: Courier New;
+    background-color: #f4f6f6;
+    border: 1px solid #35495e;
+    border-radius: 16px;
+    border-style: outset;
+}
+
+QPushButton#pushButton2 {
+    font-size:30px;
+    font-weight: bold;
+    font-family: Courier New;
+    background-color: #f4f6f6;
+    border: 1px solid #35495e;
+    border-radius: 16px;
+    border-style: outset;
+}
+
+QPushButton#pushButton:hover {
+    background-color: #d5d8dc;
+    border-width: 1px;
+    border-style: outset;
+}
+
+QPushButton#pushButton:pressed {
+    background-color: grey;
+    border-width: 1px;
+    border-style: inset;
+    color: white;
+}
+
+QPushButton#pushButton2:checked {
+    background-color: grey;
+    border-width: 1px;
+    border-style: inset;
+    color: white;
+}
+
+QPushButton#pushButton:disabled {
+    background-color: grey;
+    border-width: 1px;
+    border-style: inset;
+    color: #abb2b9;
+}

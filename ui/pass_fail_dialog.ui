@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PassFailDialog</class>
+ <widget class="QDialog" name="PassFailDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>594</width>
+    <height>350</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget[active=true]{
+	border: 5px solid #8BC34A;
+	border-radius: 5px;
+}
+QWidget[active=false]{
+	border: none;
+}
+QWidget[disabled=true] QLabel{
+	color:#BDBDBD;
+}
+QWidget[disabled=false] QLabel{
+	color:#000000;
+}
+QWidget[disabled=true] QLabel[class=&quot;touchBtn&quot;]{
+	border-radius:80px;
+	background-color:#E0E0E0;
+	color:#BDBDBD;
+}
+QWidget[disabled=false] QLabel[class=&quot;touchBtn&quot;]{
+	border-radius:80px;
+	background-color:#FFFFFF;
+	color:#000000;
+}
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,1">
+     <property name="spacing">
+      <number>-1</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="pass_button">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>24</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	color:#FFFFFF;
+	padding:50px;
+	border-radius:5px;
+	background-color:#8BC34A;
+}
+QPushButton:hover:pressed {
+	background-color:#689F38;
+}</string>
+       </property>
+       <property name="text">
+        <string>PASS</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="fail_button">
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>24</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+	color:#FFFFFF;
+	padding:50px;
+	border-radius:5px;
+	background-color:#F44336;
+}
+QPushButton:hover:pressed {
+	background-color:#E64A19;
+}</string>
+       </property>
+       <property name="text">
+        <string>FAIL</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
