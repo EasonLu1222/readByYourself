@@ -1,13 +1,15 @@
 # -*- coding: gbk -*-
 import json
 import getpass                   #便携式密码输入工具:提示用户输入一个密码且不会回显
-from utils import resource_path  #python utils是小python函数和 使公共模式更短更容易的类
+from utils import resource_path  #utils為第三方套件資源路徑獲取資源的絕對路徑，適用於開發人員和PyInstaller
 
 
 PRODUCT = '109'
 
 # =============== Instruments ===============
 DEVICES = json.load(open(resource_path('device.json'), 'r'))
+
+DEVICES = json.load(open(resource_path('C:\\Users\\fit0651\\PycharmProjects\\readByYourself\\view\\device.json'), 'r'))
 SERIAL_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='serial'}
 VISA_DEVICES = {k:v for k,v in DEVICES.items() if v[1]=='visa'}
 SERIAL_DEVICE_NAME = [e[0] for e in SERIAL_DEVICES.values()]
@@ -45,7 +47,11 @@ station_json = {
     # --- FATP repair ---
     'Gcms': 'v14_factory_img_download',
 }
-STATION = json.loads(open('jsonfile/station.json', 'r').\
+'''
+$STATION = json.loads(open('jsonfile/station.json', 'r').\
+                     read())['STATION']
+'''
+STATION = json.loads(open('C:\\Users\\fit0651\\PycharmProjects\\readByYourself\\jsonfile\\station.json', 'r').\
                      read())['STATION']
 
 # =============== Country Code ===============

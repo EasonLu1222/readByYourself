@@ -36,10 +36,10 @@ def is_serial_free(port_name):                                 #設定port_name
     try:
         serial.Serial(port_name, 115200, timeout=0.2)         #port_name, baudrate, timeout
     except SerialException as ex:                             #返回SerialException输出的错误消息
-        logger.debug(f'{PADDING}{type_(ex)}, {ex}')
-        return False
+        logger.debug(f'{PADDING}{type_(ex)}, {ex}')           #紀錄異常
+        return False                                          #回傳False
     except Exception as ex:                                   #當Exception發生時，怎麼抓它發生的位置以及詳細
-        logger.debug(f'{PADDING}{type_(ex)}, {ex}')
+        logger.debug(f'{PADDING}{type_(ex)}, {ex}')           #紀錄異常
         return False
     else:
         return True
@@ -189,20 +189,20 @@ def issue_command(serial, cmd, fetch=True):
     else:
         return None
 
-
-class BaseSerialListener(QThread):
+    #引進基本監聽,設定循環時間和旗標
+class BaseSerialListener(QThread):              #基礎serialport監聽
     update_msec = 500                           #更新時間為500ms
     if_all_ready = QSignal(bool)                #確認各工站訊號是否準備好
-    if_actions_ready = QSignal(bool)
-    def __init__(self, *args, **kwargs):
-        super(BaseSerialListener, self).__init__(*args, **kwargs)
-        self.ready_to_stop = False
-        self.is_instrument_ready = False
+    if_actions_ready = QSignal(bool)            #定義訊號旗標
+    def __init__(self, *args, **kwargs):        #定義BaseSerialListener結構,self為實體化,引進屬性*args, **kwargs
+        super(BaseSerialListener, self).__init__(*args, **kwargs) #繼承父類
+        self.ready_to_stop = False              #設定旗標ready_to_stop
+        self.is_instrument_ready = False        #設定旗標is_instrument_ready
 
-    def get_update_ports_map(self):
-        devices = get_devices()
-        ports_map = {}
-        for k,v in self.devices.items():
+    def get_update_ports_map(self):             #定義方法用來更新獲取更新ports
+        devices = get_devices()                 #獲得的get_devices用來定義devices
+        ports_map = {}                          #ports_map定義字典可以提供面查詢
+        for k,v in self.devices.items():        #
 
             # add below two lines will only allow comports which sn_numbers
             # lies in jsonfile definition, but only for dut, not for instruments

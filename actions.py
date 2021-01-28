@@ -1,19 +1,20 @@
-import json
 import os
+import json
 import re
+import requests
 import time
 import threading
+import sqlite3
 from subprocess import Popen, PIPE
-
-import requests
-from PyQt5.QtCore import QThread
-
-from config import TOTAL_MAC_URL
-from serials import is_serial_free, get_serial, issue_command
-from utils import resource_path, get_env, python_path, run
+from PyQt5.QtCore import QThread, Qt, QSize
+from PyQt5.QtWidgets import QHBoxLayout
+from serials import is_serial_free, get_serial, issue_command, wait_for_prompt
+from utils import resource_path, get_env, python_path, run, move_mainwindow_centered
 from mylogger import logger
+from sqlite3 import OperationalError
+from db.sqlite import DB_PATH
 from tasks.task_sfc import check_sfc
-
+from config import TOTAL_MAC_URL
 
 PADDING = ' ' * 4
 
@@ -214,33 +215,27 @@ def set_power(win):
     return True
 
 
-def get_remaining_addr():
+def remaining_addr_init(win):
     total_addr_count = 0
     remaining_addr_count = 0
     try:
         url = f'{TOTAL_MAC_URL}'
-        r = requests.get(url, timeout=1)
+        r = requests.get(url)
         res_json = json.loads(r.text)
         total_addr_count = int(res_json['Data'][0]['total'])
         remaining_addr_count = int(res_json['Data'][1]['usable'])
     except Exception as e:
-        logger.error(f'{e}')
+        logger.error(f'{PADDING}e')
 
-    return total_addr_count, remaining_addr_count
-
-
-def remaining_addr_init(win):
-    total_addr_count, remaining_addr_count = get_remaining_addr()
     win.show_mac_address_signal.emit(total_addr_count, remaining_addr_count)
-    return True
+    return remaining_addr_count
 
 
 def remaining_addr(win):
-    total_addr_count, remaining_addr_count = get_remaining_addr()
+    remaining_addr_count = remaining_addr_init(win)
 
     if remaining_addr_count < 2000:
         win.msg_dialog_signal.emit(f"Remaining mac address : {remaining_addr_count} ,  less than 2000!")
-    return True
 
 
 # === STATION = SIMULATION ===

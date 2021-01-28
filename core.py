@@ -949,7 +949,7 @@ class Task(QThread):
         projname = KLIPPEL_PROJECT
         workdir = f'D:\QC_Log_Files\{projname}'
         year = now.strftime('%Y')   #2019
-        week = int(now.strftime('%W'))   #47
+        week = int(now.strftime('%W'))+1  #47
         x1 = now.strftime('%Y%m%d') #20191121
         x2 = now.strftime('%Y-%m-%d') #20191121
         path = f'{workdir}\{year}\CW{week:02d}\{x1}'

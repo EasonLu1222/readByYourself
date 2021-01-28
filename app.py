@@ -6,7 +6,7 @@ import re
 import pickle
 import pandas as pd
 import pyautogui as pag
-import fix_qt_import_error
+import fix_qt_import_error                      #用來設定打包時的臨時路徑，並設定到環境變數裡(臨時設定程序關閉既消失)，用來修正qt打包時的異常
 from datetime import datetime
 from operator import itemgetter
 from pathlib import Path
