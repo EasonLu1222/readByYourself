@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-import sqlite3
+import sqlite3                                              #SQLite
 from datetime import datetime
 from sqlite3 import IntegrityError, OperationalError
 from mylogger import logger

@@ -23,15 +23,15 @@ PADDING = ' ' * 8
 
 class TouchPolling(QThread):
     '''
-    This class detects which cap touch key is pressed
+    This class detects which cap touch key is pressed     #這個物件測試是否被壓;透過i2c的地址去詢問
     by polling the cap touch's i2c address.
     '''
-    touchSignal = QSignal(str)
+    touchSignal = QSignal(str)                            #設計一個訊號為str類型
 
-    def __init__(self, ser, key_codes=[], parent=None):
-        super(TouchPolling, self).__init__(parent)
-        self.ser = ser
-        self.key_codes = key_codes[:]
+    def __init__(self, ser, key_codes=[], parent=None):  #定義物件結構__init__;引進屬性ser, key_codes=[], parent=None;實體化self
+        super(TouchPolling, self).__init__(parent)       #繼承父類
+        self.ser = ser                                   #設定屬性
+        self.key_codes = key_codes[:]                    #
         self.kill = False
 
     def run(self):

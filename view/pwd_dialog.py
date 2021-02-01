@@ -1,3 +1,5 @@
+# -*- coding= utf-8 -*-
+
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
 from ui.pwd_dialog import Ui_PwdDialog
@@ -9,8 +11,8 @@ class PwdDialog(QDialog, Ui_PwdDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
-        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)                  #介面全屏
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)                               #介面最大最小化關閉
         self.setWindowModality(Qt.ApplicationModal)
         self.confirmBtn.clicked.connect(self.on_confirm)
         self.cancelBtn.clicked.connect(self.on_cancel)
@@ -18,6 +20,7 @@ class PwdDialog(QDialog, Ui_PwdDialog):
 
     def check_pwd(self, password):
         return password==f'engmod{PRODUCT}vn'
+
         
     def showEvent(self, event):
         super(PwdDialog, self).showEvent(event)

@@ -560,11 +560,15 @@ class Task(QThread):
 
     @property
     def serial_devices(self):
-        devices = self.base['devices']
+        devices = self.base['devices']                                    #找尋json裡的device的參數
+        #print(devices)
+
         serial_devices = {
             k: v
             for k, v in devices.items() if v['name'] in SERIAL_DEVICE_NAME
         }
+        #print(SERIAL_DEVICE_NAME)
+        #print(devices.items)
         return serial_devices
 
     @property
@@ -945,7 +949,7 @@ class Task(QThread):
         projname = KLIPPEL_PROJECT
         workdir = f'D:\QC_Log_Files\{projname}'
         year = now.strftime('%Y')   #2019
-        week = int(now.strftime('%W'))   #47
+        week = int(now.strftime('%W'))+1  #47
         x1 = now.strftime('%Y%m%d') #20191121
         x2 = now.strftime('%Y-%m-%d') #20191121
         path = f'{workdir}\{year}\CW{week:02d}\{x1}'

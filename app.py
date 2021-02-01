@@ -6,7 +6,7 @@ import re
 import pickle
 import pandas as pd
 import pyautogui as pag
-import fix_qt_import_error
+import fix_qt_import_error                      #用來設定打包時的臨時路徑，並設定到環境變數裡(臨時設定程序關閉既消失)，用來修正qt打包時的異常
 from datetime import datetime
 from operator import itemgetter
 from pathlib import Path
@@ -38,6 +38,8 @@ from upgrade import (
     wait_for_process_end_if_downloading, delete_trigger_file, create_shortcut,
     delete_app_exe, MyDialog, DownloadThread,
 )
+
+#config.py 讀取jsonfile 檔裡面的 station_json 工站 STATION定義;    config.py讀取 PRODUCT定義產品類別
 from config import (
     station_json, LANG_LIST, KLIPPEL_PROJECT,
     STATION, LOCAL_APP_PATH, FTP_DIR, TRIGGER_PREFIX,
@@ -47,165 +49,197 @@ from tools.auto_update.version_checker import VersionChecker
 from mylogger import logger
 
 
-class UsbPowerSensor(): comports_pws = QSignal(list)
+class UsbPowerSensor(): comports_pws = QSignal(list)              #定義物件
 
 
 pag.FAILSAFE = False    # Tell PyAutoGUI not to throw exception when the cursor is moved to the corner of screen
 
-
-class VisaListener(BaseVisaListener, UsbPowerSensor):
-    def __init__(self, *args, **kwargs):
-        devices = kwargs.pop('devices')
-        super(VisaListener, self).__init__(*args, **kwargs)
-        self.is_reading = False
-        self.is_instrument_ready = False
-        self.set_devices(devices)
-
-    def set_devices(self, devices):
-        self.devices = devices
-        for k,v in devices.items():
-            setattr(self, f'ports_{k}', [])
+    #處理visa通訊相關
+class VisaListener(BaseVisaListener, UsbPowerSensor):              #監聽visa，和確認usbpower
+    def __init__(self, *args, **kwargs):                           #建構，定義屬性，實體化物件
+        devices = kwargs.pop('devices')                            #使用.pop會刪除dic中的值
+        super(VisaListener, self).__init__(*args, **kwargs)        #繼承父類屬性
+        self.is_reading = False                                    #設定旗標是否正在讀為False
+        self.is_instrument_ready = False                           #設定旗標儀器是否正在讀取False
+        self.set_devices(devices)                                  #呼叫def device 設定device
 
 
-class ComportDUT(): comports_dut = QSignal(list)
-class ComportPWR(): comports_pwr = QSignal(list)
-class ComportDMM(): comports_dmm = QSignal(list)
-class ComportELD(): comports_eld = QSignal(list)
+    def set_devices(self, devices):                                #定義set_devices，裡面有一個屬性devices
+        self.devices = devices                                     #self.device = device 設定屬性值
+        for k,v in devices.items():                                #抓出device裡面的item，由for迴圈開始例遍
+            setattr(self, f'ports_{k}', [])                        #setattr() 函数对应函数 getattr()，用于设置属性值，该属性不一定是存在的。f'ports_{k}'字串格式化，數值為[]，
 
-class SerialListener(BaseSerialListener,
+
+class ComportDUT(): comports_dut = QSignal(list)                   #定義物件ComportDUT()
+class ComportPWR(): comports_pwr = QSignal(list)                   #定義物件ComportDUT()
+class ComportDMM(): comports_dmm = QSignal(list)                   #定義物件ComportDUT()
+class ComportELD(): comports_eld = QSignal(list)                   #定義物件ComportDUT()
+
+
+    #處理serial通訊相關
+class SerialListener(BaseSerialListener,                                    #宣告一個物件，引進屬性(用來監聽串列埠)
                      ComportDUT, ComportPWR, ComportDMM, ComportELD):
-    def __init__(self, *args, **kwargs):
-        devices = kwargs.pop('devices')
-        super(SerialListener, self).__init__(*args, **kwargs)
-        self.is_reading = False
-        self.is_instrument_ready = False
-        self.set_devices(devices)
-
-    def set_devices(self, devices):
-        self.devices = devices
-        for k,v in devices.items():
-            setattr(self, f'ports_{k}', [])
+    def __init__(self, *args, **kwargs):                                    #建構，定義屬性，實體化物件
+        devices = kwargs.pop('devices')                                     #定義devices = kwargs為字符變數使用.pop會刪除dic中的值;讀取由config.py設定工站查詢json參數
+        #print(devices)                                                      #{'dut': {'name': 'ftdi', 'num': 1, 'sn': ['AQ5IBALNA']}}
+        super(SerialListener, self).__init__(*args, **kwargs)               #繼承父類屬性
+        self.is_reading = False                                             #設定旗標是否正在讀為False
+        self.is_instrument_ready = False                                    #設定旗標儀器是否正在讀取False
+        self.set_devices(devices)                                           #呼叫def device ;將devices送到def set_devices
 
 
+    def set_devices(self, devices):                                         #定義定義方法set_devices，裡面有一個屬性devices
+        self.devices = devices                                              #self.device = device 設定屬性值
+        for k,v in devices.items():                                         #抓出device裡面的item，由for迴圈開始例遍;濾出json裡面的item;
+            setattr(self, f'ports_{k}', [])                                 #設定屬性值ports_dut []，ports_pwr []，ports_dmm []
+            #print(f'ports_{k}', [])
+
+
+    #讀取config來設定1.什麼產品 2.哪個工站 3.工站設定 4.是否進入工程模式
 class MySettings():
     lang_list = LANG_LIST
 
-    def __init__(self, dut_num):
-        self.settings = QSettings('FAB', f'SAP{PRODUCT}')
-        self.dut_num = dut_num
-        self.update()
+    def __init__(self, dut_num):                                           #結構:引入屬性dut_num，self實體化
+        self.settings = QSettings('FAB', f'SAP{PRODUCT}')                  #QSettings 是一個 PyQt5 提供的元件，專門用於儲存參數，可於下次讀取的時候自動載入之前設定的參數。這樣一來，我們就不用額外將參數寫成檔案了。
+        self.dut_num = dut_num                                             #設定屬性
+        self.update()                                                      #呼叫更新方法
 
-    def get(self, key, default, key_type):
-        return self.settings.value(key, default, key_type)
+    def get(self, key, default, key_type):                                 #定義get 方法 引進key, default, key_type屬性
+        return self.settings.value(key, default, key_type)                 #回傳取得 self.settings = QSettings('FAB', f'SAP{PRODUCT}') 的key, default, key_type值
 
-    def set(self, key, value):
-        self.settings.setValue(key, value)
-        self.update()
+    def set(self, key, value):                                             #定義set 方法 引進  key, value 屬性
+        self.settings.setValue(key, value)                                 #設定self.settings = QSettings('FAB', f'SAP{PRODUCT}') 的key, value值
+        self.update()                                                      #呼叫更新方法
 
-    def update(self):
-        for i in range(1, self.dut_num+1):
-            setattr(self, f'is_fx{i}_checked',
-                self.get(f'fixture_{i}', False, bool))
-        self.ccode_index =  self.get('ccode_index', 0, int)
-        self.lang_index = self.get('lang_index', 0, int)
-        self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)
+    def update(self):                                                      #定義update方法
+        for i in range(1, self.dut_num+1):                                 #i由1開始最大到self.dut_num+1
+            setattr(self, f'is_fx{i}_checked',                             #設定屬性:object為self = update ,name=f'is_fx{i}_checked' ,value = self.get(f'fixture_{i}', False, bool)，
+                self.get(f'fixture_{i}', False, bool))                     #get的屬性為key = f'fixture_{i}', default=False, key_type=bool，設定布林值為False
+
+        self.ccode_index = self.get('ccode_index', 0, int)                 #獲取整數值為，設定國家
+
+        self.lang_index = self.get('lang_index', 0, int)                   #獲取整數值為，設定語系
+
+        self.is_eng_mode_on = self.get('is_eng_mode_on', False, bool)      #獲取布林值為(初始化後更新is_eng_mode_on)
 
 
+        #處理加載圖片影像
 class Label(QLabel):
-    def __init__(self, *args, antialiasing=True, **kwargs):
-        super(Label, self).__init__(*args, **kwargs)
-        self.Antialiasing = antialiasing
-        self.setMinimumSize(200, 100)
-        self.radius = 100
-        self.target = QPixmap(self.size())  # 大小和控件一样
-        self.target.fill(Qt.transparent)  # 填充背景为透明
-        p = QPixmap(resource_path(f"./images/main_window_logo_{PRODUCT}.png")).scaled(  # 加载图片并缩放和控件一样大
+    def __init__(self, *args, antialiasing=True, **kwargs):                #結構:引進屬性
+        super(Label, self).__init__(*args, **kwargs)                       #繼承父類承接屬性值
+        self.Antialiasing = antialiasing                                   #設定最小size
+        self.setMinimumSize(200, 100)                                      #設定屬性
+        self.radius = 100                                                  #設定屬性
+        self.target = QPixmap(self.size())                                 #設定label大小和控件一样
+        self.target.fill(Qt.transparent)                                   #填充背景为透明
+
+        # 加载图片并缩放和控件一样大
+        # Qt.KeepAspectRatioByExpandingQ表示在给定矩形之外，将尺寸缩放为尽可能小的矩形，从而保持纵横比。
+        # Qt.SmoothTransformationscaled 是QT自帶的影象縮放函式，Qt::SmoothTransformation可以使縮放效果更佳
+
+        p = QPixmap(resource_path(f"./images/main_window_logo_{PRODUCT}.png")).scaled(
             170, 1, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+
+        #使用QPainter類繪圖及坐標變換示例
         painter = QPainter(self.target)
         if self.Antialiasing:
-            # 抗锯齿
-            painter.setRenderHint(QPainter.Antialiasing, True)
-            painter.setRenderHint(QPainter.HighQualityAntialiasing, True)
-            painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
-        painter.drawPixmap(0, 0, p)
-        self.setPixmap(self.target)
+            painter.setRenderHint(QPainter.Antialiasing, True)                #抗锯齿
+            painter.setRenderHint(QPainter.HighQualityAntialiasing, True)     #提高圖像分辨率
+            painter.setRenderHint(QPainter.SmoothPixmapTransform, True)       #使用pixmap平滑演算法，雙線性插值法
+        painter.drawPixmap(0, 0, p)                                           #匯背景圖
+        self.setPixmap(self.target)                                           #設定顯示圖片
 
 
-class MyWindow(QMainWindow, Ui_MainWindow):
-    show_animation_dialog = QSignal(bool)
-    msg_dialog_signal = QSignal(str)
-    show_mac_address_signal = QSignal(int,int)
+class MyWindow(QMainWindow, Ui_MainWindow):                                      #宣告一個物件為MyWindow ，引進屬性定義
+    show_animation_dialog = QSignal(bool)                                        #設定訊號槽為布林
+    msg_dialog_signal = QSignal(str)                                             #設定訊號槽為字串
+    show_mac_address_signal = QSignal(int,int)                                   #設定訊號槽為整數
 
-    def __init__(self, app, task, *args):
-        super(QMainWindow, self).__init__(*args)
-        self.app = app
-        self.desktop = app.desktop()
-        self.setupUi(self)
-        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.simulation = False
+    def __init__(self, app, task, *args):                                        #定義物件結構:引進屬性 app, task, *args ，self實體化
+        super(QMainWindow, self).__init__(*args)                                 #繼承父類屬性與方法
+        self.app = app                                                           #設定屬性app 在結尾=Application()
+        self.desktop = app.desktop()                                             #QApplication :: desktop（）函式用於獲取QDesktopWidget的例項。用來獲取螢幕解析
+        self.setupUi(self)                                                       #MainWindow中的ui就是用布局类初始化。之后在构造函数需要使用ui->setupUI(this);就可以将Ui::MainWindow中的布局应用到本地的MainWindow。
+        self.setWindowFlags(self.windowFlags() | Qt.CustomizeWindowHint)         #隱藏標題欄
+        self.setWindowFlags(Qt.FramelessWindowHint)                              #Qt::FramelessWindowHint用来产生一个没有边框的窗口
+        self.simulation = False                                                  #模擬鍵盤關閉
 
-        clear_tmp_folders()
-        self.pwd_dialog = PwdDialog(self)
-        self.barcode_dialog = BarcodeDialog(self, STATION)
-        self.barcodes = []
-        self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}
-        self.can_upload = {}    # E.g. {'1': False}, the key is dut_idx(0,1,...), value tells if this data should upload to SFC
+        clear_tmp_folders()                                                       #from utils import resource_path, QssTools, clear_tmp_folders 引用
+        self.pwd_dialog = PwdDialog(self)                                         #from view.pwd_dialog import PwdDialog 引用;用來呼叫工程模式對話框
+        self.barcode_dialog = BarcodeDialog(self, STATION)                        #from view.barcode_dialog import BarcodeDialog 引用;用來呼叫BarcodeDialog對話框
+        self.barcodes = []                                                        #列表[]
+        self.port_barcodes = {}     # E.g. {'COM1': '1234', 'COM2': '5678'}       #字典{}
+        self.can_upload = {}    # E.g. {'1': False}, the key is dut_idx(0,1,...), value tells if this data should upload to SFC #值表明該數據是否應上傳到SFC 字典{}
 
-        self.set_task(task)
-        self.set_appearance()
-        self.settings = MySettings(dut_num=self.task.dut_num)
-        self.make_checkboxes()
+        self.set_task(task)                                                       #呼叫下方def set_task設定任務
+        self.set_appearance()                                                     #呼叫下方def set_appearance
+        self.settings = MySettings(dut_num=self.task.dut_num)                     #使用上方class MySettings;MySetting在實例化的時候，會去task拿dut_num，Task定義在core.py裡，dut_num是Task去json檔裡面拿的
+        self.make_checkboxes()                                                    #呼叫下方def make_checkboxes(layout checkBox)
 
-        self.cCodeSelectMenu.setCurrentIndex(self.settings.ccode_index)
-        self.langSelectMenu.setCurrentIndex(self.settings.lang_index)
-        self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)
+        self.cCodeSelectMenu.setCurrentIndex(self.settings.ccode_index)           #使用介面選擇menu(顯示國家)
+        self.langSelectMenu.setCurrentIndex(self.settings.lang_index)             #使用介面選擇menu(語言選擇碼)
+        self.checkBoxEngMode.setChecked(self.settings.is_eng_mode_on)             #介面使用是否需要Engineering mode(進入工程模式)
 
-        self.eng_mode_state_changed(self.settings.is_eng_mode_on)
+        self.eng_mode_state_changed(self.settings.is_eng_mode_on)                 #呼叫設定def eng_mode_state_changed(呼叫方法檢查工程模式狀態)程式初始時檢查狀態;有檢查工程模式對話框狀態
 
-        if 'dut' in self.task.serial_devices:
-            self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)   # E.g. {0: None, 1: None}
+
+        #用來確認serial_devices是否有設定
+        if 'dut' in self.task.serial_devices:                                     #確認#['cygnal_cp2102', 'prolific', 'ftdi', 'gw_powersupply', 'gw_dmm', 'gw_eloader']讀取devices.json
+            #print(self.task.serial_devices)
+            self._comports_dut = dict.fromkeys(range(self.task.dut_num), None)    # E.g. {0: None, 1: None}   #fromkeys()方法從序列鍵和值設置為value來創建一個新的字典(看有幾組內容)然後列表字典
+            #print(self.task.dut_num)                                              #為幾組
         else:
+
+            #如果"dut"裡的self.task.serial_devices任務沒有找到創建空的
             self._comports_dut = {}
+        #用來創建空的陣列
         self._comports_pwr = []
         self._comports_dmm = []
         self._comports_eld = []
         self._comports_pws = []
 
+        #用來確認erial_instruments是否有設定json檔裡;如果有載入instrument裡定義的資料
         if self.task.serial_instruments:
-            update_serial(self.task.serial_instruments, 'gw_powersupply', self._comports_pwr)
-            update_serial(self.task.serial_instruments, 'gw_dmm', self._comports_dmm)
-            update_serial(self.task.serial_instruments, 'gw_eloader', self._comports_eld)
+            #print(self.task.serial_instruments)
+            update_serial(self.task.serial_instruments, 'gw_powersupply', self._comports_pwr)   #在_comports_pwr裡更新內容物
+            update_serial(self.task.serial_instruments, 'gw_dmm', self._comports_dmm)           #在_comports_dmm裡更新內容物
+            update_serial(self.task.serial_instruments, 'gw_eloader', self._comports_eld)       #在_comports_eld裡更新內容物
 
-        self.dut_layout = []
-        colors = ['#edd'] * self.task.dut_num
-        for i in range(self.task.dut_num):
-            c = QWidget()
-            c.setStyleSheet(f'background-color:{colors[i]};')
-            layout = QHBoxLayout(c)
-            self.hboxPorts.addWidget(c)
-            self.dut_layout.append(layout)
 
-        self.setsignal()
+
+
+        self.dut_layout = []                                                                    #新增dut_layout為
+        colors = ['#edd'] * self.task.dut_num                                                   #由json得到self.task.dut_num數量去乘;色彩總共有 #000000 ~ #FFFFFF;#edd = #eedddd;16進制表示法
+        #print(self.task.dut_num )
+        for i in range(self.task.dut_num):                                                      #由for迴圈例遍到dut_num設定數量
+            #print(self.task.dut_num)
+            c = QWidget()                                                                       #QWidget 可為單一視窗也可嵌入到其他視窗內
+            c.setStyleSheet(f'background-color:{colors[i]};')                                   #設定QWidget設置樣式
+            #print(colors[i])
+            layout = QHBoxLayout(c)                                                             #人機介面上有設定QHBoxLayout是一個類;將c = QWidget 放在QHBoxLayout裡，且等於layout
+            self.hboxPorts.addWidget(c)                                                         #增加物件看有幾個c
+            self.dut_layout.append(layout)                                                      #將layout附加在dut_layout裡面
+
+        self.setsignal()                                                                        #呼叫使用def setsignal (設定)
 
         #  self.ser_listener = SerialListener(devices=self.task.devices)
-        self.ser_listener = SerialListener(devices=self.task.serial_devices)
-        self.ser_listener.comports_dut.connect(self.ser_update)
-        self.ser_listener.comports_pwr.connect(self.pwr_update)
-        self.ser_listener.comports_dmm.connect(self.dmm_update)
-        self.ser_listener.comports_eld.connect(self.eld_update)
-        self.ser_listener.if_all_ready.connect(self.instrument_ready)
-        self.ser_listener.if_actions_ready.connect(self.actions_ready)
+        self.ser_listener = SerialListener(devices=self.task.serial_devices)                    #串列埠監聽
+        self.ser_listener.comports_dut.connect(self.ser_update)                                 #呼叫ser_update更新各站別資訊
+        self.ser_listener.comports_pwr.connect(self.pwr_update)                                 #呼叫pwr_update更新各站別資訊
+        self.ser_listener.comports_dmm.connect(self.dmm_update)                                 #呼叫dmm_update更新各站別資訊
+        self.ser_listener.comports_eld.connect(self.eld_update)                                 #呼叫eld_update更新各站別資訊
+        self.ser_listener.if_all_ready.connect(self.instrument_ready)                           #呼叫旗標instrument_ready(用來確認所有站別是否在工作)
+        self.ser_listener.if_actions_ready.connect(self.actions_ready)                          #呼叫旗標actions_ready
         self.ser_listener.start()
 
-        self.serial_ready = False
+        self.serial_ready = False                                                               #旗標serial_ready沒有在忙碌
 
         if self.task.visa_devices:
             self.visa_listener = VisaListener(devices=self.task.visa_devices)
             self.visa_listener.comports_pws.connect(self.pws_update)
             self.visa_listener.if_all_ready.connect(self.visa_instrument_ready)
             self.visa_listener.start()
-            self.visa_ready = False
+            self.visa_ready = False                                          #旗標visa_ready有在忙碌
         else:
             self.visa_ready = True
 
@@ -308,17 +342,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 if each_widget:
                     each_widget.hide()
 
-    def make_checkboxes(self):
-        self.checkboxes = []
-        for i in range(1, self.task.dut_num+1):
-            cbox = QCheckBox(self.container)
-            self.checkboxes.append(cbox)
-            self.horizontalLayout.addWidget(cbox)
-            cbox.setChecked(getattr(self.settings, f'is_fx{i}_checked'))
-            cbox.setText(f'{self.cbox_text_translate}#{i}')
-            if STATION == 'MainBoard':
-                cbox.setChecked(True)
-                cbox.setDisabled(True)
+
+        #因應站別不同設計增加checkBox
+    def make_checkboxes(self):                                                   #定義方法make_checkboxes
+        self.checkboxes = []                                                     #設定self.checkboxes = [] 為列表
+        for i in range(1, self.task.dut_num+1):                                  #由1開始到self.task.dut_num+1停止
+            cbox = QCheckBox(self.container)                                     #設定QCheckBox的容器為cbox，為一個類
+            self.checkboxes.append(cbox)                                         #checkboxes附加在cbox裡
+            self.horizontalLayout.addWidget(cbox)                                #每個checkbox，水平對齊，
+            cbox.setChecked(getattr(self.settings, f'is_fx{i}_checked'))         #設定checkbox有幾個
+            cbox.setText(f'{self.cbox_text_translate}#{i}')                      #設定checkboxText顯示依照順序
+            if STATION == 'MainBoard':                                           #station = MainBoard
+                cbox.setChecked(True)                                            #設定為被點選
+                cbox.setDisabled(True)                                           #設定被反白
 
     def get_checkboxes_status(self):
         status_all = [self.checkboxes[i].isChecked() for i in range(self.task.dut_num)]
@@ -373,35 +409,43 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.taskdone_first:
             self.taskdone('tasks done')
 
-    def set_task(self, task):
-        self.task = task
-        self.task.window = self
-        self.task_results = []
-        self.table_view.set_data(self.task.mylist, self.task.header_ext())
-        self.table_view.setSelectionBehavior(QTableView.SelectRows)
+        #建立table_view task
+    def set_task(self, task):                                                 #定義方法為set_task(設定任務)，引進屬性
+        self.task = task                                                      #設定屬性
+        self.task.window = self                                               #設定屬性
+        self.task_results = []                                                #設定屬性為列表[]
+        self.table_view.set_data(self.task.mylist, self.task.header_ext())    #設定ui介面的table_view 設定表頭
+        self.table_view.setSelectionBehavior(QTableView.SelectRows)           #單擊某個項目時,將選擇整個行
 
-    def set_appearance(self):
-        self.logo = Label(self.container, antialiasing=True)
-        self.logo.setText("")
-        self.logo.setObjectName("logo")
+
+        #介面狀態顯示
+    def set_appearance(self):                                                 #定義方法set_appearance 顯示
+        self.logo = Label(self.container, antialiasing=True)                  #定義屬性引用class 物件=self.logo
+        self.logo.setText("")                                                 #設定為空字串
+        self.logo.setObjectName("logo")                                       #設定物件名子為logo
         self.horizontalLayout_2.addWidget(self.logo)
         widths = self.task.appearance['columns_width']
         for col in self.task.appearance['columns_hidden']:
-            self.table_view.setColumnHidden(col, True)
+            self.table_view.setColumnHidden(col, True)                                    #設定table_view欄位隱藏
         for idx, w in zip(range(len(widths)), widths):
-            self.table_view.setColumnWidth(idx, w)
-        self.table_view.setStyleSheet('font: 16pt Segoe UI')
-        self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))
-        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))
+            self.table_view.setColumnWidth(idx, w)                                        #設定欄位寬度
+        self.table_view.setStyleSheet('font: 16pt Segoe UI')                              #設置樣式表
+        self.table_view.setSpan(self.task.len(), 0, 1, len(self.task.header()))           #設置表格單元的跨度為（row，column），以通過（指定的行和列的數量rowSpanCount，columnSpanCount)
+        self.table_view.setItem(self.task.len(), 0, QTableWidgetItem(self.summary_text))  #新增表項
         for obj in [self, self.table_view.horizontalHeader()]:
-            QssTools.set_qss_to_obj(obj)
-        lb1 = QLabel(f'Program version: {getattr(thismodule, "version")}')
-        lb2 = QLabel(f'Station version: {self.task.base["version"]}')
-        lb1.setObjectName('lb1')
-        lb2.setObjectName('lb2')
-        for lb in [lb1, lb2]:
-            self.statusbar.addWidget(lb, 1)
-            lb.setAlignment(QtCore.Qt.AlignCenter)
+            QssTools.set_qss_to_obj(obj)                                                  #from utils import resource_path, QssTools, clear_tmp_folders 引用
+        lb1 = QLabel(f'Program version: {getattr(thismodule, "version")}')                #設定text顯示
+        lb2 = QLabel(f'Station version: {self.task.base["version"]}')                     #設定text顯示
+        lb1.setObjectName('lb1')                                                          #設定物件名子
+        lb2.setObjectName('lb2')                                                          #設定物件名子
+
+        #設定1.增加statusbar 2.字體居中對齊 3.設定背景顏色字體顏色字形
+        for lb in [lb1, lb2]:                                                             #用for例遍做以下設定
+            self.statusbar.addWidget(lb, 1)                                               #对象在底部保留一个水平条作为status bar 。 它用于显示永久或上下文状态信息。
+
+            lb.setAlignment(QtCore.Qt.AlignCenter)                                        #設定字體居中對其
+
+            #設定背景顏色，自行顏色(白色)，字體
             lb.setStyleSheet("QLabel#%s {background-color: #444; color: white;"
                              "font-weight: bold}" % lb.objectName())
 
@@ -447,8 +491,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         update_serial(self.task.instruments, 'ks_powersensor', comports)
         self.render_port_plot()
 
-    def ser_update(self, comports):
-        logger.debug(f'ser_update {comports}')
+    def ser_update(self, comports):                         #更新服務
+        logger.debug(f'ser_update {comports}')              #更新資訊
+
         #  dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.devices['dut'])
         dut_name, sn_numbers = itemgetter('name', 'sn')(self.task.serial_devices['dut'])
         df = get_devices_df()
@@ -578,21 +623,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def get_dut_selected(self):
         return [i for i, x in enumerate(self.get_checkboxes_status()) if x]
 
-    def setsignal(self):
-        for i, b in enumerate(self.checkboxes, 1):
-            chk_box_state_changed = lambda state, i=i: self.chk_box_fx_state_changed(state, i)
-            b.stateChanged.connect(chk_box_state_changed)
-        self.cCodeSelectMenu.currentIndexChanged.connect(self.on_ccode_changed)
-        self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)
-        self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)
-        self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)
-        self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)
-        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)
-        self.pushButton.clicked.connect(self.btn_clicked)
-        self.task.task_result.connect(self.taskrun)
+    def setsignal(self):                                                                        #設定訊號槽
+
+        #這個部份用來偵測新增的checkBox狀態
+        for i, b in enumerate(self.checkboxes, 1):                                              #讀取jsonFile可以確定工站有幾個dut;因此 b 代表checkBox，i代表有幾個
+            chk_box_state_changed = lambda state, i=i: self.chk_box_fx_state_changed(state, i)  #利用lambda function定義函式state, i=i: self.chk_box_fx_state_changed(state, i) = chk_box_state_changed
+            b.stateChanged.connect(chk_box_state_changed)                                       #b已經代表為checkBox，所以觸發後會引進chk_box_state_changed
+
+        self.cCodeSelectMenu.currentIndexChanged.connect(self.on_ccode_changed)                 #偵測人機介面改變國碼
+        self.langSelectMenu.currentIndexChanged.connect(self.on_lang_changed)                   #偵測人機介面改變語言
+        self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)                  #偵測人機介面是否啟動工程模式
+        self.pwd_dialog.dialog_close.connect(self.on_pwd_dialog_close)                          #偵測人機介面關閉工程模式對化框
+        self.barcode_dialog.barcode_entered.connect(self.on_barcode_entered)                    #偵測人機介面是否進入barcode
+        self.barcode_dialog.barcode_dialog_closed.connect(self.on_barcode_dialog_closed)        #偵測人機介面關閉barcode對話框
+        self.pushButton.clicked.connect(self.btn_clicked)                                       #偵測人機介面pushButton
+        self.task.task_result.connect(self.taskrun)                                             #
         self.task.task_each.connect(self.taskeach)
         self.task.message.connect(self.taskdone)
-        se.serial_msg.connect(self.printterm1)
+        se.serial_msg.connect(self.printterm1)                                                 #serial設定回傳連結
         self.task.printterm_msg.connect(self.printterm2)
         self.task.serial_ok.connect(self.serial_ok)
         self.task.adb_ok.connect(self.adb_ok)
@@ -694,7 +742,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             color = QColor(255, 255, 255)
         return color
 
-    def taskrun(self, result):
+    def taskrun(self, result):                                                    #taskrun任務運行當中
         logger.debug(f'taskrun result {result}')
         """
         Set background color of specified table cells to indicate pass/fail
@@ -835,7 +883,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 os.remove('power_results')
         self.actions.action_signal.emit('after')
 
-    def show_barcode_dialog(self):
+    def show_barcode_dialog(self):                                    #顯示條碼對話框
         logger.debug('show_barcode_dialog start')
         status_all = self.get_checkboxes_status()
         num = len(list(filter(lambda x: x == True, status_all)))
@@ -891,26 +939,32 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 power.off()
         event.accept()  # let the window close
 
-    def chk_box_fx_state_changed(self, status, idx):
-        self.settings.set(f'fixture_{idx}', status == Qt.Checked)
-        getattr(self.settings ,f'is_fx{idx}_checked')
+    def chk_box_fx_state_changed(self, status, idx):                       #或取新增的checkBox狀態
+        #print(status)                                                      #獲取 checkBox 狀態;獲取index checkBox
+        #print(idx)
+        self.settings.set(f'fixture_{idx}', status == Qt.Checked)          #這裡用轉換紀錄True or False ststus狀態;
+        #print(status == Qt.Checked)
+        getattr(self.settings ,f'is_fx{idx}_checked')                      #得到屬性
+        print("step2")
 
     def on_pwd_dialog_close(self, is_eng_mode_on):
         if (not is_eng_mode_on):
             self.checkBoxEngMode.setChecked(False)
 
-    def eng_mode_state_changed(self, status):
-        is_on = (status > 0)
-        self.settings.set("is_eng_mode_on", is_on)
+    def eng_mode_state_changed(self, status):             #定義方法引進屬性status，引進狀態確認self.checkBoxEngMode.stateChanged.connect(self.eng_mode_state_changed)有勾為1;沒勾為0
+        is_on = (status > 0)                              #如果(status>0)=is_on
+        self.settings.set("is_eng_mode_on", is_on)        #讀取當下介面切換的狀態並觸發QSetting裡的的is_eng_mode_on;is_on並記錄
+        #print(type(status))
+        #print(isinstance(status, bool))
         if is_on:
-            if not isinstance(status, bool):
-                self.pwd_dialog.show()
-            self.splitter.show()
-            if STATION == 'Download':
-                self.cCodeSelectMenu.show()
+            if not isinstance(status, bool):              #isinstance() 用來判斷是不是bool值;注意if not是反向;所以當為bool值時為不輸出;當不為bool值輸出;checkBox為int，記錄檔為bool
+                self.pwd_dialog.show()                    #跳出工程模式對話框
+            self.splitter.show()                          #main顯示splitter畫面
+            if STATION == 'Download':                     #如果STATION == 'Download'
+                self.cCodeSelectMenu.show()               #顯示國家選項
         else:
-            self.splitter.hide()
-            self.cCodeSelectMenu.hide()
+            self.splitter.hide()                          #隱藏分離器
+            self.cCodeSelectMenu.hide()                   #隱藏國家選項
 
     def on_ccode_changed(self, index):
         self.settings.set("ccode_index", index)
@@ -930,17 +984,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pwd_dialog.retranslateUi(self.pwd_dialog)
         self.barcode_dialog.retranslateUi(self.barcode_dialog)
 
-    def on_barcode_entered(self, barcode):
-        logger.info(f"Received barcode: {barcode}")
-        self.barcodes.append(barcode)
+    def on_barcode_entered(self, barcode):                              #定義方法為條碼進入引進barcode屬性
+        logger.info(f"Received barcode: {barcode}")                     #得到條碼回傳
+        self.barcodes.append(barcode)                                   #self.barcodes = [] 為列表;得到barcodes資訊後再增加一個
 
-    def on_barcode_dialog_closed(self):
+    def on_barcode_dialog_closed(self):                                 #關閉條碼對話框
         """
-        When the barcode(s) are ready, start testing
+        When the barcode(s) are ready, start testing                   #條形碼準備就緒後，開始測試
         """
         # Return the index of Trues. E.g.: [False, True] => [1]
 
-        if STATION in ["WPC", 'AcousticListen', 'Leak', 'BootCheck']:
+        if STATION in ["WPC", 'AcousticListen', 'Leak', 'BootCheck']:  #這些工站時pass
             pass
         else:
             infoBox = QMessageBox()  #Message Box that doesn't run
